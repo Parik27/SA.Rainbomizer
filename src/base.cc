@@ -24,7 +24,6 @@
 #include "logger.hh"
 #include <memory>
 #include "injector/injector.hpp"
-#include "hax/hax.hpp"
 
 /*******************************************************/
 // Stolen shamelessly from https://stackoverflow.com/a/26221725

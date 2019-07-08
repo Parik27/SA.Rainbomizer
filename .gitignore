@@ -1,0 +1,4 @@
+.ccls
+.ccls-cache
+bin/
+bin_rel/

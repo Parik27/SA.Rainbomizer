@@ -206,9 +206,9 @@ ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
                                 }
 
                             bool shouldFreeModel = false;
-                            if (ms_aInfoForModel[i].m_nLoadState != 1)
+                            while (ms_aInfoForModel[i].m_nLoadState != 1)
                                 {
-                                    CStreaming::RequestModel (i, 0);
+                                    CStreaming::RequestModel (i, 12);
                                     CStreaming::LoadAllRequestedModels (false);
                                     shouldFreeModel = true;
                                 }

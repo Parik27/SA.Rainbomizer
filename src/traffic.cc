@@ -261,7 +261,7 @@ ChoosePoliceVehicleBasedOnModel (int model)
     if (CModelInfo::IsPoliceModel (model))
         return model;
 
-    if (CModelInfo::IsBikeModel (model))
+    if (CModelInfo::IsBikeModel (model) || CModelInfo::IsBmxModel(model))
         return 523;
 
     return 490;

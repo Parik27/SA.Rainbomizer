@@ -26,7 +26,7 @@
 #include "cgen.hh"
 #include <ctime>
 #include "scm.hh"
-#include "cheats.hh"
+#include "sounds.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -55,7 +55,7 @@ public:
         ParkedCarRandomizer::GetInstance ()->Initialise ();
         PoliceHeliRandomizer::GetInstance ()->Initialise ();
         ScriptVehicleRandomizer::GetInstance ()->Initialise ();
-        CheatRandomizer::GetInstance ()->Initialise ();
+        SoundRandomizer::GetInstance ()->Initialise ();
     }
 
 } rainbow;

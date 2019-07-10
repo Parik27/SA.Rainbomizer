@@ -249,6 +249,20 @@ CPad::DoCheats ()
 }
 
 /*******************************************************/
+void
+CAudioEngine::PreloadMissionAudio (unsigned char slot, int id)
+{
+	CallMethod<0x507290>(this, slot, id);
+}
+
+/*******************************************************/
+char*
+CText::Get(char *key)
+{
+	return CallMethodAndReturn<char*, 0x6A0050>(this, key);
+}
+
+/*******************************************************/
 int
 random (int max, int min)
 {

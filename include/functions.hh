@@ -100,6 +100,16 @@ struct CRunningScript
     void CollectParameters (short num);
 };
 
+struct CAudioEngine
+{
+	void PreloadMissionAudio(unsigned char slot, int id);
+};
+
+struct CText
+{
+	char* Get(char* key);
+};
+
 struct CPool
 {
     void **      m_pObjects;

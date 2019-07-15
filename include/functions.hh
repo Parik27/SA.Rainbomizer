@@ -75,15 +75,6 @@ public:
     int            field_48;
 };
 
-struct CStreaming
-{
-    static int  GetDefaultCopCarModel (int a1);
-    static void RequestModel (int model, int flags);
-    static void LoadAllRequestedModels (bool bOnlyPriority);
-    static void RemoveModel (int model);
-    static void SetMissionDoesntRequireModel (int index);
-};
-
 struct CCarGenerator
 {
     void CheckForBlockage (int model_id);
@@ -108,6 +99,7 @@ struct CAudioEngine
 struct CText
 {
 	char* Get(char* key);
+	char LoadMissionText(char* table);
 };
 
 struct CPool
@@ -198,6 +190,29 @@ public:
     CBox *GetBoundingBox ();
 };
 
+struct CLoadedCarGroup
+{
+public:
+	unsigned short m_members[20];
+private:
+	unsigned short unk_2c;
+public:
+	int CountMembers();
+	int PickRandomCar(bool checkUsage, bool arg2);
+};
+
+struct CStreaming
+{
+	static CLoadedCarGroup* ms_nVehiclesLoaded;
+	
+    static int  GetDefaultCopCarModel (int a1);
+    static void RequestModel (int model, int flags);
+    static void LoadAllRequestedModels (bool bOnlyPriority);
+    static void RemoveModel (int model);
+    static void SetMissionDoesntRequireModel (int index);
+	static void SetIsDeletable(int model);
+};
+
 struct CStreamingInfo
 {
 public:
@@ -242,3 +257,4 @@ int random (int max, int min = 0);
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
 extern RwRGBA *         ms_vehicleColourTable;
+extern int*             ScriptParams;

@@ -5,6 +5,7 @@ struct SoundPair
 {
 	int id;
 	std::string name;
+	bool gxt;
 };
 
 #pragma once

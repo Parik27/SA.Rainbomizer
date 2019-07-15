@@ -25,16 +25,17 @@
 #include "base.hh"
 #include "functions.hh"
 #include "injector/injector.hpp"
+#include "loader.hh"
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
 const int MODEL_FIRELA = 0x220;
+const int MODEL_SANCHZ = 468;
 
 /*******************************************************/
 void
 SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
 {
-    printf ("%f\n", speed);
     uint16_t modelIndex = *reinterpret_cast<uint16_t *> (vehicle + 0x22);
 
     if (speed < 1.1 && speed > 0.9
@@ -42,7 +43,6 @@ SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
             || CModelInfo::IsPlaneModel (modelIndex)))
         speed = 0.7;
 
-    printf ("%d - %f\n", modelIndex, speed);
     CVehicleRecording::SetPlaybackSpeed (vehicle, speed);
 }
 
@@ -76,10 +76,12 @@ void __fastcall FixJBCarHealth (CRunningScript *scr, void *edx, short vehicle)
 
 /*******************************************************/
 void
-RevertEOTLFix (int index)
+RevertVehFixes (int index)
 {
     if (index == MODEL_FIRELA)
         ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (MODEL_FIRELA);
+	else if(index == MODEL_SANCHZ)
+		ScriptVehicleRandomizer::GetInstance ()->ApplyKSTFix (-1);
 
     CStreaming::SetMissionDoesntRequireModel (index);
 }
@@ -89,6 +91,19 @@ void *
 FixCarDoorCrash (uint8_t *vehicle, float speed)
 {
 }
+
+/*******************************************************/
+short __fastcall FixKSTCarCheck(CRunningScript *scr, void* edx, short count)
+{
+	scr->CollectParameters(count);
+	if(ScriptParams[1] == MODEL_SANCHZ)
+	{
+		int newBike = ScriptVehicleRandomizer::GetInstance()->GetKSTBike();
+		if(newBike != -1)
+			ScriptParams[1] = newBike;
+	}
+}
+
 
 /*******************************************************/
 void __fastcall FixEOTLPosition (CMatrix *matrix, void *edx, CMatrix *attach,
@@ -137,15 +152,14 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
             model);
 
     if (model == MODEL_FIRELA)
-        {
-            ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (newModel);
-        }
+		ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (newModel);
+	else if(model == MODEL_SANCHZ)
+		ScriptVehicleRandomizer::GetInstance ()->ApplyKSTFix (newModel);
 
-    while (ms_aInfoForModel[newModel].m_nLoadState != 1)
-        {
-            CStreaming::RequestModel (newModel, 12);
-            CStreaming::LoadAllRequestedModels (false);
-        }
+	// Load the new vehicle. Fallback to the original if needed
+	auto err = StreamingManager::AttemptToLoadVehicle(newModel);
+	if(err == ERR_FAILED)
+		newModel = model;
 
     uint8_t *vehicle = (uint8_t *) CCarCtrl::CreateCarForScript (newModel, x, y,
                                                                  z, createdBy);
@@ -156,13 +170,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                 = reinterpret_cast<uint32_t *> (vehicle + 0x4F8);
             *door_lock = 1;
         }
-    printf ("%x\n", vehicle);
-    if (model == 581)
-        {
-            float *health = reinterpret_cast<float *> (vehicle + 0x4C0);
-            *health       = 3402823466.0;
-        }
-
+	
     return vehicle;
 }
 
@@ -177,6 +185,60 @@ GetVehicleSeats (int vehicle)
 }
 
 /*******************************************************/
+bool
+ScriptVehicleRandomizer::DoesVehicleMatchPatternOR (int               model,
+                                                    const std::vector<int> &ors)
+{
+	for(auto pattern : ors)
+		if(DoesVehicleMatchPattern(model, pattern))
+			return true;
+	return false;
+}
+
+/*******************************************************/
+bool
+ScriptVehicleRandomizer::DoesVehicleMatchPatternAND (int               model,
+                                                     const std::vector<int> &ands)
+{
+	for(auto pattern : ands)
+		if(!DoesVehicleMatchPattern(model, pattern))
+			return false;
+	return true;
+}
+
+/*******************************************************/
+bool
+ScriptVehicleRandomizer::CheckIfVehicleMatchesPattern (int             model,
+                                                       const ScriptPatterns &pattern)
+{
+    return DoesVehicleMatchPatternOR (model, pattern.allowed)
+           && !DoesVehicleMatchPatternOR (model, pattern.denied);
+}
+
+
+/*******************************************************/
+eDoorCheckError
+ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
+{
+    eLoadError err = StreamingManager::AttemptToLoadVehicle (modelA);
+
+    // The load was unsuccessful so can't be sure
+    if (err == ERR_FAILED)
+        return ERR_UNSURE;
+
+    if (CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (orig)
+        > CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (modelA))
+        {
+			if(!ERR_ALREADY_LOADED)
+				CStreaming::SetIsDeletable(modelA);
+
+            return ERR_FALSE;
+        }
+
+    return ERR_TRUE;
+}
+
+/*******************************************************/
 int
 ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
 {
@@ -188,45 +250,27 @@ ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
                     for (int i = random (611, 400), j = 0; j < 1500;
                          i = random (611, 400), j++)
                         {
-                            bool cont = true;
-                            for (auto allowed : pattern.allowed)
+                            if (!CheckIfVehicleMatchesPattern (i, pattern))
+                                continue;
+
+							if(pattern.flags & NO_SEAT_CHECK)
+								return i;
+							
+                            auto err = DoesVehicleHaveEnoughDoors (i, id);
+
+                            if (err == ERR_UNSURE)
                                 {
-                                    if (DoesVehicleMatchPattern (i, allowed))
-                                        {
-                                            cont = false;
-                                            break;
-                                        }
-                                }
-                            for (auto disallowed : pattern.denied)
-                                {
-                                    if (DoesVehicleMatchPattern (i, disallowed))
-                                        {
-                                            cont = true;
-                                        }
+                                    Logger::GetLogger ()->LogMessage (
+                                        "Unable to spawn a "
+                                        "truly random vehicle");
+									
+                                    puts ("UNSURE");
+                                    return StreamingManager::
+                                        GetRandomLoadedVehicle ();
                                 }
 
-                            bool shouldFreeModel = false;
-                            while (ms_aInfoForModel[i].m_nLoadState != 1)
-                                {
-                                    CStreaming::RequestModel (i, 12);
-                                    CStreaming::LoadAllRequestedModels (false);
-                                    shouldFreeModel = true;
-                                }
-
-                            if ((CModelInfo::
-                                         GetMaximumNumberOfPassengersFromNumberOfDoors (
-                                             id)
-                                     > CModelInfo::
-                                         GetMaximumNumberOfPassengersFromNumberOfDoors (
-                                             i)
-                                 && !(pattern.flags & NO_SEAT_CHECK))
-                                || cont)
-                                {
-                                    if (shouldFreeModel)
-                                        CStreaming::RemoveModel (i);
-
-                                    continue;
-                                }
+                            else if (err == ERR_FALSE)
+                                continue;
 
                             return i;
                         }
@@ -291,12 +335,21 @@ ScriptVehicleRandomizer::DoesVehicleMatchPattern (int vehicle, int pattern)
 
 /*******************************************************/
 void
+LoadFix(int model, int flags)
+{
+	CStreaming::RequestModel(model, flags);
+}
+
+/*******************************************************/
+void
 ScriptVehicleRandomizer::Initialise ()
 {
     RegisterHooks ({{HOOK_CALL, 0x467B01, (void *) &RandomizeCarForScript},
                     {HOOK_CALL, 0x498AA8, (void *) &SlowDownAndromedaInStoaway},
-                    {HOOK_CALL, 0x47F070, (void *) &RevertEOTLFix},
-                    {HOOK_CALL, 0x5DFE79, (void *) &FixEOTLPosition}});
+                    {HOOK_CALL, 0x47F070, (void *) &RevertVehFixes},
+                    {HOOK_CALL, 0x5DFE79, (void *) &FixEOTLPosition},
+                    {HOOK_CALL, 0x469612, (void *) &FixKSTCarCheck},
+					{HOOK_CALL, 0x47EFB2, (void*) &LoadFix}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 

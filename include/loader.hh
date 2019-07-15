@@ -20,30 +20,18 @@
 
 #pragma once
 
-struct CText;
-const char *__fastcall RandomizeHashesAfterCheatActivated (CText *text,
-                                                           void * edx,
-                                                           char * key);
 
-class CheatRandomizer
+enum eLoadError
 {
-    static CheatRandomizer *mInstance;
+	ERR_ALREADY_LOADED,
+	ERR_LOADED,
+	ERR_FAILED
+};
 
-    int mTimer = 0;
-
-    CheatRandomizer (){};
-    static void DestroyInstance ();
-
+class StreamingManager
+{
 public:
-    /// Returns the static instance for CheatRandomizer.
-    static CheatRandomizer *GetInstance ();
 
-    /// Initialises Hooks/etc.
-    void Initialise ();
-
-	/// Randomizes the Cheat Hash table
-	void RandomizeCheatHashes();
-	
-    /// Should activate a cheat
-    bool ShouldActivate ();
+	static int GetRandomLoadedVehicle();
+	static eLoadError AttemptToLoadVehicle(int model);
 };

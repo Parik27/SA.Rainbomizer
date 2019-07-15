@@ -76,7 +76,7 @@ SoundRandomizer::InitaliseSoundTable ()
 
             sscanf (line, " %s %d ", name, &id);
             if (id >= 2000)
-                mSoundTable.push_back ({id, name + 6});
+                mSoundTable.push_back ({id, name + 6,true});
 
 			printf("%d\n", mSoundTable.size());
         }

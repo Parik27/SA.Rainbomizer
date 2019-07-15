@@ -179,6 +179,27 @@ CClumpModelInfo::GetBoundingBox ()
 }
 
 /*******************************************************/
+int
+CLoadedCarGroup::CountMembers ()
+{
+    return CallMethodAndReturn<int, 0x611C30> (this);
+}
+
+/*******************************************************/
+void
+CStreaming::SetIsDeletable(int model)
+{
+	Call<0x409C10>(model);
+}
+
+/*******************************************************/
+int
+CLoadedCarGroup::PickRandomCar (bool checkUsage, bool arg2)
+{
+    return CallMethodAndReturn<int, 0x611C50> (this, checkUsage, arg2);
+}
+
+/*******************************************************/
 void
 CStreaming::RemoveModel (int model)
 {
@@ -190,6 +211,13 @@ int
 CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (int modelIndex)
 {
     return CallAndReturn<int, 0x4C89B0> (modelIndex);
+}
+
+/*******************************************************/
+char
+CText::LoadMissionText (char *table)
+{
+    return CallMethodAndReturn<char, 0x69FBF0> (this, table);
 }
 
 /*******************************************************/
@@ -252,14 +280,14 @@ CPad::DoCheats ()
 void
 CAudioEngine::PreloadMissionAudio (unsigned char slot, int id)
 {
-	CallMethod<0x507290>(this, slot, id);
+    CallMethod<0x507290> (this, slot, id);
 }
 
 /*******************************************************/
-char*
-CText::Get(char *key)
+char *
+CText::Get (char *key)
 {
-	return CallMethodAndReturn<char*, 0x6A0050>(this, key);
+    return CallMethodAndReturn<char *, 0x6A0050> (this, key);
 }
 
 /*******************************************************/
@@ -269,6 +297,8 @@ random (int max, int min)
     return (rand () % (max - min + 1)) + min;
 }
 
-CStreamingInfo * ms_aInfoForModel      = (CStreamingInfo *) 0x8E4CC0;
-RwRGBA *         ms_vehicleColourTable = (RwRGBA *) 0xB4E480;
-CBaseModelInfo **ms_modelInfoPtrs      = (CBaseModelInfo **) 0xA9B0C8;
+CStreamingInfo * ms_aInfoForModel               = (CStreamingInfo *) 0x8E4CC0;
+RwRGBA *         ms_vehicleColourTable          = (RwRGBA *) 0xB4E480;
+CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;
+int *            ScriptParams                   = (int *) 0xA43C78;
+CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;

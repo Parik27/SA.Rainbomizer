@@ -37,7 +37,6 @@ short __fastcall FixKSTCarCheck(CRunningScript *scr, void* edx, short count);
 void __fastcall FixJBCarHealth (CRunningScript *scr, void *edx, short vehicle);
 void __fastcall FixEOTLPosition (CMatrix *matrix, void *edx, CMatrix *attach,
                                  char link);
-
 enum flags
 {
     NO_SEAT_CHECK = 1

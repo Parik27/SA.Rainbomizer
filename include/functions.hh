@@ -88,18 +88,43 @@ struct CCarCtrl
 
 struct CRunningScript
 {
+public:
+    CRunningScript *m_pNext;
+    CRunningScript *m_pPrev;
+    char            m_szName[8];
+    unsigned char * m_pBaseIP;
+    unsigned char * m_pCurrentIP;
+    unsigned char * m_apStack[8];
+    unsigned short  m_nSP;
+
+private:
+    char _pad3A[2];
+
+public:
+    int  m_aLocalVars[32];
+    int  m_anTimers[2];
+    bool m_bIsActive;
+    bool m_bCondResult;
+    bool m_bUseMissionCleanup;
+    bool m_bIsExternal;
+    bool m_bTextBlockOverride;
+
+private:
+    char _padC9[3];
+
+public:
     void CollectParameters (short num);
 };
 
 struct CAudioEngine
 {
-	void PreloadMissionAudio(unsigned char slot, int id);
+    void PreloadMissionAudio (unsigned char slot, int id);
 };
 
 struct CText
 {
-	char* Get(char* key);
-	char LoadMissionText(char* table);
+    char *Get (char *key);
+    char  LoadMissionText (char *table);
 };
 
 struct CPool
@@ -193,24 +218,26 @@ public:
 struct CLoadedCarGroup
 {
 public:
-	unsigned short m_members[20];
+    unsigned short m_members[20];
+
 private:
-	unsigned short unk_2c;
+    unsigned short unk_2c;
+
 public:
-	int CountMembers();
-	int PickRandomCar(bool checkUsage, bool arg2);
+    int CountMembers ();
+    int PickRandomCar (bool checkUsage, bool arg2);
 };
 
 struct CStreaming
 {
-	static CLoadedCarGroup* ms_nVehiclesLoaded;
-	
+    static CLoadedCarGroup *ms_nVehiclesLoaded;
+
     static int  GetDefaultCopCarModel (int a1);
     static void RequestModel (int model, int flags);
     static void LoadAllRequestedModels (bool bOnlyPriority);
     static void RemoveModel (int model);
     static void SetMissionDoesntRequireModel (int index);
-	static void SetIsDeletable(int model);
+    static void SetIsDeletable (int model);
 };
 
 struct CStreamingInfo
@@ -257,4 +284,4 @@ int random (int max, int min = 0);
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
 extern RwRGBA *         ms_vehicleColourTable;
-extern int*             ScriptParams;
+extern int *            ScriptParams;

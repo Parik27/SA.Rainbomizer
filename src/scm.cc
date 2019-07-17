@@ -144,6 +144,15 @@ ScriptVehicleRandomizer::ApplyEOTLFixes (int newFiretruck)
 }
 
 /*******************************************************/
+void ApplyFixedBasedOnModel(int model, int newModel)
+{
+	if (model == MODEL_FIRELA)
+		ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (newModel);
+	else if(model == MODEL_SANCHZ)
+		ScriptVehicleRandomizer::GetInstance ()->ApplyKSTFix (newModel);
+}
+
+/*******************************************************/
 void *
 RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
 {
@@ -151,11 +160,8 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
         = ScriptVehicleRandomizer::GetInstance ()->GetRandomIDBasedOnVehicle (
             model);
 
-    if (model == MODEL_FIRELA)
-		ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (newModel);
-	else if(model == MODEL_SANCHZ)
-		ScriptVehicleRandomizer::GetInstance ()->ApplyKSTFix (newModel);
-
+	ApplyFixedBasedOnModel(model, newModel);
+	
 	// Load the new vehicle. Fallback to the original if needed
 	auto err = StreamingManager::AttemptToLoadVehicle(newModel);
 	if(err == ERR_FAILED)
@@ -335,21 +341,13 @@ ScriptVehicleRandomizer::DoesVehicleMatchPattern (int vehicle, int pattern)
 
 /*******************************************************/
 void
-LoadFix(int model, int flags)
-{
-	CStreaming::RequestModel(model, flags);
-}
-
-/*******************************************************/
-void
 ScriptVehicleRandomizer::Initialise ()
 {
     RegisterHooks ({{HOOK_CALL, 0x467B01, (void *) &RandomizeCarForScript},
                     {HOOK_CALL, 0x498AA8, (void *) &SlowDownAndromedaInStoaway},
                     {HOOK_CALL, 0x47F070, (void *) &RevertVehFixes},
                     {HOOK_CALL, 0x5DFE79, (void *) &FixEOTLPosition},
-                    {HOOK_CALL, 0x469612, (void *) &FixKSTCarCheck},
-					{HOOK_CALL, 0x47EFB2, (void*) &LoadFix}});
+                    {HOOK_CALL, 0x469612, (void *) &FixKSTCarCheck}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 
@@ -362,15 +360,17 @@ ScriptVehicleRandomizer::Initialise ()
 
         {.pattern = 406, .allowed = {406}, .denied = {}, .flags = 0},
 
+        {.pattern = 486, .allowed = {486}, .denied = {}, .flags = 0},
+
         {.pattern = 581,
          .allowed = {VEHICLE_APPEARANCE_BIKE, 594},
          .denied  = {},
          .flags   = 0},
 
         {.pattern = 539, .allowed = {VEHICLE_BOAT, 464, 501, 465}},
-		{.pattern = 521, .allowed = {VEHICLE_APPEARANCE_BIKE}},
-		{.pattern = 522, .allowed = {VEHICLE_APPEARANCE_BIKE}},
-		
+        {.pattern = 521, .allowed = {VEHICLE_APPEARANCE_BIKE}},
+        {.pattern = 522, .allowed = {VEHICLE_APPEARANCE_BIKE}},
+
         {.pattern = 524, .allowed = {524}, .denied = {}, .flags = 0},
 
         {.pattern = 501, .allowed = {465, 501}, .denied = {}, .flags = 0},

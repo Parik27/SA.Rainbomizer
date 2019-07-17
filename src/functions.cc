@@ -122,16 +122,19 @@ CModelInfo::IsPoliceModel (int modelId)
 {
     switch (modelId)
         {
-        case 427:
-        case 490:
-        case 430:
-        case 432:
-        case 523:
-        case 433:
-        case 596:
-        case 597:
-        case 598:
-        case 599: return true;
+        case 427: // MODEL_ENFORCER
+        case 430: // MODEL_PREDATOR
+        case 432: // MODEL_RHINO
+        case 433: // MODEL_BARRACKS
+        case 490: // MODEL_FBIRANCH
+        case 523: // MODEL_COPBIKE
+        case 528: // MODEL_FBITRUCK
+        case 596: // MODEL_COPCARLA
+        case 597: // MODEL_COPCARSF
+        case 598: // MODEL_COPCARVG
+        case 599: // MODEL_COPCARRU
+        case 601: // MODEL_SWATVAN
+            return true;
         }
     return false;
 }

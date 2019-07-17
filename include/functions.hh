@@ -22,12 +22,12 @@
 
 /* These contain game functions that might be called by other modules */
 
-class cVehicleParams;
-class CBaseModelInfo;
-class CClumpModelInfo;
-class CVector;
-class CBox;
-class CColModel;
+struct cVehicleParams;
+struct CBaseModelInfo;
+struct CClumpModelInfo;
+struct CVector;
+struct CBox;
+struct CColModel;
 
 enum eVehicleClass
 {
@@ -45,7 +45,7 @@ enum eVehicleClass
     VEHICLE_TRAILER,
 };
 
-class cVehicleParams
+struct cVehicleParams
 {
 public:
     unsigned int   m_nVehicleSubclass;
@@ -183,7 +183,7 @@ struct CVector
     float z;
 };
 
-class CBox
+struct CBox
 {
 public:
     CVector m_vecMin;
@@ -209,7 +209,7 @@ public:
     struct RwObject *m_pRwObject;
 };
 
-class CClumpModelInfo : public CBaseModelInfo
+struct CClumpModelInfo : public CBaseModelInfo
 {
 public:
     CBox *GetBoundingBox ();

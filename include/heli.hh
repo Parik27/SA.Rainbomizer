@@ -20,8 +20,8 @@
 
 #pragma once
 
-class CHeli;
-class _EXCEPTION_POINTERS;
+struct CHeli;
+struct _EXCEPTION_POINTERS;
 
 int  GetRandomHeliID ();
 void RandomizeHelisOnUnload ();

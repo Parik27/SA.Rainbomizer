@@ -21,7 +21,7 @@
 
 #pragma once
 
-class CCarGenerator;
+struct CCarGenerator;
 
 // Hooks
 void __fastcall RandomizeFixedSpawn (CCarGenerator *gen, void *edx, int model_id);

@@ -41,7 +41,7 @@ struct HookProperties
 /// Creates hooks based on HookProperties
 void RegisterHooks (std::vector<HookProperties> hooks);
 
-class _EXCEPTION_POINTERS;
+struct _EXCEPTION_POINTERS;
 
 class ExceptionManager
 {

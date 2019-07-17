@@ -35,8 +35,8 @@
  - ChoosePoliceModel
  */
 
-class cVehicleParams;
-class CAEVehicleAudioEntity;
+struct cVehicleParams;
+struct CAEVehicleAudioEntity;
 
 // Hooked Functions
 int   RandomizePoliceCars ();

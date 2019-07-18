@@ -33,7 +33,7 @@ void  SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed);
 void *FixCarDoorCrash (uint8_t *vehicle, int index, int door);
 void  RevertVehFixes (int vehicle);
 short FixCWPacker(void* script, void* edx, short count);
-short __fastcall FixKSTCarCheck(CRunningScript *scr, void* edx, short count);
+void __fastcall FixKSTCarCheck(CRunningScript *scr, void* edx, short count);
 void __fastcall FixJBCarHealth (CRunningScript *scr, void *edx, short vehicle);
 void __fastcall FixEOTLPosition (CMatrix *matrix, void *edx, CMatrix *attach,
                                  char link);

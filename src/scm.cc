@@ -86,7 +86,7 @@ RevertVehFixes (int index)
 }
 
 /*******************************************************/
-short __fastcall FixKSTCarCheck (CRunningScript *scr, void *edx, short count)
+void __fastcall FixKSTCarCheck (CRunningScript *scr, void *edx, short count)
 {
     scr->CollectParameters (count);
     if (ScriptParams[1] == MODEL_SANCHZ)
@@ -241,7 +241,7 @@ ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
 int
 ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
 {
-   return 522;
+	//return 522;
     for (auto pattern : mPatterns)
         {
             if (DoesVehicleMatchPattern (id, pattern.pattern))

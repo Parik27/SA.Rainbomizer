@@ -42,7 +42,7 @@ struct CAEVehicleAudioEntity;
 int   RandomizePoliceCars ();
 int   RandomizeTrafficCars (int *type);
 int   RandomizeCarToLoad ();
-int   FixEmptyPoliceCars (uint8_t *vehicle, char a3);
+void  FixEmptyPoliceCars (uint8_t *vehicle, char a3);
 void *RandomizeCarPeds (int type, int model, float *pos, bool unk);
 
 void __fastcall FixFreightTrainCrash (CAEVehicleAudioEntity *audio, void *edx,

@@ -39,7 +39,7 @@ CStreaming::RequestModel (int model, int flags)
 void *
 CPopulation::AddPed (int type, int model, float *posn, bool unk)
 {
-    CallAndReturn<void *, 0x612710> (type, model, posn, unk);
+    return CallAndReturn<void *, 0x612710> (type, model, posn, unk);
 }
 
 /*******************************************************/

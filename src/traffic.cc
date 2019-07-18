@@ -203,7 +203,7 @@ RandomizeCarToLoad ()
    into thinking that it is a different vehicle (temporarily)
   */
 /*******************************************************/
-int
+void
 FixEmptyPoliceCars (uint8_t *vehicle, char a3)
 {
     uint16_t *modelIndex     = (uint16_t *) (vehicle + 0x22);

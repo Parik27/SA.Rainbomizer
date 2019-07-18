@@ -18,7 +18,6 @@
 
  */
 
-
 #include "scm.hh"
 #include <cstdlib>
 #include "logger.hh"
@@ -80,30 +79,24 @@ RevertVehFixes (int index)
 {
     if (index == MODEL_FIRELA)
         ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (MODEL_FIRELA);
-	else if(index == MODEL_SANCHZ)
-		ScriptVehicleRandomizer::GetInstance ()->ApplyKSTFix (-1);
+    else if (index == MODEL_SANCHZ)
+        ScriptVehicleRandomizer::GetInstance ()->ApplyKSTFix (-1);
 
     CStreaming::SetMissionDoesntRequireModel (index);
 }
 
 /*******************************************************/
-void *
-FixCarDoorCrash (uint8_t *vehicle, float speed)
+short __fastcall FixKSTCarCheck (CRunningScript *scr, void *edx, short count)
 {
+    scr->CollectParameters (count);
+    if (ScriptParams[1] == MODEL_SANCHZ)
+        {
+            int newBike
+                = ScriptVehicleRandomizer::GetInstance ()->GetKSTBike ();
+            if (newBike != -1)
+                ScriptParams[1] = newBike;
+        }
 }
-
-/*******************************************************/
-short __fastcall FixKSTCarCheck(CRunningScript *scr, void* edx, short count)
-{
-	scr->CollectParameters(count);
-	if(ScriptParams[1] == MODEL_SANCHZ)
-	{
-		int newBike = ScriptVehicleRandomizer::GetInstance()->GetKSTBike();
-		if(newBike != -1)
-			ScriptParams[1] = newBike;
-	}
-}
-
 
 /*******************************************************/
 void __fastcall FixEOTLPosition (CMatrix *matrix, void *edx, CMatrix *attach,
@@ -144,12 +137,13 @@ ScriptVehicleRandomizer::ApplyEOTLFixes (int newFiretruck)
 }
 
 /*******************************************************/
-void ApplyFixedBasedOnModel(int model, int newModel)
+void
+ApplyFixedBasedOnModel (int model, int newModel)
 {
-	if (model == MODEL_FIRELA)
-		ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (newModel);
-	else if(model == MODEL_SANCHZ)
-		ScriptVehicleRandomizer::GetInstance ()->ApplyKSTFix (newModel);
+    if (model == MODEL_FIRELA)
+        ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (newModel);
+    else if (model == MODEL_SANCHZ)
+        ScriptVehicleRandomizer::GetInstance ()->ApplyKSTFix (newModel);
 }
 
 /*******************************************************/
@@ -160,12 +154,12 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
         = ScriptVehicleRandomizer::GetInstance ()->GetRandomIDBasedOnVehicle (
             model);
 
-	ApplyFixedBasedOnModel(model, newModel);
-	
-	// Load the new vehicle. Fallback to the original if needed
-	auto err = StreamingManager::AttemptToLoadVehicle(newModel);
-	if(err == ERR_FAILED)
-		newModel = model;
+    ApplyFixedBasedOnModel (model, newModel);
+
+    // Load the new vehicle. Fallback to the original if needed
+    auto err = StreamingManager::AttemptToLoadVehicle (newModel);
+    if (err == ERR_FAILED)
+        newModel = model;
 
     uint8_t *vehicle = (uint8_t *) CCarCtrl::CreateCarForScript (newModel, x, y,
                                                                  z, createdBy);
@@ -176,7 +170,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                 = reinterpret_cast<uint32_t *> (vehicle + 0x4F8);
             *door_lock = 1;
         }
-	
+
     return vehicle;
 }
 
@@ -192,35 +186,34 @@ GetVehicleSeats (int vehicle)
 
 /*******************************************************/
 bool
-ScriptVehicleRandomizer::DoesVehicleMatchPatternOR (int               model,
+ScriptVehicleRandomizer::DoesVehicleMatchPatternOR (int model,
                                                     const std::vector<int> &ors)
 {
-	for(auto pattern : ors)
-		if(DoesVehicleMatchPattern(model, pattern))
-			return true;
-	return false;
+    for (auto pattern : ors)
+        if (DoesVehicleMatchPattern (model, pattern))
+            return true;
+    return false;
 }
 
 /*******************************************************/
 bool
-ScriptVehicleRandomizer::DoesVehicleMatchPatternAND (int               model,
-                                                     const std::vector<int> &ands)
+ScriptVehicleRandomizer::DoesVehicleMatchPatternAND (
+    int model, const std::vector<int> &ands)
 {
-	for(auto pattern : ands)
-		if(!DoesVehicleMatchPattern(model, pattern))
-			return false;
-	return true;
+    for (auto pattern : ands)
+        if (!DoesVehicleMatchPattern (model, pattern))
+            return false;
+    return true;
 }
 
 /*******************************************************/
 bool
-ScriptVehicleRandomizer::CheckIfVehicleMatchesPattern (int             model,
-                                                       const ScriptPatterns &pattern)
+ScriptVehicleRandomizer::CheckIfVehicleMatchesPattern (
+    int model, const ScriptPatterns &pattern)
 {
     return DoesVehicleMatchPatternOR (model, pattern.allowed)
            && !DoesVehicleMatchPatternOR (model, pattern.denied);
 }
-
 
 /*******************************************************/
 eDoorCheckError
@@ -235,8 +228,8 @@ ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
     if (CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (orig)
         > CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (modelA))
         {
-			if(!ERR_ALREADY_LOADED)
-				CStreaming::SetIsDeletable(modelA);
+            if (!ERR_ALREADY_LOADED)
+                CStreaming::SetIsDeletable (modelA);
 
             return ERR_FALSE;
         }
@@ -248,7 +241,7 @@ ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
 int
 ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
 {
-    // return 522;
+   return 522;
     for (auto pattern : mPatterns)
         {
             if (DoesVehicleMatchPattern (id, pattern.pattern))
@@ -259,9 +252,9 @@ ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
                             if (!CheckIfVehicleMatchesPattern (i, pattern))
                                 continue;
 
-							if(pattern.flags & NO_SEAT_CHECK)
-								return i;
-							
+                            if (pattern.flags & NO_SEAT_CHECK)
+                                return i;
+
                             auto err = DoesVehicleHaveEnoughDoors (i, id);
 
                             if (err == ERR_UNSURE)
@@ -269,7 +262,7 @@ ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
                                     Logger::GetLogger ()->LogMessage (
                                         "Unable to spawn a "
                                         "truly random vehicle");
-									
+
                                     puts ("UNSURE");
                                     return StreamingManager::
                                         GetRandomLoadedVehicle ();
@@ -340,6 +333,85 @@ ScriptVehicleRandomizer::DoesVehicleMatchPattern (int vehicle, int pattern)
 }
 
 /*******************************************************/
+bool CheckForCAutomobile(uint8_t* vehicle)
+{
+	uint16_t modelIndex = *reinterpret_cast<uint16_t *> (vehicle + 0x22);
+	if(CModelInfo::IsBikeModel(modelIndex) || CModelInfo::IsBmxModel(modelIndex) ||
+	   CModelInfo::IsBoatModel(modelIndex) || CModelInfo::IsTrainModel(modelIndex))
+		return false;
+	
+	return true;
+}
+
+/*******************************************************/
+bool CheckForCarNode(uint8_t* vehicle, int node)
+{
+	int* carNodes = reinterpret_cast<int*>(vehicle + 0x648);
+	if(!carNodes[node])
+		return false;
+	
+	return true;
+}
+
+/* Was thinking to replace these with a macro, couldn't come up with one
+ * :thinking: */
+
+/*******************************************************/
+void *__fastcall PopDoorFix (uint8_t *vehicle, void *edx, int a2, int a3,
+                             char a4)
+{
+    if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
+        return nullptr;
+
+    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3, a4);
+}
+
+/*******************************************************/
+void* __fastcall PopPanelFix(uint8_t* vehicle, void* edx,  int a2, char a3, char a4)
+{	
+	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
+		return nullptr;
+
+	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle, a2, a3, a4);
+}
+
+/*******************************************************/
+void* __fastcall PopBootFix(uint8_t* vehicle, void* edx)
+{	
+	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, 0x11))
+		return nullptr;
+
+	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle);
+}
+
+/*******************************************************/
+void* __fastcall CloseBootFix(uint8_t* vehicle, void* edx,  int a2, int a3, char a4)
+{	
+	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
+		return nullptr;
+
+	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle, a2, a3, a4);
+}
+
+/*******************************************************/
+void* __fastcall FixDoorFix(uint8_t* vehicle, void* edx,  int a2, int a3)
+{	
+	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
+		return nullptr;
+
+	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle, a2, a3);
+}
+
+/*******************************************************/
+void* __fastcall FixPanelFix(uint8_t* vehicle, void* edx,  int a2, char a3)
+{	
+	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
+		return nullptr;
+
+	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle, a2, a3);
+}
+
+/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -347,7 +419,12 @@ ScriptVehicleRandomizer::Initialise ()
                     {HOOK_CALL, 0x498AA8, (void *) &SlowDownAndromedaInStoaway},
                     {HOOK_CALL, 0x47F070, (void *) &RevertVehFixes},
                     {HOOK_CALL, 0x5DFE79, (void *) &FixEOTLPosition},
-                    {HOOK_CALL, 0x469612, (void *) &FixKSTCarCheck}});
+                    {HOOK_CALL, 0x469612, (void *) &FixKSTCarCheck},
+                    {HOOK_CALL, 0x4958C6, (void *) &PopDoorFix},
+                    {HOOK_CALL, 0x6ADF80, (void *) &PopPanelFix},
+                    {HOOK_CALL, 0x48C1FA, (void *) &PopBootFix},
+                    {HOOK_CALL, 0x495902, (void *) &FixDoorFix},
+                    {HOOK_CALL, 0x495B74, (void *) &FixPanelFix}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 

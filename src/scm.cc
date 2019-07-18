@@ -241,7 +241,7 @@ ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
 int
 ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
 {
-	//return 522;
+	return 522;
     for (auto pattern : mPatterns)
         {
             if (DoesVehicleMatchPattern (id, pattern.pattern))
@@ -385,6 +385,15 @@ void* __fastcall PopBootFix(uint8_t* vehicle, void* edx)
 }
 
 /*******************************************************/
+int __fastcall VehicleUpdateFix(uint8_t* vehicle, void* edx, int model)
+{
+	if(!CheckForCAutomobile(vehicle))
+		return model;
+
+	return CallMethodAndReturn<int, 0x6E3290>(vehicle, model);
+}
+
+/*******************************************************/
 void* __fastcall CloseBootFix(uint8_t* vehicle, void* edx,  int a2, int a3, char a4)
 {	
 	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
@@ -424,7 +433,8 @@ ScriptVehicleRandomizer::Initialise ()
                     {HOOK_CALL, 0x6ADF80, (void *) &PopPanelFix},
                     {HOOK_CALL, 0x48C1FA, (void *) &PopBootFix},
                     {HOOK_CALL, 0x495902, (void *) &FixDoorFix},
-                    {HOOK_CALL, 0x495B74, (void *) &FixPanelFix}});
+                    {HOOK_CALL, 0x495B74, (void *) &FixPanelFix},
+					{HOOK_CALL, 0x4985DA, (void *) &VehicleUpdateFix}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 

@@ -12,7 +12,7 @@ eLoadError
 StreamingManager::AttemptToLoadVehicle(int model)
 {
 	eLoadError error = ERR_ALREADY_LOADED;
-	const int TRIES = 16;
+	const int TRIES = 1;
 	
 	for (int i = 0; ms_aInfoForModel[model].m_nLoadState != 1; i++)
 	{

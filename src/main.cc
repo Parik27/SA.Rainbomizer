@@ -29,6 +29,7 @@
 #include "sounds.hh"
 #include "cheats.hh"
 #include "plates.hh"
+#include "handling.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -58,6 +59,7 @@ public:
         ScriptVehicleRandomizer::GetInstance ()->Initialise ();
         LicensePlateRandomizer::GetInstance ()->Initialise ();
         SoundRandomizer::GetInstance ()->Initialise ();
+		//HandlingRandomizer::GetInstance()->Initialise();
 		//CheatRandomizer::GetInstance ()->Initialise ();
     }
 

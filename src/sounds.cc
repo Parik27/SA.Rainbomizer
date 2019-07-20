@@ -5,6 +5,8 @@
 #include "base.hh"
 #include <cctype>
 #include "text.hh"
+#include <ctime>
+#include <algorithm>
 
 SoundRandomizer *SoundRandomizer::mInstance = nullptr;
 
@@ -12,51 +14,73 @@ SoundRandomizer *SoundRandomizer::mInstance = nullptr;
 void __fastcall RandomizeAudioLoad (CAudioEngine *audio, void *edx,
                                     unsigned char slot, int id)
 {
-    auto soundPair = SoundRandomizer::GetInstance ()->GetRandomPair ();
-    audio->PreloadMissionAudio (slot, soundPair.id);
+    auto soundsR = SoundRandomizer::GetInstance ();
+    try
+        {
+            int  newIndex;
+            auto newSoundPair  = soundsR->GetRandomPair (newIndex);
+            auto prevSoundPair = soundsR->GetPairByID (id);
+
+            audio->PreloadMissionAudio (slot, newSoundPair.id);
+            soundsR->GetPreviousPairs ()[prevSoundPair.name] = newIndex;
+        }
+    catch (std::exception e)
+        {
+            return audio->PreloadMissionAudio (slot, id);
+        }
 }
 
 /*******************************************************/
-char* __fastcall CorrectSubtitles(CText* text, void* edx, char* key)
+char *__fastcall CorrectSubtitles (CText *text, void *edx, char *key)
 {
-	auto prevId = SoundRandomizer::GetInstance ()->GetPreviousPairID ();
-	if(prevId == -1)
-		return text->Get(key);
+    auto soundsR = SoundRandomizer::GetInstance ();
 
-	printf("Getting ID: %d\n", prevId);
-	auto soundPair = SoundRandomizer::GetInstance ()->GetPairByID (prevId);
-	printf("%s\n", soundPair.name.c_str());
-	return (char*) GxtManager::GetText(soundPair.name);
+    try
+        {
+            auto prevIndex = soundsR->GetPreviousPairs ().at (key);
+            soundsR->GetPreviousPairs ().erase (key);
+
+            auto soundPair
+                = SoundRandomizer::GetInstance ()->GetPairByIndex (prevIndex);
+            return (char *) GxtManager::GetText (soundPair.name);
+        }
+    catch (std::out_of_range e)
+        {
+            return text->Get (key);
+        }
+}
+
+/*******************************************************/
+std::unordered_map<std::string, int> &
+SoundRandomizer::GetPreviousPairs ()
+{
+    return mPreviousPairs;
 }
 
 /*******************************************************/
 SoundPair
-SoundRandomizer::GetRandomPair ()
+SoundRandomizer::GetRandomPair (int &index)
 {
-	int id = random (mSoundTable.size () - 1);
-	mPreviousPairs.push_back(id);
-	
-	return mSoundTable[id];
+    int id = random (mSoundTable.size () - 1);
+
+    index = id;
+    return mSoundTable[id];
+}
+
+/*******************************************************/
+SoundPair
+SoundRandomizer::GetPairByIndex (int id)
+{
+    return mSoundTable[id];
 }
 
 /*******************************************************/
 SoundPair
 SoundRandomizer::GetPairByID (int id)
 {
-    return mSoundTable[id];
-}
-
-/*******************************************************/
-int
-SoundRandomizer::GetPreviousPairID ()
-{
-	if(mPreviousPairs.size() < 1)
-		return -1;
-	
-	int id = mPreviousPairs.front();
-	mPreviousPairs.erase(mPreviousPairs.begin());
-
-	return id;
+    auto iter = std::find_if (mSoundTable.begin (), mSoundTable.end (),
+                              [id](const SoundPair &a) { return a.id == id; });
+    return *iter;
 }
 
 /*******************************************************/
@@ -82,8 +106,6 @@ SoundRandomizer::InitaliseSoundTable ()
             sscanf (line, " %s %d ", name, &id);
             if (id >= 2000)
                 mSoundTable.push_back ({id, name + 6});
-
-			printf("%d\n", mSoundTable.size());
         }
 }
 
@@ -92,12 +114,9 @@ void
 SoundRandomizer::Initialise ()
 {
     Logger::GetLogger ()->LogMessage ("Intialised SoundRandomizer");
-    RegisterHooks ({
-			{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
-			{HOOK_CALL, 0x468173, (void *) &CorrectSubtitles}
-		});
+    RegisterHooks ({{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
+                    {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles}});
     InitaliseSoundTable ();
-	printf("%d\n", mSoundTable.size());
 }
 
 /*******************************************************/

@@ -148,7 +148,6 @@ GxtManager::Initialise (CText *text)
     Update (text->tKeyMain);
     for (int i = 0; i < sizeof (tables) / 4; i++)
         {
-            printf ("%s\n", tables[i]);
             text->LoadMissionText (tables[i]);
             Update (text->tKeyMission);
         }

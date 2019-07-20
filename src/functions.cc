@@ -244,6 +244,13 @@ CVehicleRecording::SetPlaybackSpeed (void *a1, float a2)
 }
 
 /*******************************************************/
+int
+cHandlingDataMgr::LoadHandlingData ()
+{
+	return CallMethodAndReturn<int, 0x5BD830>(this);
+}
+
+/*******************************************************/
 void
 CRunningScript::CollectParameters (short num)
 {

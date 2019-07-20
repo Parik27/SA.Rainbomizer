@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 struct SoundPair
 {
@@ -21,7 +22,7 @@ class SoundRandomizer
     static SoundRandomizer *mInstance;
 
 	std::vector<SoundPair> mSoundTable;
-	std::vector<int> mPreviousPairs;
+	std::unordered_map<std::string, int> mPreviousPairs;
 	
 	void InitaliseSoundTable();
 	
@@ -36,11 +37,14 @@ public:
     void Initialise ();
 
 	/// Returns a random sound pair
-	SoundPair GetRandomPair();
+	SoundPair GetRandomPair(int &index);
 
-	/// Returns previous sound pair
-	int GetPreviousPairID();
+	/// Returns random pair map
+	std::unordered_map<std::string, int>& GetPreviousPairs();
+	
+	/// Returns sound pair by array index
+	SoundPair GetPairByIndex(int index);
 
-	/// Returns previous sound pair
+	/// Returns sound pair by ID
 	SoundPair GetPairByID(int id);
 };

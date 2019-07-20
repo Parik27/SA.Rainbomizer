@@ -306,7 +306,39 @@ struct CMatrix
     void Attach (CMatrix *attach, char link);
 };
 
-CMatrix *RwFrameGetLTM (void *frame);
+struct tHandlingData
+{
+	unsigned char data[0xE0];
+};
+
+struct tBikeHandlingData
+{
+	unsigned char data[0x40];
+};
+
+struct tPlaneHandlingData
+{
+	unsigned char data[0x58];
+};
+
+struct tBoatHandlingData
+{
+	unsigned char data[0x3C];
+};
+
+struct cHandlingDataMgr
+{
+	int unkFields[5];
+	tHandlingData vehicleHandling[210];
+	tBikeHandlingData bikeHandling[13];
+	tPlaneHandlingData planeHandling[24];
+	tBoatHandlingData boatHandling[12];
+	
+	int LoadHandlingData();
+};
+
+CMatrix *
+RwFrameGetLTM (void *frame);
 
 int random (int max, int min = 0);
 

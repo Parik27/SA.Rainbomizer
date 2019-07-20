@@ -121,10 +121,39 @@ struct CAudioEngine
     void PreloadMissionAudio (unsigned char slot, int id);
 };
 
+struct CKeyGen
+{
+	static int GetUppercaseKey(const char* string);
+};
+
+struct TKey
+{
+	char* pos;
+	int hash;
+};
+
+struct CKeyArray
+{
+	TKey* data;
+    short size;
+};	
+
+struct CData
+{
+	char* data;
+	int size;
+};
+
 struct CText
 {
+	CKeyArray tKeyMain;
+	CData tDataMain;
+	CKeyArray tKeyMission;
+	CData tDataMission;
+
+	void Load(char a2);
     char *Get (char *key);
-    char  LoadMissionText (char *table);
+    char  LoadMissionText (const char *table);
 };
 
 struct CPool

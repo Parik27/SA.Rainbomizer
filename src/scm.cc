@@ -241,7 +241,7 @@ ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
 int
 ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
 {
-	return 522;
+	//return 522;
     for (auto pattern : mPatterns)
         {
             if (DoesVehicleMatchPattern (id, pattern.pattern))

@@ -28,6 +28,7 @@
 #include "scm.hh"
 #include "sounds.hh"
 #include "cheats.hh"
+#include "plates.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -37,7 +38,6 @@
 // |_|_____|____/|_|  \___/|_.__/ \___/ \__| //
 ///////////////////////////////////////////////
 // Visit his Twitch Channel - https://www.twitch.tv/123robot
-
 
 class Rainbomizer
 {
@@ -56,7 +56,8 @@ public:
         ParkedCarRandomizer::GetInstance ()->Initialise ();
         PoliceHeliRandomizer::GetInstance ()->Initialise ();
         ScriptVehicleRandomizer::GetInstance ()->Initialise ();
-        //SoundRandomizer::GetInstance ()->Initialise ();
+        LicensePlateRandomizer::GetInstance ()->Initialise ();
+        SoundRandomizer::GetInstance ()->Initialise ();
 		//CheatRandomizer::GetInstance ()->Initialise ();
     }
 

@@ -4,6 +4,7 @@
 #include "functions.hh"
 #include "base.hh"
 #include <cctype>
+#include "text.hh"
 
 SoundRandomizer *SoundRandomizer::mInstance = nullptr;
 
@@ -22,9 +23,10 @@ char* __fastcall CorrectSubtitles(CText* text, void* edx, char* key)
 	if(prevId == -1)
 		return text->Get(key);
 
+	printf("Getting ID: %d\n", prevId);
 	auto soundPair = SoundRandomizer::GetInstance ()->GetPairByID (prevId);
 	printf("%s\n", soundPair.name.c_str());
-	return text->Get((char*) soundPair.name.c_str());
+	return (char*) GxtManager::GetText(soundPair.name);
 }
 
 /*******************************************************/
@@ -32,8 +34,8 @@ SoundPair
 SoundRandomizer::GetRandomPair ()
 {
 	int id = random (mSoundTable.size () - 1);
-	mPreviousPair = id;
-
+	mPreviousPairs.push_back(id);
+	
 	return mSoundTable[id];
 }
 
@@ -48,8 +50,11 @@ SoundRandomizer::GetPairByID (int id)
 int
 SoundRandomizer::GetPreviousPairID ()
 {
-	int id = mPreviousPair;
-    mPreviousPair = -1;
+	if(mPreviousPairs.size() < 1)
+		return -1;
+	
+	int id = mPreviousPairs.front();
+	mPreviousPairs.erase(mPreviousPairs.begin());
 
 	return id;
 }
@@ -76,7 +81,7 @@ SoundRandomizer::InitaliseSoundTable ()
 
             sscanf (line, " %s %d ", name, &id);
             if (id >= 2000)
-                mSoundTable.push_back ({id, name + 6,true});
+                mSoundTable.push_back ({id, name + 6});
 
 			printf("%d\n", mSoundTable.size());
         }

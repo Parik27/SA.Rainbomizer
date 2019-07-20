@@ -182,6 +182,12 @@ CClumpModelInfo::GetBoundingBox ()
 }
 
 /*******************************************************/
+int CKeyGen::GetUppercaseKey(const char *string)
+{
+	return CallAndReturn<int, 0x53CF30>(string);
+}
+
+/*******************************************************/
 int
 CLoadedCarGroup::CountMembers ()
 {
@@ -218,7 +224,7 @@ CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (int modelIndex)
 
 /*******************************************************/
 char
-CText::LoadMissionText (char *table)
+CText::LoadMissionText (const char *table)
 {
     return CallMethodAndReturn<char, 0x69FBF0> (this, table);
 }
@@ -291,6 +297,13 @@ char *
 CText::Get (char *key)
 {
     return CallMethodAndReturn<char *, 0x6A0050> (this, key);
+}
+
+/*******************************************************/
+void
+CText::Load(char a2)
+{
+	CallMethod<0x6A01A0>(this, a2);
 }
 
 /*******************************************************/

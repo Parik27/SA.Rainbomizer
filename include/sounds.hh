@@ -5,7 +5,6 @@ struct SoundPair
 {
 	int id;
 	std::string name;
-	bool gxt;
 };
 
 #pragma once
@@ -22,7 +21,7 @@ class SoundRandomizer
     static SoundRandomizer *mInstance;
 
 	std::vector<SoundPair> mSoundTable;
-	int mPreviousPair = -1;
+	std::vector<int> mPreviousPairs;
 	
 	void InitaliseSoundTable();
 	

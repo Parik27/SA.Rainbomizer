@@ -5,6 +5,7 @@
 #include <cstring>
 #include "text.hh"
 #include "functions.hh"
+#include <algorithm>
 
 LicensePlateRandomizer *    LicensePlateRandomizer::mInstance = nullptr;
 

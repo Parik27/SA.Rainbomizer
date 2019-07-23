@@ -7,6 +7,7 @@
 #include "text.hh"
 #include <ctime>
 #include <algorithm>
+#include <stdexcept>
 
 SoundRandomizer *SoundRandomizer::mInstance = nullptr;
 

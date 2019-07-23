@@ -12,12 +12,11 @@ void  RandomizeData(T* data, int len)
 {
 	for(int i = 0; i < len; i++)
 	{
-		
-		T temp = data[i];
+		auto temp = data[i].animGroup;
 		int swap = random(len - 1);
 		
-		data[i] = data[swap];
-		data[swap] = temp;
+		data[i].animGroup = data[swap].animGroup;
+		data[swap].animGroup = temp;
 	}
 }
 
@@ -25,10 +24,11 @@ void  RandomizeData(T* data, int len)
 int __fastcall RandomizeHandling(cHandlingDataMgr *handling, void* edx)
 {
 	handling->LoadHandlingData();
-	RandomizeData(handling->vehicleHandling, 210);
-	RandomizeData(handling->bikeHandling, 13);
-	RandomizeData(handling->planeHandling, 24);
-	RandomizeData(handling->boatHandling, 12);
+	//RandomizeData(handling->vehicleHandling, 210);
+	//RandomizeData(handling->bikeHandling, 13);
+	//RandomizeData(handling->planeHandling, 24);
+	//RandomizeData(handling->boatHandling, 12);
+	return 0;
 }
 
 /*******************************************************/

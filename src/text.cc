@@ -50,43 +50,6 @@ GxtManager::Update (CKeyArray &array)
 }
 
 /*******************************************************/
-int
-CountWords (const char *str)
-{
-    int words = 1;
-    for (int i = 0; i < strlen (str); i++)
-        {
-            if (str[i] == ' ')
-                words++;
-        }
-}
-
-/*******************************************************/
-std::string
-GetWord (const char *str, int word_index)
-{
-    int word_start = 0;
-    int word_end   = strlen (str) - 1;
-
-    int current_word = 0;
-    for (int i = 0; i < word_end; i++)
-        {
-            if (current_word == word_index && !word_start)
-                word_start = i - 1;
-
-            if (current_word == word_index + 1)
-                {
-                    word_end = i - 1;
-                    break;
-                }
-
-            if (str[i] == ' ')
-                current_word++;
-        }
-    return std::string (str + word_start, word_end - word_start);
-}
-
-/*******************************************************/
 const char *
 GxtManager::GetRandomWord ()
 {

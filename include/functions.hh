@@ -114,6 +114,9 @@ private:
 
 public:
     void CollectParameters (short num);
+	bool CheckName(const char* name);
+	void ProcessCommands1526to1537(int opcode);
+	void UpdateCompareFlag(char flag);
 };
 
 struct CAudioEngine
@@ -123,35 +126,35 @@ struct CAudioEngine
 
 struct CKeyGen
 {
-	static int GetUppercaseKey(const char* string);
+    static int GetUppercaseKey (const char *string);
 };
 
 struct TKey
 {
-	char* pos;
-	int hash;
+    char *pos;
+    int   hash;
 };
 
 struct CKeyArray
 {
-	TKey* data;
+    TKey *data;
     short size;
-};	
+};
 
 struct CData
 {
-	char* data;
-	int size;
+    char *data;
+    int   size;
 };
 
 struct CText
 {
-	CKeyArray tKeyMain;
-	CData tDataMain;
-	CKeyArray tKeyMission;
-	CData tDataMission;
+    CKeyArray tKeyMain;
+    CData     tDataMain;
+    CKeyArray tKeyMission;
+    CData     tDataMission;
 
-	void Load(char a2);
+    void  Load (char a2);
     char *Get (char *key);
     char  LoadMissionText (const char *table);
 };
@@ -159,7 +162,7 @@ struct CText
 struct CPool
 {
     void **      m_pObjects;
-    static void *GetAtVehicle (signed int handle);
+    void *GetAt (signed int handle, int size);
 };
 
 struct CPad
@@ -306,35 +309,106 @@ struct CMatrix
     void Attach (CMatrix *attach, char link);
 };
 
+struct tTransmissionGear
+{
+    float m_fMaxVelocity;
+    float m_fChangeUpVelocity;
+    float m_fChangeDownVelocity;
+};
+
+class cTransmission
+{
+public:
+    tTransmissionGear m_aGears[6];
+    unsigned char     m_nDriveType;
+    unsigned char     m_nEngineType;
+    unsigned char     m_nNumberOfGears;
+    char              field_4B;
+    unsigned int      m_nHandlingFlags;
+    float             m_fEngineAcceleration;
+    float             m_fEngineInertia;
+    float             m_fMaxGearVelocity;
+    int               field_5C;
+    float             m_fMinGearVelocity;
+    float             m_fCurrentSpeed;
+};
+
 struct tHandlingData
 {
-	unsigned char data[0xE0];
+    int           m_nVehicleId;
+    float         m_fMass;
+    float         field_8;
+    float         m_fTurnMass;
+    float         m_fDragMult;
+    CVector       m_vecCentreOfMass;
+    unsigned char m_nPercentSubmerged;
+    float         m_fBuoyancyConstant;
+    float         m_fTractionMultiplier;
+    cTransmission m_transmissionData;
+    float         m_fBrakeDeceleration;
+    float         m_fBrakeBias;
+    char          m_bABS;
+    char          field_9D;
+    char          field_9E;
+    char          field_9F;
+    float         m_fSteeringLock;
+    float         m_fTractionLoss;
+    float         m_fTractionBias;
+    float         m_fSuspensionForceLevel;
+    float         m_fSuspensionDampingLevel;
+    float         m_fSuspensionHighSpdComDamp;
+    float         m_fSuspensionUpperLimit;
+    float         m_fSuspensionLowerLimit;
+    float         m_fSuspensionBiasBetweenFrontAndRear;
+    float         m_fSuspensionAntiDiveMultiplier;
+    float         m_fCollisionDamageMultiplier;
+    int           m_nModelFlags;
+    int           m_nHandlingFlags;
+    float         m_fSeatOffsetDistance;
+    unsigned int  m_nMonetaryValue;
+    unsigned char m_nFrontLights;
+    unsigned char m_nRearLights;
+    unsigned char m_nAnimGroup;
 };
 
 struct tBikeHandlingData
 {
-	unsigned char data[0x40];
+    unsigned char data[0x40];
 };
 
 struct tPlaneHandlingData
 {
-	unsigned char data[0x58];
+    unsigned char data[0x58];
 };
 
 struct tBoatHandlingData
 {
-	unsigned char data[0x3C];
+    unsigned char data[0x3C];
 };
 
 struct cHandlingDataMgr
 {
-	int unkFields[5];
-	tHandlingData vehicleHandling[210];
-	tBikeHandlingData bikeHandling[13];
-	tPlaneHandlingData planeHandling[24];
-	tBoatHandlingData boatHandling[12];
-	
-	int LoadHandlingData();
+    int                unkFields[5];
+    tHandlingData      vehicleHandling[210];
+    tBikeHandlingData  bikeHandling[13];
+    tPlaneHandlingData planeHandling[24];
+    tBoatHandlingData  boatHandling[12];
+
+    int LoadHandlingData ();
+};
+
+struct cSimpleTransform
+{
+	CVector m_vPosn;
+	float m_fAngle;
+};
+
+CVector FindPlayerCoors(int playerId=0);
+float Dist(CVector a, CVector b);
+
+struct CEntity
+{
+	cSimpleTransform* GetPosition();
 };
 
 CMatrix *
@@ -346,3 +420,4 @@ extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
 extern RwRGBA *         ms_vehicleColourTable;
 extern int *            ScriptParams;
+extern CPool*           ms_pPedPool;

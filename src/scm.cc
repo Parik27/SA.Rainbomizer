@@ -25,6 +25,7 @@
 #include "functions.hh"
 #include "injector/injector.hpp"
 #include "loader.hh"
+#include <cmath>
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
@@ -241,7 +242,7 @@ ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
 int
 ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
 {
-	//return 522;
+    // return 522;
     for (auto pattern : mPatterns)
         {
             if (DoesVehicleMatchPattern (id, pattern.pattern))
@@ -333,24 +334,28 @@ ScriptVehicleRandomizer::DoesVehicleMatchPattern (int vehicle, int pattern)
 }
 
 /*******************************************************/
-bool CheckForCAutomobile(uint8_t* vehicle)
+bool
+CheckForCAutomobile (uint8_t *vehicle)
 {
-	uint16_t modelIndex = *reinterpret_cast<uint16_t *> (vehicle + 0x22);
-	if(CModelInfo::IsBikeModel(modelIndex) || CModelInfo::IsBmxModel(modelIndex) ||
-	   CModelInfo::IsBoatModel(modelIndex) || CModelInfo::IsTrainModel(modelIndex))
-		return false;
-	
-	return true;
+    uint16_t modelIndex = *reinterpret_cast<uint16_t *> (vehicle + 0x22);
+    if (CModelInfo::IsBikeModel (modelIndex)
+        || CModelInfo::IsBmxModel (modelIndex)
+        || CModelInfo::IsBoatModel (modelIndex)
+        || CModelInfo::IsTrainModel (modelIndex))
+        return false;
+
+    return true;
 }
 
 /*******************************************************/
-bool CheckForCarNode(uint8_t* vehicle, int node)
+bool
+CheckForCarNode (uint8_t *vehicle, int node)
 {
-	int* carNodes = reinterpret_cast<int*>(vehicle + 0x648);
-	if(!carNodes[node])
-		return false;
-	
-	return true;
+    int *carNodes = reinterpret_cast<int *> (vehicle + 0x648);
+    if (!carNodes[node])
+        return false;
+
+    return true;
 }
 
 /* Was thinking to replace these with a macro, couldn't come up with one
@@ -367,57 +372,81 @@ void *__fastcall PopDoorFix (uint8_t *vehicle, void *edx, int a2, int a3,
 }
 
 /*******************************************************/
-void* __fastcall PopPanelFix(uint8_t* vehicle, void* edx,  int a2, char a3, char a4)
-{	
-	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
-		return nullptr;
-
-	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle, a2, a3, a4);
-}
-
-/*******************************************************/
-void* __fastcall PopBootFix(uint8_t* vehicle, void* edx)
-{	
-	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, 0x11))
-		return nullptr;
-
-	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle);
-}
-
-/*******************************************************/
-int __fastcall VehicleUpdateFix(uint8_t* vehicle, void* edx, int model)
+void *__fastcall PopPanelFix (uint8_t *vehicle, void *edx, int a2, char a3,
+                              char a4)
 {
-	if(!CheckForCAutomobile(vehicle))
-		return model;
+    if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
+        return nullptr;
 
-	return CallMethodAndReturn<int, 0x6E3290>(vehicle, model);
+    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3, a4);
 }
 
 /*******************************************************/
-void* __fastcall CloseBootFix(uint8_t* vehicle, void* edx,  int a2, int a3, char a4)
-{	
-	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
-		return nullptr;
+void *__fastcall PopBootFix (uint8_t *vehicle, void *edx)
+{
+    if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, 0x11))
+        return nullptr;
 
-	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle, a2, a3, a4);
+    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle);
 }
 
 /*******************************************************/
-void* __fastcall FixDoorFix(uint8_t* vehicle, void* edx,  int a2, int a3)
-{	
-	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
-		return nullptr;
+int __fastcall VehicleUpdateFix (uint8_t *vehicle, void *edx, int model)
+{
+    if (!CheckForCAutomobile (vehicle))
+        return model;
 
-	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle, a2, a3);
+    return CallMethodAndReturn<int, 0x6E3290> (vehicle, model);
 }
 
 /*******************************************************/
-void* __fastcall FixPanelFix(uint8_t* vehicle, void* edx,  int a2, char a3)
-{	
-	if(!CheckForCAutomobile(vehicle) || !CheckForCarNode(vehicle, a2))
-		return nullptr;
+void *__fastcall CloseBootFix (uint8_t *vehicle, void *edx, int a2, int a3,
+                               char a4)
+{
+    if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
+        return nullptr;
 
-	return CallMethodAndReturn<void*, 0x6ADEF0>(vehicle, a2, a3);
+    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3, a4);
+}
+
+/*******************************************************/
+void *__fastcall FixDoorFix (uint8_t *vehicle, void *edx, int a2, int a3)
+{
+    if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
+        return nullptr;
+
+    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3);
+}
+
+/*******************************************************/
+void *__fastcall FixPanelFix (uint8_t *vehicle, void *edx, int a2, char a3)
+{
+    if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
+        return nullptr;
+
+    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3);
+}
+
+/*******************************************************/
+void __fastcall FixGTAMadman (CRunningScript *scr, void *edx, int opcode)
+{
+    if (scr->CheckName ("heist4"))
+        {
+            if (opcode == 1534)
+                {
+                    scr->CollectParameters (9);
+                    CVector playerPos = FindPlayerCoors ();
+                    CVector truckPos
+                        = *reinterpret_cast<CVector *> (ScriptParams + 1);
+
+                    float dist   = Dist (playerPos, truckPos);
+                    bool  result = dist < 10;
+					
+                    scr->UpdateCompareFlag (result);
+                    return;
+                }
+        }
+    scr->ProcessCommands1526to1537 (opcode);
 }
 
 /*******************************************************/
@@ -434,7 +463,8 @@ ScriptVehicleRandomizer::Initialise ()
                     {HOOK_CALL, 0x48C1FA, (void *) &PopBootFix},
                     {HOOK_CALL, 0x495902, (void *) &FixDoorFix},
                     {HOOK_CALL, 0x495B74, (void *) &FixPanelFix},
-					{HOOK_CALL, 0x4985DA, (void *) &VehicleUpdateFix}});
+                    {HOOK_CALL, 0x4985DA, (void *) &VehicleUpdateFix},
+                    {HOOK_CALL, 0x49128C, (void *) &FixGTAMadman}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 

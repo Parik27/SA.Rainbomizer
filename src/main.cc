@@ -60,7 +60,7 @@ public:
         LicensePlateRandomizer::GetInstance ()->Initialise ();
         SoundRandomizer::GetInstance ()->Initialise ();
 		//HandlingRandomizer::GetInstance()->Initialise();
-		//CheatRandomizer::GetInstance ()->Initialise ();
+		CheatRandomizer::GetInstance ()->Initialise ();
     }
 
 } rainbow;

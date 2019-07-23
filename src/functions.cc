@@ -20,6 +20,8 @@
 
 #include "functions.hh"
 #include "base.hh"
+#include <cstring>
+#include <cmath>
 
 /*******************************************************/
 int
@@ -259,9 +261,9 @@ CRunningScript::CollectParameters (short num)
 
 /*******************************************************/
 void *
-CPool::GetAtVehicle (int handle)
+CPool::GetAt (int handle, int size)
 {
-    return CallMethodAndReturn<void *, 0x4048E0> ((void *) 0xB74494, handle);
+    return this->m_pObjects + size * (handle >> 8);
 }
 
 /*******************************************************/
@@ -307,10 +309,49 @@ CText::Get (char *key)
 }
 
 /*******************************************************/
+bool CRunningScript::CheckName (const char *name)
+{
+	if(strcmp(name, this->m_szName) == 0)
+		return true;
+	return false;
+}
+
+/*******************************************************/
+void CRunningScript::ProcessCommands1526to1537(int opcode)
+{
+	CallMethod<0x487F60>(this, opcode);
+}
+
+/*******************************************************/
+void CRunningScript::UpdateCompareFlag(char flag)
+{
+	CallMethod<0x4859D0>(this, flag);
+}
+
+/*******************************************************/
 void
 CText::Load(char a2)
 {
 	CallMethod<0x6A01A0>(this, a2);
+}
+
+/*******************************************************/
+CVector FindPlayerCoors(int playerId)
+{
+	return CallAndReturn<CVector, 0x56E010>(playerId);
+}
+
+/*******************************************************/
+float Dist(CVector a, CVector b)
+{
+	return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+}
+
+/*******************************************************/
+cSimpleTransform*
+CEntity::GetPosition()
+{
+	return CallMethodAndReturn<cSimpleTransform*, 0x4043A0>(this);
 }
 
 /*******************************************************/
@@ -325,3 +366,4 @@ RwRGBA *         ms_vehicleColourTable          = (RwRGBA *) 0xB4E480;
 CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;
 int *            ScriptParams                   = (int *) 0xA43C78;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
+CPool*           ms_pPedPool                    = (CPool*) 0xB74490;

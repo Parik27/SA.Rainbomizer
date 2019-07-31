@@ -378,7 +378,7 @@ void *__fastcall PopPanelFix (uint8_t *vehicle, void *edx, int a2, char a3,
     if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
         return nullptr;
 
-    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3, a4);
+    return CallMethodAndReturn<void *, 0x6ADF80> (vehicle, a2, a3, a4);
 }
 
 /*******************************************************/
@@ -387,7 +387,7 @@ void *__fastcall PopBootFix (uint8_t *vehicle, void *edx)
     if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, 0x11))
         return nullptr;
 
-    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle);
+    return CallMethodAndReturn<void *, 0x6AF910> (vehicle);
 }
 
 /*******************************************************/
@@ -406,7 +406,7 @@ void *__fastcall CloseBootFix (uint8_t *vehicle, void *edx, int a2, int a3,
     if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
         return nullptr;
 
-    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3, a4);
+    return CallMethodAndReturn<void *, 0x6AFA20> (vehicle, a2, a3, a4);
 }
 
 /*******************************************************/
@@ -415,7 +415,7 @@ void *__fastcall FixDoorFix (uint8_t *vehicle, void *edx, int a2, int a3)
     if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
         return nullptr;
 
-    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3);
+    return CallMethodAndReturn<void *, 0x6A35A0> (vehicle, a2, a3);
 }
 
 /*******************************************************/
@@ -424,7 +424,7 @@ void *__fastcall FixPanelFix (uint8_t *vehicle, void *edx, int a2, char a3)
     if (!CheckForCAutomobile (vehicle) || !CheckForCarNode (vehicle, a2))
         return nullptr;
 
-    return CallMethodAndReturn<void *, 0x6ADEF0> (vehicle, a2, a3);
+    return CallMethodAndReturn<void *, 0x6A3670> (vehicle, a2, a3);
 }
 
 /*******************************************************/
@@ -459,7 +459,7 @@ ScriptVehicleRandomizer::Initialise ()
                     {HOOK_CALL, 0x5DFE79, (void *) &FixEOTLPosition},
                     {HOOK_CALL, 0x469612, (void *) &FixKSTCarCheck},
                     {HOOK_CALL, 0x4958C6, (void *) &PopDoorFix},
-                    {HOOK_CALL, 0x6ADF80, (void *) &PopPanelFix},
+                    {HOOK_CALL, 0x495B38, (void *) &PopPanelFix},
                     {HOOK_CALL, 0x48C1FA, (void *) &PopBootFix},
                     {HOOK_CALL, 0x495902, (void *) &FixDoorFix},
                     {HOOK_CALL, 0x495B74, (void *) &FixPanelFix},

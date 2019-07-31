@@ -6,24 +6,18 @@
 
 HandlingRandomizer *    HandlingRandomizer::mInstance = nullptr;
 
-/*******************************************************/
-template<typename T>
-void  RandomizeData(T* data, int len)
-{
-	for(int i = 0; i < len; i++)
-	{
-		auto temp = data[i].animGroup;
-		int swap = random(len - 1);
-		
-		data[i].animGroup = data[swap].animGroup;
-		data[swap].animGroup = temp;
-	}
-}
 
 /*******************************************************/
 int __fastcall RandomizeHandling(cHandlingDataMgr *handling, void* edx)
 {
 	handling->LoadHandlingData();
+	for(int i = 0; i < 210; i++)
+	{
+		auto handl = handling->vehicleHandling[i];
+		int id = random(210-1);
+		handling->vehicleHandling[i] = handling->vehicleHandling[id];
+		handling->vehicleHandling[id] = handl;
+	}
 	//RandomizeData(handling->vehicleHandling, 210);
 	//RandomizeData(handling->bikeHandling, 13);
 	//RandomizeData(handling->planeHandling, 24);

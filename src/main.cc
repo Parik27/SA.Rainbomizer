@@ -59,7 +59,7 @@ public:
         ScriptVehicleRandomizer::GetInstance ()->Initialise ();
         LicensePlateRandomizer::GetInstance ()->Initialise ();
         SoundRandomizer::GetInstance ()->Initialise ();
-		//HandlingRandomizer::GetInstance()->Initialise();
+		HandlingRandomizer::GetInstance()->Initialise();
 		CheatRandomizer::GetInstance ()->Initialise ();
     }
 

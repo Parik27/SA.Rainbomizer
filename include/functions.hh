@@ -369,6 +369,44 @@ struct tHandlingData
     unsigned char m_nFrontLights;
     unsigned char m_nRearLights;
     unsigned char m_nAnimGroup;
+
+	tHandlingData& operator=(const tHandlingData &rhs)
+		{
+			// Check for self-assignment!
+    if (this == &rhs)
+		return *this;
+
+	this->m_nVehicleId = rhs.m_nVehicleId;
+	this->m_fMass = rhs.m_fMass;
+	this->field_8 = rhs.field_8;
+	this->m_fTurnMass = rhs.m_fTurnMass;
+	this->m_fDragMult = rhs.m_fDragMult;
+	this->m_vecCentreOfMass = rhs.m_vecCentreOfMass;
+	this->m_nPercentSubmerged = rhs.m_nPercentSubmerged;
+	this->m_fBuoyancyConstant = rhs.m_fBuoyancyConstant;
+	this->m_fTractionMultiplier = rhs.m_fTractionMultiplier;
+	this->m_transmissionData = rhs.m_transmissionData;
+	this->m_fBrakeDeceleration = rhs.m_fBrakeDeceleration;
+	this->m_fBrakeBias = rhs.m_fBrakeBias;
+	this->m_bABS = rhs.m_bABS;
+	this->field_9D = rhs.field_9D;
+	this->field_9E = rhs.field_9E;
+	this->field_9F = rhs.field_9F;
+	this->m_fSteeringLock = rhs.m_fSteeringLock;
+	this->m_fTractionLoss = rhs.m_fTractionLoss;
+	this->m_fTractionBias = rhs.m_fTractionBias;
+	this->m_fSuspensionForceLevel = rhs.m_fSuspensionForceLevel;
+	this->m_fSuspensionDampingLevel = rhs.m_fSuspensionDampingLevel;
+	this->m_fSuspensionHighSpdComDamp = rhs.m_fSuspensionHighSpdComDamp;
+	this->m_fSuspensionUpperLimit = rhs.m_fSuspensionUpperLimit;
+	this->m_fSuspensionLowerLimit = rhs.m_fSuspensionLowerLimit;
+	this->m_fSuspensionBiasBetweenFrontAndRear = rhs.m_fSuspensionBiasBetweenFrontAndRear;
+	this->m_fSuspensionAntiDiveMultiplier = rhs.m_fSuspensionAntiDiveMultiplier;
+	this->m_fCollisionDamageMultiplier = rhs.m_fCollisionDamageMultiplier;
+	this->m_nMonetaryValue = rhs.m_nMonetaryValue;
+    return *this;
+}
+
 };
 
 struct tBikeHandlingData

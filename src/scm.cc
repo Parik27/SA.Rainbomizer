@@ -31,6 +31,7 @@ ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
 const int MODEL_FIRELA = 0x220;
 const int MODEL_SANCHZ = 468;
+const int MODEL_RC_BARON = 464;
 
 /*******************************************************/
 void
@@ -161,6 +162,26 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     auto err = StreamingManager::AttemptToLoadVehicle (newModel);
     if (err == ERR_FAILED)
         newModel = model;
+	
+    // Freefall fix
+    if (x > 1279.6 && x < 1279.7)
+        {
+            while (newModel == MODEL_RC_BARON)
+                {
+                    newModel = ScriptVehicleRandomizer::GetInstance ()
+                                   ->GetRandomIDBasedOnVehicle (model);
+                }
+            x += 50;
+        }
+
+    // Dam and Blast + Saint Mark's Bistro Fix
+    if (x > 1477.4 && x < 1479.8)
+        {
+            while (newModel == MODEL_RC_BARON)
+                {
+                    newModel = ScriptVehicleRandomizer::GetInstance ()->GetRandomIDBasedOnVehicle (model);
+                }
+        }
 
     uint8_t *vehicle = (uint8_t *) CCarCtrl::CreateCarForScript (newModel, x, y,
                                                                  z, createdBy);

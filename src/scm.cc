@@ -505,9 +505,11 @@ ScriptVehicleRandomizer::Initialise ()
          .denied  = {},
          .flags   = 0},
 
-        {.pattern = 539, .allowed = {VEHICLE_BOAT, 464, 501, 465}},
+        {.pattern = 539, .allowed = {VEHICLE_BOAT, 464, 501, 465}, .denied  = {472, 595, 484, 453, 454, 430}},
         {.pattern = 521, .allowed = {VEHICLE_APPEARANCE_BIKE}},
         {.pattern = 522, .allowed = {VEHICLE_APPEARANCE_BIKE}},
+	    
+	{.pattern = 601, .allowed = {432, 601}, .denied = {}, .flags = 0},
 
         {.pattern = 524, .allowed = {524}, .denied = {}, .flags = 0},
 

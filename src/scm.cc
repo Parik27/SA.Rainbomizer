@@ -182,6 +182,12 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                     newModel = ScriptVehicleRandomizer::GetInstance ()->GetRandomIDBasedOnVehicle (model);
                 }
         }
+	
+    // Photo Opportunity Fix
+    if (x > -2173 && x < -2167)
+        {
+            z = random (65, 36);
+        }
 
     uint8_t *vehicle = (uint8_t *) CCarCtrl::CreateCarForScript (newModel, x, y,
                                                                  z, createdBy);

@@ -122,6 +122,8 @@ public:
 struct CAudioEngine
 {
     void PreloadMissionAudio (unsigned char slot, int id);
+	bool GetMissionAudioLoadingStatus(unsigned char id);
+	bool IsMissionAudioSampleFinished(unsigned char slot);
 };
 
 struct CKeyGen
@@ -376,9 +378,7 @@ struct tHandlingData
     if (this == &rhs)
 		return *this;
 
-	this->m_nVehicleId = rhs.m_nVehicleId;
 	this->m_fMass = rhs.m_fMass;
-	this->field_8 = rhs.field_8;
 	this->m_fTurnMass = rhs.m_fTurnMass;
 	this->m_fDragMult = rhs.m_fDragMult;
 	this->m_vecCentreOfMass = rhs.m_vecCentreOfMass;
@@ -389,9 +389,6 @@ struct tHandlingData
 	this->m_fBrakeDeceleration = rhs.m_fBrakeDeceleration;
 	this->m_fBrakeBias = rhs.m_fBrakeBias;
 	this->m_bABS = rhs.m_bABS;
-	this->field_9D = rhs.field_9D;
-	this->field_9E = rhs.field_9E;
-	this->field_9F = rhs.field_9F;
 	this->m_fSteeringLock = rhs.m_fSteeringLock;
 	this->m_fTractionLoss = rhs.m_fTractionLoss;
 	this->m_fTractionBias = rhs.m_fTractionBias;

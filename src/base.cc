@@ -126,3 +126,27 @@ ExceptionManager::GetExceptionManager ()
 
     return mManager;
 }
+
+/*******************************************************/
+GamePathA::GamePathA ()
+{
+    _path[0]  = '\0';
+    HMODULE h = NULL;
+    h         = GetModuleHandleA (NULL);
+    GetModuleFileNameA (h, _path, MAX_PATH);
+    char *bslp = strrchr (_path, '\\');
+    char *fslp = strrchr (_path, '/');
+    char *slp  = std::max (bslp, fslp);
+    if (slp)
+        slp[1] = '\0';
+}
+
+/*******************************************************/
+char *
+GetGameDirRelativePathA (const char *subpath)
+{
+    static GamePathA gamePath;
+    strcpy (gamePath._temp_path, gamePath._path);
+    strcat (gamePath._temp_path, subpath);
+    return gamePath._temp_path;
+}

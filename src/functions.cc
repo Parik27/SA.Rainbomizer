@@ -302,6 +302,20 @@ CAudioEngine::PreloadMissionAudio (unsigned char slot, int id)
 }
 
 /*******************************************************/
+bool
+CAudioEngine::GetMissionAudioLoadingStatus(unsigned char id)
+{
+	return CallMethodAndReturn<bool, 0x5072A0>(this, id);
+}
+
+/*******************************************************/
+bool
+CAudioEngine::IsMissionAudioSampleFinished(unsigned char id)
+{
+	return CallMethodAndReturn<bool, 0x5072C0>(this, id);
+}
+
+/*******************************************************/
 char *
 CText::Get (char *key)
 {

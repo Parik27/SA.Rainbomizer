@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <vector>
 #include <functional>
+#include <cstring>
 
 enum eHookType
 {
@@ -37,6 +38,15 @@ struct HookProperties
     uintptr_t src;
     void *    dest;
 };
+
+struct GamePathA {
+    char _path[160 + 1];
+    char _temp_path[160 + 1];
+
+    GamePathA();
+};
+
+char *GetGameDirRelativePathA(const char *subpath);
 
 /// Creates hooks based on HookProperties
 void RegisterHooks (std::vector<HookProperties> hooks);

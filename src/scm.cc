@@ -496,11 +496,6 @@ ScriptVehicleRandomizer::Initialise ()
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 
     this->mPatterns = {
-
-		{.pattern = 510,
-		 .allowed = {VEHICLE_APPEARANCE_BIKE},
-		 .denied = {},
-		 .flags = NO_SEAT_CHECK},
 		
         {.pattern = 487,
          .allowed = {VEHICLE_ALL},

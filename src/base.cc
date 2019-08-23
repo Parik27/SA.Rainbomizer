@@ -24,6 +24,7 @@
 #include "logger.hh"
 #include <memory>
 #include "injector/injector.hpp"
+#include <algorithm>
 
 /*******************************************************/
 // Stolen shamelessly from https://stackoverflow.com/a/26221725
@@ -136,7 +137,7 @@ GamePathA::GamePathA ()
     GetModuleFileNameA (h, _path, MAX_PATH);
     char *bslp = strrchr (_path, '\\');
     char *fslp = strrchr (_path, '/');
-    char *slp  = std::max (bslp, fslp);
+    char *slp  = (std::max) (bslp, fslp);
     if (slp)
         slp[1] = '\0';
 }

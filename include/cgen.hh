@@ -18,18 +18,18 @@
 
  */
 
-
 #pragma once
 
 struct CCarGenerator;
 
 // Hooks
-void __fastcall RandomizeFixedSpawn (CCarGenerator *gen, void *edx, int model_id);
+void __fastcall RandomizeFixedSpawn (CCarGenerator *gen, void *edx,
+                                     int model_id);
 int __fastcall RandomizeRandomSpawn (void *group, void *edx, char a2, char a3);
 
 class ParkedCarRandomizer
 {
-    static ParkedCarRandomizer *    mInstance;
+    static ParkedCarRandomizer *mInstance;
 
     ParkedCarRandomizer (){};
     static void DestroyInstance ();
@@ -40,6 +40,4 @@ public:
 
     /// Initialises Hooks/etc.
     void Initialise ();
-
 };
-			 

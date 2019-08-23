@@ -1,51 +1,49 @@
 #include "plates.hh"
 #include <cstdlib>
-#include "base.hh" 
+#include "base.hh"
 #include "logger.hh"
 #include <cstring>
 #include "text.hh"
 #include "functions.hh"
 #include <algorithm>
 
-LicensePlateRandomizer *    LicensePlateRandomizer::mInstance = nullptr;
+LicensePlateRandomizer *LicensePlateRandomizer::mInstance = nullptr;
 
 /*******************************************************/
 const char *__fastcall GetNewCustomPlateText (void *thisInfo, void *edx)
 {
-    return GxtManager::GetRandomWord();
+    return GxtManager::GetRandomWord ();
 }
 
 /*******************************************************/
-void __fastcall InitialiseText(CText* text, void* edx, char a2)
+void __fastcall InitialiseText (CText *text, void *edx, char a2)
 {
-	text->Load(a2);
-	GxtManager::Initialise(text);
+    text->Load (a2);
+    GxtManager::Initialise (text);
 }
 
 /*******************************************************/
 void
 GetNewPlateText (char *buf, int len)
 {
-	memset(buf, 0, 8);
+    memset (buf, 0, 8);
 
-	const char* word = GxtManager::GetRandomWord();
-	int length = strlen(word);
-	
-	strncpy(buf, word, std::min(length, 8));
+    const char *word   = GxtManager::GetRandomWord ();
+    int         length = strlen (word);
+
+    strncpy (buf, word, std::min (length, 8));
 }
 
 /*******************************************************/
 void
 LicensePlateRandomizer::Initialise ()
 {
-	Logger::GetLogger()->LogMessage("Intialised LicensePlateRandomizer");
-        RegisterHooks ({
-				{HOOK_CALL, 0x6D10FB, (void*) &GetNewCustomPlateText},
-				{HOOK_CALL, 0x4C9484, (void*) &GetNewPlateText},
-				{HOOK_CALL, 0x468E9A, (void*) &InitialiseText},
-				{HOOK_CALL, 0x618E97, (void*) &InitialiseText},
-				{HOOK_CALL, 0x5BA167, (void*) &InitialiseText}
-			});
+    Logger::GetLogger ()->LogMessage ("Intialised LicensePlateRandomizer");
+    RegisterHooks ({{HOOK_CALL, 0x6D10FB, (void *) &GetNewCustomPlateText},
+                    {HOOK_CALL, 0x4C9484, (void *) &GetNewPlateText},
+                    {HOOK_CALL, 0x468E9A, (void *) &InitialiseText},
+                    {HOOK_CALL, 0x618E97, (void *) &InitialiseText},
+                    {HOOK_CALL, 0x5BA167, (void *) &InitialiseText}});
 }
 
 /*******************************************************/
@@ -61,10 +59,9 @@ LicensePlateRandomizer *
 LicensePlateRandomizer::GetInstance ()
 {
     if (!LicensePlateRandomizer::mInstance)
-	{
-        LicensePlateRandomizer::mInstance = new LicensePlateRandomizer ();
-		atexit (&LicensePlateRandomizer::DestroyInstance);
-	}
+        {
+            LicensePlateRandomizer::mInstance = new LicensePlateRandomizer ();
+            atexit (&LicensePlateRandomizer::DestroyInstance);
+        }
     return LicensePlateRandomizer::mInstance;
 }
-		 

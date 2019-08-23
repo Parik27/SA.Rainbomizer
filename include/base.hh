@@ -39,14 +39,15 @@ struct HookProperties
     void *    dest;
 };
 
-struct GamePathA {
+struct GamePathA
+{
     char _path[160 + 1];
     char _temp_path[160 + 1];
 
-    GamePathA();
+    GamePathA ();
 };
 
-char *GetGameDirRelativePathA(const char *subpath);
+char *GetGameDirRelativePathA (const char *subpath);
 
 /// Creates hooks based on HookProperties
 void RegisterHooks (std::vector<HookProperties> hooks);

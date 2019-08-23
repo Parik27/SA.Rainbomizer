@@ -32,7 +32,7 @@ class SoundRandomizer
     std::unordered_map<std::string, int> mPreviousPairs;
     SlotSoundPair                        slots[5];
     std::string                          mPrevOverridenText;
-	std::string                          mPrevOverridenKey;
+    std::string                          mPrevOverridenKey;
 
     void InitaliseSoundTable ();
 
@@ -59,7 +59,7 @@ public:
     SoundPair GetPairByID (int id);
 
     const std::string &GetPreviousOverridenText ();
-	const std::string &GetPreviousOverridenKey ();
+    const std::string &GetPreviousOverridenKey ();
 
     void SetPreviousOverridenText (const std::string &key,
                                    const std::string &text);

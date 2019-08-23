@@ -114,16 +114,16 @@ private:
 
 public:
     void CollectParameters (short num);
-	bool CheckName(const char* name);
-	void ProcessCommands1526to1537(int opcode);
-	void UpdateCompareFlag(char flag);
+    bool CheckName (const char *name);
+    void ProcessCommands1526to1537 (int opcode);
+    void UpdateCompareFlag (char flag);
 };
 
 struct CAudioEngine
 {
     void PreloadMissionAudio (unsigned char slot, int id);
-	bool GetMissionAudioLoadingStatus(unsigned char id);
-	bool IsMissionAudioSampleFinished(unsigned char slot);
+    bool GetMissionAudioLoadingStatus (unsigned char id);
+    bool IsMissionAudioSampleFinished (unsigned char slot);
 };
 
 struct CKeyGen
@@ -163,8 +163,8 @@ struct CText
 
 struct CPool
 {
-    void **      m_pObjects;
-    void *GetAt (signed int handle, int size);
+    void **m_pObjects;
+    void * GetAt (signed int handle, int size);
 };
 
 struct CPad
@@ -372,38 +372,40 @@ struct tHandlingData
     unsigned char m_nRearLights;
     unsigned char m_nAnimGroup;
 
-	tHandlingData& operator=(const tHandlingData &rhs)
-		{
-			// Check for self-assignment!
-    if (this == &rhs)
-		return *this;
+    tHandlingData &
+    operator= (const tHandlingData &rhs)
+    {
+        // Check for self-assignment!
+        if (this == &rhs)
+            return *this;
 
-	this->m_fMass = rhs.m_fMass;
-	this->m_fTurnMass = rhs.m_fTurnMass;
-	this->m_fDragMult = rhs.m_fDragMult;
-	this->m_vecCentreOfMass = rhs.m_vecCentreOfMass;
-	this->m_nPercentSubmerged = rhs.m_nPercentSubmerged;
-	this->m_fBuoyancyConstant = rhs.m_fBuoyancyConstant;
-	this->m_fTractionMultiplier = rhs.m_fTractionMultiplier;
-	this->m_transmissionData = rhs.m_transmissionData;
-	this->m_fBrakeDeceleration = rhs.m_fBrakeDeceleration;
-	this->m_fBrakeBias = rhs.m_fBrakeBias;
-	this->m_bABS = rhs.m_bABS;
-	this->m_fSteeringLock = rhs.m_fSteeringLock;
-	this->m_fTractionLoss = rhs.m_fTractionLoss;
-	this->m_fTractionBias = rhs.m_fTractionBias;
-	this->m_fSuspensionForceLevel = rhs.m_fSuspensionForceLevel;
-	this->m_fSuspensionDampingLevel = rhs.m_fSuspensionDampingLevel;
-	this->m_fSuspensionHighSpdComDamp = rhs.m_fSuspensionHighSpdComDamp;
-	this->m_fSuspensionUpperLimit = rhs.m_fSuspensionUpperLimit;
-	this->m_fSuspensionLowerLimit = rhs.m_fSuspensionLowerLimit;
-	this->m_fSuspensionBiasBetweenFrontAndRear = rhs.m_fSuspensionBiasBetweenFrontAndRear;
-	this->m_fSuspensionAntiDiveMultiplier = rhs.m_fSuspensionAntiDiveMultiplier;
-	this->m_fCollisionDamageMultiplier = rhs.m_fCollisionDamageMultiplier;
-	this->m_nMonetaryValue = rhs.m_nMonetaryValue;
-    return *this;
-}
-
+        this->m_fMass                     = rhs.m_fMass;
+        this->m_fTurnMass                 = rhs.m_fTurnMass;
+        this->m_fDragMult                 = rhs.m_fDragMult;
+        this->m_vecCentreOfMass           = rhs.m_vecCentreOfMass;
+        this->m_nPercentSubmerged         = rhs.m_nPercentSubmerged;
+        this->m_fBuoyancyConstant         = rhs.m_fBuoyancyConstant;
+        this->m_fTractionMultiplier       = rhs.m_fTractionMultiplier;
+        this->m_transmissionData          = rhs.m_transmissionData;
+        this->m_fBrakeDeceleration        = rhs.m_fBrakeDeceleration;
+        this->m_fBrakeBias                = rhs.m_fBrakeBias;
+        this->m_bABS                      = rhs.m_bABS;
+        this->m_fSteeringLock             = rhs.m_fSteeringLock;
+        this->m_fTractionLoss             = rhs.m_fTractionLoss;
+        this->m_fTractionBias             = rhs.m_fTractionBias;
+        this->m_fSuspensionForceLevel     = rhs.m_fSuspensionForceLevel;
+        this->m_fSuspensionDampingLevel   = rhs.m_fSuspensionDampingLevel;
+        this->m_fSuspensionHighSpdComDamp = rhs.m_fSuspensionHighSpdComDamp;
+        this->m_fSuspensionUpperLimit     = rhs.m_fSuspensionUpperLimit;
+        this->m_fSuspensionLowerLimit     = rhs.m_fSuspensionLowerLimit;
+        this->m_fSuspensionBiasBetweenFrontAndRear
+            = rhs.m_fSuspensionBiasBetweenFrontAndRear;
+        this->m_fSuspensionAntiDiveMultiplier
+            = rhs.m_fSuspensionAntiDiveMultiplier;
+        this->m_fCollisionDamageMultiplier = rhs.m_fCollisionDamageMultiplier;
+        this->m_nMonetaryValue             = rhs.m_nMonetaryValue;
+        return *this;
+    }
 };
 
 struct tBikeHandlingData
@@ -434,20 +436,19 @@ struct cHandlingDataMgr
 
 struct cSimpleTransform
 {
-	CVector m_vPosn;
-	float m_fAngle;
+    CVector m_vPosn;
+    float   m_fAngle;
 };
 
-CVector FindPlayerCoors(int playerId=0);
-float Dist(CVector a, CVector b);
+CVector FindPlayerCoors (int playerId = 0);
+float   Dist (CVector a, CVector b);
 
 struct CEntity
 {
-	cSimpleTransform* GetPosition();
+    cSimpleTransform *GetPosition ();
 };
 
-CMatrix *
-RwFrameGetLTM (void *frame);
+CMatrix *RwFrameGetLTM (void *frame);
 
 int random (int max, int min = 0);
 
@@ -455,4 +456,4 @@ extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
 extern RwRGBA *         ms_vehicleColourTable;
 extern int *            ScriptParams;
-extern CPool*           ms_pPedPool;
+extern CPool *          ms_pPedPool;

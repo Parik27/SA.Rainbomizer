@@ -184,9 +184,10 @@ CClumpModelInfo::GetBoundingBox ()
 }
 
 /*******************************************************/
-int CKeyGen::GetUppercaseKey(const char *string)
+int
+CKeyGen::GetUppercaseKey (const char *string)
 {
-	return CallAndReturn<int, 0x53CF30>(string);
+    return CallAndReturn<int, 0x53CF30> (string);
 }
 
 /*******************************************************/
@@ -198,9 +199,9 @@ CLoadedCarGroup::CountMembers ()
 
 /*******************************************************/
 void
-CStreaming::SetIsDeletable(int model)
+CStreaming::SetIsDeletable (int model)
 {
-	Call<0x409C10>(model);
+    Call<0x409C10> (model);
 }
 
 /*******************************************************/
@@ -249,7 +250,7 @@ CVehicleRecording::SetPlaybackSpeed (void *a1, float a2)
 int
 cHandlingDataMgr::LoadHandlingData ()
 {
-	return CallMethodAndReturn<int, 0x5BD830>(this);
+    return CallMethodAndReturn<int, 0x5BD830> (this);
 }
 
 /*******************************************************/
@@ -303,16 +304,16 @@ CAudioEngine::PreloadMissionAudio (unsigned char slot, int id)
 
 /*******************************************************/
 bool
-CAudioEngine::GetMissionAudioLoadingStatus(unsigned char id)
+CAudioEngine::GetMissionAudioLoadingStatus (unsigned char id)
 {
-	return CallMethodAndReturn<bool, 0x5072A0>(this, id);
+    return CallMethodAndReturn<bool, 0x5072A0> (this, id);
 }
 
 /*******************************************************/
 bool
-CAudioEngine::IsMissionAudioSampleFinished(unsigned char id)
+CAudioEngine::IsMissionAudioSampleFinished (unsigned char id)
 {
-	return CallMethodAndReturn<bool, 0x5072C0>(this, id);
+    return CallMethodAndReturn<bool, 0x5072C0> (this, id);
 }
 
 /*******************************************************/
@@ -323,49 +324,54 @@ CText::Get (char *key)
 }
 
 /*******************************************************/
-bool CRunningScript::CheckName (const char *name)
+bool
+CRunningScript::CheckName (const char *name)
 {
-	if(strcmp(name, this->m_szName) == 0)
-		return true;
-	return false;
-}
-
-/*******************************************************/
-void CRunningScript::ProcessCommands1526to1537(int opcode)
-{
-	CallMethod<0x487F60>(this, opcode);
-}
-
-/*******************************************************/
-void CRunningScript::UpdateCompareFlag(char flag)
-{
-	CallMethod<0x4859D0>(this, flag);
+    if (strcmp (name, this->m_szName) == 0)
+        return true;
+    return false;
 }
 
 /*******************************************************/
 void
-CText::Load(char a2)
+CRunningScript::ProcessCommands1526to1537 (int opcode)
 {
-	CallMethod<0x6A01A0>(this, a2);
+    CallMethod<0x487F60> (this, opcode);
 }
 
 /*******************************************************/
-CVector FindPlayerCoors(int playerId)
+void
+CRunningScript::UpdateCompareFlag (char flag)
 {
-	return CallAndReturn<CVector, 0x56E010>(playerId);
+    CallMethod<0x4859D0> (this, flag);
 }
 
 /*******************************************************/
-float Dist(CVector a, CVector b)
+void
+CText::Load (char a2)
 {
-	return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+    CallMethod<0x6A01A0> (this, a2);
 }
 
 /*******************************************************/
-cSimpleTransform*
-CEntity::GetPosition()
+CVector
+FindPlayerCoors (int playerId)
 {
-	return CallMethodAndReturn<cSimpleTransform*, 0x4043A0>(this);
+    return CallAndReturn<CVector, 0x56E010> (playerId);
+}
+
+/*******************************************************/
+float
+Dist (CVector a, CVector b)
+{
+    return sqrt (pow (a.x - b.x, 2) + pow (a.y - b.y, 2) + pow (a.z - b.z, 2));
+}
+
+/*******************************************************/
+cSimpleTransform *
+CEntity::GetPosition ()
+{
+    return CallMethodAndReturn<cSimpleTransform *, 0x4043A0> (this);
 }
 
 /*******************************************************/
@@ -380,4 +386,4 @@ RwRGBA *         ms_vehicleColourTable          = (RwRGBA *) 0xB4E480;
 CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;
 int *            ScriptParams                   = (int *) 0xA43C78;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
-CPool*           ms_pPedPool                    = (CPool*) 0xB74490;
+CPool *          ms_pPedPool                    = (CPool *) 0xB74490;

@@ -52,15 +52,15 @@ public:
         ExceptionManager::GetExceptionManager ()->RegisterExceptionManager ();
         logger->LogMessage ("Registered Exception Manager");
 
-        //TrafficRandomizer::GetInstance ()->Initialise ();
+        TrafficRandomizer::GetInstance ()->Initialise ();
         CarColRandomizer::GetInstance ()->Initialise ();
         ParkedCarRandomizer::GetInstance ()->Initialise ();
         PoliceHeliRandomizer::GetInstance ()->Initialise ();
         ScriptVehicleRandomizer::GetInstance ()->Initialise ();
         LicensePlateRandomizer::GetInstance ()->Initialise ();
         SoundRandomizer::GetInstance ()->Initialise ();
-		HandlingRandomizer::GetInstance()->Initialise();
-		CheatRandomizer::GetInstance ()->Initialise ();
+        HandlingRandomizer::GetInstance ()->Initialise ();
+        CheatRandomizer::GetInstance ()->Initialise ();
     }
 
 } rainbow;

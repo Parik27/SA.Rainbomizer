@@ -136,7 +136,7 @@ RandomizeTrafficCars (int *type)
 
     for (int i = 0; i < 1500; i++)
         {
-			// I tried StreamingManager::GetRandomLoadedVehicle, it didn't work.
+            // I tried StreamingManager::GetRandomLoadedVehicle, it didn't work.
             int random_id = random (611, 400);
 
             if (trafficRandomizer->mForcedCar)
@@ -262,7 +262,7 @@ ChoosePoliceVehicleBasedOnModel (int model)
     if (CModelInfo::IsPoliceModel (model))
         return model;
 
-    if (CModelInfo::IsBikeModel (model) || CModelInfo::IsBmxModel(model))
+    if (CModelInfo::IsBikeModel (model) || CModelInfo::IsBmxModel (model))
         return 523;
 
     return 490;

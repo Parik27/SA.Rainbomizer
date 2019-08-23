@@ -20,18 +20,16 @@
 
 #pragma once
 
-
 enum eLoadError
 {
-	ERR_ALREADY_LOADED,
-	ERR_LOADED,
-	ERR_FAILED
+    ERR_ALREADY_LOADED,
+    ERR_LOADED,
+    ERR_FAILED
 };
 
 class StreamingManager
 {
 public:
-
-	static int GetRandomLoadedVehicle();
-	static eLoadError AttemptToLoadVehicle(int model);
+    static int        GetRandomLoadedVehicle ();
+    static eLoadError AttemptToLoadVehicle (int model);
 };

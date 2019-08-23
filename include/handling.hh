@@ -1,11 +1,11 @@
 #pragma once
 
 struct cHandlingDataMgr;
-int __fastcall RandomizeHandling(cHandlingDataMgr *handling, void* edx);
+int __fastcall RandomizeHandling (cHandlingDataMgr *handling, void *edx);
 
 class HandlingRandomizer
 {
-    static HandlingRandomizer *    mInstance;
+    static HandlingRandomizer *mInstance;
 
     HandlingRandomizer (){};
     static void DestroyInstance ();
@@ -16,5 +16,4 @@ public:
 
     /// Initialises Hooks/etc.
     void Initialise ();
-
 };

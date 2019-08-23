@@ -27,14 +27,12 @@ struct CKeyArray;
 
 class GxtManager
 {
-	static std::vector<std::pair<unsigned, std::string>> mData;
-	static void Update(CKeyArray &array);
-	static std::string mRandomWordData;
-	
-public:
+    static std::vector<std::pair<unsigned, std::string>> mData;
+    static void        Update (CKeyArray &array);
+    static std::string mRandomWordData;
 
-	static void Initialise(CText* text);
-	static const char* GetText(std::string key);
-	static const char* GetRandomWord();
+public:
+    static void        Initialise (CText *text);
+    static const char *GetText (std::string key);
+    static const char *GetRandomWord ();
 };
- 

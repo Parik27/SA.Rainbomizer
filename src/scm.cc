@@ -29,8 +29,8 @@
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
-const int MODEL_FIRELA = 0x220;
-const int MODEL_SANCHZ = 468;
+const int MODEL_FIRELA   = 0x220;
+const int MODEL_SANCHZ   = 468;
 const int MODEL_RC_BARON = 464;
 
 /*******************************************************/
@@ -162,7 +162,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     auto err = StreamingManager::AttemptToLoadVehicle (newModel);
     if (err == ERR_FAILED)
         newModel = model;
-	
+
     // Freefall fix
     if (x > 1279.6 && x < 1279.7)
         {
@@ -179,10 +179,11 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
         {
             while (newModel == MODEL_RC_BARON)
                 {
-                    newModel = ScriptVehicleRandomizer::GetInstance ()->GetRandomIDBasedOnVehicle (model);
+                    newModel = ScriptVehicleRandomizer::GetInstance ()
+                                   ->GetRandomIDBasedOnVehicle (model);
                 }
         }
-	
+
     // Photo Opportunity Fix
     if (x > -2173 && x < -2167)
         {
@@ -468,7 +469,7 @@ void __fastcall FixGTAMadman (CRunningScript *scr, void *edx, int opcode)
 
                     float dist   = Dist (playerPos, truckPos);
                     bool  result = dist < 10;
-					
+
                     scr->UpdateCompareFlag (result);
                     return;
                 }
@@ -496,7 +497,7 @@ ScriptVehicleRandomizer::Initialise ()
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 
     this->mPatterns = {
-		
+
         {.pattern = 487,
          .allowed = {VEHICLE_ALL},
          .denied  = {},
@@ -511,11 +512,13 @@ ScriptVehicleRandomizer::Initialise ()
          .denied  = {},
          .flags   = 0},
 
-        {.pattern = 539, .allowed = {VEHICLE_BOAT, 464, 501, 465}, .denied  = {472, 595, 484, 453, 454, 430}},
+        {.pattern = 539,
+         .allowed = {VEHICLE_BOAT, 464, 501, 465},
+         .denied  = {472, 595, 484, 453, 454, 430}},
         {.pattern = 521, .allowed = {VEHICLE_APPEARANCE_BIKE}},
         {.pattern = 522, .allowed = {VEHICLE_APPEARANCE_BIKE}},
-	    
-	{.pattern = 601, .allowed = {432, 601}, .denied = {}, .flags = 0},
+
+        {.pattern = 601, .allowed = {432, 601}, .denied = {}, .flags = 0},
 
         {.pattern = 524, .allowed = {524}, .denied = {}, .flags = 0},
 
@@ -528,12 +531,13 @@ ScriptVehicleRandomizer::Initialise ()
         {.pattern = 515, .allowed = {514, 515, 403}, .denied = {}, .flags = 0},
 
         {.pattern = 403, .allowed = {514, 515, 403}, .denied = {}, .flags = 0},
-	    
-	 {.pattern = 478,
-         .allowed = {	602, 496, 401, 518, 527, 419, 587, 533, 526, 474, 600, 445,507,
-			439, 549, 491, 422, 605, 572, 478, 554, 536, 575, 534, 534, 567,
-			535, 576, 412, 402, 542, 603, 475, 429, 541, 415, 480, 562, 434,
-			494, 502, 503, 411, 559, 560, 506, 541, 558, 555, 477, 546, 550},
+
+        {.pattern = 478,
+         .allowed
+         = {602, 496, 401, 518, 527, 419, 587, 533, 526, 474, 600, 445, 507,
+            439, 549, 491, 422, 605, 572, 478, 554, 536, 575, 534, 534, 567,
+            535, 576, 412, 402, 542, 603, 475, 429, 541, 415, 480, 562, 434,
+            494, 502, 503, 411, 559, 560, 506, 541, 558, 555, 477, 546, 550},
          .denied = {},
          .flags  = 0},
 

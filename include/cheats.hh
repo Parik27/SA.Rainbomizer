@@ -41,9 +41,9 @@ public:
     /// Initialises Hooks/etc.
     void Initialise ();
 
-	/// Randomizes the Cheat Hash table
-	void RandomizeCheatHashes();
-	
+    /// Randomizes the Cheat Hash table
+    void RandomizeCheatHashes ();
+
     /// Should activate a cheat
     bool ShouldActivate ();
 };

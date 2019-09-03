@@ -201,6 +201,7 @@ struct CModelInfo
     static bool IsBmxModel (int modelId);
     static bool IsTrailerModel (int modelId);
     static bool IsPoliceModel (int modelId);
+    static bool IsRCModel (int modelId);
     static int  LoadVehicleColours ();
     static int  GetMaximumNumberOfPassengersFromNumberOfDoors (int modelIndex);
 };

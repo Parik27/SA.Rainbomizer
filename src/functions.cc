@@ -142,6 +142,23 @@ CModelInfo::IsPoliceModel (int modelId)
 }
 
 /*******************************************************/
+bool
+CModelInfo::IsRCModel (int model)
+{
+    switch (model)
+        {
+        case 441: // MODEL_RC_BANDIT
+        case 464: // MODEL_RC_BARON
+        case 594: // MODEL_RC_CAM
+        case 501: // MODEL_RC_GOBLIN
+        case 465: //MODEL_RC_RAIDER
+        case 564: // MODEL_RC_TIGER
+            return true;
+        }
+    return false;
+}
+
+/*******************************************************/
 int
 CModelInfo::LoadVehicleColours ()
 {

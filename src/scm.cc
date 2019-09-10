@@ -186,7 +186,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     // Photo Opportunity Fix
     if (x > -2173 && x < -2167)
         {
-            z = random (65, 36);
+            z = random (42, 36);
         }
     
         // Cut Throat Business Fix

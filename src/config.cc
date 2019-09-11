@@ -39,6 +39,26 @@ BaseConfig::Read (std::shared_ptr<cpptoml::table> table)
 
 /*******************************************************/
 void
+HandlingConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+}
+
+/*******************************************************/
+void
+WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+}
+
+/*******************************************************/
+void
 GeneralConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
     if (!table)
@@ -63,7 +83,7 @@ TrafficConfig::Read (std::shared_ptr<cpptoml::table> table)
     CONFIG (table, enableAircrafts, "EnableAircrafts", bool);
     CONFIG (table, enableCars, "EnableCars", bool);
     CONFIG (table, enableBikes, "EnableBikes", bool);
-	CONFIG (table, enableTrailers, "EnableTrailers", bool);
+    CONFIG (table, enableTrailers, "EnableTrailers", bool);
     CONFIG (table, defaultModel, "DefaultModel", int);
 }
 
@@ -89,7 +109,7 @@ CheatConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     BaseConfig::Read (table);
 
-	CONFIG (table, enableEasterEgg, "EnableEasterEgg", bool);
+    CONFIG (table, enableEasterEgg, "EnableEasterEgg", bool);
 }
 
 /*******************************************************/
@@ -101,10 +121,9 @@ ParkedCarConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     BaseConfig::Read (table);
 
-	CONFIG (table, randomizeFixedSpawns, "RandomizeFixedSpawns", bool);
-	CONFIG (table, randomizeRandomSpawns, "RandomizeRandomSpawns", bool);
+    CONFIG (table, randomizeFixedSpawns, "RandomizeFixedSpawns", bool);
+    CONFIG (table, randomizeRandomSpawns, "RandomizeRandomSpawns", bool);
 }
-
 
 /*******************************************************/
 void
@@ -115,8 +134,8 @@ SoundsConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     BaseConfig::Read (table);
 
-	CONFIG (table, matchSubtitles, "MatchSubtitles", bool);
-	CONFIG (table, audioEventsFile, "AudioEventsFile", std::string);
+    CONFIG (table, matchSubtitles, "MatchSubtitles", bool);
+    CONFIG (table, audioEventsFile, "AudioEventsFile", std::string);
 }
 
 /*******************************************************/
@@ -128,7 +147,7 @@ ScriptVehicleConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     BaseConfig::Read (table);
 
-	CONFIG (table, skipChecks, "SkipChecks", bool);
+    CONFIG (table, skipChecks, "SkipChecks", bool);
 }
 
 /*******************************************************/
@@ -137,17 +156,17 @@ ConfigManager::Initialise (std::string file)
 {
     auto config = cpptoml::parse_file ("config.toml");
 
-    mConfigs.general.Read(config);
-	mConfigs.traffic.Read(config->get_table("TrafficRandomizer"));
-	mConfigs.carcol.Read(config->get_table("CarColRandomizer"));
-    mConfigs.policeHeli.Read(config->get_table("PoliceHeliRandomizer"));
-    mConfigs.cheat.Read(config->get_table("CheatRandomizer"));
-    mConfigs.handling.Read(config->get_table("HandlingRandomizer"));
-    mConfigs.weapon.Read(config->get_table("WeaponRandomizer"));
-    mConfigs.parkedCar.Read(config->get_table("ParkedCarRandomizer"));
-    mConfigs.licensePlate.Read(config->get_table("LicensePlateRandomizer"));
-    mConfigs.sounds.Read(config->get_table("SoundsRandomizer"));
-    mConfigs.scriptVehicle.Read(config->get_table("ScriptVehicleRandomizer"));
+    mConfigs.general.Read (config);
+    mConfigs.traffic.Read (config->get_table ("TrafficRandomizer"));
+    mConfigs.carcol.Read (config->get_table ("CarColRandomizer"));
+    mConfigs.policeHeli.Read (config->get_table ("PoliceHeliRandomizer"));
+    mConfigs.cheat.Read (config->get_table ("CheatRandomizer"));
+    mConfigs.handling.Read (config->get_table ("HandlingRandomizer"));
+    mConfigs.weapon.Read (config->get_table ("WeaponRandomizer"));
+    mConfigs.parkedCar.Read (config->get_table ("ParkedCarRandomizer"));
+    mConfigs.licensePlate.Read (config->get_table ("LicensePlateRandomizer"));
+    mConfigs.sounds.Read (config->get_table ("SoundsRandomizer"));
+    mConfigs.scriptVehicle.Read (config->get_table ("ScriptVehicleRandomizer"));
 }
 
 /*******************************************************/
@@ -171,8 +190,8 @@ ConfigManager::GetInstance ()
 }
 
 /*******************************************************/
-const Configs&
-ConfigManager::GetConfigs()
+const Configs &
+ConfigManager::GetConfigs ()
 {
-	return this->mConfigs;
+    return this->mConfigs;
 }

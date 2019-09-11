@@ -2,7 +2,7 @@
 
 class WeaponRandomizer
 {
-    static WeaponRandomizer *    mInstance;
+    static WeaponRandomizer *mInstance;
 
     WeaponRandomizer (){};
     static void DestroyInstance ();
@@ -13,5 +13,4 @@ public:
 
     /// Initialises Hooks/etc.
     void Initialise ();
-
 };

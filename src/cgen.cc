@@ -38,7 +38,7 @@ ParkedCarRandomizer::Initialise ()
 
     if (config.randomizeRandomSpawns)
         RegisterHooks ({{HOOK_CALL, 0x6F3583, (void *) &RandomizeRandomSpawn}});
-	
+
     if (config.randomizeFixedSpawns)
         RegisterHooks ({{HOOK_CALL, 0x6F35FF, (void *) &RandomizeFixedSpawn}});
 

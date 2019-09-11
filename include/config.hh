@@ -24,9 +24,8 @@
 #include <memory>
 #include <vector>
 
-namespace cpptoml
-{
-	class table;
+namespace cpptoml {
+class table;
 }
 
 /*******************************************************/
@@ -34,14 +33,14 @@ struct BaseConfig
 {
     bool enabled = true;
 
-	void Read(std::shared_ptr<cpptoml::table> table);
+    void Read (std::shared_ptr<cpptoml::table> table);
 };
 
 /*******************************************************/
 struct GeneralConfig : public BaseConfig
 {
-    int seed = -1;
-	void Read(std::shared_ptr<cpptoml::table> table);
+    int  seed = -1;
+    void Read (std::shared_ptr<cpptoml::table> table);
 };
 
 /*******************************************************/
@@ -89,12 +88,14 @@ struct CheatConfig : public BaseConfig
 struct HandlingConfig : public BaseConfig
 {
     bool enabled = false;
+    void Read (std::shared_ptr<cpptoml::table> table);
 };
 
 /*******************************************************/
 struct WeaponConfig : public BaseConfig
 {
     bool enabled = false;
+    void Read (std::shared_ptr<cpptoml::table> table);
 };
 
 /*******************************************************/

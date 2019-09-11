@@ -30,19 +30,19 @@
 WeaponRandomizer *WeaponRandomizer::mInstance = nullptr;
 
 /*******************************************************/
-int*
+int *
 GetWeaponInfo (int weaponId, char skill)
 {
     int array_index = 47;
 
-	switch (skill)
+    switch (skill)
         {
         case 0: array_index = weaponId + 25; break;
         case 1: array_index = weaponId; break;
         case 2: array_index = weaponId + 36; break;
         case 3: array_index = weaponId + 47;
         }
-    return (int*) ((char*) 0xC8AAB8 + 0x70 * array_index);
+    return (int *) ((char *) 0xC8AAB8 + 0x70 * array_index);
 }
 
 /*******************************************************/
@@ -50,31 +50,35 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
                                     int ammo, int slot)
 {
 
-	int original_slot = -1;
+    int original_slot = -1;
     if (weapon != 0)
-	{
-		int target_slot = GetWeaponInfo(weapon, 1)[5];
-		
-		weapon = 0;		
-		while(weapon == 0 || weapon == 19 || weapon == 20 || weapon == 21 || weapon == 14 || weapon == 40)
-			weapon = random(46, 1);
+        {
+            int target_slot = GetWeaponInfo (weapon, 1)[5];
 
-		StreamingManager::AttemptToLoadVehicle (GetWeaponInfo(weapon, 1)[3]);
+            weapon = 0;
+            while (weapon == 0 || weapon == 19 || weapon == 20 || weapon == 21
+                   || weapon == 14 || weapon == 40)
+                weapon = random (46, 1);
 
-		printf("%d - %d %d\n", weapon, GetWeaponInfo(weapon, 1)[3], GetWeaponInfo(weapon, 1)[4]);
-		if(GetWeaponInfo(weapon, slot)[4] != -1)
-			StreamingManager::AttemptToLoadVehicle (GetWeaponInfo(weapon, 1)[4]);
+            StreamingManager::AttemptToLoadVehicle (
+                GetWeaponInfo (weapon, 1)[3]);
 
-		original_slot = GetWeaponInfo(weapon, 1)[5];
-		GetWeaponInfo(weapon, 1)[5] = target_slot;
-	}
-	
+            printf ("%d - %d %d\n", weapon, GetWeaponInfo (weapon, 1)[3],
+                    GetWeaponInfo (weapon, 1)[4]);
+            if (GetWeaponInfo (weapon, slot)[4] != -1)
+                StreamingManager::AttemptToLoadVehicle (
+                    GetWeaponInfo (weapon, 1)[4]);
+
+            original_slot                = GetWeaponInfo (weapon, 1)[5];
+            GetWeaponInfo (weapon, 1)[5] = target_slot;
+        }
+
     int ret = thisPed->GiveWeapon (weapon, ammo, slot);
 
-	if(original_slot >= 0)
-		GetWeaponInfo(weapon, 1)[5] = original_slot;
-	
-	return ret;
+    if (original_slot >= 0)
+        GetWeaponInfo (weapon, 1)[5] = original_slot;
+
+    return ret;
 }
 
 /*******************************************************/
@@ -82,11 +86,10 @@ void
 WeaponRandomizer::Initialise ()
 {
 
-	auto config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
-	if(!config.enabled)
-		return;
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
+    if (!config.enabled)
+        return;
 
-	
     int addresses[]
         = {0x0438647, 0x043865E, 0x0438675, 0x043868C, 0x04386A3, 0x04386BD,
            0x04386D4, 0x04386EB, 0x0438705, 0x043871F, 0x0438748, 0x043875F,
@@ -103,12 +106,12 @@ WeaponRandomizer::Initialise ()
            0x05E899A, 0x061390C, 0x062B3BC, 0x062B5C9, 0x068B8DF, 0x068E355,
            0x068E39D, 0x068E3F2, 0x068E418, 0x069082D, 0x06D19E6, 0x06D1A24,
            0x074282C};
-    
-	for(int i = 0; i < sizeof(addresses)/4; i++)
-	{
-		injector::MakeCALL(addresses[i], (void*) &RandomizeGiveWeapon);
-	}
-	
+
+    for (int i = 0; i < sizeof (addresses) / 4; i++)
+        {
+            injector::MakeCALL (addresses[i], (void *) &RandomizeGiveWeapon);
+        }
+
     Logger::GetLogger ()->LogMessage ("Intialised WeaponRandomizer");
 }
 

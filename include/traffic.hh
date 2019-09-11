@@ -63,8 +63,8 @@ class TrafficRandomizer
     TrafficRandomizer (){};
     static void DestroyInstance ();
 
-	bool IsVehicleAllowed(int model);
-	
+    bool IsVehicleAllowed (int model);
+
     void FixTrainSpawns ();
 
 public:
@@ -84,9 +84,8 @@ public:
     /// Gets instance for TrafficRandomizer
     static TrafficRandomizer *GetInstance ();
 
-    friend int RandomizeTrafficCars (int *type);
-    friend int RandomizeCarToLoad ();
-    friend int RandomizePoliceCars ();
-	friend void LoadRandomVehiclesAtStart ();
-	
+    friend int  RandomizeTrafficCars (int *type);
+    friend int  RandomizeCarToLoad ();
+    friend int  RandomizePoliceCars ();
+    friend void LoadRandomVehiclesAtStart ();
 };

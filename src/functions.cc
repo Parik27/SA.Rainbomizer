@@ -22,6 +22,9 @@
 #include "base.hh"
 #include <cstring>
 #include <cmath>
+#include <random>
+#include "config.hh"
+#include <ctime>
 
 /*******************************************************/
 int
@@ -151,7 +154,7 @@ CModelInfo::IsRCModel (int model)
         case 464: // MODEL_RC_BARON
         case 594: // MODEL_RC_CAM
         case 501: // MODEL_RC_GOBLIN
-        case 465: //MODEL_RC_RAIDER
+        case 465: // MODEL_RC_RAIDER
         case 564: // MODEL_RC_TIGER
             return true;
         }
@@ -160,16 +163,16 @@ CModelInfo::IsRCModel (int model)
 
 /*******************************************************/
 int
-CCarCtrl::ChooseModel(int *type)
+CCarCtrl::ChooseModel (int *type)
 {
-	return CallAndReturn<int, 0x424CE0>(type);
+    return CallAndReturn<int, 0x424CE0> (type);
 }
 
 /*******************************************************/
 int
-CPed::GiveWeapon(int weapon, int ammo, int slot)
+CPed::GiveWeapon (int weapon, int ammo, int slot)
 {
-	return CallMethodAndReturn<int, 0x5E6080>(this, weapon, ammo, slot);
+    return CallMethodAndReturn<int, 0x5E6080> (this, weapon, ammo, slot);
 }
 
 /*******************************************************/
@@ -246,7 +249,7 @@ CStreaming::SetIsDeletable (int model)
 int
 CLoadedCarGroup::PickRandomCar (bool checkUsage, bool arg2)
 {
-    return CallMethodAndReturn<int, 0x611C50> (this, checkUsage, arg2);
+    return this->m_members[random (CountMembers () - 1)];
 }
 
 /*******************************************************/
@@ -413,10 +416,22 @@ CEntity::GetPosition ()
 }
 
 /*******************************************************/
+std::mt19937 &
+rand_engine ()
+{
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
+    thread_local static std::mt19937 engine{
+        config.seed != -1 ? config.seed : (unsigned int) time (NULL)};
+
+    return engine;
+}
+
+/*******************************************************/
 int
 random (int max, int min)
 {
-    return (rand () % (max - min + 1)) + min;
+    std::uniform_int_distribution<int> dist{min, max};
+    return dist (rand_engine ());
 }
 
 CStreamingInfo * ms_aInfoForModel               = (CStreamingInfo *) 0x8E4CC0;

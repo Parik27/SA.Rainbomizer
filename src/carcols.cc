@@ -136,7 +136,7 @@ RandomizeColourTables ()
 
     for (int i = 0; i < 128; i++)
         {
-			// Check for exceptions
+            // Check for exceptions
             if (std::find (std::begin (config.exceptions),
                            std::end (config.exceptions), i)
                 != std::end (config.exceptions))

@@ -47,10 +47,10 @@ RandomizeHelisOnUnload ()
 void
 PoliceHeliRandomizer::Initialise ()
 {
-	auto config = ConfigManager::GetInstance ()->GetConfigs ().policeHeli;
-	if(!config.enabled)
-		return;
-	
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().policeHeli;
+    if (!config.enabled)
+        return;
+
     RegisterHooks ({{HOOK_CALL, 0x40B88B, (void *) &RandomizeHelisOnUnload},
                     {HOOK_CALL, 0x40B845, (void *) &TurnOnRandomization}});
 

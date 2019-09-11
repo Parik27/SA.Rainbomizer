@@ -30,8 +30,8 @@
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
-const int MODEL_FIRELA   = 0x220;
-const int MODEL_SANCHZ   = 468;
+const int MODEL_FIRELA = 0x220;
+const int MODEL_SANCHZ = 468;
 
 /*******************************************************/
 void
@@ -166,7 +166,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     // Freefall fix
     if (x > 1279.6 && x < 1279.7)
         {
-            while (CModelInfo::IsRCModel(newModel))
+            while (CModelInfo::IsRCModel (newModel))
                 {
                     newModel = ScriptVehicleRandomizer::GetInstance ()
                                    ->GetRandomIDBasedOnVehicle (model);
@@ -177,7 +177,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     // Dam and Blast + Saint Mark's Bistro Fix
     if (x > 1477.4 && x < 1479.8)
         {
-            while (CModelInfo::IsRCModel(newModel))
+            while (CModelInfo::IsRCModel (newModel))
                 {
                     newModel = ScriptVehicleRandomizer::GetInstance ()
                                    ->GetRandomIDBasedOnVehicle (model);
@@ -189,15 +189,15 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
         {
             z = random (42, 36);
         }
-    
-        // Cut Throat Business Fix
+
+    // Cut Throat Business Fix
     if (x > -7.4399 && x < -7.4388)
         {
-           if (!CModelInfo::IsRCModel(newModel))
-           {
-              x += 40;
-              z -= 6;
-           }
+            if (!CModelInfo::IsRCModel (newModel))
+                {
+                    x += 40;
+                    z -= 6;
+                }
         }
 
     uint8_t *vehicle = (uint8_t *) CCarCtrl::CreateCarForScript (newModel, x, y,
@@ -513,11 +513,10 @@ ScriptVehicleRandomizer::Initialise ()
 
     if (config.skipChecks)
         {
-            this->mPatterns
-                = { {.pattern = VEHICLE_ALL,
-                     .allowed = {VEHICLE_ALL},
-                     .denied  = {},
-                     .flags   = NO_SEAT_CHECK} };
+            this->mPatterns = {{.pattern = VEHICLE_ALL,
+                                .allowed = {VEHICLE_ALL},
+                                .denied  = {},
+                                .flags   = NO_SEAT_CHECK}};
         }
 
     this->mPatterns = {

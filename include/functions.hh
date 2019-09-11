@@ -84,7 +84,7 @@ struct CCarCtrl
 {
     static void *CreateCarForScript (int modelId, float X, float Y, float Z,
                                      char a5);
-	static int ChooseModel(int* type);
+    static int   ChooseModel (int *type);
 };
 
 struct CRunningScript
@@ -238,7 +238,7 @@ struct CVehicle
 
 struct CPed
 {
-	int GiveWeapon(int weapon, int ammo, int slot);
+    int GiveWeapon (int weapon, int ammo, int slot);
 };
 
 struct CBaseModelInfo
@@ -279,7 +279,7 @@ struct CStreaming
     static void RemoveModel (int model);
     static void SetMissionDoesntRequireModel (int index);
     static void SetIsDeletable (int model);
-	static void RemoveLeastUsedModel(int flags);
+    static void RemoveLeastUsedModel (int flags);
 };
 
 struct CStreamingInfo

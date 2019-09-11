@@ -21,25 +21,25 @@
 
 # General Configuration
 
-Enabled = True
+Enabled = true
 Seed    = -1 # -1 for random
 
 #######################################################
 # Traffic Randomizer
 [TrafficRandomizer]
 
-Enabled = True
+Enabled = true
 
 # This will make a specific vehicle spawn on streets
-ForcedVehicleEnabled = False
+ForcedVehicleEnabled = false
 ForcedVehicleID = 500
 
-EnableTrains = True
-EnableBoats = True
-EnableAircrafts = True
-EnableCars = True
-EnableBikes = True
-EnableTrailers = True
+EnableTrains = true
+EnableBoats = true
+EnableAircrafts = true
+EnableCars = true
+EnableBikes = true
+EnableTrailers = true
 
 # For special vehicles on street that can't spawn peds
 DefaultModel = 0
@@ -47,54 +47,54 @@ DefaultModel = 0
 #######################################################
 [CarColRandomizer]
 
-Enabled = True
+Enabled = true
 Exceptions = [0, 1] # These colours will not be randomized
 
 #######################################################
 [PoliceHeliRandomizer]
-Enabled = True
+Enabled = true
 
 #######################################################
 [CheatRandomizer]
 
-Enabled = True
-EnableEasterEgg = True
+Enabled = true
+EnableEasterEgg = true
 
 #######################################################
 # Experimental - Crashes are quite often
 [HandlingRandomizer]
 
-Enabled = False
+Enabled = false
 
 #######################################################
 # Experimental - Very buggy, and incomplete
 [WeaponRandomizer]
 
-Enabled = False
+Enabled = false
 
 #######################################################
 [ParkedCarRandomizer]
 
-Enabled = True
-RandomizeFixedSpawns = True
-RandomizeRandomSpawns = True
+Enabled = true
+RandomizeFixedSpawns = true
+RandomizeRandomSpawns = true
 
 #######################################################
 [LicensePlateRandomizer]
 
-Enabled = True
+Enabled = true
 
 #######################################################
 [SoundsRandomizer] # Random Dialogues for now
 
-Enabled = True
-MatchSubtitles = True
+Enabled = true
+MatchSubtitles = true
 AudioEventsFile = "data/AudioEvents.txt" # Relative to game directory
 
 #######################################################
 [ScriptVehicleRandomizer]
 
-Enabled = True
-SkipChecks = False  # Don't enable this if you don't want to softlock every
+Enabled = true
+SkipChecks = false  # Don't enable this if you don't want to softlock every
                     # other mission :P
 

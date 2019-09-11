@@ -36,27 +36,27 @@ const char *__fastcall RandomizeHashesAfterCheatActivated (CText *text,
                                                            void *edx, char *key)
 {
     CheatRandomizer::GetInstance ()->RandomizeCheatHashes ();
-	auto config = ConfigManager::GetInstance ()->GetConfigs ().cheat;
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().cheat;
 
-	if(config.enableEasterEgg)
-	{
-		int         chits_len = sizeof (chits) / sizeof (chits[0]);
-		const char *chit      = chits[random (chits_len - 1)].c_str ();
-		
-		return chit;
-	}
+    if (config.enableEasterEgg)
+        {
+            int         chits_len = sizeof (chits) / sizeof (chits[0]);
+            const char *chit      = chits[random (chits_len - 1)].c_str ();
 
-	return text->Get(key);
+            return chit;
+        }
+
+    return text->Get (key);
 }
 
 /*******************************************************/
 void
 CheatRandomizer::Initialise ()
 {
-	auto config = ConfigManager::GetInstance ()->GetConfigs ().cheat;
-	if(!config.enabled)
-		return;
-	
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().cheat;
+    if (!config.enabled)
+        return;
+
     Logger::GetLogger ()->LogMessage ("Intialised CheatRandomizer");
     RegisterHooks (
         {{HOOK_CALL, 0x43854D, (void *) &RandomizeHashesAfterCheatActivated}});

@@ -49,10 +49,10 @@ int __fastcall RandomizeHandling (cHandlingDataMgr *handling, void *edx)
 void
 HandlingRandomizer::Initialise ()
 {
-	auto config = ConfigManager::GetInstance ()->GetConfigs ().handling;
-	if(!config.enabled)
-		return;
-	
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().handling;
+    if (!config.enabled)
+        return;
+
     RegisterHooks ({{HOOK_CALL, 0x5BFA9A, (void *) &RandomizeHandling}});
     Logger::GetLogger ()->LogMessage ("Intialised HandlingRandomizer");
 }

@@ -48,20 +48,20 @@ public:
     /*******************************************************/
     Rainbomizer ()
     {
-		auto config = ConfigManager::GetInstance();
-		config->Initialise("rainbomizer.toml");
+        auto config = ConfigManager::GetInstance ();
+        config->Initialise ("rainbomizer.toml");
 
-		if(!config->GetConfigs().general.enabled)
-			return;
+        if (!config->GetConfigs ().general.enabled)
+            return;
 
-		int seed = config->GetConfigs().general.seed;
+        int seed = config->GetConfigs ().general.seed;
         srand (seed == -1 ? time (NULL) : seed);
-		
+
         auto logger = Logger::GetLogger ();
 
         ExceptionManager::GetExceptionManager ()->RegisterExceptionManager ();
         logger->LogMessage ("Registered Exception Manager");
-		
+
         TrafficRandomizer::GetInstance ()->Initialise ();
         CarColRandomizer::GetInstance ()->Initialise ();
         ParkedCarRandomizer::GetInstance ()->Initialise ();

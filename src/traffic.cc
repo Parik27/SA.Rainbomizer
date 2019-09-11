@@ -40,8 +40,8 @@ TrafficRandomizer::Initialise ()
     if (!config.enabled)
         return;
 
-    if (config.forcedVehicleEnabled && config.forcedVehicleID > 500
-        && config.forcedVehicleID < 611)
+    if (config.forcedVehicleEnabled && config.forcedVehicleID >= 400
+        && config.forcedVehicleID <= 611)
         this->SetForcedRandomCar (config.forcedVehicleID);
 
     RegisterHooks ({{HOOK_JUMP, 0x421980, (void *) &RandomizePoliceCars},
@@ -159,9 +159,9 @@ RandomizeTrafficCars (int *type)
 
     if (trafficRandomizer->mForcedCar)
         random_id = trafficRandomizer->mForcedCar;
-	
-	else if(!trafficRandomizer->IsVehicleAllowed(random_id))
-		return -1;
+
+    else if (!trafficRandomizer->IsVehicleAllowed (random_id))
+        return -1;
 
     if (ms_aInfoForModel[random_id].m_nLoadState == 1)
         {
@@ -219,9 +219,11 @@ TrafficRandomizer::IsVehicleAllowed (int model)
         && !config.enableCars)
         return false;
 
-	// Trailers
-	if(CModelInfo::IsTrailerModel(model) && !config.enableTrailers)
-		return false;
+    // Trailers
+    if (CModelInfo::IsTrailerModel (model) && !config.enableTrailers)
+        return false;
+
+    return true;
 }
 
 /*******************************************************/
@@ -234,8 +236,8 @@ RandomizeCarToLoad ()
     for (int i = 0; i < 16; i++)
         {
             int random_id = random (611, 400);
-			if(!trafficRandomizer->IsVehicleAllowed(random_id))
-				continue;
+            if (!trafficRandomizer->IsVehicleAllowed (random_id))
+                continue;
 
             if (trafficRandomizer->mForcedCar)
                 random_id = trafficRandomizer->mForcedCar;
@@ -286,8 +288,8 @@ RandomizeCarPeds (int type, int model, float *pos, bool unk)
     if (ms_aInfoForModel[model].m_nLoadState == 1)
         return CPopulation::AddPed (type, model, pos, unk);
 
-	auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
-	
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
+
     // spawn CJ because why not :P
     return CPopulation::AddPed (type, config.defaultModel, pos, unk);
 }
@@ -324,8 +326,14 @@ ChoosePoliceVehicleBasedOnModel (int model)
     if (model != 528 && model != 601 && CModelInfo::IsPoliceModel (model))
         return model;
 
-    if (CModelInfo::IsBikeModel (model) || CModelInfo::IsBmxModel (model))
-        return 523;
+    int seats
+        = CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (model);
+    switch (seats)
+        {
+        case 1: return 523;
 
-    return 490;
+        case 2: return 599;
+
+        default: return 490;
+        };
 }

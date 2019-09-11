@@ -24,6 +24,8 @@
 #include <windows.h>
 #include <ctime>
 #include "injector/injector.hpp"
+#include "loader.hh"
+#include "config.hh"
 
 const int          LOG_MOST_RECENT_VEHICLES     = 5;
 TrafficRandomizer *TrafficRandomizer::mInstance = nullptr;
@@ -33,9 +35,18 @@ void
 TrafficRandomizer::Initialise ()
 {
 
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
+
+    if (!config.enabled)
+        return;
+
+    if (config.forcedVehicleEnabled && config.forcedVehicleID > 500
+        && config.forcedVehicleID < 611)
+        this->SetForcedRandomCar (config.forcedVehicleID);
+
     RegisterHooks ({{HOOK_JUMP, 0x421980, (void *) &RandomizePoliceCars},
                     {HOOK_CALL, 0x431EE5, (void *) &FixEmptyPoliceCars},
-                    {HOOK_JUMP, 0x424CE0, (void *) &RandomizeTrafficCars},
+                    {HOOK_CALL, 0x43022A, (void *) &RandomizeTrafficCars},
                     {HOOK_CALL, 0x613B7F, (void *) &RandomizeCarPeds},
                     {HOOK_JUMP, 0x421900, (void *) &RandomizeCarToLoad},
                     {HOOK_CALL, 0x42C620, (void *) &FixEmptyPoliceCars},
@@ -115,11 +126,11 @@ RandomizePoliceCars ()
 /*******************************************************/
 /* Chooses a random vehicle for traffic vehicles */
 /*******************************************************/
-
-int
-RandomizeTrafficCars (int *type)
+void
+LoadRandomVehiclesAtStart ()
 {
     auto trafficRandomizer = TrafficRandomizer::GetInstance ();
+
     if (!trafficRandomizer->mInitialVehiclesLoaded)
         {
             // Randomizes loading a few vehicles
@@ -133,38 +144,84 @@ RandomizeTrafficCars (int *type)
             CStreaming::LoadAllRequestedModels (false);
             trafficRandomizer->mInitialVehiclesLoaded = true;
         }
+}
 
-    for (int i = 0; i < 1500; i++)
+/*******************************************************/
+/* Chooses a random vehicle for traffic vehicles */
+/*******************************************************/
+
+int
+RandomizeTrafficCars (int *type)
+{
+    auto trafficRandomizer = TrafficRandomizer::GetInstance ();
+
+    int random_id = StreamingManager::GetRandomLoadedVehicle ();
+
+    if (trafficRandomizer->mForcedCar)
+        random_id = trafficRandomizer->mForcedCar;
+	
+	else if(!trafficRandomizer->IsVehicleAllowed(random_id))
+		return -1;
+
+    if (ms_aInfoForModel[random_id].m_nLoadState == 1)
         {
-            // I tried StreamingManager::GetRandomLoadedVehicle, it didn't work.
-            int random_id = random (611, 400);
+            // Add to the recently spawned list
+            trafficRandomizer->mMostRecentSpawnedVehicles.push_back (random_id);
 
-            if (trafficRandomizer->mForcedCar)
-                random_id = trafficRandomizer->mForcedCar;
+            if (trafficRandomizer->mMostRecentSpawnedVehicles.size ()
+                > LOG_MOST_RECENT_VEHICLES)
+                trafficRandomizer->mMostRecentSpawnedVehicles.pop_front ();
 
-            if (ms_aInfoForModel[random_id].m_nLoadState == 1)
+            // Set type for vehicles
+            if (type)
                 {
-                    // Add to the recently spawned list
-                    trafficRandomizer->mMostRecentSpawnedVehicles.push_back (
-                        random_id);
-
-                    if (trafficRandomizer->mMostRecentSpawnedVehicles.size ()
-                        > LOG_MOST_RECENT_VEHICLES)
-                        trafficRandomizer->mMostRecentSpawnedVehicles
-                            .pop_front ();
-
-                    if (type)
-                        {
-                            if (CModelInfo::IsPoliceModel (random_id))
-                                *type = 13;
-                        }
-                    return random_id;
+                    CCarCtrl::ChooseModel (type);
+                    if (CModelInfo::IsPoliceModel (random_id))
+                        *type = 13; // TYPE_POLICECAR
                 }
-            else if (trafficRandomizer->mForcedCar)
-                return -1;
+            return random_id;
         }
+    else if (trafficRandomizer->mForcedCar)
+        return -1;
 
     return -1;
+}
+
+/*******************************************************/
+/* Returns true/false if config file allows a vehicle to spawn */
+/*******************************************************/
+bool
+TrafficRandomizer::IsVehicleAllowed (int model)
+{
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
+
+    // Aircrafts
+    if ((CModelInfo::IsHeliModel (model) || CModelInfo::IsPlaneModel (model))
+        && !config.enableAircrafts)
+        return false;
+
+    // Boats
+    if (CModelInfo::IsBoatModel (model) && !config.enableBoats)
+        return false;
+
+    // Bikes
+    if ((CModelInfo::IsBikeModel (model) || CModelInfo::IsBmxModel (model))
+        && !config.enableBikes)
+        return false;
+
+    // Trains
+    if (CModelInfo::IsTrainModel (model) && !config.enableTrains)
+        return false;
+
+    // Cars
+    if ((CModelInfo::IsCarModel (model) || CModelInfo::IsQuadBikeModel (model)
+         || CModelInfo::IsMonsterTruckModel (model))
+        && !config.enableCars)
+        return false;
+
+	// Trailers
+	if(CModelInfo::IsTrailerModel(model) && !config.enableTrailers)
+		return false;
 }
 
 /*******************************************************/
@@ -177,6 +234,8 @@ RandomizeCarToLoad ()
     for (int i = 0; i < 16; i++)
         {
             int random_id = random (611, 400);
+			if(!trafficRandomizer->IsVehicleAllowed(random_id))
+				continue;
 
             if (trafficRandomizer->mForcedCar)
                 random_id = trafficRandomizer->mForcedCar;
@@ -223,11 +282,14 @@ FixEmptyPoliceCars (uint8_t *vehicle, char a3)
 void *
 RandomizeCarPeds (int type, int model, float *pos, bool unk)
 {
+
     if (ms_aInfoForModel[model].m_nLoadState == 1)
         return CPopulation::AddPed (type, model, pos, unk);
 
+	auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
+	
     // spawn CJ because why not :P
-    return CPopulation::AddPed (type, 0, pos, unk);
+    return CPopulation::AddPed (type, config.defaultModel, pos, unk);
 }
 
 /*******************************************************/
@@ -259,7 +321,7 @@ void __fastcall FixFreightTrainCrash (CAEVehicleAudioEntity *audio, void *edx,
 int
 ChoosePoliceVehicleBasedOnModel (int model)
 {
-    if (CModelInfo::IsPoliceModel (model))
+    if (model != 528 && model != 601 && CModelInfo::IsPoliceModel (model))
         return model;
 
     if (CModelInfo::IsBikeModel (model) || CModelInfo::IsBmxModel (model))

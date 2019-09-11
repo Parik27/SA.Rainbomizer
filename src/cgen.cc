@@ -24,6 +24,7 @@
 #include "base.hh"
 #include "functions.hh"
 #include "traffic.hh"
+#include "config.hh"
 
 ParkedCarRandomizer *ParkedCarRandomizer::mInstance = nullptr;
 
@@ -31,10 +32,16 @@ ParkedCarRandomizer *ParkedCarRandomizer::mInstance = nullptr;
 void
 ParkedCarRandomizer::Initialise ()
 {
-    RegisterHooks ({
-        {HOOK_CALL, 0x6F3583, (void *) &RandomizeRandomSpawn},
-        {HOOK_CALL, 0x6F35FF, (void *) &RandomizeFixedSpawn},
-    });
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().parkedCar;
+    if (!config.enabled)
+        return;
+
+    if (config.randomizeRandomSpawns)
+        RegisterHooks ({{HOOK_CALL, 0x6F3583, (void *) &RandomizeRandomSpawn}});
+	
+    if (config.randomizeFixedSpawns)
+        RegisterHooks ({{HOOK_CALL, 0x6F35FF, (void *) &RandomizeFixedSpawn}});
+
     Logger::GetLogger ()->LogMessage ("Intialised ParkedCarRandomizer");
 }
 

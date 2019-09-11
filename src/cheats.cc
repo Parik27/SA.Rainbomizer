@@ -24,6 +24,7 @@
 #include "base.hh"
 #include "functions.hh"
 #include <ctime>
+#include "config.hh"
 
 CheatRandomizer *CheatRandomizer::mInstance = nullptr;
 
@@ -35,17 +36,27 @@ const char *__fastcall RandomizeHashesAfterCheatActivated (CText *text,
                                                            void *edx, char *key)
 {
     CheatRandomizer::GetInstance ()->RandomizeCheatHashes ();
+	auto config = ConfigManager::GetInstance ()->GetConfigs ().cheat;
 
-    int         chits_len = sizeof (chits) / sizeof (chits[0]);
-    const char *chit      = chits[random (chits_len - 1)].c_str ();
+	if(config.enableEasterEgg)
+	{
+		int         chits_len = sizeof (chits) / sizeof (chits[0]);
+		const char *chit      = chits[random (chits_len - 1)].c_str ();
+		
+		return chit;
+	}
 
-    return chit;
+	return text->Get(key);
 }
 
 /*******************************************************/
 void
 CheatRandomizer::Initialise ()
 {
+	auto config = ConfigManager::GetInstance ()->GetConfigs ().cheat;
+	if(!config.enabled)
+		return;
+	
     Logger::GetLogger ()->LogMessage ("Intialised CheatRandomizer");
     RegisterHooks (
         {{HOOK_CALL, 0x43854D, (void *) &RandomizeHashesAfterCheatActivated}});

@@ -25,6 +25,7 @@
 #include "functions.hh"
 #include "injector/injector.hpp"
 #include "loader.hh"
+#include "config.hh"
 #include <cmath>
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
@@ -279,7 +280,7 @@ ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
 int
 ScriptVehicleRandomizer::GetRandomIDBasedOnVehicle (int id)
 {
-    // return 522;
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().scriptVehicle;
     for (auto pattern : mPatterns)
         {
             if (DoesVehicleMatchPattern (id, pattern.pattern))
@@ -490,6 +491,11 @@ void __fastcall FixGTAMadman (CRunningScript *scr, void *edx, int opcode)
 void
 ScriptVehicleRandomizer::Initialise ()
 {
+
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().scriptVehicle;
+    if (!config.enabled)
+        return;
+
     RegisterHooks ({{HOOK_CALL, 0x467B01, (void *) &RandomizeCarForScript},
                     {HOOK_CALL, 0x498AA8, (void *) &SlowDownAndromedaInStoaway},
                     {HOOK_CALL, 0x47F070, (void *) &RevertVehFixes},
@@ -504,6 +510,15 @@ ScriptVehicleRandomizer::Initialise ()
                     {HOOK_CALL, 0x49128C, (void *) &FixGTAMadman}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
+
+    if (config.skipChecks)
+        {
+            this->mPatterns
+                = { {.pattern = VEHICLE_ALL,
+                     .allowed = {VEHICLE_ALL},
+                     .denied  = {},
+                     .flags   = NO_SEAT_CHECK} };
+        }
 
     this->mPatterns = {
 

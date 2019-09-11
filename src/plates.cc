@@ -6,6 +6,7 @@
 #include "text.hh"
 #include "functions.hh"
 #include <algorithm>
+#include "config.hh"
 
 LicensePlateRandomizer *LicensePlateRandomizer::mInstance = nullptr;
 
@@ -38,6 +39,11 @@ GetNewPlateText (char *buf, int len)
 void
 LicensePlateRandomizer::Initialise ()
 {
+	auto config = ConfigManager::GetInstance ()->GetConfigs ().licensePlate;
+    if (!config.enabled)
+        return;
+
+	
     Logger::GetLogger ()->LogMessage ("Intialised LicensePlateRandomizer");
     RegisterHooks ({{HOOK_CALL, 0x6D10FB, (void *) &GetNewCustomPlateText},
                     {HOOK_CALL, 0x4C9484, (void *) &GetNewPlateText},

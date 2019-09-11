@@ -24,6 +24,8 @@
 #include "functions.hh"
 #include <cmath>
 #include "logger.hh"
+#include "config.hh"
+#include <algorithm>
 
 CarColRandomizer *CarColRandomizer::mInstance = nullptr;
 
@@ -102,6 +104,11 @@ CarColRandomizer::GetInstance ()
 void
 CarColRandomizer::Initialise ()
 {
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().carcol;
+
+    if (!config.enabled)
+        return;
+
     RegisterHooks ({{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables},
                     {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}});
 
@@ -125,9 +132,16 @@ RandomizeColourTables ()
 {
     int ret = CModelInfo::LoadVehicleColours ();
 
-    // Skip first 2 colours (white, black)
-    for (int i = 2; i < 128; i++)
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().carcol;
+
+    for (int i = 0; i < 128; i++)
         {
+			// Check for exceptions
+            if (std::find (std::begin (config.exceptions),
+                           std::end (config.exceptions), i)
+                != std::end (config.exceptions))
+                continue;
+
             int colour[] = {0, 0, 0};
             HSVtoRGB ((int) (i * 2.8125), random (50, 100) / 100.0,
                       random (50, 100) / 100.0, colour);

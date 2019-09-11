@@ -8,6 +8,7 @@
 #include <ctime>
 #include <algorithm>
 #include <stdexcept>
+#include "config.hh"
 
 SoundRandomizer *SoundRandomizer::mInstance = nullptr;
 
@@ -60,7 +61,11 @@ char *__fastcall RemoveSubtitlesHook (CText *TheText, void *edx, char *key)
 char *__fastcall CorrectSubtitles (CText *text, void *edx, char *key)
 {
     auto soundsR = SoundRandomizer::GetInstance ();
+	auto config = ConfigManager::GetInstance ()->GetConfigs ().sounds;
 
+	if(!config.matchSubtitles)
+		return text->Get (key);
+	
     try
         {
             auto prevIndex = soundsR->GetPreviousPairs ().at (key);
@@ -177,6 +182,10 @@ SoundRandomizer::InitaliseSoundTable ()
 void
 SoundRandomizer::Initialise ()
 {
+	auto config = ConfigManager::GetInstance ()->GetConfigs ().sounds;
+    if (!config.enabled)
+        return;
+	
     Logger::GetLogger ()->LogMessage ("Intialised SoundRandomizer");
     RegisterHooks ({{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
                     {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles},

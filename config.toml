@@ -1,0 +1,100 @@
+########################################################
+
+# Rainbomizer - A (probably fun) Grand Theft Auto San Andreas Mod that
+#               randomizes stuff
+# Copyright (C) 2019 - Parik
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#######################################################
+
+# General Configuration
+
+Enabled = True
+Seed    = -1 # -1 for random
+
+#######################################################
+# Traffic Randomizer
+[TrafficRandomizer]
+
+Enabled = True
+
+# This will make a specific vehicle spawn on streets
+ForcedVehicleEnabled = False
+ForcedVehicleID = 500
+
+EnableTrains = True
+EnableBoats = True
+EnableAircrafts = True
+EnableCars = True
+EnableBikes = True
+EnableTrailers = True
+
+# For special vehicles on street that can't spawn peds
+DefaultModel = 0
+
+#######################################################
+[CarColRandomizer]
+
+Enabled = True
+Exceptions = [0, 1] # These colours will not be randomized
+
+#######################################################
+[PoliceHeliRandomizer]
+Enabled = True
+
+#######################################################
+[CheatRandomizer]
+
+Enabled = True
+EnableEasterEgg = True
+
+#######################################################
+# Experimental - Crashes are quite often
+[HandlingRandomizer]
+
+Enabled = False
+
+#######################################################
+# Experimental - Very buggy, and incomplete
+[WeaponRandomizer]
+
+Enabled = False
+
+#######################################################
+[ParkedCarRandomizer]
+
+Enabled = True
+RandomizeFixedSpawns = True
+RandomizeRandomSpawns = True
+
+#######################################################
+[LicensePlateRandomizer]
+
+Enabled = True
+
+#######################################################
+[SoundsRandomizer] # Random Dialogues for now
+
+Enabled = True
+MatchSubtitles = True
+AudioEventsFile = "data/AudioEvents.txt" # Relative to game directory
+
+#######################################################
+[ScriptVehicleRandomizer]
+
+Enabled = True
+SkipChecks = False  # Don't enable this if you don't want to softlock every
+                    # other mission :P
+

@@ -160,6 +160,20 @@ CModelInfo::IsRCModel (int model)
 
 /*******************************************************/
 int
+CCarCtrl::ChooseModel(int *type)
+{
+	return CallAndReturn<int, 0x424CE0>(type);
+}
+
+/*******************************************************/
+int
+CPed::GiveWeapon(int weapon, int ammo, int slot)
+{
+	return CallMethodAndReturn<int, 0x5E6080>(this, weapon, ammo, slot);
+}
+
+/*******************************************************/
+int
 CModelInfo::LoadVehicleColours ()
 {
     return CallAndReturn<int, 0x5B6890> ();
@@ -212,6 +226,13 @@ int
 CLoadedCarGroup::CountMembers ()
 {
     return CallMethodAndReturn<int, 0x611C30> (this);
+}
+
+/*******************************************************/
+void
+CStreaming::RemoveLeastUsedModel (int flags)
+{
+    Call<0x40CFD0> (flags);
 }
 
 /*******************************************************/

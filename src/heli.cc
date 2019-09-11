@@ -24,6 +24,7 @@
 #include "functions.hh"
 #include "base.hh"
 #include "injector/injector.hpp"
+#include "config.hh"
 
 PoliceHeliRandomizer *PoliceHeliRandomizer::mInstance = nullptr;
 
@@ -46,6 +47,10 @@ RandomizeHelisOnUnload ()
 void
 PoliceHeliRandomizer::Initialise ()
 {
+	auto config = ConfigManager::GetInstance ()->GetConfigs ().policeHeli;
+	if(!config.enabled)
+		return;
+	
     RegisterHooks ({{HOOK_CALL, 0x40B88B, (void *) &RandomizeHelisOnUnload},
                     {HOOK_CALL, 0x40B845, (void *) &TurnOnRandomization}});
 

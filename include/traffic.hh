@@ -63,6 +63,8 @@ class TrafficRandomizer
     TrafficRandomizer (){};
     static void DestroyInstance ();
 
+	bool IsVehicleAllowed(int model);
+	
     void FixTrainSpawns ();
 
 public:
@@ -85,4 +87,6 @@ public:
     friend int RandomizeTrafficCars (int *type);
     friend int RandomizeCarToLoad ();
     friend int RandomizePoliceCars ();
+	friend void LoadRandomVehiclesAtStart ();
+	
 };

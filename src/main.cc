@@ -30,6 +30,8 @@
 #include "cheats.hh"
 #include "plates.hh"
 #include "handling.hh"
+#include "weapons.hh"
+#include "config.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -46,12 +48,20 @@ public:
     /*******************************************************/
     Rainbomizer ()
     {
-        srand (time (NULL));
+		auto config = ConfigManager::GetInstance();
+		config->Initialise("rainbomizer.toml");
+
+		if(!config->GetConfigs().general.enabled)
+			return;
+
+		int seed = config->GetConfigs().general.seed;
+        srand (seed == -1 ? time (NULL) : seed);
+		
         auto logger = Logger::GetLogger ();
 
         ExceptionManager::GetExceptionManager ()->RegisterExceptionManager ();
         logger->LogMessage ("Registered Exception Manager");
-
+		
         TrafficRandomizer::GetInstance ()->Initialise ();
         CarColRandomizer::GetInstance ()->Initialise ();
         ParkedCarRandomizer::GetInstance ()->Initialise ();
@@ -61,6 +71,7 @@ public:
         SoundRandomizer::GetInstance ()->Initialise ();
         HandlingRandomizer::GetInstance ()->Initialise ();
         CheatRandomizer::GetInstance ()->Initialise ();
+        WeaponRandomizer::GetInstance ()->Initialise ();
     }
 
 } rainbow;

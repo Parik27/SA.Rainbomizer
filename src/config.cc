@@ -21,6 +21,8 @@
 #include "config.hh"
 #include "cpptoml/cpptoml.h"
 #include <cstdlib>
+#include "logger.hh"
+#include "config_default.hh"
 
 ConfigManager *ConfigManager::mInstance = nullptr;
 
@@ -151,22 +153,55 @@ ScriptVehicleConfig::Read (std::shared_ptr<cpptoml::table> table)
 }
 
 /*******************************************************/
-void
-ConfigManager::Initialise (std::string file)
+bool
+DoesFileExist (const std::string &file)
 {
-    auto config = cpptoml::parse_file ("config.toml");
+    FILE *f = fopen (file.c_str (), "r");
+    if (f)
+        {
+            fclose (f);
+            return true;
+        }
+    return false;
+}
 
-    mConfigs.general.Read (config);
-    mConfigs.traffic.Read (config->get_table ("TrafficRandomizer"));
-    mConfigs.carcol.Read (config->get_table ("CarColRandomizer"));
-    mConfigs.policeHeli.Read (config->get_table ("PoliceHeliRandomizer"));
-    mConfigs.cheat.Read (config->get_table ("CheatRandomizer"));
-    mConfigs.handling.Read (config->get_table ("HandlingRandomizer"));
-    mConfigs.weapon.Read (config->get_table ("WeaponRandomizer"));
-    mConfigs.parkedCar.Read (config->get_table ("ParkedCarRandomizer"));
-    mConfigs.licensePlate.Read (config->get_table ("LicensePlateRandomizer"));
-    mConfigs.sounds.Read (config->get_table ("SoundsRandomizer"));
-    mConfigs.scriptVehicle.Read (config->get_table ("ScriptVehicleRandomizer"));
+/*******************************************************/
+void
+ConfigManager::WriteDefaultConfig (const std::string &file)
+{
+    FILE *f = fopen (file.c_str (), "wb");
+    fwrite (config_toml, config_toml_len, 1, f);
+    fclose (f);
+}
+
+/*******************************************************/
+void
+ConfigManager::Initialise (const std::string &file)
+{
+    try
+        {
+            auto config = cpptoml::parse_file (file);
+            mConfigs.general.Read (config);
+            mConfigs.traffic.Read (config->get_table ("TrafficRandomizer"));
+            mConfigs.carcol.Read (config->get_table ("CarColRandomizer"));
+            mConfigs.policeHeli.Read (
+                config->get_table ("PoliceHeliRandomizer"));
+            mConfigs.cheat.Read (config->get_table ("CheatRandomizer"));
+            mConfigs.handling.Read (config->get_table ("HandlingRandomizer"));
+            mConfigs.weapon.Read (config->get_table ("WeaponRandomizer"));
+            mConfigs.parkedCar.Read (config->get_table ("ParkedCarRandomizer"));
+            mConfigs.licensePlate.Read (
+                config->get_table ("LicensePlateRandomizer"));
+            mConfigs.sounds.Read (config->get_table ("SoundsRandomizer"));
+            mConfigs.scriptVehicle.Read (
+                config->get_table ("ScriptVehicleRandomizer"));
+        }
+    catch (std::exception e)
+        {
+            Logger::GetLogger ()->LogMessage (e.what ());
+            if (!DoesFileExist (file))
+                WriteDefaultConfig (file);
+        }
 }
 
 /*******************************************************/

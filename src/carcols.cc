@@ -143,8 +143,8 @@ RandomizeColourTables ()
                 continue;
 
             int colour[] = {0, 0, 0};
-            HSVtoRGB ((int) (i * 2.8125), random (50, 100) / 100.0,
-                      random (50, 100) / 100.0, colour);
+            HSVtoRGB ((int) (i * 2.8125), random (100, 50) / 100.0,
+                      random (100, 50) / 100.0, colour);
 
             ms_vehicleColourTable[i].r = (uint8_t) colour[0];
             ms_vehicleColourTable[i].g = (uint8_t) colour[1];

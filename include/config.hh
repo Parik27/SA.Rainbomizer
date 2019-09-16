@@ -156,12 +156,14 @@ class ConfigManager
     ConfigManager (){};
     static void DestroyInstance ();
 
+	void WriteDefaultConfig(const std::string &file);
+	
 public:
     /// Returns the static instance for ConfigManager.
     static ConfigManager *GetInstance ();
 
     /// Initialises
-    void Initialise (std::string file);
+    void Initialise (const std::string &file);
 
     /// Gets the config
     const Configs &GetConfigs ();

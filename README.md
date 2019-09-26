@@ -67,4 +67,4 @@ More information about how to configure specific randomizers is provided in the 
 
 You can contribute to the project by reporting any crashes/issues you encounter in the [Issues](https://github.com/Zarig/Rainbomizer/issues) section of the repository
 
-Also, if you know how to code, you can help improve the mod by creating Pull Requests in the repository. You're required to follow the format rules, for which a .clang_format is provided.
+Pull requests are welcome but are required to follow the current style used in the project.

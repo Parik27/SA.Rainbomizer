@@ -23,12 +23,12 @@
 #include <ctime>
 
 Logger *    Logger::mInstance = nullptr;
-std::string Logger::mFileName = "log.txt";
+std::string Logger::mFileName = "rainbomizer.log.txt";
 
 /*******************************************************/
 Logger::Logger ()
 {
-    mFile = fopen ("log.txt", "a+");
+    mFile = fopen ("rainbomizer.log.txt", "a+");
 
     if (!mFile)
         return;

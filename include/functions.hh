@@ -449,6 +449,7 @@ struct cSimpleTransform
 };
 
 CVector FindPlayerCoors (int playerId = 0);
+CPed* FindPlayerPed(int playerId = 0);
 float   Dist (CVector a, CVector b);
 
 struct CEntity

@@ -69,8 +69,11 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
                 StreamingManager::AttemptToLoadVehicle (
                     GetWeaponInfo (weapon, 1)[4]);
 
-            original_slot                = GetWeaponInfo (weapon, 1)[5];
-            GetWeaponInfo (weapon, 1)[5] = target_slot;
+            if (thisPed != FindPlayerPed ())
+                {
+                    original_slot                = GetWeaponInfo (weapon, 1)[5];
+                    GetWeaponInfo (weapon, 1)[5] = target_slot;
+                }
         }
 
     int ret = thisPed->GiveWeapon (weapon, ammo, slot);
@@ -100,12 +103,11 @@ WeaponRandomizer::Initialise ()
            0x0438AB2, 0x0438ACC, 0x0438BAF, 0x0438BC6, 0x0438BDD, 0x0438BF4,
            0x0438C0B, 0x0438C25, 0x0438C3F, 0x0438C68, 0x0438C7F, 0x0438C96,
            0x0438CAD, 0x0438CC4, 0x0438CDE, 0x0438CF8, 0x04395D8, 0x0439F30,
-           0x043D577, 0x043D8ED, 0x0441D93, 0x0442936, 0x0444ECE, 0x0448682,
-           0x047D335, 0x048D8C7, 0x049C1CF, 0x049C248, 0x04D5CD0, 0x056EC5E,
-           0x05B009C, 0x05D459D, 0x05DDCC0, 0x05E7D82, 0x05E7E2D, 0x05E83DE,
-           0x05E899A, 0x061390C, 0x062B3BC, 0x062B5C9, 0x068B8DF, 0x068E355,
-           0x068E39D, 0x068E3F2, 0x068E418, 0x069082D, 0x06D19E6, 0x06D1A24,
-           0x074282C};
+           0x043D577, 0x043D8ED, 0x0442936, 0x0444ECE, 0x0448682, 0x047D335,
+           0x048D8C7, 0x049C1CF, 0x049C248, 0x056EC5E, 0x05B009C, 0x05DDCC0,
+           0x05E7D82, 0x05E7E2D, 0x05E899A, 0x061390C, 0x062B3BC, 0x062B5C9,
+           0x068B8DF, 0x068E355, 0x068E39D, 0x068E3F2, 0x068E418, 0x069082D,
+           0x06D19E6, 0x06D1A24, 0x074282C};
 
     for (int i = 0; i < sizeof (addresses) / 4; i++)
         {

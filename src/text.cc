@@ -43,7 +43,6 @@ struct Comp
 void
 GxtManager::Update (CKeyArray &array)
 {
-    ;
     for (int i = 0; i < array.size; i++)
         mData.push_back (
             std::make_pair (array.data[i].hash, array.data[i].pos));

@@ -44,6 +44,7 @@ CStreaming::RequestModel (int model, int flags)
 void *
 CPopulation::AddPed (int type, int model, float *posn, bool unk)
 {
+	printf("%d\n", model);
     return CallAndReturn<void *, 0x612710> (type, model, posn, unk);
 }
 
@@ -400,6 +401,14 @@ FindPlayerCoors (int playerId)
 {
     return CallAndReturn<CVector, 0x56E010> (playerId);
 }
+
+/*******************************************************/
+CPed*
+FindPlayerPed (int playerId)
+{
+    return CallAndReturn<CPed *, 0x56E210> (playerId);
+}
+
 
 /*******************************************************/
 float

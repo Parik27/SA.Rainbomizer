@@ -54,9 +54,6 @@ public:
         if (!config->GetConfigs ().general.enabled)
             return;
 
-        int seed = config->GetConfigs ().general.seed;
-        srand (seed == -1 ? time (NULL) : seed);
-
         auto logger = Logger::GetLogger ();
 
         ExceptionManager::GetExceptionManager ()->RegisterExceptionManager ();

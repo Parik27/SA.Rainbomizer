@@ -285,6 +285,7 @@ void *
 RandomizeCarPeds (int type, int model, float *pos, bool unk)
 {
 
+	printf("%d\n", model);
     if (ms_aInfoForModel[model].m_nLoadState == 1)
         return CPopulation::AddPed (type, model, pos, unk);
 

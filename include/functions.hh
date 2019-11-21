@@ -239,6 +239,7 @@ struct CVehicle
 struct CPed
 {
     int GiveWeapon (int weapon, int ammo, int slot);
+	void* CCopPed__CCopPed(int type);
 };
 
 struct CBaseModelInfo

@@ -50,7 +50,8 @@ TrafficRandomizer::Initialise ()
                     {HOOK_CALL, 0x613B7F, (void *) &RandomizeCarPeds},
                     {HOOK_JUMP, 0x421900, (void *) &RandomizeCarToLoad},
                     {HOOK_CALL, 0x42C620, (void *) &FixEmptyPoliceCars},
-                    {HOOK_CALL, 0x501F3B, (void *) &FixFreightTrainCrash}});
+                    {HOOK_CALL, 0x501F3B, (void *) &FixFreightTrainCrash},
+                    {HOOK_CALL, 0x61282F, (void *) &FixCopCrash}});
 
     ExceptionManager::GetExceptionManager ()->RegisterHandler (
         &ExceptionHandlerCallback);
@@ -110,6 +111,22 @@ TrafficRandomizer::ExceptionHandlerCallback (_EXCEPTION_POINTERS *ep)
         }
 
     Logger::GetLogger ()->LogMessage (log);
+}
+
+/*******************************************************/
+/* Fixes a crash when an unloaded cop model spawn causes
+   a game crash */
+/*******************************************************/
+void *__fastcall FixCopCrash (CPed *ped, void *edx, int type)
+{
+    for (auto i : {std::make_pair (287, 5), std::make_pair (286, 4),
+                   std::make_pair (285, 3)})
+        {
+            if (ms_aInfoForModel[i.first].m_nLoadState == 1)
+                return ped->CCopPed__CCopPed (i.second);
+        }
+
+    return ped->CCopPed__CCopPed (0);
 }
 
 /*******************************************************/
@@ -284,8 +301,6 @@ FixEmptyPoliceCars (uint8_t *vehicle, char a3)
 void *
 RandomizeCarPeds (int type, int model, float *pos, bool unk)
 {
-
-	printf("%d\n", model);
     if (ms_aInfoForModel[model].m_nLoadState == 1)
         return CPopulation::AddPed (type, model, pos, unk);
 

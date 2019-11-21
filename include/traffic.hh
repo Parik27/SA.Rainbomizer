@@ -37,6 +37,7 @@
 
 struct cVehicleParams;
 struct CAEVehicleAudioEntity;
+struct CPed;
 
 // Hooked Functions
 int   RandomizePoliceCars ();
@@ -44,7 +45,7 @@ int   RandomizeTrafficCars (int *type);
 int   RandomizeCarToLoad ();
 void  FixEmptyPoliceCars (uint8_t *vehicle, char a3);
 void *RandomizeCarPeds (int type, int model, float *pos, bool unk);
-
+void *__fastcall FixCopCrash (CPed *ped, void *edx, int type);
 void __fastcall FixFreightTrainCrash (CAEVehicleAudioEntity *audio, void *edx,
                                       cVehicleParams *vehicle_params);
 

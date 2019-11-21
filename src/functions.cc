@@ -177,6 +177,13 @@ CPed::GiveWeapon (int weapon, int ammo, int slot)
 }
 
 /*******************************************************/
+void*
+CPed::CCopPed__CCopPed(int type)
+{
+	return CallMethodAndReturn<void*, 0x5DDC60>(this, type);
+}
+
+/*******************************************************/
 int
 CModelInfo::LoadVehicleColours ()
 {

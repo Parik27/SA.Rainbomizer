@@ -95,6 +95,8 @@ struct HandlingConfig : public BaseConfig
 struct WeaponConfig : public BaseConfig
 {
     bool enabled = false;
+	bool playerRandomization = true;
+	bool skipChecks = false;
     void Read (std::shared_ptr<cpptoml::table> table);
 };
 

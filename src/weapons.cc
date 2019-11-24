@@ -49,9 +49,11 @@ GetWeaponInfo (int weaponId, char skill)
 int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
                                     int ammo, int slot)
 {
-
+	auto config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
+	
     int original_slot = -1;
-    if (weapon != 0)
+    if (weapon != 0 &&
+		!(FindPlayerPed() == thisPed && config.playerRandomization))
         {
             int target_slot = GetWeaponInfo (weapon, 1)[5];
 

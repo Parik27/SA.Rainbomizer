@@ -67,10 +67,13 @@ EnableEasterEgg = true
 Enabled = false
 
 #######################################################
-# Experimental - Very buggy, and incomplete
 [WeaponRandomizer]
 
 Enabled = false
+RandomizePlayerWeapons = true
+SkipChecks = false # Checks related to weapons required for certain missions
+                   # You might not be able to complete some missions
+				   # without this enabled.
 
 #######################################################
 [ParkedCarRandomizer]

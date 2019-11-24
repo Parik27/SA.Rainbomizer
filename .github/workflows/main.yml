@@ -21,7 +21,7 @@ jobs:
         cmake -G "NMake Makefiles" ../
         nmake
         mkdir output
-        cp librainbomizer.asi output
+        cp rainbomizer.asi SA.Rainbomizer.asi
         cp ../config.toml output/rainbomizer.toml
         
     - name: Upload

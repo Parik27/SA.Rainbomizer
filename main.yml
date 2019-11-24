@@ -1,0 +1,30 @@
+name: Build
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup
+      uses: ilammy/msvc-dev-cmd@v1.0.0
+      with:
+        arch: x86
+        
+    - name: Compile
+      run: |
+        mkdir bin && cd bin
+        cmake -G "NMake Makefiles"
+        nmake
+        mkdir output && cp librainbomizer.asi output
+        cp ../config.toml output/rainbomizer.toml
+        
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: "Binaries"
+        path: bin/output
+        

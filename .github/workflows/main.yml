@@ -16,10 +16,12 @@ jobs:
         
     - name: Compile
       run: |
-        mkdir bin && cd bin
+        mkdir bin
+		cd bin
         cmake -G "NMake Makefiles"
         nmake
-        mkdir output && cp librainbomizer.asi output
+        mkdir output
+		cp librainbomizer.asi output
         cp ../config.toml output/rainbomizer.toml
         
     - name: Upload

@@ -21,12 +21,12 @@ jobs:
         cmake -G "NMake Makefiles" ../
         nmake
         mkdir output
-        cp rainbomizer.asi SA.Rainbomizer.asi
+        cp rainbomizer.asi output/SA.Rainbomizer.asi
         cp ../config.toml output/rainbomizer.toml
         
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
-        name: "Binaries"
+        name: "SA.Rainbomizer"
         path: bin/output
         

@@ -60,7 +60,7 @@ class ExceptionManager
     static long __stdcall RunExceptionHandler (_EXCEPTION_POINTERS *ep);
 
     ExceptionManager (){};
-    std::vector<std::function<void(_EXCEPTION_POINTERS *ep)>>
+    std::vector<std::function<void (_EXCEPTION_POINTERS *ep)>>
         mExceptionHandlers;
 
     static void DestroyExceptionManager ();
@@ -68,7 +68,8 @@ class ExceptionManager
 public:
     /// Registers a new Exception Handler. These are executed in order in a case
     /// of a crash
-    void RegisterHandler (std::function<void(_EXCEPTION_POINTERS *ep)> handler);
+    void
+    RegisterHandler (std::function<void (_EXCEPTION_POINTERS *ep)> handler);
 
     /// Initiates the Exception Manager
     void RegisterExceptionManager ();
@@ -82,7 +83,7 @@ template <unsigned int address, typename... Args>
 void
 Call (Args... args)
 {
-    reinterpret_cast<void(__cdecl *) (Args...)> (address) (args...);
+    reinterpret_cast<void (__cdecl *) (Args...)> (address) (args...);
 }
 
 /*******************************************************/
@@ -98,8 +99,8 @@ template <unsigned int address, typename C, typename... Args>
 void
 CallMethod (C _this, Args... args)
 {
-    reinterpret_cast<void(__thiscall *) (C, Args...)> (address) (_this,
-                                                                 args...);
+    reinterpret_cast<void (__thiscall *) (C, Args...)> (address) (_this,
+                                                                  args...);
 }
 
 /*******************************************************/
@@ -116,7 +117,7 @@ template <unsigned int tableIndex, typename C, typename... Args>
 void
 CallVirtualMethod (C _this, Args... args)
 {
-    reinterpret_cast<void(__thiscall *) (C, Args...)> (
+    reinterpret_cast<void (__thiscall *) (C, Args...)> (
         (*reinterpret_cast<void ***> (_this))[tableIndex]) (_this, args...);
 }
 

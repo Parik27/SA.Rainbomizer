@@ -68,7 +68,7 @@ ExceptionManager *ExceptionManager::mManager = nullptr;
 /*******************************************************/
 void
 ExceptionManager::RegisterHandler (
-    std::function<void(_EXCEPTION_POINTERS *ep)> handler)
+    std::function<void (_EXCEPTION_POINTERS *ep)> handler)
 {
     mExceptionHandlers.push_back (handler);
 }

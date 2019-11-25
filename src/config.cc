@@ -57,8 +57,8 @@ WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
         return;
 
     CONFIG (table, enabled, "Enabled", bool);
-	CONFIG (table, skipChecks, "SkipChecks", bool);
-	CONFIG (table, playerRandomization, "RandomizePlayerWeapons", bool);
+    CONFIG (table, skipChecks, "SkipChecks", bool);
+    CONFIG (table, playerRandomization, "RandomizePlayerWeapons", bool);
 }
 
 /*******************************************************/

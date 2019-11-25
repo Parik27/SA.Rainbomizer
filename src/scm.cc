@@ -400,6 +400,16 @@ CheckForCarNode (uint8_t *vehicle, int node)
  * :thinking: */
 
 /*******************************************************/
+char __fastcall FixGearUp (CVehicle *vehicle)
+{
+    if (CheckForCarNode ((uint8_t *) vehicle, 21)
+        || CheckForCarNode ((uint8_t *) vehicle, 22))
+        vehicle->SetGearUp ();
+
+    return 2;
+}
+
+/*******************************************************/
 void *__fastcall PopDoorFix (uint8_t *vehicle, void *edx, int a2, int a3,
                              char a4)
 {
@@ -507,7 +517,8 @@ ScriptVehicleRandomizer::Initialise ()
                     {HOOK_CALL, 0x495902, (void *) &FixDoorFix},
                     {HOOK_CALL, 0x495B74, (void *) &FixPanelFix},
                     {HOOK_CALL, 0x4985DA, (void *) &VehicleUpdateFix},
-                    {HOOK_CALL, 0x49128C, (void *) &FixGTAMadman}});
+                    {HOOK_CALL, 0x49128C, (void *) &FixGTAMadman},
+                    {HOOK_CALL, 0x475BBC, (void *) &FixGearUp}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 

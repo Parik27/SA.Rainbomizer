@@ -18,7 +18,7 @@ jobs:
       run: |
         mkdir bin
         cd bin
-        cmake -G "NMake Makefiles" ../
+        cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release ../
         nmake
         mkdir output
         cp rainbomizer.asi output/SA.Rainbomizer.asi

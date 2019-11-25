@@ -146,7 +146,7 @@ SoundPair
 SoundRandomizer::GetPairByID (int id)
 {
     auto iter = std::find_if (mSoundTable.begin (), mSoundTable.end (),
-                              [id](const SoundPair &a) { return a.id == id; });
+                              [id] (const SoundPair &a) { return a.id == id; });
     return *iter;
 }
 

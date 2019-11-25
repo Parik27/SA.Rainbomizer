@@ -1,5 +1,5 @@
 # rainbomizer
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.1.5)
 project(rainbomizer)
 
 # C++20
@@ -8,7 +8,8 @@ if (MSVC_VERSION GREATER_EQUAL "1900")
     CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
     if (_cpp_latest_flag_supported)
         add_compile_options("/std:c++latest")
-    endif()
+      endif()
+	  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
 # Sources

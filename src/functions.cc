@@ -44,7 +44,7 @@ CStreaming::RequestModel (int model, int flags)
 void *
 CPopulation::AddPed (int type, int model, float *posn, bool unk)
 {
-	printf("%d\n", model);
+    printf ("%d\n", model);
     return CallAndReturn<void *, 0x612710> (type, model, posn, unk);
 }
 
@@ -177,10 +177,10 @@ CPed::GiveWeapon (int weapon, int ammo, int slot)
 }
 
 /*******************************************************/
-void*
-CPed::CCopPed__CCopPed(int type)
+void *
+CPed::CCopPed__CCopPed (int type)
 {
-	return CallMethodAndReturn<void*, 0x5DDC60>(this, type);
+    return CallMethodAndReturn<void *, 0x5DDC60> (this, type);
 }
 
 /*******************************************************/
@@ -286,6 +286,13 @@ int
 CVehicle::GetVehicleAppearence ()
 {
     return CallMethodAndReturn<int, 0x6D1080> (this);
+}
+
+/*******************************************************/
+char
+CVehicle::SetGearUp ()
+{
+    return CallMethodAndReturn<char, 0x6CAC20> (this);
 }
 
 /*******************************************************/
@@ -410,12 +417,11 @@ FindPlayerCoors (int playerId)
 }
 
 /*******************************************************/
-CPed*
+CPed *
 FindPlayerPed (int playerId)
 {
     return CallAndReturn<CPed *, 0x56E210> (playerId);
 }
-
 
 /*******************************************************/
 float

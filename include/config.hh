@@ -94,9 +94,9 @@ struct HandlingConfig : public BaseConfig
 /*******************************************************/
 struct WeaponConfig : public BaseConfig
 {
-    bool enabled = false;
-	bool playerRandomization = true;
-	bool skipChecks = false;
+    bool enabled             = false;
+    bool playerRandomization = true;
+    bool skipChecks          = false;
     void Read (std::shared_ptr<cpptoml::table> table);
 };
 
@@ -158,8 +158,8 @@ class ConfigManager
     ConfigManager (){};
     static void DestroyInstance ();
 
-	void WriteDefaultConfig(const std::string &file);
-	
+    void WriteDefaultConfig (const std::string &file);
+
 public:
     /// Returns the static instance for ConfigManager.
     static ConfigManager *GetInstance ();

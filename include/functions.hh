@@ -233,13 +233,14 @@ struct CColModel
 
 struct CVehicle
 {
-    int GetVehicleAppearence ();
+    int  GetVehicleAppearence ();
+    char SetGearUp ();
 };
 
 struct CPed
 {
-    int GiveWeapon (int weapon, int ammo, int slot);
-	void* CCopPed__CCopPed(int type);
+    int   GiveWeapon (int weapon, int ammo, int slot);
+    void *CCopPed__CCopPed (int type);
 };
 
 struct CBaseModelInfo
@@ -450,7 +451,7 @@ struct cSimpleTransform
 };
 
 CVector FindPlayerCoors (int playerId = 0);
-CPed* FindPlayerPed(int playerId = 0);
+CPed *  FindPlayerPed (int playerId = 0);
 float   Dist (CVector a, CVector b);
 
 struct CEntity

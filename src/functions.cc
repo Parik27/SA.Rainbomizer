@@ -389,6 +389,17 @@ CRunningScript::CheckName (const char *name)
 }
 
 /*******************************************************/
+bool
+CRunningScripts::CheckForRunningScript (const char *thread)
+{
+    for (auto script = CRunningScripts::pActiveScript; script;
+         script      = script->m_pNext){
+        if (script->m_bIsMission && script->CheckName (thread))
+            return true;
+    }
+}
+
+/*******************************************************/
 void
 CRunningScript::ProcessCommands1526to1537 (int opcode)
 {
@@ -462,4 +473,4 @@ CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;
 int *            ScriptParams                   = (int *) 0xA43C78;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
 CPool *          ms_pPedPool                    = (CPool *) 0xB74490;
-CRunningScript  *CRunningScripts::pActiveScript = (CRunningScript *) 0xA8B42C;
+CRunningScript *&CRunningScripts::pActiveScript = *(CRunningScript **) 0xA8B42C;

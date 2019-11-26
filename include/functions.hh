@@ -114,6 +114,20 @@ private:
     char _padC9[3];
 
 public:
+    int             m_nWakeTime;
+    unsigned short  m_nLogicalOp;
+    bool            m_bNotFlag;
+    bool            m_bWastedBustedCheck;
+    bool            m_bWastedOrBusted;
+private:
+    char _padD5[3];
+public:
+    unsigned char  *m_pSceneSkipIP;
+    bool            m_bIsMission;
+private:
+    char _padDD[3];
+
+public:
     void CollectParameters (short num);
     bool CheckName (const char *name);
     void ProcessCommands1526to1537 (int opcode);
@@ -123,7 +137,8 @@ public:
 
 struct CRunningScripts
 {
-    static CRunningScript* pActiveScript;
+    static CRunningScript* &pActiveScript;
+    static bool CheckForRunningScript(const char* thread);
 };
 
 struct CAudioEngine

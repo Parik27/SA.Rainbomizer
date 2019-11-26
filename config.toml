@@ -81,7 +81,7 @@ Patterns = [
 	{ thread = "finalec", ped = 0, weapon = 28, allowed = ["slot"]},
 	{ thread = "drugs1", weapon = 28, allowed = ["slot"]},
 	{ weapon = 43, allowed = [43]},
-	{ weapon = "sweet1", weapon = 41, allowed = [41]},
+	{ thread = "sweet1", weapon = 41, allowed = [41]},
 	{ thread = "heist5", weapon = 38, allowed = ["slot"]},
 	{ thread = "zero1", weapon = 38, allowed = ["slot"]},
 	{ thread = "casino6", weapon = 37, allowed = [37]},

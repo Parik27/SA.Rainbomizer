@@ -76,6 +76,7 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
             weapon = WeaponRandomizer::GetInstance ()->GetRandomWeapon (thisPed,
                                                                         weapon);
 
+			printf("%d\n", weapon);
             StreamingManager::AttemptToLoadVehicle (
                 GetWeaponInfo (weapon, 1)[3]);
 
@@ -148,11 +149,11 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
 	
     for (auto pattern : config.patterns)
         {
-            if ((weapon == -1 || pattern.weapon == weapon)
+            if ((pattern.weapon == -1 || pattern.weapon == weapon)
                 && (pattern.ped == -1
                     || (pattern.ped == 0 && ped == FindPlayerPed ()))
                 && (pattern.thread == ""
-                    || CRunningScripts::pActiveScript->CheckName (
+                    || CRunningScripts::CheckForRunningScript (
                         pattern.thread.c_str ())))
                 {
                     if (pattern.allowed.size () != 0)

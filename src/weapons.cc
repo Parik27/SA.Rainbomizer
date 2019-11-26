@@ -26,8 +26,24 @@
 #include "injector/injector.hpp"
 #include "loader.hh"
 #include "config.hh"
+#include <algorithm>
 
 WeaponRandomizer *WeaponRandomizer::mInstance = nullptr;
+
+const int WEAPON_MELEE = 100;
+
+std::vector<std::vector<int>> weapon_slots = {{0, 1},
+                                              {2, 3, 4, 5, 6, 7, 8, 9},
+                                              {22, 23, 24},
+                                              {25, 26, 27},
+                                              {28, 29, 32},
+                                              {30, 31},
+                                              {33, 34},
+                                              {35, 36, 37, 38},
+                                              {16, 17, 18, 39},
+                                              {41, 42, 43},
+                                              {10, 11, 12, 14, 15},
+                                              {44, 45, 46}};
 
 /*******************************************************/
 int *
@@ -57,16 +73,12 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
         {
             int target_slot = GetWeaponInfo (weapon, 1)[5];
 
-            weapon = 0;
-            while (weapon == 0 || weapon == 19 || weapon == 20 || weapon == 21
-                   || weapon == 14 || weapon == 40)
-                weapon = random (46, 1);
+            weapon = WeaponRandomizer::GetInstance ()->GetRandomWeapon (thisPed,
+                                                                        weapon);
 
             StreamingManager::AttemptToLoadVehicle (
                 GetWeaponInfo (weapon, 1)[3]);
 
-            printf ("%d - %d %d\n", weapon, GetWeaponInfo (weapon, 1)[3],
-                    GetWeaponInfo (weapon, 1)[4]);
             if (GetWeaponInfo (weapon, slot)[4] != -1)
                 StreamingManager::AttemptToLoadVehicle (
                     GetWeaponInfo (weapon, 1)[4]);
@@ -125,6 +137,56 @@ WeaponRandomizer::DestroyInstance ()
 {
     if (WeaponRandomizer::mInstance)
         delete WeaponRandomizer::mInstance;
+}
+
+/*******************************************************/
+int
+WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
+{
+    auto &config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
+	puts(CRunningScripts::pActiveScript->m_szName);
+	
+    for (auto pattern : config.patterns)
+        {
+            if ((weapon == -1 || pattern.weapon == weapon)
+                && (pattern.ped == -1
+                    || (pattern.ped == 0 && ped == FindPlayerPed ()))
+                && (pattern.thread == ""
+                    || CRunningScripts::pActiveScript->CheckName (
+                        pattern.thread.c_str ())))
+                {
+                    if (pattern.allowed.size () != 0)
+                        {
+                            int weapon = pattern.allowed[random (
+                                pattern.allowed.size () - 1)];
+
+                            if (weapon == WEAPON_SLOT)
+                                {
+                                    int  slot = GetWeaponInfo (weapon, 1)[5];
+                                    auto slot_weapons = weapon_slots[slot];
+                                    weapon            = slot_weapons[random (
+                                        slot_weapons.size () - 1)];
+                                }
+
+                            return weapon;
+                        }
+                    int              weapon;
+                    std::vector<int> buggy_weapons = {19, 20, 21, 14, 40};
+
+                    while ((weapon = random (46, 1),
+
+                            std::find (buggy_weapons.begin (),
+                                       buggy_weapons.end (), weapon)
+                                    != buggy_weapons.end ()
+
+                                || std::find (pattern.denied.begin (),
+                                              pattern.denied.end (), weapon)
+                                       != pattern.denied.end ()))
+                        ;
+
+                    return weapon;
+                }
+        }
 }
 
 /*******************************************************/

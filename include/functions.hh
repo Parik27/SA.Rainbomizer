@@ -120,6 +120,12 @@ public:
     void UpdateCompareFlag (char flag);
 };
 
+
+struct CRunningScripts
+{
+    static CRunningScript* pActiveScript;
+};
+
 struct CAudioEngine
 {
     void PreloadMissionAudio (unsigned char slot, int id);

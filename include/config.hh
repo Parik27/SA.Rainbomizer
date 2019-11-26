@@ -29,6 +29,21 @@ class table;
 }
 
 /*******************************************************/
+/* Related to Weapon Pattern configuration */
+/*******************************************************/
+const int WEAPON_SLOT = 101;
+const int WEAPON_ANY  = -1;
+
+struct WeaponPattern
+{
+    std::string          thread  = "";
+    int                  ped     = -1;
+    int                  weapon  = -1;
+    std::vector<int64_t> allowed = {};
+    std::vector<int64_t> denied  = {};
+};
+
+/*******************************************************/
 struct BaseConfig
 {
     bool enabled = true;
@@ -94,9 +109,11 @@ struct HandlingConfig : public BaseConfig
 /*******************************************************/
 struct WeaponConfig : public BaseConfig
 {
-    bool enabled             = false;
-    bool playerRandomization = true;
-    bool skipChecks          = false;
+    bool                       enabled             = false;
+    bool                       playerRandomization = true;
+    bool                       skipChecks          = false;
+    std::vector<WeaponPattern> patterns            = {};
+
     void Read (std::shared_ptr<cpptoml::table> table);
 };
 
@@ -159,6 +176,7 @@ class ConfigManager
     static void DestroyInstance ();
 
     void WriteDefaultConfig (const std::string &file);
+    std::shared_ptr<cpptoml::table> ParseDefaultConfig();
 
 public:
     /// Returns the static instance for ConfigManager.

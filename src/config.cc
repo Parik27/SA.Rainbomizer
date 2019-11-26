@@ -18,11 +18,14 @@
 
  */
 
+#define CPPTOML_NO_RTTI
+
 #include "config.hh"
 #include "cpptoml/cpptoml.h"
 #include <cstdlib>
 #include "logger.hh"
 #include "config_default.hh"
+#include <sstream>
 
 ConfigManager *ConfigManager::mInstance = nullptr;
 
@@ -59,6 +62,64 @@ WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
     CONFIG (table, enabled, "Enabled", bool);
     CONFIG (table, skipChecks, "SkipChecks", bool);
     CONFIG (table, playerRandomization, "RandomizePlayerWeapons", bool);
+    
+    // Read Pattern
+    if (auto patterns = table->get_table_array ("Patterns"))
+        {
+            for (const auto &pattern : *patterns)
+                {
+                    WeaponPattern _pattern;
+                    _pattern.weapon
+                        = pattern->get_as<int> ("weapon").value_or (-1);
+                    _pattern.ped = pattern->get_as<int> ("ped").value_or (-1);
+
+                    _pattern.thread
+                        = pattern->get_as<std::string> ("thread").value_or ("");
+
+                    auto read_table = [&] (std::string       key,
+                                           std::vector<int64_t> &v) {
+                        if (auto table = pattern->get_array (key))
+                            {
+                                for (const auto &val : *table)
+                                    {
+                                        switch ((*val).type ())
+                                            {
+                                            case cpptoml::base_type::INT:
+                                                v.push_back (
+                                                    val.get ()
+                                                        ->as<int64_t> ()
+                                                        ->get ());
+                                                break;
+
+                                                case cpptoml::base_type::
+                                                    STRING: {
+                                                    std::string value
+                                                        = val.get ()
+                                                              ->as<
+                                                                  std::
+                                                                      string> ()
+                                                              ->get ();
+
+                                                    if(value == "slot")
+                                                        v.push_back(WEAPON_SLOT);
+                                                    
+                                                    break;
+                                                }
+
+                                            default: continue;
+                                            }
+                                    }
+                            }
+                    };
+                    read_table ("allowed", _pattern.allowed);
+                    read_table ("denied", _pattern.denied);
+
+                    this->patterns.push_back(_pattern);
+                }
+        }
+
+    // Fallback Pattern
+    this->patterns.push_back(WeaponPattern());
 }
 
 /*******************************************************/
@@ -177,33 +238,46 @@ ConfigManager::WriteDefaultConfig (const std::string &file)
 }
 
 /*******************************************************/
+std::shared_ptr<cpptoml::table>
+ConfigManager::ParseDefaultConfig ()
+{
+    // Read the default config file
+    auto stream = std::istringstream (
+        std::string ((char *) config_toml, config_toml_len));
+
+    cpptoml::parser p{stream};
+    return std::move(p.parse());
+}
+
+/*******************************************************/
 void
 ConfigManager::Initialise (const std::string &file)
 {
+    std::shared_ptr<cpptoml::table> config;
     try
         {
-            auto config = cpptoml::parse_file (file);
-            mConfigs.general.Read (config);
-            mConfigs.traffic.Read (config->get_table ("TrafficRandomizer"));
-            mConfigs.carcol.Read (config->get_table ("CarColRandomizer"));
-            mConfigs.policeHeli.Read (
-                config->get_table ("PoliceHeliRandomizer"));
-            mConfigs.cheat.Read (config->get_table ("CheatRandomizer"));
-            mConfigs.handling.Read (config->get_table ("HandlingRandomizer"));
-            mConfigs.weapon.Read (config->get_table ("WeaponRandomizer"));
-            mConfigs.parkedCar.Read (config->get_table ("ParkedCarRandomizer"));
-            mConfigs.licensePlate.Read (
-                config->get_table ("LicensePlateRandomizer"));
-            mConfigs.sounds.Read (config->get_table ("SoundsRandomizer"));
-            mConfigs.scriptVehicle.Read (
-                config->get_table ("ScriptVehicleRandomizer"));
+            config = cpptoml::parse_file (file);
         }
     catch (std::exception e)
         {
             Logger::GetLogger ()->LogMessage (e.what ());
+            config = ParseDefaultConfig();
+            
             if (!DoesFileExist (file))
                 WriteDefaultConfig (file);
         }
+
+    mConfigs.general.Read (config);
+    mConfigs.traffic.Read (config->get_table ("TrafficRandomizer"));
+    mConfigs.carcol.Read (config->get_table ("CarColRandomizer"));
+    mConfigs.policeHeli.Read (config->get_table ("PoliceHeliRandomizer"));
+    mConfigs.cheat.Read (config->get_table ("CheatRandomizer"));
+    mConfigs.handling.Read (config->get_table ("HandlingRandomizer"));
+    mConfigs.weapon.Read (config->get_table ("WeaponRandomizer"));
+    mConfigs.parkedCar.Read (config->get_table ("ParkedCarRandomizer"));
+    mConfigs.licensePlate.Read (config->get_table ("LicensePlateRandomizer"));
+    mConfigs.sounds.Read (config->get_table ("SoundsRandomizer"));
+    mConfigs.scriptVehicle.Read (config->get_table ("ScriptVehicleRandomizer"));
 }
 
 /*******************************************************/

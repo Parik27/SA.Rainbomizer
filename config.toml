@@ -69,11 +69,29 @@ Enabled = false
 #######################################################
 [WeaponRandomizer]
 
-Enabled = false
+Enabled = true
 RandomizePlayerWeapons = true
 SkipChecks = false # Checks related to weapons required for certain missions
                    # You might not be able to complete some missions
 				   # without this enabled.
+
+# Pattern checks
+Patterns = [
+	{ thread = "drugs4", ped = 0, weapon = 30, allowed = ["slot"]},
+	{ thread = "finalec", ped = 0, weapon = 28, allowed = ["slot"]},
+	{ thread = "drugs1", weapon = 28, allowed = ["slot"]},
+	{ weapon = 43, allowed = [43]},
+	{ weapon = "sweet1", weapon = 41, allowed = [41]},
+	{ thread = "heist5", weapon = 38, allowed = ["slot"]},
+	{ thread = "zero1", weapon = 38, allowed = ["slot"]},
+	{ thread = "casino6", weapon = 37, allowed = [37]},
+	{ thread = "casino6", weapon = 37, allowed = [37]},
+	{ thread = "shrange", allowed = ["slot"]},
+	{ thread = "truth2", weapon = 37, allowed = [37]},
+	{ thread = "truth2", weapon = 35, allowed = [35, 36, 38]},
+	{ thread = "des10", ped = 0, allowed = [28, 32, 22, 26]},
+	{ thread = "casino9", weapon = 22, allowed = [22, 23, 24]}
+]
 
 #######################################################
 [ParkedCarRandomizer]

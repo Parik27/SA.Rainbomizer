@@ -462,3 +462,4 @@ CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;
 int *            ScriptParams                   = (int *) 0xA43C78;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
 CPool *          ms_pPedPool                    = (CPool *) 0xB74490;
+CRunningScript  *CRunningScripts::pActiveScript = (CRunningScript *) 0xA8B42C;

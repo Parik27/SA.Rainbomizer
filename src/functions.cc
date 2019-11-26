@@ -44,7 +44,6 @@ CStreaming::RequestModel (int model, int flags)
 void *
 CPopulation::AddPed (int type, int model, float *posn, bool unk)
 {
-    printf ("%d\n", model);
     return CallAndReturn<void *, 0x612710> (type, model, posn, unk);
 }
 
@@ -383,7 +382,7 @@ CText::Get (char *key)
 bool
 CRunningScript::CheckName (const char *name)
 {
-    if (strcmp (name, this->m_szName) == 0)
+    if (std::string (name) == this->m_szName)
         return true;
     return false;
 }

@@ -89,7 +89,7 @@ Patterns = [
 	{ thread = "shrange", allowed = ["slot"]},
 	{ thread = "truth2", weapon = 37, allowed = [37]},
 	{ thread = "truth2", weapon = 35, allowed = [35, 36, 38]},
-	{ thread = "des10", ped = 0, allowed = [28, 32, 22, 26]},
+	{ thread = "des10", ped = 0, allowed = [28, 32]},
 	{ thread = "casino9", weapon = 22, allowed = [22, 23, 24]}
 ]
 

@@ -69,14 +69,13 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
 
     int original_slot = -1;
     if (weapon != 0
-        && !(FindPlayerPed () == thisPed && config.playerRandomization))
+        && !(FindPlayerPed () == thisPed && !config.playerRandomization))
         {
             int target_slot = GetWeaponInfo (weapon, 1)[5];
 
             weapon = WeaponRandomizer::GetInstance ()->GetRandomWeapon (thisPed,
                                                                         weapon);
-
-			printf("%d\n", weapon);
+			
             StreamingManager::AttemptToLoadVehicle (
                 GetWeaponInfo (weapon, 1)[3]);
 
@@ -145,8 +144,8 @@ int
 WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
 {
     auto &config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
-	puts(CRunningScripts::pActiveScript->m_szName);
-	
+
+	int  slot = GetWeaponInfo (weapon, 1)[5];
     for (auto pattern : config.patterns)
         {
             if ((pattern.weapon == -1 || pattern.weapon == weapon)
@@ -163,7 +162,6 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
 
                             if (weapon == WEAPON_SLOT)
                                 {
-                                    int  slot = GetWeaponInfo (weapon, 1)[5];
                                     auto slot_weapons = weapon_slots[slot];
                                     weapon            = slot_weapons[random (
                                         slot_weapons.size () - 1)];

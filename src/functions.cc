@@ -392,10 +392,11 @@ bool
 CRunningScripts::CheckForRunningScript (const char *thread)
 {
     for (auto script = CRunningScripts::pActiveScript; script;
-         script      = script->m_pNext){
-        if (script->m_bIsMission && script->CheckName (thread))
-            return true;
-    }
+         script      = script->m_pNext)
+        {
+            if (script->m_bIsMission && script->CheckName (thread))
+                return true;
+        }
 }
 
 /*******************************************************/

@@ -176,7 +176,7 @@ class ConfigManager
     static void DestroyInstance ();
 
     void WriteDefaultConfig (const std::string &file);
-    std::shared_ptr<cpptoml::table> ParseDefaultConfig();
+    std::shared_ptr<cpptoml::table> ParseDefaultConfig ();
 
 public:
     /// Returns the static instance for ConfigManager.

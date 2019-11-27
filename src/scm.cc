@@ -159,8 +159,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     ApplyFixedBasedOnModel (model, newModel);
 
     // Load the new vehicle. Fallback to the original if needed
-    auto err = StreamingManager::AttemptToLoadVehicle (newModel);
-    if (err == ERR_FAILED)
+    if (StreamingManager::AttemptToLoadVehicle (newModel) == ERR_FAILED)
         newModel = model;
 
     // Freefall fix
@@ -261,7 +260,8 @@ ScriptVehicleRandomizer::DoesVehicleHaveEnoughDoors (int modelA, int orig)
     eLoadError err = StreamingManager::AttemptToLoadVehicle (modelA);
 
     // The load was unsuccessful so can't be sure
-    if (err == ERR_FAILED)
+    if (StreamingManager::AttemptToLoadVehicle (modelA) == ERR_FAILED
+        || StreamingManager::AttemptToLoadVehicle (orig) == ERR_FAILED)
         return ERR_UNSURE;
 
     if (CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (orig)

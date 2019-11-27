@@ -62,7 +62,7 @@ WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
     CONFIG (table, enabled, "Enabled", bool);
     CONFIG (table, skipChecks, "SkipChecks", bool);
     CONFIG (table, playerRandomization, "RandomizePlayerWeapons", bool);
-    
+
     // Read Pattern
     if (auto patterns = table->get_table_array ("Patterns"))
         {
@@ -76,7 +76,7 @@ WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
                     _pattern.thread
                         = pattern->get_as<std::string> ("thread").value_or ("");
 
-                    auto read_table = [&] (std::string       key,
+                    auto read_table = [&] (std::string           key,
                                            std::vector<int64_t> &v) {
                         if (auto table = pattern->get_array (key))
                             {
@@ -100,9 +100,10 @@ WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
                                                                       string> ()
                                                               ->get ();
 
-                                                    if(value == "slot")
-                                                        v.push_back(WEAPON_SLOT);
-                                                    
+                                                    if (value == "slot")
+                                                        v.push_back (
+                                                            WEAPON_SLOT);
+
                                                     break;
                                                 }
 
@@ -114,12 +115,12 @@ WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
                     read_table ("allowed", _pattern.allowed);
                     read_table ("denied", _pattern.denied);
 
-                    this->patterns.push_back(_pattern);
+                    this->patterns.push_back (_pattern);
                 }
         }
 
     // Fallback Pattern
-    this->patterns.push_back(WeaponPattern());
+    this->patterns.push_back (WeaponPattern ());
 }
 
 /*******************************************************/
@@ -246,7 +247,7 @@ ConfigManager::ParseDefaultConfig ()
         std::string ((char *) config_toml, config_toml_len));
 
     cpptoml::parser p{stream};
-    return std::move(p.parse());
+    return std::move (p.parse ());
 }
 
 /*******************************************************/
@@ -261,8 +262,8 @@ ConfigManager::Initialise (const std::string &file)
     catch (std::exception e)
         {
             Logger::GetLogger ()->LogMessage (e.what ());
-            config = ParseDefaultConfig();
-            
+            config = ParseDefaultConfig ();
+
             if (!DoesFileExist (file))
                 WriteDefaultConfig (file);
         }

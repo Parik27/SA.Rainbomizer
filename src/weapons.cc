@@ -75,7 +75,7 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
 
             weapon = WeaponRandomizer::GetInstance ()->GetRandomWeapon (thisPed,
                                                                         weapon);
-			
+
             StreamingManager::AttemptToLoadVehicle (
                 GetWeaponInfo (weapon, 1)[3]);
 
@@ -145,7 +145,7 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
 {
     auto &config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
 
-	int  slot = GetWeaponInfo (weapon, 1)[5];
+    int slot = GetWeaponInfo (weapon, 1)[5];
     for (auto pattern : config.patterns)
         {
             if ((pattern.weapon == -1 || pattern.weapon == weapon)

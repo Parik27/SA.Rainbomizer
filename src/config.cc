@@ -132,6 +132,8 @@ GeneralConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     BaseConfig::Read (table);
     CONFIG (table, seed, "Seed", int);
+    CONFIG (table, unprotect, "Unprotect", int);
+    CONFIG (table, save_slot, "AutosaveSlot", int);
 }
 
 /*******************************************************/

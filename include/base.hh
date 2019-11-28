@@ -52,6 +52,9 @@ char *GetGameDirRelativePathA (const char *subpath);
 /// Creates hooks based on HookProperties
 void RegisterHooks (std::vector<HookProperties> hooks);
 
+/// Unprotects the entire module
+void UnProtectInstance ();
+
 struct _EXCEPTION_POINTERS;
 
 class ExceptionManager

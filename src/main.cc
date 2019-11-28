@@ -32,6 +32,7 @@
 #include "handling.hh"
 #include "weapons.hh"
 #include "config.hh"
+#include "autosave.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -54,6 +55,10 @@ public:
         if (!config->GetConfigs ().general.enabled)
             return;
 
+        // Unprotect if required
+        if (!config->GetConfigs ().general.unprotect)
+            UnProtectInstance ();
+
         auto logger = Logger::GetLogger ();
 
         ExceptionManager::GetExceptionManager ()->RegisterExceptionManager ();
@@ -69,6 +74,7 @@ public:
         HandlingRandomizer::GetInstance ()->Initialise ();
         CheatRandomizer::GetInstance ()->Initialise ();
         WeaponRandomizer::GetInstance ()->Initialise ();
+        AutoSave::GetInstance ()->Initialise ();
     }
 
 } rainbow;

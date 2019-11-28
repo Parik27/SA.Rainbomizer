@@ -14,8 +14,8 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 - **License Plate Randomizer**: Randomizes the license plates of vehicles to a random word.
 - **Voice Line Randomizer**: Randomizes dialogues spoken by characters in missions. *(Requires original AudioEvents.txt)*
 - **Script Vehicle Randomizer**: Randomizes the vehicles you are given in missions. The randomizer makes sure that you get vehicles that are usable for the mission.
+- **Weapons Randomizer**: Randomizes the weapons that are dropped/weilded by the player/enemies and also the pickups scattered around the map.
 - *(Experimental)* **Handling Randomizer**: Shuffles the handlings of vehicles.
-- *(Experimental)* **Weapons Randomizer**: Randomizes the weapons that are dropped/weilded by the player/enemies and also the pickups scattered around the map.
 
 ## Supported Versions 🌈
 

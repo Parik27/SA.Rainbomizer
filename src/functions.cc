@@ -388,6 +388,13 @@ CRunningScript::CheckName (const char *name)
 }
 
 /*******************************************************/
+int
+CRunningScript::EndThread ()
+{
+    return CallMethodAndReturn<int, 0x465AA0> (this);
+}
+
+/*******************************************************/
 bool
 CRunningScripts::CheckForRunningScript (const char *thread)
 {
@@ -397,6 +404,13 @@ CRunningScripts::CheckForRunningScript (const char *thread)
             if (script->m_bIsMission && script->CheckName (thread))
                 return true;
         }
+}
+
+/*******************************************************/
+char
+CRunningScript::ProcessCommands0to99 (int opcode)
+{
+    CallMethodAndReturn<char, 0x465E60> (this, opcode);
 }
 
 /*******************************************************/
@@ -442,10 +456,31 @@ Dist (CVector a, CVector b)
 }
 
 /*******************************************************/
+char
+CGenericGameStorage::GenericSave ()
+{
+    return CallAndReturn<char, 0x5D13E0> ();
+}
+
+/*******************************************************/
+char *
+CGenericGameStorage::MakeValidSaveFileName (int saveNum)
+{
+    return CallAndReturn<char *, 0x5D0E90> (saveNum);
+}
+
+/*******************************************************/
 cSimpleTransform *
 CEntity::GetPosition ()
 {
     return CallMethodAndReturn<cSimpleTransform *, 0x4043A0> (this);
+}
+
+/*******************************************************/
+void
+CStats::IncrementStat (short id, float val)
+{
+    Call<0x55C180> (id, val);
 }
 
 /*******************************************************/

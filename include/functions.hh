@@ -134,7 +134,9 @@ public:
     void CollectParameters (short num);
     bool CheckName (const char *name);
     void ProcessCommands1526to1537 (int opcode);
+    char ProcessCommands0to99 (int opcode);
     void UpdateCompareFlag (char flag);
+    int  EndThread ();
 };
 
 struct CRunningScripts
@@ -240,6 +242,17 @@ struct CVector
     float x;
     float y;
     float z;
+};
+
+struct CGenericGameStorage
+{
+    static char *MakeValidSaveFileName (int saveNum);
+    static char  GenericSave ();
+};
+
+struct CStats
+{
+    static void IncrementStat (short id, float val);
 };
 
 struct CBox

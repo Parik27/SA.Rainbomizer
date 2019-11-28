@@ -63,6 +63,21 @@ RegisterHooks (std::vector<HookProperties> hooks)
         }
 }
 
+/*******************************************************/
+void
+UnProtectInstance ()
+{
+    auto              hExecutableInstance = (size_t) GetModuleHandle (NULL);
+    IMAGE_NT_HEADERS *ntHeader
+        = (IMAGE_NT_HEADERS *) (hExecutableInstance
+                                + ((IMAGE_DOS_HEADER *) hExecutableInstance)
+                                      ->e_lfanew);
+    SIZE_T size = ntHeader->OptionalHeader.SizeOfImage;
+    DWORD  oldProtect;
+    VirtualProtect ((VOID *) hExecutableInstance, size, PAGE_EXECUTE_READWRITE,
+                    &oldProtect);
+}
+
 ExceptionManager *ExceptionManager::mManager = nullptr;
 
 /*******************************************************/

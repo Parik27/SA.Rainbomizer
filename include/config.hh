@@ -54,7 +54,10 @@ struct BaseConfig
 /*******************************************************/
 struct GeneralConfig : public BaseConfig
 {
-    int  seed = -1;
+    int  seed      = -1;
+    bool unprotect = false;
+    int  save_slot = 8;
+
     void Read (std::shared_ptr<cpptoml::table> table);
 };
 

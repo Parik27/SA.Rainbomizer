@@ -67,6 +67,9 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
 
+    if (weapon == 40 && thisPed != FindPlayerPed ())
+        return 0;
+
     int original_slot = -1;
     if (weapon != 0
         && !(FindPlayerPed () == thisPed && !config.playerRandomization))

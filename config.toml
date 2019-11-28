@@ -21,8 +21,11 @@
 
 # General Configuration
 
-Enabled = true
-Seed    = -1 # -1 for random
+Enabled   = true
+Seed      = -1 # -1 for random
+
+Unprotect = true
+AutosaveSlot = 8 # Set it to a non-existant slot (eg. -1 or 9) to disable
 
 #######################################################
 # Traffic Randomizer

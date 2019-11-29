@@ -52,7 +52,6 @@ char *__fastcall SetShouldSaveGlobalVars (CRunningScript *scr, void *edx,
     char *var        = scr->GetPointerToScriptVariable (a2);
     int   global_var = (var - (char *) ScriptSpace) / 4;
 
-    printf ("%d\n", global_var);
     if (AutoSave::GetInstance ()->IsMissionGlobalVariable (global_var))
         AutoSave::GetInstance ()->SetShouldSave (true);
 

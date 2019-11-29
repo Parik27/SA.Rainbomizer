@@ -104,6 +104,16 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
 }
 
 /*******************************************************/
+int __fastcall RandomizeGiveWeaponDelayed (CPed *thisPed, void *edx, int weapon,
+                                           int ammo, int slot)
+{
+    if (thisPed == FindPlayerPed ())
+        return thisPed->GiveWeapon (weapon, ammo, slot);
+
+    return RandomizeGiveWeapon (thisPed, edx, weapon, ammo, slot);
+}
+
+/*******************************************************/
 void
 WeaponRandomizer::Initialise ()
 {
@@ -112,26 +122,28 @@ WeaponRandomizer::Initialise ()
     if (!config.enabled)
         return;
 
-    int addresses[]
-        = {0x0438647, 0x043865E, 0x0438675, 0x043868C, 0x04386A3, 0x04386BD,
-           0x04386D4, 0x04386EB, 0x0438705, 0x043871F, 0x0438748, 0x043875F,
-           0x0438776, 0x043878D, 0x04387A4, 0x04387BE, 0x04387D5, 0x04387EC,
-           0x0438806, 0x0438820, 0x043891B, 0x0438932, 0x0438949, 0x0438960,
-           0x043897A, 0x0438994, 0x04389AB, 0x04389C5, 0x04389DF, 0x0438A08,
-           0x0438A1F, 0x0438A36, 0x0438A4D, 0x0438A67, 0x0438A81, 0x0438A98,
-           0x0438AB2, 0x0438ACC, 0x0438BAF, 0x0438BC6, 0x0438BDD, 0x0438BF4,
-           0x0438C0B, 0x0438C25, 0x0438C3F, 0x0438C68, 0x0438C7F, 0x0438C96,
-           0x0438CAD, 0x0438CC4, 0x0438CDE, 0x0438CF8, 0x04395D8, 0x0439F30,
-           0x043D577, 0x043D8ED, 0x0442936, 0x0444ECE, 0x0448682, 0x047D335,
-           0x048D8C7, 0x049C1CF, 0x049C248, 0x056EC5E, 0x05B009C, 0x05DDCC0,
-           0x05E7D82, 0x05E7E2D, 0x05E899A, 0x061390C, 0x062B3BC, 0x062B5C9,
-           0x068B8DF, 0x068E355, 0x068E39D, 0x068E3F2, 0x068E418, 0x069082D,
-           0x06D19E6, 0x06D1A24, 0x074282C};
-
-    for (int i = 0; i < sizeof (addresses) / 4; i++)
+    // CPed::GiveWeapon
+    for (int address :
+         {0x0438647, 0x043865E, 0x0438675, 0x043868C, 0x04386A3, 0x04386BD,
+          0x04386D4, 0x04386EB, 0x0438705, 0x043871F, 0x0438748, 0x043875F,
+          0x0438776, 0x043878D, 0x04387A4, 0x04387BE, 0x04387D5, 0x04387EC,
+          0x0438806, 0x0438820, 0x043891B, 0x0438932, 0x0438949, 0x0438960,
+          0x043897A, 0x0438994, 0x04389AB, 0x04389C5, 0x04389DF, 0x0438A08,
+          0x0438A1F, 0x0438A36, 0x0438A4D, 0x0438A67, 0x0438A81, 0x0438A98,
+          0x0438AB2, 0x0438ACC, 0x0438BAF, 0x0438BC6, 0x0438BDD, 0x0438BF4,
+          0x0438C0B, 0x0438C25, 0x0438C3F, 0x0438C68, 0x0438C7F, 0x0438C96,
+          0x0438CAD, 0x0438CC4, 0x0438CDE, 0x0438CF8, 0x04395D8, 0x0439F30,
+          0x043D577, 0x043D8ED, 0x0442936, 0x0444ECE, 0x0448682, 0x047D335,
+          0x048D8C7, 0x049C1CF, 0x049C248, 0x056EC5E, 0x05B009C, 0x05DDCC0,
+          0x05E7D82, 0x05E7E2D, 0x061390C, 0x062B3BC, 0x062B5C9, 0x068B8DF,
+          0x068E355, 0x068E39D, 0x068E3F2, 0x068E418, 0x069082D, 0x06D19E6,
+          0x06D1A24, 0x074282C})
         {
-            injector::MakeCALL (addresses[i], (void *) &RandomizeGiveWeapon);
+            injector::MakeCALL (address, (void *) &RandomizeGiveWeapon);
         }
+
+    // CPed::GiveWeapon with Player exception
+    injector::MakeCALL (0x5E899A, (void *) &RandomizeGiveWeaponDelayed);
 
     Logger::GetLogger ()->LogMessage ("Intialised WeaponRandomizer");
 }
@@ -191,6 +203,7 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
                     return weapon;
                 }
         }
+    return weapon;
 }
 
 /*******************************************************/

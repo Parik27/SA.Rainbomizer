@@ -211,13 +211,14 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     // OG Loc's Vehicle
     if (x > -7.0310 && x < -7.0300)
         {
-            if (random (100) <= 50) {
+            if (random (100) <= 50)
+                {
                     model = 472;
                 }
             while (newModel != 539 && newModel != 473 && newModel != 464
                    && newModel != 501
                    && !CModelInfo::IsPlaneModel (
-                          newModel)) // Vortex, Dinghy, RC Baron, RC Goblin
+                       newModel)) // Vortex, Dinghy, RC Baron, RC Goblin
                 {
                     newModel = ScriptVehicleRandomizer::GetInstance ()
                                    ->GetRandomIDBasedOnVehicle (model);
@@ -226,12 +227,13 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     // Madd Dogg's Vehicle
     if (x > -4.863 && x < -4.853)
         {
-            if (random (100) <= 50) {
+            if (random (100) <= 50)
+                {
                     model = 472;
                 }
             while (newModel != 539 && newModel != 464 && newModel != 501
                    && !CModelInfo::IsBoatModel (
-                          newModel)) // Vortex, RC Baron, RC Goblin
+                       newModel)) // Vortex, RC Baron, RC Goblin
                 {
                     newModel = ScriptVehicleRandomizer::GetInstance ()
                                    ->GetRandomIDBasedOnVehicle (model);
@@ -253,11 +255,13 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     // Driving School [Alley Oop] Fix
     if (y > -111.86 && y < -108.86) // -2050.12 - -2050.0847
         {
-            // Added this check to prevent endless loops when scrolling through tests
+            // Added this check to prevent endless loops when scrolling through
+            // tests
             if (model != 597 && model != 420) // SF Police, Taxi
                 {
                     while (newModel != 429 && newModel != 541 && newModel != 480
-                           && newModel != 494 && newModel != 506 && newModel != 451)
+                           && newModel != 494 && newModel != 506
+                           && newModel != 451)
                         // Banshee, Bullet, Comet, Hotring Racer, Super GT,
                         // Turismo
                         {
@@ -271,8 +275,8 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     if (x > -2584.41 && x < -2584.27)
         {
             model = 472;
-            while (!CModelInfo::IsBoatModel (newModel)
-                   && newModel != 539 && newModel != 460) // Vortex, Skimmer
+            while (!CModelInfo::IsBoatModel (newModel) && newModel != 539
+                   && newModel != 460) // Vortex, Skimmer
                 {
                     newModel = ScriptVehicleRandomizer::GetInstance ()
                                    ->GetRandomIDBasedOnVehicle (model);
@@ -633,7 +637,7 @@ ScriptVehicleRandomizer::Initialise ()
         {.pattern = 406, .allowed = {406}, .denied = {}, .flags = 0},
 
         {.pattern = 486, .allowed = {486}, .denied = {}, .flags = 0},
-        
+
         {.pattern = 489,
          .allowed = {VEHICLE_ALL},
          .denied  = {VEHICLE_APPEARANCE_BIKE, VEHICLE_APPEARANCE_BOAT,

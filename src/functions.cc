@@ -411,6 +411,7 @@ CRunningScripts::CheckForRunningScript (const char *thread)
             if (script->m_bIsMission && script->CheckName (thread))
                 return true;
         }
+    return false;
 }
 
 /*******************************************************/

@@ -17,8 +17,8 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().pickups;
 
-    printf ("%05d %05d\r", modelId, ammo);
-    if (ammo && modelId != 1212 && modelId != 367)
+    if (ammo && modelId != 1212 && modelId != 367 && modelId != 344
+        && modelId != 366)
         {
             modelId
                 = WeaponRandomizer::GetInstance ()->GetRandomWeapon (nullptr,

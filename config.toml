@@ -100,7 +100,7 @@ Patterns = [
 #######################################################
 [PickupsRandomizer]
 
-Enabled = true
+Enabled = false
 ReplaceWithWeaponsOnly = true # Does nothing yet
 
 #######################################################

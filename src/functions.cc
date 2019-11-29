@@ -323,6 +323,16 @@ CRunningScript::GetPointerToScriptVariable (int a2)
 }
 
 /*******************************************************/
+int
+CPickups::GenerateNewOne (float x, float y, float z, unsigned int modelId,
+                          char pickupType, int ammo, unsigned int moneyPerDay,
+                          char isEmpty, char *message)
+{
+    return CallAndReturn<int, 0x456F20> (x, y, z, modelId, pickupType, ammo,
+                                         moneyPerDay, isEmpty, message);
+}
+
+/*******************************************************/
 void *
 CPool::GetAt (int handle, int size)
 {

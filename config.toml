@@ -84,6 +84,7 @@ Patterns = [
 	{ thread = "finalec", ped = 0, weapon = 28, allowed = ["slot"]},
 	{ thread = "drugs1", weapon = 28, allowed = ["slot"]},
 	{ weapon = 43, allowed = [43]},
+	{ weapon = 44, allowed = [44, 45]},
 	{ thread = "sweet1", weapon = 41, allowed = [41]},
 	{ thread = "heist5", weapon = 38, allowed = ["slot"]},
 	{ thread = "zero1", weapon = 38, allowed = ["slot"]},
@@ -95,6 +96,12 @@ Patterns = [
 	{ thread = "des10", ped = 0, allowed = [28, 32]},
 	{ thread = "casino9", weapon = 22, allowed = [22, 23, 24]}
 ]
+
+#######################################################
+[PickupsRandomizer]
+
+Enabled = true
+ReplaceWithWeaponsOnly = true # Does nothing yet
 
 #######################################################
 [ParkedCarRandomizer]
@@ -114,6 +121,8 @@ Enabled = true
 Enabled = true
 MatchSubtitles = true
 AudioEventsFile = "data/AudioEvents.txt" # Relative to game directory
+ForceAudioLineEnabled = false
+ForceAudioLine = 0
 
 #######################################################
 [ScriptVehicleRandomizer]

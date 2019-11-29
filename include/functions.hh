@@ -280,6 +280,14 @@ struct CPed
     void *CCopPed__CCopPed (int type);
 };
 
+struct CPickups
+{
+    static int GenerateNewOne (float x, float y, float z, unsigned int modelId,
+                               char pickupType, int ammo,
+                               unsigned int moneyPerDay, char isEmpty,
+                               char *message);
+};
+
 struct CBaseModelInfo
 {
 public:

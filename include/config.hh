@@ -112,10 +112,18 @@ struct HandlingConfig : public BaseConfig
 /*******************************************************/
 struct WeaponConfig : public BaseConfig
 {
-    bool                       enabled             = false;
+    bool                       enabled             = true;
     bool                       playerRandomization = true;
     bool                       skipChecks          = false;
     std::vector<WeaponPattern> patterns            = {};
+
+    void Read (std::shared_ptr<cpptoml::table> table);
+};
+
+/*******************************************************/
+struct PickupsConfig : public BaseConfig
+{
+    bool sameType = false;
 
     void Read (std::shared_ptr<cpptoml::table> table);
 };
@@ -139,8 +147,10 @@ struct LicensePlateConfig : public BaseConfig
 struct SoundsConfig : public BaseConfig
 {
 
-    bool        matchSubtitles  = true;
-    std::string audioEventsFile = "data/AudioEvents.txt";
+    bool        matchSubtitles    = true;
+    std::string audioEventsFile   = "data/AudioEvents.txt";
+    bool        forceAudioEnabled = false;
+    int         forceAudioID      = -1;
 
     void Read (std::shared_ptr<cpptoml::table> table);
 };
@@ -162,6 +172,7 @@ struct Configs
     CheatConfig         cheat;
     HandlingConfig      handling;
     WeaponConfig        weapon;
+    PickupsConfig       pickups;
     ParkedCarConfig     parkedCar;
     LicensePlateConfig  licensePlate;
     SoundsConfig        sounds;

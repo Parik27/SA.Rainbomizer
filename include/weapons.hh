@@ -2,6 +2,8 @@
 
 struct CPed;
 
+int *GetWeaponInfo (int weaponId, char skill);
+
 class WeaponRandomizer
 {
     static WeaponRandomizer *mInstance;

@@ -195,6 +195,20 @@ ParkedCarConfig::Read (std::shared_ptr<cpptoml::table> table)
 
 /*******************************************************/
 void
+PickupsConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    BaseConfig::Read (table);
+
+    puts ("Reading Pickups");
+
+    CONFIG (table, sameType, "ReplaceWithWeaponsOnly", bool);
+}
+
+/*******************************************************/
+void
 SoundsConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
     if (!table)
@@ -204,6 +218,8 @@ SoundsConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     CONFIG (table, matchSubtitles, "MatchSubtitles", bool);
     CONFIG (table, audioEventsFile, "AudioEventsFile", std::string);
+    CONFIG (table, forceAudioEnabled, "ForceAudioLineEnabled", bool);
+    CONFIG (table, forceAudioID, "ForceAudioLine", int);
 }
 
 /*******************************************************/
@@ -278,6 +294,7 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.handling.Read (config->get_table ("HandlingRandomizer"));
     mConfigs.weapon.Read (config->get_table ("WeaponRandomizer"));
     mConfigs.parkedCar.Read (config->get_table ("ParkedCarRandomizer"));
+    mConfigs.pickups.Read (config->get_table ("PickupsRandomizer"));
     mConfigs.licensePlate.Read (config->get_table ("LicensePlateRandomizer"));
     mConfigs.sounds.Read (config->get_table ("SoundsRandomizer"));
     mConfigs.scriptVehicle.Read (config->get_table ("ScriptVehicleRandomizer"));

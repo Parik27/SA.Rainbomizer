@@ -33,6 +33,7 @@
 #include "weapons.hh"
 #include "config.hh"
 #include "autosave.hh"
+#include "pickups.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -74,6 +75,7 @@ public:
         HandlingRandomizer::GetInstance ()->Initialise ();
         CheatRandomizer::GetInstance ()->Initialise ();
         WeaponRandomizer::GetInstance ()->Initialise ();
+        PickupsRandomizer::GetInstance ()->Initialise ();
         AutoSave::GetInstance ()->Initialise ();
     }
 

@@ -69,6 +69,8 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
 
     if (weapon == 40 && thisPed != FindPlayerPed ())
         return 0;
+    else
+        thisPed->GiveWeapon (weapon, ammo, slot);
 
     int original_slot = -1;
     if (weapon != 0
@@ -173,7 +175,7 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
                             return weapon;
                         }
                     int              weapon;
-                    std::vector<int> buggy_weapons = {19, 20, 21, 14, 40};
+                    std::vector<int> buggy_weapons = {19, 20, 21, 14, 40, 39};
 
                     while ((weapon = random (46, 1),
 

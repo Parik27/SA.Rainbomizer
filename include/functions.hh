@@ -131,12 +131,13 @@ private:
     char _padDD[3];
 
 public:
-    void CollectParameters (short num);
-    bool CheckName (const char *name);
-    void ProcessCommands1526to1537 (int opcode);
-    char ProcessCommands0to99 (int opcode);
-    void UpdateCompareFlag (char flag);
-    int  EndThread ();
+    char *GetPointerToScriptVariable (int a2);
+    void  CollectParameters (short num);
+    bool  CheckName (const char *name);
+    void  ProcessCommands1526to1537 (int opcode);
+    char  ProcessCommands0to99 (int opcode);
+    void  UpdateCompareFlag (char flag);
+    int   EndThread ();
 };
 
 struct CRunningScripts
@@ -503,4 +504,5 @@ extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
 extern RwRGBA *         ms_vehicleColourTable;
 extern int *            ScriptParams;
+extern int *            ScriptSpace;
 extern CPool *          ms_pPedPool;

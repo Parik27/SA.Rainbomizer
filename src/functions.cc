@@ -316,6 +316,13 @@ CRunningScript::CollectParameters (short num)
 }
 
 /*******************************************************/
+char *
+CRunningScript::GetPointerToScriptVariable (int a2)
+{
+    return CallMethodAndReturn<char *, 0x464790> (this, a2);
+}
+
+/*******************************************************/
 void *
 CPool::GetAt (int handle, int size)
 {
@@ -410,7 +417,7 @@ CRunningScripts::CheckForRunningScript (const char *thread)
 char
 CRunningScript::ProcessCommands0to99 (int opcode)
 {
-    CallMethodAndReturn<char, 0x465E60> (this, opcode);
+    return CallMethodAndReturn<char, 0x465E60> (this, opcode);
 }
 
 /*******************************************************/
@@ -506,6 +513,7 @@ CStreamingInfo * ms_aInfoForModel               = (CStreamingInfo *) 0x8E4CC0;
 RwRGBA *         ms_vehicleColourTable          = (RwRGBA *) 0xB4E480;
 CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;
 int *            ScriptParams                   = (int *) 0xA43C78;
+int *            ScriptSpace                    = (int *) 0xA49960;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
 CPool *          ms_pPedPool                    = (CPool *) 0xB74490;
 CRunningScript *&CRunningScripts::pActiveScript = *(CRunningScript **) 0xA8B42C;

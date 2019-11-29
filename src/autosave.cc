@@ -41,9 +41,22 @@ int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
 void
 SetShouldSave (uint16_t id, float val)
 {
-    puts ("Should save!");
     AutoSave::GetInstance ()->SetShouldSave (true);
     CStats::IncrementStat (id, val);
+}
+
+/*******************************************************/
+char *__fastcall SetShouldSaveGlobalVars (CRunningScript *scr, void *edx,
+                                          int a2)
+{
+    char *var        = scr->GetPointerToScriptVariable (a2);
+    int   global_var = (var - (char *) ScriptSpace) / 4;
+
+    printf ("%d\n", global_var);
+    if (AutoSave::GetInstance ()->IsMissionGlobalVariable (global_var))
+        AutoSave::GetInstance ()->SetShouldSave (true);
+
+    return var;
 }
 
 /*******************************************************/
@@ -55,8 +68,27 @@ AutoSave::Initialise ()
         return;
 
     this->InstallHooks ();
-    RegisterHooks ({{HOOK_CALL, 0x480D11, (void *) &::SetShouldSave}});
+    RegisterHooks (
+        {{HOOK_CALL, 0x480D11, (void *) &::SetShouldSave},
+         {HOOK_CALL, 0x465FC3, (void *) &::SetShouldSaveGlobalVars}});
+
     Logger::GetLogger ()->LogMessage ("Intialised AutoSave");
+}
+
+/*******************************************************/
+bool
+AutoSave::IsMissionGlobalVariable (int global_var)
+{
+    // $629 => $RIOT_TOTAL_PASSED_MISSIONS
+    // Note: This is for adding more mission global variables for fine tuning
+    //       when saves happen
+    for (int variable : {629})
+        {
+            if (variable == global_var)
+                return true;
+        }
+
+    return false;
 }
 
 /*******************************************************/

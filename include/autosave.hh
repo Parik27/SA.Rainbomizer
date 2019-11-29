@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdio>
+
 const int ORIGINAL_DATA_SIZE = 5;
 class AutoSave
 {
@@ -25,6 +27,7 @@ public:
     void
     SetShouldSave (bool shouldSave)
     {
+        puts (shouldSave ? "Save Scheduled" : "Save Successful");
         m_shouldSave = shouldSave;
     };
 
@@ -33,4 +36,6 @@ public:
 
     void InstallHooks ();
     void RevertHooks ();
+
+    bool IsMissionGlobalVariable (int global_var);
 };

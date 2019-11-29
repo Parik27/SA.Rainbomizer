@@ -189,14 +189,107 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
             z = random (42, 36);
         }
 
-    // Cut Throat Business Fix
+    // The Da Nang Thang Fix
+    if (x > -2430.8 && x < -2430.6)
+        {
+            y += 30;
+        }
+
+    // Cut Throat Business Fix //
+    // Player's Vehicle
     if (x > -7.4399 && x < -7.4388)
         {
-            if (!CModelInfo::IsRCModel (newModel))
+            model = 472;
+            while (!CModelInfo::IsBoatModel (newModel))
                 {
-                    x += 40;
-                    z -= 6;
+                    newModel = ScriptVehicleRandomizer::GetInstance ()
+                                   ->GetRandomIDBasedOnVehicle (model);
                 }
+            x += 40;
+            z -= 6;
+        }
+    // OG Loc's Vehicle
+    if (x > -7.0310 && x < -7.0300)
+        {
+            if (random (100) <= 50) {
+                    model = 472;
+                }
+            while (newModel != 539 && newModel != 473 && newModel != 464
+                   && newModel != 501
+                   && !CModelInfo::IsPlaneModel (
+                          newModel)) // Vortex, Dinghy, RC Baron, RC Goblin
+                {
+                    newModel = ScriptVehicleRandomizer::GetInstance ()
+                                   ->GetRandomIDBasedOnVehicle (model);
+                }
+        }
+    // Madd Dogg's Vehicle
+    if (x > -4.863 && x < -4.853)
+        {
+            if (random (100) <= 50) {
+                    model = 472;
+                }
+            while (newModel != 539 && newModel != 464 && newModel != 501
+                   && !CModelInfo::IsBoatModel (
+                          newModel)) // Vortex, RC Baron, RC Goblin
+                {
+                    newModel = ScriptVehicleRandomizer::GetInstance ()
+                                   ->GetRandomIDBasedOnVehicle (model);
+                }
+        }
+
+    // Chopper Checkpoint Fix
+    if (x > 377.57 && x < 384.57)
+        {
+            model = 469;
+            while (!CModelInfo::IsHeliModel (newModel)
+                   && !CModelInfo::IsPlaneModel (newModel))
+                {
+                    newModel = ScriptVehicleRandomizer::GetInstance ()
+                                   ->GetRandomIDBasedOnVehicle (model);
+                }
+        }
+
+    // Driving School [Alley Oop] Fix
+    if (y > -111.86 && y < -108.86) // -2050.12 - -2050.0847
+        {
+            // Added this check to prevent endless loops when scrolling through tests
+            if (model != 597 && model != 420) // SF Police, Taxi
+                {
+                    while (newModel != 429 && newModel != 541 && newModel != 480
+                           && newModel != 494 && newModel != 506 && newModel != 451)
+                        // Banshee, Bullet, Comet, Hotring Racer, Super GT,
+                        // Turismo
+                        {
+                            newModel = ScriptVehicleRandomizer::GetInstance ()
+                                           ->GetRandomIDBasedOnVehicle (model);
+                        }
+                }
+        }
+
+    // Boat School [Flying Fish] Fix
+    if (x > -2584.41 && x < -2584.27)
+        {
+            model = 472;
+            while (!CModelInfo::IsBoatModel (newModel)
+                   && newModel != 539 && newModel != 460) // Vortex, Skimmer
+                {
+                    newModel = ScriptVehicleRandomizer::GetInstance ()
+                                   ->GetRandomIDBasedOnVehicle (model);
+                }
+        }
+
+    // Boat School [Air, Land & Sea] Fix
+    if (x > -2017.29 && x < -2011.29)
+        {
+            model = 472;
+            while (!CModelInfo::IsBoatModel (newModel)
+                   && newModel != 539) // Vortex
+                {
+                    newModel = ScriptVehicleRandomizer::GetInstance ()
+                                   ->GetRandomIDBasedOnVehicle (model);
+                }
+            x -= 60;
         }
 
     uint8_t *vehicle = (uint8_t *) CCarCtrl::CreateCarForScript (newModel, x, y,
@@ -546,9 +639,6 @@ ScriptVehicleRandomizer::Initialise ()
          .denied  = {},
          .flags   = 0},
 
-        {.pattern = 539,
-         .allowed = {VEHICLE_BOAT, 464, 501, 465},
-         .denied  = {472, 595, 484, 453, 454, 430}},
         {.pattern = 521, .allowed = {VEHICLE_APPEARANCE_BIKE}},
         {.pattern = 522, .allowed = {VEHICLE_APPEARANCE_BIKE}},
 

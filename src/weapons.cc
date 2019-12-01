@@ -67,11 +67,6 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
 
-    if (weapon == 40 && thisPed != FindPlayerPed ())
-        return 0;
-    else
-        thisPed->GiveWeapon (weapon, ammo, slot);
-
     int original_slot = -1;
     if (weapon != 0
         && !(FindPlayerPed () == thisPed && !config.playerRandomization))
@@ -137,7 +132,7 @@ WeaponRandomizer::Initialise ()
           0x048D8C7, 0x049C1CF, 0x049C248, 0x056EC5E, 0x05B009C, 0x05DDCC0,
           0x05E7D82, 0x05E7E2D, 0x061390C, 0x062B3BC, 0x062B5C9, 0x068B8DF,
           0x068E355, 0x068E39D, 0x068E3F2, 0x068E418, 0x069082D, 0x06D19E6,
-          0x06D1A24, 0x074282C})
+          0x06D1A24})
         {
             injector::MakeCALL (address, (void *) &RandomizeGiveWeapon);
         }

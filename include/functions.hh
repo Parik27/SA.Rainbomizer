@@ -18,6 +18,8 @@
 
  */
 
+#include <cstdint>
+
 #pragma once
 
 /* These contain game functions that might be called by other modules */
@@ -236,6 +238,38 @@ struct CModelInfo
 struct CAEVehicleAudioEntity
 {
     void ProcessTrainTrackSound (void *vehicle_info);
+};
+
+struct CAEAudioUtility
+{
+    static char GetBankAndSoundFromScriptSlotAudioEvent (int *      wavId,
+                                                         int *      out_sfx,
+                                                         int *      out_bank,
+                                                         signed int slot);
+};
+
+struct BankLkup
+{
+    uint8_t  sfxIndex;
+    char     pad[3];
+    uint32_t m_dwOffset;
+    uint32_t m_dwLength;
+};
+
+struct PakFile
+{
+    char     _pad_00[8];
+    int16_t  loopOffset;
+    uint16_t headRoom;
+};
+
+struct CAEMp3BankLoader
+{
+    void *    m_pBankSlotsInfo;
+    BankLkup *m_pBankLkups;
+
+    int  GetLoopOffset (unsigned short sfxId, short bankSlotInfoId);
+    char Initialise ();
 };
 
 struct CVector

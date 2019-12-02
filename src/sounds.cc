@@ -86,6 +86,51 @@ char *__fastcall CorrectSubtitles (CText *text, void *edx, char *key)
 }
 
 /*******************************************************/
+char __fastcall InitialiseLoopedSoundList (CAEMp3BankLoader *thisLoader)
+{
+    int  ret             = thisLoader->Initialise ();
+    auto soundRandomizer = SoundRandomizer::GetInstance ();
+
+    FILE *scriptSFX
+        = fopen (GetGameDirRelativePathA ("audio/SFX/SCRIPT"), "rb");
+
+    for (auto it = soundRandomizer->mSoundTable.begin ();
+         it != soundRandomizer->mSoundTable.end ();)
+        {
+
+            int sfx_id;
+            int bank;
+            CAEAudioUtility::GetBankAndSoundFromScriptSlotAudioEvent (&it->id,
+                                                                      &bank,
+                                                                      &sfx_id,
+                                                                      1);
+
+            auto bankLkup = thisLoader->m_pBankLkups[bank];
+            if (bankLkup.sfxIndex == 3)
+                {
+                    PakFile sfx;
+                    fseek (scriptSFX,
+                           bankLkup.m_dwOffset + sizeof (PakFile) * sfx_id,
+                           SEEK_SET);
+
+                    fread (&sfx, sizeof (PakFile), 1, scriptSFX);
+
+                    // Looping sound
+                    if (sfx.loopOffset != -1)
+                        {
+                            soundRandomizer->mLoopedSounds.push_back (*it);
+                            soundRandomizer->mSoundTable.erase (it);
+                            continue;
+                        }
+                }
+            ++it;
+        }
+
+    fclose (scriptSFX);
+    return ret;
+}
+
+/*******************************************************/
 const std::string &
 SoundRandomizer::GetPreviousOverridenText ()
 {
@@ -114,11 +159,31 @@ SoundRandomizer::GetPreviousPairs ()
 {
     return mPreviousPairs;
 }
+/*******************************************************/
+bool
+SoundRandomizer::IsSoundLooped (int id)
+{
+    for (auto i : mLoopedSounds)
+        {
+            if (i.id == id)
+                return true;
+        }
+
+    return false;
+}
 
 /*******************************************************/
 SoundPair
 SoundRandomizer::GetRandomPair (int &index, int slot, int id)
 {
+
+    if (this->IsSoundLooped (id))
+        {
+            auto pair = mLoopedSounds[random (mLoopedSounds.size () - 1)];
+            puts (pair.name.c_str ());
+            return pair;
+        }
+
     if (slots[slot].oldSound == id)
         {
             index = slots[slot].newSound;
@@ -190,13 +255,15 @@ SoundRandomizer::Initialise ()
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised SoundRandomizer");
-    RegisterHooks ({{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
-                    {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles},
-                    {HOOK_CALL, 0x4680E7, (void *) &CorrectSubtitles},
-                    {HOOK_CALL, 0x485397, (void *) &RemoveSubtitlesHook},
-                    {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
-                    {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
-                    {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts}});
+    RegisterHooks (
+        {{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
+         {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles},
+         {HOOK_CALL, 0x4680E7, (void *) &CorrectSubtitles},
+         {HOOK_CALL, 0x485397, (void *) &RemoveSubtitlesHook},
+         {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
+         {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
+         {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
+         {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList}});
     InitaliseSoundTable ();
 }
 

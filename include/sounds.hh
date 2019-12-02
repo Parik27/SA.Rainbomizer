@@ -18,17 +18,20 @@ struct SlotSoundPair
 
 struct CAudioEngine;
 struct CText;
+struct CAEMp3BankLoader;
 
 void __fastcall RandomizeAudioLoad (CAudioEngine *audio, void *edx,
                                     unsigned char slot, int id);
 char *__fastcall CorrectSubtitles (CText *TheText, void *edx, char *key);
 char *__fastcall RemoveSubtitlesHook (CText *TheText, void *edx, char *key);
+char __fastcall InitialiseLoopedSoundList (CAEMp3BankLoader *thisLoader);
 
 class SoundRandomizer
 {
     static SoundRandomizer *mInstance;
 
     std::vector<SoundPair>               mSoundTable;
+    std::vector<SoundPair>               mLoopedSounds;
     std::unordered_map<std::string, int> mPreviousPairs;
     SlotSoundPair                        slots[5];
     std::string                          mPrevOverridenText;
@@ -56,6 +59,9 @@ public:
     SoundPair GetPairByIndex (int index);
 
     /// Returns sound pair by ID
+    bool IsSoundLooped (int id);
+
+    /// Returns sound pair by ID
     SoundPair GetPairByID (int id);
 
     const std::string &GetPreviousOverridenText ();
@@ -63,4 +69,7 @@ public:
 
     void SetPreviousOverridenText (const std::string &key,
                                    const std::string &text);
+
+    friend char __fastcall InitialiseLoopedSoundList (
+        CAEMp3BankLoader *thisLoader);
 };

@@ -204,6 +204,30 @@ CAEVehicleAudioEntity::ProcessTrainTrackSound (void *vehicle_info)
 }
 
 /*******************************************************/
+char
+CAEAudioUtility::GetBankAndSoundFromScriptSlotAudioEvent (int *      wavId,
+                                                          int *      out_slot,
+                                                          int *      out_bank,
+                                                          signed int slot)
+{
+    return CallAndReturn<char, 0x4D9CC0> (wavId, out_slot, out_bank, slot);
+}
+
+/*******************************************************/
+int
+CAEMp3BankLoader::GetLoopOffset (unsigned short sfxId, short bankSlotInfoId)
+{
+    return CallMethodAndReturn<int, 0x4E0380> (this, sfxId, bankSlotInfoId);
+}
+
+/*******************************************************/
+char
+CAEMp3BankLoader::Initialise ()
+{
+    return CallMethodAndReturn<char, 0x4E08F0> (this);
+}
+
+/*******************************************************/
 void
 CCarGenerator::CheckForBlockage (int model_id)
 {

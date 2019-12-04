@@ -119,7 +119,7 @@ char __fastcall InitialiseLoopedSoundList (CAEMp3BankLoader *thisLoader)
                     if (sfx.loopOffset != -1)
                         {
                             soundRandomizer->mLoopedSounds.push_back (*it);
-                            soundRandomizer->mSoundTable.erase (it);
+                            it = soundRandomizer->mSoundTable.erase (it);
                             continue;
                         }
                 }

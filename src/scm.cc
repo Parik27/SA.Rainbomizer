@@ -284,7 +284,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
         }
 
     // Boat School [Air, Land & Sea] Fix
-    if (x > -2014.267 && x < -2014.266)
+    if (x > -2014.268 && x < -2014.267)
         {
             model = 472;
             while (!CModelInfo::IsBoatModel (newModel)

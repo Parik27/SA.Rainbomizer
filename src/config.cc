@@ -26,6 +26,7 @@
 #include "logger.hh"
 #include "config_default.hh"
 #include <sstream>
+#include "scm.hh"
 
 ConfigManager *ConfigManager::mInstance = nullptr;
 
@@ -54,6 +55,53 @@ HandlingConfig::Read (std::shared_ptr<cpptoml::table> table)
 
 /*******************************************************/
 void
+WeaponConfig::ReadTable (std::shared_ptr<cpptoml::table> pattern,
+                         const std::string &key, std::vector<int64_t> &v)
+{
+    if (auto table = pattern->get_array (key))
+        {
+            for (const auto &val : *table)
+                {
+                    switch ((*val).type ())
+                        {
+                        case cpptoml::base_type::INT:
+                            v.push_back (val.get ()->as<int64_t> ()->get ());
+                            break;
+
+                            case cpptoml::base_type::STRING: {
+                                std::string value
+                                    = val.get ()->as<std::string> ()->get ();
+
+                                if (value == "slot")
+                                    v.push_back (WEAPON_SLOT);
+
+                                break;
+                            }
+
+                        default: continue;
+                        }
+                }
+        }
+}
+
+/*******************************************************/
+void
+WeaponConfig::ReadPattern (std::shared_ptr<cpptoml::table> pattern)
+{
+    WeaponPattern _pattern;
+    _pattern.weapon = pattern->get_as<int> ("weapon").value_or (-1);
+    _pattern.ped    = pattern->get_as<int> ("ped").value_or (-1);
+
+    _pattern.thread = pattern->get_as<std::string> ("thread").value_or ("");
+
+    ReadTable (pattern, "allowed", _pattern.allowed);
+    ReadTable (pattern, "denied", _pattern.denied);
+
+    this->patterns.push_back (_pattern);
+}
+
+/*******************************************************/
+void
 WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
     if (!table)
@@ -67,56 +115,7 @@ WeaponConfig::Read (std::shared_ptr<cpptoml::table> table)
     if (auto patterns = table->get_table_array ("Patterns"))
         {
             for (const auto &pattern : *patterns)
-                {
-                    WeaponPattern _pattern;
-                    _pattern.weapon
-                        = pattern->get_as<int> ("weapon").value_or (-1);
-                    _pattern.ped = pattern->get_as<int> ("ped").value_or (-1);
-
-                    _pattern.thread
-                        = pattern->get_as<std::string> ("thread").value_or ("");
-
-                    auto read_table = [&] (std::string           key,
-                                           std::vector<int64_t> &v) {
-                        if (auto table = pattern->get_array (key))
-                            {
-                                for (const auto &val : *table)
-                                    {
-                                        switch ((*val).type ())
-                                            {
-                                            case cpptoml::base_type::INT:
-                                                v.push_back (
-                                                    val.get ()
-                                                        ->as<int64_t> ()
-                                                        ->get ());
-                                                break;
-
-                                                case cpptoml::base_type::
-                                                    STRING: {
-                                                    std::string value
-                                                        = val.get ()
-                                                              ->as<
-                                                                  std::
-                                                                      string> ()
-                                                              ->get ();
-
-                                                    if (value == "slot")
-                                                        v.push_back (
-                                                            WEAPON_SLOT);
-
-                                                    break;
-                                                }
-
-                                            default: continue;
-                                            }
-                                    }
-                            }
-                    };
-                    read_table ("allowed", _pattern.allowed);
-                    read_table ("denied", _pattern.denied);
-
-                    this->patterns.push_back (_pattern);
-                }
+                ReadPattern (pattern);
         }
 
     // Fallback Pattern
@@ -224,6 +223,101 @@ SoundsConfig::Read (std::shared_ptr<cpptoml::table> table)
 
 /*******************************************************/
 void
+ScriptVehicleConfig::ReadTable (std::shared_ptr<cpptoml::table> pattern,
+                                const std::string &key, std::vector<int16_t> &v)
+{
+
+    auto int_array = pattern->get_array_of<int64_t> (key);
+    auto str_array = pattern->get_array_of<std::string> (key);
+    if (int_array)
+        {
+            for (const auto &vehicle : *int_array)
+                {
+                    if (vehicle < 400 || vehicle > 611)
+                        continue;
+
+                    v.push_back (vehicle);
+                }
+        }
+    else if (str_array)
+        {
+            for (const auto &vehicle : *str_array)
+                {
+                    v.push_back (StrToVehicleType (vehicle));
+                }
+        }
+}
+
+/*******************************************************/
+int
+ScriptVehicleConfig::StrToVehicleType (const std::string &str)
+{
+
+    std::unordered_map<std::string, int> vehicle_maps
+        = {{"cars", VEHICLES_CARS},      {"bikes", VEHICLES_BIKES},
+           {"boats", VEHICLES_BOATS},    {"helis", VEHICLES_HELIS},
+           {"planes", VEHICLES_PLANES},  {"bmx", VEHICLES_BMX},
+           {"all", VEHICLES_ALL},        {"trains", VEHICLES_TRAINS},
+           {"rc", VEHICLE_APPEARANCE_RC}};
+
+    if (vehicle_maps.count (str) == 1)
+        return vehicle_maps[str];
+
+    try
+        {
+            int vehicle = std::stoi (str);
+            if (vehicle >= 400 && vehicle <= 611)
+                return vehicle;
+        }
+    catch (const std::exception &e)
+        {
+            puts (str.c_str ());
+        }
+
+    return VEHICLES_ALL;
+}
+
+/*******************************************************/
+void
+ScriptVehicleConfig::ReadPattern (std::shared_ptr<cpptoml::table> pattern)
+{
+    VehiclePattern _pattern;
+
+    // Vehicle Pattern
+    if (auto val = pattern->get_as<int64_t> ("vehicle"))
+        _pattern.vehicle = val.value_or (VEHICLES_ALL);
+    if (auto val = pattern->get_as<std::string> ("vehicle"))
+        _pattern.vehicle = StrToVehicleType (val.value_or ("all"));
+
+    _pattern.seat_check = pattern->get_as<bool> ("seat_check").value_or (true);
+    _pattern.thread     = pattern->get_as<std::string> ("thread").value_or ("");
+
+    auto coords = pattern->get_array_of<int64_t> ("coords");
+    auto move   = pattern->get_array_of<int64_t> ("move");
+
+    // Coords and Move
+    if (coords && coords->size () == 3)
+        {
+            _pattern.coords[0] = (*coords)[0];
+            _pattern.coords[1] = (*coords)[1];
+            _pattern.coords[2] = (*coords)[2];
+        }
+    if (move && move->size () == 4)
+        {
+            _pattern.move[0] = (*move)[0];
+            _pattern.move[1] = (*move)[1];
+            _pattern.move[2] = (*move)[2];
+            _pattern.move[3] = (*move)[3];
+        }
+
+    ReadTable (pattern, "allowed", _pattern.allowed);
+    ReadTable (pattern, "denied", _pattern.denied);
+
+    this->patterns.push_back (_pattern);
+}
+
+/*******************************************************/
+void
 ScriptVehicleConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
     if (!table)
@@ -232,6 +326,15 @@ ScriptVehicleConfig::Read (std::shared_ptr<cpptoml::table> table)
     BaseConfig::Read (table);
 
     CONFIG (table, skipChecks, "SkipChecks", bool);
+
+    // Read Patterns
+    if (auto patterns = table->get_table_array ("Patterns"))
+        {
+            for (const auto &pattern : *patterns)
+                {
+                    ReadPattern (pattern);
+                }
+        }
 }
 
 /*******************************************************/
@@ -265,7 +368,7 @@ ConfigManager::ParseDefaultConfig ()
         std::string ((char *) config_toml, config_toml_len));
 
     cpptoml::parser p{stream};
-    return std::move (p.parse ());
+    return p.parse ();
 }
 
 /*******************************************************/
@@ -277,7 +380,7 @@ ConfigManager::Initialise (const std::string &file)
         {
             config = cpptoml::parse_file (file);
         }
-    catch (std::exception e)
+    catch (const std::exception &e)
         {
             Logger::GetLogger ()->LogMessage (e.what ());
             config = ParseDefaultConfig ();

@@ -250,6 +250,13 @@ CClumpModelInfo::GetBoundingBox ()
 
 /*******************************************************/
 int
+CGame::Init3 (void *file)
+{
+    return CallAndReturn<int, 0x5BA400> (file);
+}
+
+/*******************************************************/
+int
 CKeyGen::GetUppercaseKey (const char *string)
 {
     return CallAndReturn<int, 0x53CF30> (string);

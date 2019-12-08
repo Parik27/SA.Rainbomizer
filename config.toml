@@ -130,4 +130,60 @@ ForceAudioLine = 0
 Enabled = true
 SkipChecks = false  # Don't enable this if you don't want to softlock every
                     # other mission :P
+Patterns = [
 
+	# Mission specific-patterns
+
+	{vehicle = 487, allowed = ["helis", "planes"], thread = "cprace", seat_check = false},
+	{thread = "dschool", vehicle = 429, allowed = [429, 541, 480, 494, 506, 451]},
+	{coords  = [-2584, 2213, 0], vehicle = 539, allowed = [460, 539]},
+	{thread = "boat", vehicle = 539, allowed = ["460", "539", "boats"], move  = [-60, 0, 0, 0]},
+    {vehicle = 487, allowed = ["all"], seat_check = false},
+	{vehicle = 406, allowed = [406]},
+	{vehicle = 486, allowed = [486]},
+	{vehicle = 489, allowed = ["cars"]},
+	{vehicle = 581, coords = [1671, -1695, 19], allowed = ["bikes", "594"]},
+	{thread = "bskool", vehicle = 521, allowed = ["bikes"]},
+	{vehicle = 522, allowed = ["bikes"]},
+	{vehicle = 601, allowed = [601]},
+	{vehicle = 524, allowed = [524]},
+	{vehicle = 501, allowed = [465, 501]},
+	{vehicle = 530, allowed = [530]},
+	{thread = "drugs4", vehicle = 514, allowed = ["all"], seat_check = false},
+	{thread = "drugs4", vehicle = 584, allowed = ["all"], seat_check = false},
+	{vehicle = 514, allowed = [514, 515, 403]},
+	{vehicle = 515, allowed = [514, 515, 403]},
+	{vehicle = 403, allowed = [514, 515, 403]},
+	{vehicle = 478, coords = [2107, 1409, 9], allowed = [
+			602, 496, 401, 518, 527, 419, 587, 533, 526, 474, 600, 445, 507,
+            439, 549, 491, 422, 605, 572, 478, 554, 536, 575, 534, 534, 567,
+            535, 576, 412, 402, 542, 603, 475, 429, 541, 415, 480, 562, 434,
+            494, 502, 503, 411, 559, 560, 506, 541, 558, 555, 477, 546, 550
+	], seat_check = false},
+	{vehicle = 544, allowed = ["all"], seat_check = false, denied = ["trains", "boats"]},
+	{vehicle = 567, coords = [2644, -2028, 12], allowed = [
+			536, 575, 534, 567, 535, 576, 412, 566
+	], seat_check = false},
+	{vehicle = 584, allowed = [435, 450, 591, 584]},
+	{vehicle = 435, allowed = [435, 450, 591, 584]},
+	{vehicle = 450, allowed = [435, 450, 591, 584]},
+	{vehicle = 591, allowed = [435, 450, 591, 584]},
+	{vehicle = "bmx", allowed = ["cars", "bikes"], denied = [428, 443, 406]},
+	{vehicle = 425, allowed = [425, 520]},
+	{vehicle = 520, allowed = [520]},
+	{vehicle = 425, allowed = [425, 520]},
+	{vehicle = 510, coords = [-2171, -2422, 33], allowed = [510]},
+	{vehicle = 539, coords = [-7, -1116, 7], move = [40, 0, -6, 0], allowed = ["boats", "539"], seat_check = false}, # Player
+	{vehicle = 539, coords = [-7, -1111, 6], allowed = ["all"], seat_check = false},  # OG Loc
+	{vehicle = 539, coords = [-4, -1120, 7], allowed = ["boats", "539", "464", "501", "465"]}, # Madd Dogg
+	{vehicle = 593, coords = [1279, 1361, 9], move = [50, 0, 0, -90], allowed = ["planes"], denied = ["rc"]},
+	{vehicle = 553, allowed = ["planes"], denied = ["rc"]},
+	{coords = [1479, 1758, 12], vehicle = 519, allowed = ["planes"], denied = ["rc"]},
+	
+	# General Patterns
+	{vehicle = "cars", allowed = ["cars", "bikes"]},
+	{vehicle = "helis", allowed = ["helis"]},
+	{vehicle = "planes", allowed = ["planes"], denied = [539]},
+	{vehicle = "boats", allowed = ["boats", "539"]},
+	{vehicle = "bikes", allowed = ["bikes", "cars"]},
+]

@@ -26,7 +26,7 @@
 
 namespace cpptoml {
 class table;
-}
+} // namespace cpptoml
 
 /*******************************************************/
 /* Related to Weapon Pattern configuration */
@@ -41,6 +41,32 @@ struct WeaponPattern
     int                  weapon  = -1;
     std::vector<int64_t> allowed = {};
     std::vector<int64_t> denied  = {};
+};
+
+/*******************************************************/
+/* Related to Vehicle Pattern configuration */
+/*******************************************************/
+enum eVehicleTypes
+{
+    VEHICLES_ALL  = -1,
+    VEHICLES_CARS = 12,
+    VEHICLES_BIKES,
+    VEHICLES_HELIS,
+    VEHICLES_BOATS,
+    VEHICLES_PLANES,
+    VEHICLES_BMX    = 10,
+    VEHICLES_TRAINS = 6
+};
+
+struct VehiclePattern
+{
+    std::string          thread     = "";
+    int                  vehicle    = -1;
+    std::vector<int16_t> allowed    = {};
+    std::vector<int16_t> denied     = {};
+    int                  coords[3]  = {-1, -1, -1};
+    int                  move[4]    = {0, 0, 0, 0};
+    bool                 seat_check = true;
 };
 
 /*******************************************************/
@@ -118,6 +144,9 @@ struct WeaponConfig : public BaseConfig
     std::vector<WeaponPattern> patterns            = {};
 
     void Read (std::shared_ptr<cpptoml::table> table);
+    void ReadPattern (std::shared_ptr<cpptoml::table> pattern);
+    void ReadTable (std::shared_ptr<cpptoml::table> pattern,
+                    const std::string &key, std::vector<int64_t> &out);
 };
 
 /*******************************************************/
@@ -158,8 +187,15 @@ struct SoundsConfig : public BaseConfig
 /*******************************************************/
 struct ScriptVehicleConfig : public BaseConfig
 {
-    bool skipChecks = false;
+    bool                        skipChecks = false;
+    std::vector<VehiclePattern> patterns   = {};
+
+    int StrToVehicleType (const std::string &str);
+
     void Read (std::shared_ptr<cpptoml::table> table);
+    void ReadPattern (std::shared_ptr<cpptoml::table> pattern);
+    void ReadTable (std::shared_ptr<cpptoml::table> pattern,
+                    const std::string &key, std::vector<int16_t> &v);
 };
 
 /*******************************************************/

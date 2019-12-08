@@ -533,6 +533,11 @@ CVector FindPlayerCoors (int playerId = 0);
 CPed *  FindPlayerPed (int playerId = 0);
 float   Dist (CVector a, CVector b);
 
+struct CGame
+{
+    static int Init3 (void *fileName);
+};
+
 struct CEntity
 {
     cSimpleTransform *GetPosition ();

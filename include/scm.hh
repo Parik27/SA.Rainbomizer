@@ -23,6 +23,7 @@
 #include <vector>
 #include <cstdint>
 #include <cstdio>
+#include <string>
 
 struct CMatrix;
 struct CRunningScript;
@@ -53,14 +54,17 @@ enum eVehicleApperance
     VEHICLE_APPEARANCE_HELI,
     VEHICLE_APPEARANCE_BOAT,
     VEHICLE_APPEARANCE_PLANE,
+    VEHICLE_APPEARANCE_RC
 };
 
-struct ScriptPatterns
+struct CachedPattern
 {
-    int              pattern;
-    std::vector<int> allowed;
-    std::vector<int> denied;
-    int              flags;
+    int                   pattern;
+    std::string           thread;
+    int                   coords[3];
+    int                   move[4];
+    std::vector<uint16_t> cars;
+    bool                  seat_check;
 };
 
 enum eDoorCheckError
@@ -73,19 +77,20 @@ enum eDoorCheckError
 class ScriptVehicleRandomizer
 {
     static ScriptVehicleRandomizer *mInstance;
-    std::vector<ScriptPatterns>     mPatterns;
+    std::vector<CachedPattern>      mPatternCache;
+    uint8_t                         mSeatsCache[212];
 
     ScriptVehicleRandomizer (){};
     static void DestroyInstance ();
 
-    bool mPosFixEnabled          = false;
-    int  mSanchezDrivingOverride = -1;
+    bool        mPosFixEnabled          = false;
+    int         mSanchezDrivingOverride = -1;
+    std::string mLastThread;
 
-    bool DoesVehicleMatchPatternOR (int model, const std::vector<int> &ors);
-    bool DoesVehicleMatchPatternAND (int model, const std::vector<int> &ands);
-    bool CheckIfVehicleMatchesPattern (int                   model,
-                                       const ScriptPatterns &pattern);
     eDoorCheckError DoesVehicleHaveEnoughDoors (int modelA, int modelB);
+
+    void CacheSeats ();
+    void CachePatterns ();
 
 public:
     void ApplyEOTLFixes (int newFiretruck);
@@ -94,14 +99,13 @@ public:
     ApplyKSTFix (int newSanchez)
     {
         mSanchezDrivingOverride = newSanchez;
-        printf ("%d", newSanchez);
     };
 
     /// Returns the static instance for ScriptVehicleRandomizer.
     static ScriptVehicleRandomizer *GetInstance ();
 
     /// Returns a random id with which the given vehicle can be replaced
-    int GetRandomIDBasedOnVehicle (int id);
+    int ProcessVehicleChange (int id, float &x, float &y, float &z);
 
     /// Returns if the EOTL pos fixed is enabled
     bool
@@ -110,11 +114,19 @@ public:
         return mPosFixEnabled;
     }
 
+    /// Updates the last thread
+    void
+    UpdateLastThread (const std::string &thread)
+    {
+        mLastThread = thread;
+    }
+
     /// Returns if a vehicle matches a certain pattern
     bool DoesVehicleMatchPattern (int vehicle, int pattern);
 
     /// Initialises Hooks/etc.
     void Initialise ();
+    void InitialiseCache ();
 
     /// Initialises Hooks/etc.
     int

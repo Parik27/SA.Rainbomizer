@@ -95,7 +95,8 @@ Patterns = [
 	{ thread = "truth2", weapon = 35, allowed = [35, 36, 38]},
 	{ thread = "des10", ped = 0, allowed = [28, 32]},
 	{ thread = "casino9", weapon = 22, allowed = [22, 23, 24]},
-	{ thread = "heist9", ped = 0, weapon = 17, allowed = [17]}
+	{ thread = "heist9", ped = 0, weapon = 17, allowed = [17]},
+	{ weapon = 46, allowed = [46]}
 ]
 
 #######################################################
@@ -186,5 +187,5 @@ Patterns = [
 	{vehicle = "helis", allowed = ["helis"]},
 	{vehicle = "planes", allowed = ["planes"], denied = [539]},
 	{vehicle = "boats", allowed = ["boats", "539"]},
-	{vehicle = "bikes", allowed = ["bikes", "cars"]},
+	{vehicle = "bikes", allowed = ["bikes", "cars"]}
 ]

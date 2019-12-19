@@ -165,6 +165,7 @@ int16_t __fastcall UpdateLastThread (CRunningScript *script, void *edx,
     script->CollectParameters (count);
     ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
         script->m_szName);
+    return 0;
 }
 
 /*******************************************************/

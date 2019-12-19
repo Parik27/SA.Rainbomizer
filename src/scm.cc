@@ -398,7 +398,7 @@ int
 InitialiseCacheForRandomization (void *fileName)
 {
     ScriptVehicleRandomizer::GetInstance ()->InitialiseCache ();
-    CGame::Init3 (fileName);
+    return CGame::Init3 (fileName);
 }
 
 /*******************************************************/

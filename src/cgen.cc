@@ -40,7 +40,7 @@ ParkedCarRandomizer::Initialise ()
         RegisterHooks ({{HOOK_CALL, 0x6F3583, (void *) &RandomizeRandomSpawn}});
 
     if (config.randomizeFixedSpawns)
-        RegisterHooks ({{HOOK_CALL, 0x6F35FF, (void *) &RandomizeFixedSpawn}});
+        RegisterHooks ({{HOOK_CALL, 0x6F3EC1, (void *) &RandomizeFixedSpawn}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ParkedCarRandomizer");
 }
@@ -69,13 +69,13 @@ ParkedCarRandomizer::GetInstance ()
 /* This function hooks the CheckForBlockage function of a car generator
    to change the model index of a car generator. */
 /*******************************************************/
-void __fastcall RandomizeFixedSpawn (CCarGenerator *gen, void *edx,
-                                     int model_id)
+void __fastcall RandomizeFixedSpawn (CCarGenerator *gen)
 {
-    uint16_t *modelId = (uint16_t *) gen;
-    *modelId          = random (611, 400);
-
-    gen->CheckForBlockage (*modelId);
+    auto oldModel   = gen->m_nModelId;
+    gen->m_nModelId = random (611, 400);
+    
+    gen->DoInternalProcessing ();
+    gen->m_nModelId = oldModel;
 }
 
 /*******************************************************/

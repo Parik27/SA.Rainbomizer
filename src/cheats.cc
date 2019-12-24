@@ -29,7 +29,7 @@
 CheatRandomizer *CheatRandomizer::mInstance = nullptr;
 
 std::string chits[] = {"Chit Activated", "Cabbage", "Giant Pizza Activated",
-                       "Beep Boop Boop Beep", "Mong"};
+                       "Beep Boop Boop Beep"};
 
 /*******************************************************/
 const char *__fastcall RandomizeHashesAfterCheatActivated (CText *text,

@@ -79,7 +79,33 @@ public:
 
 struct CCarGenerator
 {
+    int16_t m_nModelId;
+    void DoInternalProcessing();
     void CheckForBlockage (int model_id);
+};
+
+struct Message
+{
+    int m_pText;
+    int16_t m_dwFlag;
+    char _pad1[2];
+    int m_dwTime;
+    int m_dwStartTime;
+    int m_dwNumber[6];
+    char* m_pString;
+    char m_bPreviousBrief;
+    char _pad2[3];
+};
+
+struct CHud
+{
+    static void SetMessage(char* str);
+};
+
+struct CMessages
+{
+    static char* AddMessage (char *string, int time, int16_t flags,
+                     int8_t bAddToPreviousBrief);
 };
 
 struct CCarCtrl
@@ -258,15 +284,20 @@ struct BankLkup
 
 struct PakFile
 {
-    char     _pad_00[8];
-    int16_t  loopOffset;
-    uint16_t headRoom;
+    uint32_t     soundBufferOffset;
+    int32_t      sampleRate;
+    int16_t     loopOffset;
+    uint16_t     soundHeadroom;
 };
 
 struct CAEMp3BankLoader
 {
     void *    m_pBankSlotsInfo;
     BankLkup *m_pBankLkups;
+    char     *m_pPakFileNames;
+    uint16_t  m_nNumBankSlotInfos;
+    uint16_t  m_nNumBankLkups;
+    uint16_t  m_nNumPakFiles;
 
     int  GetLoopOffset (unsigned short sfxId, short bankSlotInfoId);
     char Initialise ();

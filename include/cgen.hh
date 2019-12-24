@@ -23,8 +23,7 @@
 struct CCarGenerator;
 
 // Hooks
-void __fastcall RandomizeFixedSpawn (CCarGenerator *gen, void *edx,
-                                     int model_id);
+void __fastcall RandomizeFixedSpawn (CCarGenerator *gen);
 int __fastcall RandomizeRandomSpawn (void *group, void *edx, char a2, char a3);
 
 class ParkedCarRandomizer

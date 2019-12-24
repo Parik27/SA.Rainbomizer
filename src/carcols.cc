@@ -26,6 +26,9 @@
 #include "logger.hh"
 #include "config.hh"
 #include <algorithm>
+#include "injector/injector.hpp"
+#include <chrono>
+#include <string>
 
 CarColRandomizer *CarColRandomizer::mInstance = nullptr;
 
@@ -102,6 +105,24 @@ CarColRandomizer::GetInstance ()
 
 /*******************************************************/
 void
+RandomizeFadeColour ()
+{
+    struct CColour
+    {
+        uint8_t r, g, b;
+    };
+    double time = 1000.0 * clock () / CLOCKS_PER_SEC;
+
+    int colour[3];
+    HSVtoRGB ((int) (time / 10) % 360, 0.7, 0.7, colour);
+
+    injector::WriteMemory<CColour> (0xC3EFA8,
+                                    {(uint8_t) colour[0], (uint8_t) colour[1],
+                                     (uint8_t) colour[2]});
+}
+
+/*******************************************************/
+void
 CarColRandomizer::Initialise ()
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().carcol;
@@ -111,6 +132,11 @@ CarColRandomizer::Initialise ()
 
     RegisterHooks ({{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables},
                     {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}});
+
+    if (config.fades)
+        RegisterHooks ({{HOOK_CALL, 0x50BF22, (void *) &RandomizeFadeColour}});
+
+    injector::MakeRangedNOP (0x50BF22 + 5, 0x50BF33);
 
     Logger::GetLogger ()->LogMessage ("Initialised CarColRandomizer");
 }

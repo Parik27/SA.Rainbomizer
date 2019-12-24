@@ -73,7 +73,7 @@ void __fastcall RandomizeFixedSpawn (CCarGenerator *gen)
 {
     auto oldModel   = gen->m_nModelId;
     gen->m_nModelId = random (611, 400);
-    
+
     gen->DoInternalProcessing ();
     gen->m_nModelId = oldModel;
 }

@@ -229,9 +229,9 @@ CAEMp3BankLoader::Initialise ()
 
 /*******************************************************/
 void
-CCarGenerator::DoInternalProcessing()
+CCarGenerator::DoInternalProcessing ()
 {
-    CallMethod<0x6F34D0>(this);
+    CallMethod<0x6F34D0> (this);
 }
 
 /*******************************************************/
@@ -340,9 +340,9 @@ CVehicleRecording::SetPlaybackSpeed (void *a1, float a2)
 }
 
 /*******************************************************/
-char*
+char *
 CMessages::AddMessage (char *string, int time, int16_t flags,
-                      int8_t bAddToPreviousBrief)
+                       int8_t bAddToPreviousBrief)
 {
     return CallAndReturn<char *, 0x69F1E0> (string, time, flags,
                                             bAddToPreviousBrief);
@@ -350,9 +350,9 @@ CMessages::AddMessage (char *string, int time, int16_t flags,
 
 /*******************************************************/
 void
-CHud::SetMessage(char* str)
+CHud::SetMessage (char *str)
 {
-    return Call<0x588F60>(str);
+    return Call<0x588F60> (str);
 }
 
 /*******************************************************/

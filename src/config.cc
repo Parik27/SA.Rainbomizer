@@ -162,6 +162,7 @@ CarColConfig::Read (std::shared_ptr<cpptoml::table> table)
         return;
 
     BaseConfig::Read (table);
+    CONFIG (table, fades, "RandomizeFades", bool);
 
     this->exceptions = table->get_array_of<int64_t> ("Exceptions")
                            .value_or (this->exceptions);

@@ -111,6 +111,7 @@ struct CarColConfig : public BaseConfig
 {
 
     std::vector<int64_t> exceptions = {0, 1};
+    bool                 fades      = false;
 
     void Read (std::shared_ptr<cpptoml::table> table);
 };

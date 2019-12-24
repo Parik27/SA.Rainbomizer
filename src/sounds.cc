@@ -7,39 +7,15 @@
 #include "text.hh"
 #include <ctime>
 #include <algorithm>
+#include <ctype.h>
 #include <stdexcept>
+#include <stdio.h>
+#include <string.h>
+#include <string>
 #include "config.hh"
+#include "injector/injector.hpp"
 
 SoundRandomizer *SoundRandomizer::mInstance = nullptr;
-
-/*******************************************************/
-bool __fastcall AudioHasFinishedHook (CAudioEngine *audio, void *edx,
-                                      uint8_t id)
-{
-    bool status = audio->IsMissionAudioSampleFinished (id);
-    printf ("%s\n", status ? "True" : "False");
-    return status;
-}
-
-/*******************************************************/
-void __fastcall RandomizeAudioLoad (CAudioEngine *audio, void *edx,
-                                    unsigned char slot, int id)
-{
-    auto soundsR = SoundRandomizer::GetInstance ();
-    try
-        {
-            int  newIndex;
-            auto newSoundPair  = soundsR->GetRandomPair (newIndex, slot, id);
-            auto prevSoundPair = soundsR->GetPairByID (id);
-
-            audio->PreloadMissionAudio (slot, newSoundPair.id);
-            soundsR->GetPreviousPairs ()[prevSoundPair.name] = newIndex;
-        }
-    catch (std::exception e)
-        {
-            return audio->PreloadMissionAudio (slot, id);
-        }
-}
 
 /*******************************************************/
 void __fastcall InitialiseTexts (CText *text, void *edx, char a2)
@@ -58,75 +34,135 @@ char *__fastcall RemoveSubtitlesHook (CText *TheText, void *edx, char *key)
 }
 
 /*******************************************************/
-char *__fastcall CorrectSubtitles (CText *text, void *edx, char *key)
+// char *__fastcall CorrectSubtitles (CText *text, void *edx, char *key)
+// {
+//     auto soundsR = SoundRandomizer::GetInstance ();
+//     auto config  = ConfigManager::GetInstance ()->GetConfigs ().sounds;
+
+//     if (!config.matchSubtitles)
+//         return text->Get (key);
+
+//     try
+//         {
+//             auto prevIndex = soundsR->GetPreviousPairs ().at (key);
+//             soundsR->GetPreviousPairs ().erase (key);
+
+//             auto soundPair
+//                 = SoundRandomizer::GetInstance ()->GetPairByIndex
+//                 (prevIndex);
+
+//             auto text = (char *) GxtManager::GetText (soundPair.name);
+//             soundsR->SetPreviousOverridenText (key, text);
+
+//             return text;
+//         }
+//     catch (std::out_of_range e)
+//         {
+//             return text->Get (key);
+//         }
+// }
+
+/*******************************************************/
+std::vector<FILE *>
+GetPakFiles (CAEMp3BankLoader *loader)
 {
-    auto soundsR = SoundRandomizer::GetInstance ();
-    auto config  = ConfigManager::GetInstance ()->GetConfigs ().sounds;
-
-    if (!config.matchSubtitles)
-        return text->Get (key);
-
-    try
+    std::vector<FILE *> files;
+    if (!loader->m_pPakFileNames)
         {
-            auto prevIndex = soundsR->GetPreviousPairs ().at (key);
-            soundsR->GetPreviousPairs ().erase (key);
+            Logger::GetLogger ()->LogMessage ("Unable to intialise Sound List");
+            Logger::GetLogger ()->LogMessage ("Unable to read Pak file names");
 
-            auto soundPair
-                = SoundRandomizer::GetInstance ()->GetPairByIndex (prevIndex);
-
-            auto text = (char *) GxtManager::GetText (soundPair.name);
-            soundsR->SetPreviousOverridenText (key, text);
-
-            return text;
+            return files;
         }
-    catch (std::out_of_range e)
+
+    for (int i = 0; i < loader->m_nNumPakFiles; i++)
         {
-            return text->Get (key);
+            std::string fileName (loader->m_pPakFileNames + 52 * i);
+            FILE *      pakFile = fopen (GetGameDirRelativePathA (
+                                       ("audio/SFX/" + fileName).c_str ()),
+                                   "rb");
+
+            if (!pakFile)
+                {
+                    Logger::GetLogger ()->LogMessage (
+                        "Unable to intialise Sound List");
+                    Logger::GetLogger ()->LogMessage ("Unable to read "
+                                                      + fileName);
+                }
+            files.push_back (pakFile);
+        }
+    return files;
+}
+
+/*******************************************************/
+void
+ForEachBankSound (FILE *file, BankLkup bank,
+                  std::function<void (PakFile, int)> callback)
+{
+    uint16_t soundCount;
+    fseek (file, bank.m_dwOffset, SEEK_SET);
+    fread (&soundCount, 2, 1, file);
+
+    for (int i = 0; i < soundCount; i++)
+        {
+            PakFile pak;
+            fread (&pak, sizeof (PakFile), 1, file);
+
+            callback (pak, i);
         }
 }
 
 /*******************************************************/
-char __fastcall InitialiseLoopedSoundList (CAEMp3BankLoader *thisLoader)
+std::string
+GetSubtitleForSFX (short bank, short slot, short sfxIndex)
+{
+    auto soundRandomizer = SoundRandomizer::GetInstance ();
+
+    if (sfxIndex == 3)
+        {
+            int event = SoundRandomizer::CalculateEventFromSFX (bank, slot);
+            return soundRandomizer->GetSubtitleByID (event);
+        }
+    return "";
+}
+
+/*******************************************************/
+std::vector<SFXPair>
+GetValidSoundPairs (CAEMp3BankLoader *loader, std::vector<FILE *> files,
+                    bool closeFiles = true)
+{
+    std::vector<SFXPair> list;
+    for (int i = 0; i < loader->m_nNumBankLkups; i++)
+        {
+            auto bank = loader->m_pBankLkups[i];
+            if (bank.sfxIndex > files.size ())
+                break;
+
+            auto pakFile = files[bank.sfxIndex];
+
+            ForEachBankSound (pakFile, bank, [&] (PakFile pak, int j) {
+                if (pak.loopOffset == -1)
+                    list.push_back (
+                        {i, j, GetSubtitleForSFX (i, j, bank.sfxIndex)});
+            });
+        }
+
+    // close file
+    if (closeFiles)
+        std::for_each (files.begin (), files.end (), fclose);
+
+    return list;
+}
+
+/*******************************************************/
+char __fastcall InitialiseSoundsList (CAEMp3BankLoader *thisLoader)
 {
     int  ret             = thisLoader->Initialise ();
     auto soundRandomizer = SoundRandomizer::GetInstance ();
 
-    FILE *scriptSFX
-        = fopen (GetGameDirRelativePathA ("audio/SFX/SCRIPT"), "rb");
+    soundRandomizer->mBankLkups
+        = GetValidSoundPairs (thisLoader, GetPakFiles (thisLoader));
 
-    for (auto it = soundRandomizer->mSoundTable.begin ();
-         it != soundRandomizer->mSoundTable.end ();)
-        {
-
-            int sfx_id;
-            int bank;
-            CAEAudioUtility::GetBankAndSoundFromScriptSlotAudioEvent (&it->id,
-                                                                      &bank,
-                                                                      &sfx_id,
-                                                                      1);
-
-            auto bankLkup = thisLoader->m_pBankLkups[bank];
-            if (bankLkup.sfxIndex == 3)
-                {
-                    PakFile sfx;
-                    fseek (scriptSFX,
-                           bankLkup.m_dwOffset + sizeof (PakFile) * sfx_id,
-                           SEEK_SET);
-
-                    fread (&sfx, sizeof (PakFile), 1, scriptSFX);
-
-                    // Looping sound
-                    if (sfx.loopOffset != -1)
-                        {
-                            soundRandomizer->mLoopedSounds.push_back (*it);
-                            it = soundRandomizer->mSoundTable.erase (it);
-                            continue;
-                        }
-                }
-            ++it;
-        }
-
-    fclose (scriptSFX);
     return ret;
 }
 
@@ -159,63 +195,14 @@ SoundRandomizer::GetPreviousPairs ()
 {
     return mPreviousPairs;
 }
-/*******************************************************/
-bool
-SoundRandomizer::IsSoundLooped (int id)
-{
-    for (auto i : mLoopedSounds)
-        {
-            if (i.id == id)
-                return true;
-        }
-
-    return false;
-}
 
 /*******************************************************/
-SoundPair
-SoundRandomizer::GetRandomPair (int &index, int slot, int id)
+std::string
+SoundRandomizer::GetSubtitleByID (int id)
 {
-
-    if (this->IsSoundLooped (id))
-        {
-            auto pair = mLoopedSounds[random (mLoopedSounds.size () - 1)];
-            puts (pair.name.c_str ());
-            return pair;
-        }
-
-    if (slots[slot].oldSound == id)
-        {
-            index = slots[slot].newSound;
-            return mSoundTable[index];
-        }
-
-    int randomID = random (mSoundTable.size () - 1);
-
-    index                = randomID;
-    slots[slot].oldSound = id;
-    slots[slot].newSound = randomID;
-
-    return mSoundTable[randomID];
-}
-
-/*******************************************************/
-SoundPair
-SoundRandomizer::GetPairByIndex (int id)
-{
-    return mSoundTable[id];
-}
-
-/*******************************************************/
-SoundPair
-SoundRandomizer::GetPairByID (int id)
-{
-    auto iter = std::find_if (mSoundTable.begin (), mSoundTable.end (),
-                              [id] (const SoundPair &a) { return a.id == id; });
-    if (iter != mSoundTable.end ())
-        return *iter;
-
-    return {-1, "default"};
+    if (this->mSubtitles.count (id))
+        return mSubtitles[id];
+    return "";
 }
 
 /*******************************************************/
@@ -242,8 +229,135 @@ SoundRandomizer::InitaliseSoundTable ()
 
             sscanf (line, " %s %d ", name, &id);
             if (id >= 2000)
-                mSoundTable.push_back ({id, name + 6});
+                mSubtitles[id] = name + 6;
         }
+}
+
+/*******************************************************/
+char
+ReturnRandomBankAndSound (signed int *wavId, int *bank, int *sfx,
+                          signed int slot)
+{
+    auto soundRandomizer = SoundRandomizer::GetInstance ();
+    auto sound
+        = soundRandomizer
+              ->mBankLkups[random (soundRandomizer->mBankLkups.size () - 1)];
+
+    *bank = sound.bank;
+    *sfx  = sound.sfx;
+
+    soundRandomizer->UpdatePreviousPairs (*wavId, sound);
+    return true;
+}
+
+/*******************************************************/
+int
+SoundRandomizer::CalculateEventFromSFX (int bank, int sfx)
+{
+    return (bank - 147) * 200 + sfx + 2000;
+}
+
+/*******************************************************/
+std::string
+SoundRandomizer::GetNewSubtitleForEvent (int event, const SFXPair &pair)
+{
+    std::string next_sub = pair.subtitle;
+    // A 1 in 100 chance
+    if (pair.subtitle == "" && random (100) == 0)
+        {
+            static std::vector<std::string> place_holders
+                = {"*sound of people talking*", "bla bla bla",
+                   "grumble grumble grumble", "INSERT WORDS HERE",
+                   "Alert: A sound is currently playing. Thank you for your "
+                   "time."};
+
+            next_sub = place_holders[random (place_holders.size ())];
+        }
+    else if (pair.subtitle != "")
+        next_sub = GxtManager::GetText (pair.subtitle);
+
+    return next_sub;
+}
+
+/*******************************************************/
+void
+SoundRandomizer::UpdatePreviousPairs (int event, const SFXPair &pair)
+{
+    std::string sub = GxtManager::GetText (GetSubtitleByID (event));
+    if (sub != "")
+        {
+            std::string next_sub = GetNewSubtitleForEvent (event, pair);
+
+            mPreviousPairs[sub] = mCurrentReplacedSubIndex;
+            mReplacedSubtitles[mCurrentReplacedSubIndex] = next_sub;
+
+            mCurrentReplacedSubIndex++;
+            mCurrentReplacedSubIndex %= 10;
+        }
+}
+
+/*******************************************************/
+void
+CorrectSubtitles (char *string, int time, int16_t flags,
+                  char bAddToPreviousBrief)
+{
+    auto soundRandomizer = SoundRandomizer::GetInstance ();
+    if (bAddToPreviousBrief && soundRandomizer->mPreviousPairs.count (string))
+        {
+            bAddToPreviousBrief = soundRandomizer->mPreviousPairs[string] + 2;
+            soundRandomizer->mPreviousPairs.erase (
+                soundRandomizer->mPreviousPairs.find (string));
+        }
+    CMessages::AddMessage (string, time, flags, bAddToPreviousBrief);
+}
+
+/*******************************************************/
+void
+ShuffleString (char *str)
+{
+    static char colour_codes[] = {'b', 'g', 'l', 'p', 'r', 'w', 'y', 'h'};
+
+    while (*str)
+        {
+            if (isalpha (*str) && str[-1] == '~' && str[1] == '~')
+                *str = colour_codes[random (sizeof (colour_codes) - 1)];
+
+            else if (isalpha (*str))
+                {
+                    if (isupper (*str))
+                        *str = random (90, 65);
+                    else
+                        *str = random (122, 97);
+                }
+            str++;
+        }
+}
+
+/*******************************************************/
+void
+DisplayCorrectedSubtitles (char *str)
+{
+    int8_t index = injector::ReadMemory<int8_t> (0xC1A7F0 + 0x2C);
+
+    // bAddToPreviousBrief = soundRandomizer->mPreviousPairs[string] + 2;
+    // puts(str);
+    if (index > 1)
+        {
+            auto        soundRandomizer = SoundRandomizer::GetInstance ();
+            std::string new_sub         = "";
+
+            new_sub = soundRandomizer->mReplacedSubtitles[index - 2];
+
+            if (new_sub != "")
+                {
+                    memset (str, 0, 400);
+                    strcpy (str, new_sub.c_str ());
+                }
+            else
+                ShuffleString (str);
+        }
+
+    CHud::SetMessage (str);
 }
 
 /*******************************************************/
@@ -254,16 +368,23 @@ SoundRandomizer::Initialise ()
     if (!config.enabled)
         return;
 
+    // CMessages::Display
+
     Logger::GetLogger ()->LogMessage ("Intialised SoundRandomizer");
-    RegisterHooks (
-        {{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
-         {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles},
-         {HOOK_CALL, 0x4680E7, (void *) &CorrectSubtitles},
-         {HOOK_CALL, 0x485397, (void *) &RemoveSubtitlesHook},
-         {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList}});
+    RegisterHooks ({{HOOK_CALL, 0x4EC1D2, (void *) &ReturnRandomBankAndSound},
+                    {HOOK_CALL, 0x468137, (void *) &CorrectSubtitles},
+                    {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
+                    {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
+                    {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
+                    {HOOK_CALL, 0x4D99B3, (void *) &InitialiseSoundsList},
+                    {HOOK_CALL, 0x69F09C, (void *) &DisplayCorrectedSubtitles},
+                    {HOOK_CALL, 0x4681BE, (void *) &CorrectSubtitles}});
+
+    // This NOP's the code that deletes the m_pPakFiles variable which is used
+    // in InitialiseSoundList
+    injector::MakeNOP (0x04DFDCE, 0x7);
+    injector::MakeNOP (0x04DFDC3, 0x5);
+
     InitaliseSoundTable ();
 }
 

@@ -55,6 +55,26 @@ HandlingConfig::Read (std::shared_ptr<cpptoml::table> table)
 
 /*******************************************************/
 void
+MissionConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+}
+
+/*******************************************************/
+void
+ObjectConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+}
+
+/*******************************************************/
+void
 WeaponConfig::ReadTable (std::shared_ptr<cpptoml::table> pattern,
                          const std::string &key, std::vector<int64_t> &v)
 {
@@ -402,6 +422,8 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.licensePlate.Read (config->get_table ("LicensePlateRandomizer"));
     mConfigs.sounds.Read (config->get_table ("SoundsRandomizer"));
     mConfigs.scriptVehicle.Read (config->get_table ("ScriptVehicleRandomizer"));
+    mConfigs.missions.Read (config->get_table ("MissionRandomizer"));
+    mConfigs.objects.Read (config->get_table ("ObjectRandomizer"));
 }
 
 /*******************************************************/

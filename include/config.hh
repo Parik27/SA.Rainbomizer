@@ -200,6 +200,20 @@ struct ScriptVehicleConfig : public BaseConfig
 };
 
 /*******************************************************/
+struct MissionConfig : public BaseConfig
+{
+    bool enabled = false;
+    void Read (std::shared_ptr<cpptoml::table> table);
+};
+
+/*******************************************************/
+struct ObjectConfig : public BaseConfig
+{
+    bool enabled = false;
+    void Read (std::shared_ptr<cpptoml::table> table);
+};
+
+/*******************************************************/
 struct Configs
 {
     GeneralConfig       general;
@@ -214,6 +228,8 @@ struct Configs
     LicensePlateConfig  licensePlate;
     SoundsConfig        sounds;
     ScriptVehicleConfig scriptVehicle;
+    MissionConfig       missions;
+    ObjectConfig        objects;
 };
 
 /*******************************************************/

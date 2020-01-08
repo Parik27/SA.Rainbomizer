@@ -134,9 +134,11 @@ CarColRandomizer::Initialise ()
                     {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}});
 
     if (config.fades)
-        RegisterHooks ({{HOOK_CALL, 0x50BF22, (void *) &RandomizeFadeColour}});
-
-    injector::MakeRangedNOP (0x50BF22 + 5, 0x50BF33);
+        {
+            RegisterHooks (
+                {{HOOK_CALL, 0x50BF22, (void *) &RandomizeFadeColour}});
+            injector::MakeRangedNOP (0x50BF22 + 5, 0x50BF33);
+        }
 
     Logger::GetLogger ()->LogMessage ("Initialised CarColRandomizer");
 }

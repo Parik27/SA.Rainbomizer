@@ -97,6 +97,7 @@ Patterns = [
 	{ thread = "des10", ped = 0, allowed = [28, 32]},
 	{ thread = "casino9", weapon = 22, allowed = [22, 23, 24]},
 	{ thread = "heist9", ped = 0, weapon = 17, allowed = [17]},
+	{ weapon = 39, allowed = [39]},
 	{ weapon = 46, allowed = [46]}
 ]
 
@@ -152,7 +153,7 @@ Patterns = [
 	{vehicle = 524, allowed = [524]},
 	{vehicle = 501, allowed = [465, 501]},
 	{vehicle = 530, allowed = [530]},
-	{coords = [323, 2540, 15], vehicle = 476, move = [0, -50, 0, 0] allowed = ["planes"], denied = ["rc"]},
+	{coords = [323, 2540, 15], vehicle = 476, move = [0, -50, 0, 0], allowed = ["planes"], denied = ["rc"]},
 	{thread = "drugs4", vehicle = 514, allowed = ["all"], seat_check = false},
 	{thread = "drugs4", vehicle = 584, allowed = ["all"], seat_check = false},
 	{vehicle = 514, allowed = [514, 515, 403]},

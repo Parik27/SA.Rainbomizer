@@ -153,7 +153,7 @@ Patterns = [
 	{vehicle = 524, allowed = [524]},
 	{vehicle = 501, allowed = [465, 501]},
 	{vehicle = 530, allowed = [530]},
-	{coords = [323, 2540, 15], vehicle = 476, move = [0, -50, 0, 0], allowed = ["planes"], denied = ["rc"]},
+	{coords = [323, 2540, 15], vehicle = 476, move = [0, -35, 0, 0], allowed = ["planes"], denied = ["rc"]},
 	{thread = "drugs4", vehicle = 514, allowed = ["all"], seat_check = false},
 	{thread = "drugs4", vehicle = 584, allowed = ["all"], seat_check = false},
 	{vehicle = 514, allowed = [514, 515, 403]},
@@ -173,11 +173,11 @@ Patterns = [
 	{vehicle = 435, allowed = [435, 450, 591, 584]},
 	{vehicle = 450, allowed = [435, 450, 591, 584]},
 	{vehicle = 591, allowed = [435, 450, 591, 584]},
+	{vehicle = 510, coords = [-2171, -2422, 33], allowed = [510]},
 	{vehicle = "bmx", allowed = ["cars", "bikes"], denied = [428, 443, 406]},
 	{vehicle = 425, allowed = [425, 520]},
 	{vehicle = 520, allowed = [520]},
 	{vehicle = 425, allowed = [425, 520]},
-	{vehicle = 510, coords = [-2171, -2422, 33], allowed = [510], move = [0, 0, 10]},
 	{vehicle = 539, coords = [-7, -1116, 7], move = [40, 0, -6, 0], allowed = ["boats", "539"], seat_check = false}, # Player
 	{vehicle = 539, coords = [-7, -1111, 6], allowed = ["all"], seat_check = false},  # OG Loc
 	{vehicle = 539, coords = [-4, -1120, 7], allowed = ["boats", "539", "464", "501", "465"]}, # Madd Dogg

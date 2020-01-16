@@ -112,6 +112,9 @@ struct CarColConfig : public BaseConfig
 
     std::vector<int64_t> exceptions = {0, 1};
     bool                 fades      = false;
+    bool                 texts      = false;
+    bool                 hueCycle   = false;
+    bool                 crazyMode  = false;
 
     void Read (std::shared_ptr<cpptoml::table> table);
 };
@@ -202,7 +205,9 @@ struct ScriptVehicleConfig : public BaseConfig
 /*******************************************************/
 struct MissionConfig : public BaseConfig
 {
-    bool enabled = false;
+    bool enabled              = false;
+    bool forcedMissionEnabled = false;
+    int  forcedMissionID      = -1;
     void Read (std::shared_ptr<cpptoml::table> table);
 };
 
@@ -211,6 +216,26 @@ struct ObjectConfig : public BaseConfig
 {
     bool enabled = false;
     void Read (std::shared_ptr<cpptoml::table> table);
+};
+
+/*******************************************************/
+struct CutsceneConfig : public BaseConfig
+{
+    bool        enabled      = false;
+    std::string cutsceneFile = "Cutscene_Models.txt";
+    void        Read (std::shared_ptr<cpptoml::table> table);
+};
+
+/*******************************************************/
+struct ParticlesConfig : public BaseConfig
+{
+    bool enabled = false;
+    void Read (std::shared_ptr<cpptoml::table> table);
+};
+
+/*******************************************************/
+struct BlipsConfig : public BaseConfig
+{
 };
 
 /*******************************************************/
@@ -230,6 +255,9 @@ struct Configs
     ScriptVehicleConfig scriptVehicle;
     MissionConfig       missions;
     ObjectConfig        objects;
+    CutsceneConfig      cutscenes;
+    BlipsConfig         blips;
+    ParticlesConfig     particles;
 };
 
 /*******************************************************/

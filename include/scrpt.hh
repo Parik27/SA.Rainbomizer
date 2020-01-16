@@ -1,0 +1,79 @@
+#include <cstring>
+#include <cstdio>
+
+struct GlobalVar
+{
+    short val;
+    GlobalVar (short val) { this->val = val; }
+};
+struct LocalVar
+{
+    short val;
+    LocalVar (short val) { this->val = val; }
+};
+
+class Scrpt
+{
+    unsigned char *data;
+    int            offset;
+
+    void Append (const void *bytes, int size);
+
+public:
+    Scrpt (short opcodeId);
+    ~Scrpt ();
+
+    unsigned char *
+    GetData ()
+    {
+        return data;
+    };
+
+    void operator<< (char n);
+    void operator<< (int n);
+    void operator<< (short n);
+    void operator<< (float n);
+    void operator<< (GlobalVar n);
+    void operator<< (LocalVar n);
+    void operator<< (const char *str);
+
+    /*******************************************************/
+    template <typename T>
+    void
+    Pack (T value)
+    {
+        operator<< (value);
+    }
+
+    /*******************************************************/
+    template <typename First, typename... Rest>
+    void
+    Pack (First first, Rest... rest)
+    {
+        Pack (first);
+        Pack (rest...);
+    }
+
+    void
+    Pack ()
+    {
+    }
+
+    /*******************************************************/
+    template <typename... Args>
+    static unsigned char *
+    CreateOpcode (short opcodeId, const char *name, unsigned char *dst,
+                  Args... args)
+    {
+        Scrpt opcode = Scrpt (opcodeId);
+        opcode.Pack (args...);
+
+        memcpy (dst, opcode.GetData (), opcode.offset);
+        for (int i = 0; i < opcode.offset; i++)
+            {
+                printf ("%x ", opcode.GetData ()[i]);
+            }
+        printf ("\n");
+        return dst + opcode.offset;
+    }
+};

@@ -32,6 +32,48 @@ TrafficRandomizer *TrafficRandomizer::mInstance = nullptr;
 
 /*******************************************************/
 void
+TrafficRandomizer::MakeRCsEnterable ()
+{
+    injector::MakeNOP (0x6D6AA7, 2);
+    injector::WriteMemory<uint8_t> (0x6D5409 + 2, -1); // cmp eax, 11
+    injector::WriteMemory<uint8_t> (0x6D5425, 0xEB);   // jns short loc_6D542D
+}
+
+/*******************************************************/
+void
+TrafficRandomizer::Install6AF420_Hook ()
+{
+    memcpy (mOriginalData, (void *) 0x6AF420, 5);
+    injector::MakeJMP (0x6AF420, (void *) &PlaceOnRoadFix);
+}
+
+/*******************************************************/
+void
+TrafficRandomizer::Revert6AF420_Hook ()
+{
+    memcpy ((void *) 0x6AF420, mOriginalData, 5);
+}
+
+/*******************************************************/
+void __fastcall PlaceOnRoadFix (CVehicle *vehicle, void *edx)
+{
+    CColModel *model = CallMethodAndReturn<CColModel *, 0x535300> (vehicle);
+    if (!model)
+        return;
+
+    if (model->m_pColData->m_pLines)
+        {
+            auto trafficRandomizer = TrafficRandomizer::GetInstance ();
+            trafficRandomizer->Revert6AF420_Hook ();
+            vehicle->AutomobilePlaceOnRoadProperly ();
+            trafficRandomizer->Install6AF420_Hook ();
+        }
+    else
+        vehicle->BikePlaceOnRoadProperly ();
+}
+
+/*******************************************************/
+void
 TrafficRandomizer::Initialise ()
 {
 
@@ -44,6 +86,9 @@ TrafficRandomizer::Initialise ()
         && config.forcedVehicleID <= 611)
         this->SetForcedRandomCar (config.forcedVehicleID);
 
+    // TODO: Add Config option
+    this->MakeRCsEnterable ();
+
     RegisterHooks ({{HOOK_JUMP, 0x421980, (void *) &RandomizePoliceCars},
                     {HOOK_CALL, 0x431EE5, (void *) &FixEmptyPoliceCars},
                     {HOOK_CALL, 0x43022A, (void *) &RandomizeTrafficCars},
@@ -52,6 +97,8 @@ TrafficRandomizer::Initialise ()
                     {HOOK_CALL, 0x42C620, (void *) &FixEmptyPoliceCars},
                     {HOOK_CALL, 0x501F3B, (void *) &FixFreightTrainCrash},
                     {HOOK_CALL, 0x61282F, (void *) &FixCopCrash}});
+
+    this->Install6AF420_Hook ();
 
     ExceptionManager::GetExceptionManager ()->RegisterHandler (
         &ExceptionHandlerCallback);
@@ -252,7 +299,7 @@ RandomizeCarToLoad ()
     auto trafficRandomizer = TrafficRandomizer::GetInstance ();
     for (int i = 0; i < 16; i++)
         {
-            int random_id = random (611, 400);
+            int random_id = random (400, 611);
             if (!trafficRandomizer->IsVehicleAllowed (random_id))
                 continue;
 

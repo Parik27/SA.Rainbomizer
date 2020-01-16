@@ -23,21 +23,10 @@
 #include "base.hh"
 #include <deque>
 
-// Hook Functions
-/*
- - GetDefaultPoliceCar
- - StreamingRequestModel
- - ChooseModel
- - PopulationAddPed
- - ChooseCarModelToLoad
- - Update GetNewVehicle jump table
- - AddPoliceCarOccupants
- - ChoosePoliceModel
- */
-
 struct cVehicleParams;
 struct CAEVehicleAudioEntity;
 struct CPed;
+struct CVehicle;
 
 // Hooked Functions
 int   RandomizePoliceCars ();
@@ -48,7 +37,7 @@ void *RandomizeCarPeds (int type, int model, float *pos, bool unk);
 void *__fastcall FixCopCrash (CPed *ped, void *edx, int type);
 void __fastcall FixFreightTrainCrash (CAEVehicleAudioEntity *audio, void *edx,
                                       cVehicleParams *vehicle_params);
-
+void __fastcall PlaceOnRoadFix (CVehicle *vehicle, void *edx);
 int ChoosePoliceVehicleBasedOnModel (int model);
 
 /// Randomizes cars that spawn in traffic including the police cars
@@ -61,8 +50,12 @@ class TrafficRandomizer
     int                       mForcedCar             = 0;
     static TrafficRandomizer *mInstance;
 
+    unsigned char mOriginalData[5];
+
     TrafficRandomizer (){};
     static void DestroyInstance ();
+
+    void MakeRCsEnterable ();
 
     bool IsVehicleAllowed (int model);
 
@@ -71,6 +64,9 @@ class TrafficRandomizer
 public:
     /// Initialises Hooks/etc.
     void Initialise ();
+
+    void Install6AF420_Hook ();
+    void Revert6AF420_Hook ();
 
     /// Exception Handling
     static void ExceptionHandlerCallback (_EXCEPTION_POINTERS *ep);

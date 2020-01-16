@@ -184,7 +184,7 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
                     int              weapon;
                     std::vector<int> buggy_weapons = {19, 20, 21, 14, 40, 39};
 
-                    while ((weapon = random (46, 1),
+                    while ((weapon = random (1, 46),
 
                             std::find (buggy_weapons.begin (),
                                        buggy_weapons.end (), weapon)

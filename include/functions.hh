@@ -30,6 +30,7 @@ struct CClumpModelInfo;
 struct CVector;
 struct CBox;
 struct CColModel;
+struct CPed;
 
 enum eVehicleClass
 {
@@ -166,6 +167,9 @@ public:
     char  ProcessCommands0to99 (int opcode);
     void  UpdateCompareFlag (char flag);
     int   EndThread ();
+
+    static void SetCharCoordinates (CPed *ped, CVector pos, bool bWarpGang,
+                                    bool bOffset);
 };
 
 struct CRunningScripts
@@ -328,15 +332,27 @@ public:
     CVector m_vecMax;
 };
 
+struct CColData
+{
+    uint8_t   pad[0x10];
+    uintptr_t m_pLines;
+};
+
 struct CColModel
 {
-    CBox m_boundBox;
+    CBox      m_boundBox;
+    uint8_t   m_Sphere[0x14];
+    CColData *m_pColData;
 };
 
 struct CVehicle
 {
-    int  GetVehicleAppearence ();
-    char SetGearUp ();
+    uint8_t  pad[0x22];
+    uint16_t m_nModelIndex;
+    int      GetVehicleAppearence ();
+    void     AutomobilePlaceOnRoadProperly ();
+    void     BikePlaceOnRoadProperly ();
+    char     SetGearUp ();
 };
 
 struct CPed
@@ -429,6 +445,7 @@ struct CMatrix
     unsigned int pad3;
 
     void Attach (CMatrix *attach, char link);
+    void SetRotateZOnly (float angle);
 };
 
 struct tTransmissionGear
@@ -560,23 +577,61 @@ struct cSimpleTransform
     float   m_fAngle;
 };
 
-CVector FindPlayerCoors (int playerId = 0);
-CPed *  FindPlayerPed (int playerId = 0);
-float   Dist (CVector a, CVector b);
+struct CMatrixLink
+{
+    CMatrix matrix;
+};
+
+struct CEntity
+{
+    int              vtable;
+    cSimpleTransform m_SimpleTransform;
+    CMatrixLink *    m_pMatrix;
+
+    cSimpleTransform *GetPosition ();
+    int               SetHeading (float heading);
+};
+
+template <typename T> struct ListItem_c
+{
+    T *next;
+    T *prev;
+};
+
+struct FxSystemBP_c
+{
+    ListItem_c<FxSystemBP_c> m_link;
+    uint32_t                 m_nKey;
+    float                    m_fLength;
+    float                    m_fLoop;
+};
+
+template <typename T> struct List_c
+{
+    T *      last;
+    T *      first;
+    uint32_t count;
+};
+
+struct FxManager_c
+{
+    List_c<FxSystemBP_c> SystemBlueprints;
+};
+
+CVector  FindPlayerCoors (int playerId = -1);
+CPed *   FindPlayerPed (int playerId = -1);
+CEntity *FindPlayerEntity (int playerId = -1);
+float    Dist (CVector a, CVector b);
 
 struct CGame
 {
     static int Init3 (void *fileName);
 };
 
-struct CEntity
-{
-    cSimpleTransform *GetPosition ();
-};
-
 CMatrix *RwFrameGetLTM (void *frame);
 
-int random (int max, int min = 0);
+int random (int max);
+int random (int min, int max);
 
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;

@@ -36,6 +36,9 @@
 #include "pickups.hh"
 #include "missions.hh"
 #include "objects.hh"
+#include "cutscenes.hh"
+#include "particles.hh"
+#include "blips.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -67,6 +70,8 @@ public:
         ExceptionManager::GetExceptionManager ()->RegisterExceptionManager ();
         logger->LogMessage ("Registered Exception Manager");
 
+        HookManager::GetInstance ()->Initialise ();
+
         TrafficRandomizer::GetInstance ()->Initialise ();
         CarColRandomizer::GetInstance ()->Initialise ();
         ParkedCarRandomizer::GetInstance ()->Initialise ();
@@ -78,8 +83,12 @@ public:
         CheatRandomizer::GetInstance ()->Initialise ();
         WeaponRandomizer::GetInstance ()->Initialise ();
         PickupsRandomizer::GetInstance ()->Initialise ();
-        // MissionRandomizer::GetInstance ()->Initialise ();
+        MissionRandomizer::GetInstance ()->Initialise ();
         ObjectsRandomizer::GetInstance ()->Initialise ();
+        CutsceneRandomizer::GetInstance ()->Initialise ();
+        ParticleRandomizer::GetInstance ()->Initialise ();
+        BlipRandomizer::GetInstance ()->Initialise ();
+
         AutoSave::GetInstance ()->Initialise ();
     }
 

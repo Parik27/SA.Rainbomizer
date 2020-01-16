@@ -72,7 +72,7 @@ ParkedCarRandomizer::GetInstance ()
 void __fastcall RandomizeFixedSpawn (CCarGenerator *gen)
 {
     auto oldModel   = gen->m_nModelId;
-    gen->m_nModelId = random (611, 400);
+    gen->m_nModelId = random (400, 611);
 
     gen->DoInternalProcessing ();
     gen->m_nModelId = oldModel;

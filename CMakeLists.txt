@@ -12,6 +12,8 @@ if (MSVC_VERSION GREATER_EQUAL "1900")
 	  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
+set (CMAKE_CXX_STANDARD 14)
+
 # Sources
 include_directories(include)
 file(GLOB SOURCES src/*.cc)
@@ -20,4 +22,8 @@ add_library("rainbomizer" SHARED ${SOURCES})
 
 # Properties
 set_target_properties("rainbomizer" PROPERTIES SUFFIX ".asi")
-target_compile_features("rainbomizer" PRIVATE cxx_auto_type)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  
+else()
+  target_compile_features("rainbomizer" PRIVATE cxx_auto_type)
+endif()

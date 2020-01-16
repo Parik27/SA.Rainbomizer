@@ -52,6 +52,9 @@ DefaultModel = 0
 
 Enabled = true
 RandomizeFades = false
+RainbowText = true
+RainbowHueCycle = false
+CrazyMode = false # You don't want this, trust me ;)
 Exceptions = [0, 1] # These colours will not be randomized
 
 #######################################################
@@ -113,6 +116,27 @@ ReplaceWithWeaponsOnly = true # Does nothing yet
 Enabled = true
 RandomizeFixedSpawns = true
 RandomizeRandomSpawns = true
+
+#######################################################
+[MissionRandomizer]
+
+Enabled = false
+
+#######################################################
+[CutsceneRandomizer]
+
+Enabled = false
+CutsceneFile = "Cutscene_Models.txt"
+
+#######################################################
+[BlipsRandomizer]
+
+Enabled = true
+
+#######################################################
+[ParticleRandomizer]
+
+Enabled = false
 
 #######################################################
 [LicensePlateRandomizer]

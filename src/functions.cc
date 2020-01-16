@@ -25,6 +25,7 @@
 #include <random>
 #include "config.hh"
 #include <ctime>
+#include "injector/calling.hpp"
 
 /*******************************************************/
 int
@@ -334,6 +335,20 @@ CVehicle::SetGearUp ()
 
 /*******************************************************/
 void
+CVehicle::AutomobilePlaceOnRoadProperly ()
+{
+    CallMethod<0x6AF420> (this);
+}
+
+/*******************************************************/
+void
+CVehicle::BikePlaceOnRoadProperly ()
+{
+    CallMethod<0x6BEEB0> (this);
+}
+
+/*******************************************************/
+void
 CVehicleRecording::SetPlaybackSpeed (void *a1, float a2)
 {
     Call<0x459660> (a1, a2);
@@ -408,6 +423,13 @@ CMatrix::Attach (CMatrix *attach, char link)
 }
 
 /*******************************************************/
+void
+CMatrix::SetRotateZOnly (float angle)
+{
+    CallMethod<0x59B020> (this, angle);
+}
+
+/*******************************************************/
 CMatrix *
 RwFrameGetLTM (void *frame)
 {
@@ -466,6 +488,15 @@ CRunningScript::EndThread ()
 }
 
 /*******************************************************/
+void
+CRunningScript::SetCharCoordinates (CPed *ped, CVector pos, bool bWarpGang,
+                                    bool bOffset)
+{
+    injector::stdcall<void (CPed *, CVector, bool, bool)>::call<0x464DC0> (
+        ped, pos, bWarpGang, bOffset);
+}
+
+/*******************************************************/
 bool
 CRunningScripts::CheckForRunningScript (const char *thread)
 {
@@ -521,6 +552,13 @@ FindPlayerPed (int playerId)
 }
 
 /*******************************************************/
+CEntity *
+FindPlayerEntity (int playerId)
+{
+    return CallAndReturn<CEntity *, 0x56E120> (playerId);
+}
+
+/*******************************************************/
 float
 Dist (CVector a, CVector b)
 {
@@ -549,6 +587,13 @@ CEntity::GetPosition ()
 }
 
 /*******************************************************/
+int
+CEntity::SetHeading (float heading)
+{
+    return CallMethodAndReturn<int, 0x43E0C0> (this, heading);
+}
+
+/*******************************************************/
 void
 CStats::IncrementStat (short id, float val)
 {
@@ -568,10 +613,17 @@ rand_engine ()
 
 /*******************************************************/
 int
-random (int max, int min)
+random (int min, int max)
 {
     std::uniform_int_distribution<int> dist{min, max};
     return dist (rand_engine ());
+}
+
+/*******************************************************/
+int
+random (int max)
+{
+    return random (0, max);
 }
 
 CStreamingInfo * ms_aInfoForModel               = (CStreamingInfo *) 0x8E4CC0;

@@ -15,6 +15,10 @@ class MissionRandomizer
     unsigned char *mTempMissionData = nullptr;
     int *          mLocalVariables  = nullptr;
 
+    void ApplyMissionSpecificFixes (unsigned char *data);
+    void TeleportPlayerAfterMission ();
+    int  GetCorrectedMissionNo ();
+
 public:
     CRunningScript *mRandomizedScript        = nullptr;
     int             mRandomizedMissionNumber = -1;
@@ -29,6 +33,12 @@ public:
 
     /// Checks if the mission script should jump
     bool ShouldJump (CRunningScript *src);
+
+    /// Applies Mission Specific Fixes (start)
+    void ApplyMissionStartSpecificFixes (unsigned char *data);
+
+    /// Returns a random mission
+    int GetRandomMission (int originalMission);
 
     /// Jumps the script to the original offset
     void MoveScriptToOriginalOffset (CRunningScript *src);

@@ -61,11 +61,34 @@ MissionConfig::Read (std::shared_ptr<cpptoml::table> table)
         return;
 
     CONFIG (table, enabled, "Enabled", bool);
+    CONFIG (table, forcedMissionEnabled, "ForcedMissionEnabled", bool);
+    CONFIG (table, forcedMissionID, "ForcedMissionID", int);
 }
 
 /*******************************************************/
 void
 ObjectConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+}
+
+/*******************************************************/
+void
+CutsceneConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+    CONFIG (table, cutsceneFile, "CutsceneFile", std::string);
+}
+
+/*******************************************************/
+void
+ParticlesConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
     if (!table)
         return;
@@ -183,6 +206,9 @@ CarColConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     BaseConfig::Read (table);
     CONFIG (table, fades, "RandomizeFades", bool);
+    CONFIG (table, texts, "RainbowText", bool);
+    CONFIG (table, hueCycle, "RainbowHueCycle", bool);
+    CONFIG (table, crazyMode, "CrazyMode", bool);
 
     this->exceptions = table->get_array_of<int64_t> ("Exceptions")
                            .value_or (this->exceptions);
@@ -424,6 +450,9 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.scriptVehicle.Read (config->get_table ("ScriptVehicleRandomizer"));
     mConfigs.missions.Read (config->get_table ("MissionRandomizer"));
     mConfigs.objects.Read (config->get_table ("ObjectRandomizer"));
+    mConfigs.blips.Read (config->get_table ("BlipsRandomizer"));
+    mConfigs.particles.Read (config->get_table ("ParticleRandomizer"));
+    mConfigs.cutscenes.Read (config->get_table ("CutsceneRandomizer"));
 }
 
 /*******************************************************/

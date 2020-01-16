@@ -25,6 +25,7 @@
 #include <vector>
 #include <functional>
 #include <cstring>
+#include <unordered_map>
 
 enum eHookType
 {
@@ -49,8 +50,37 @@ struct GamePathA
 
 char *GetGameDirRelativePathA (const char *subpath);
 
-/// Creates hooks based on HookProperties
+/*******************************************************/
+class HookManager
+{
+    static int InstallDelayedHooks ();
+
+    static HookManager *                   mInstance;
+    std::unordered_map<uint32_t, uint32_t> mHooks;
+    std::vector<HookProperties>            mDelayedHooks;
+    std::vector<std::function<void ()>>    mDelayedFuncs;
+
+    HookManager (){};
+    static void DestroyInstance ();
+
+public:
+    /// Returns the static instance for HookManager.
+    static HookManager *GetInstance ();
+
+    /// Initialises Hooks/etc.
+    void Initialise ();
+
+    /// Creates hooks based on HookProperties
+    void RegisterHooks (std::vector<HookProperties> hooks);
+    void RegisterDelayedFunction (std::function<void ()> func);
+    void RegisterDelayedHooks (std::vector<HookProperties> hooks);
+
+    static int GetOriginalCall (void *newCall);
+};
+
 void RegisterHooks (std::vector<HookProperties> hooks);
+void RegisterDelayedFunction (std::function<void ()> func);
+void RegisterDelayedHooks (std::vector<HookProperties> hooks);
 
 /// Unprotects the entire module
 void UnProtectInstance ();

@@ -26,7 +26,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include <algorithm>
-#include "injector/injector.hpp"
+#include "injector/calling.hpp"
 #include <chrono>
 #include <string>
 
@@ -121,6 +121,46 @@ RandomizeFadeColour ()
                                      (uint8_t) colour[2]});
 }
 
+struct CRGBA
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+    uint8_t a;
+};
+
+/*******************************************************/
+CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
+                                    uint8_t g, uint8_t b, uint8_t a)
+{
+    static bool hueCycle
+        = ConfigManager::GetInstance ()->GetConfigs ().carcol.hueCycle;
+    static bool crazyMode
+        = ConfigManager::GetInstance ()->GetConfigs ().carcol.crazyMode;
+    static int offset = random (0, 10000);
+    float      time = (!hueCycle) ? offset : 1000.0 * clock () / CLOCKS_PER_SEC;
+
+    int colour[3];
+    int hash = (r * 255 + g) * 255 + b;
+    HSVtoRGB ((int) (time / 10 + hash) % 360, 0.7, 0.7, colour);
+
+    if ((r != g && g != b) || crazyMode)
+        {
+            thisCol->r = colour[0];
+            thisCol->g = colour[1];
+            thisCol->b = colour[2];
+            thisCol->a = a;
+        }
+    else
+        {
+            thisCol->r = r;
+            thisCol->g = g;
+            thisCol->b = b;
+            thisCol->a = a;
+        }
+    return thisCol;
+}
+
 /*******************************************************/
 void
 CarColRandomizer::Initialise ()
@@ -132,6 +172,9 @@ CarColRandomizer::Initialise ()
 
     RegisterHooks ({{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables},
                     {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}});
+
+    if (config.texts)
+        RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours}});
 
     if (config.fades)
         {
@@ -171,8 +214,8 @@ RandomizeColourTables ()
                 continue;
 
             int colour[] = {0, 0, 0};
-            HSVtoRGB ((int) (i * 2.8125), random (100, 50) / 100.0,
-                      random (100, 50) / 100.0, colour);
+            HSVtoRGB ((int) (i * 2.8125), random (50, 100) / 100.0,
+                      random (50, 100) / 100.0, colour);
 
             ms_vehicleColourTable[i].r = (uint8_t) colour[0];
             ms_vehicleColourTable[i].g = (uint8_t) colour[1];

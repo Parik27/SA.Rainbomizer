@@ -24,7 +24,12 @@
 #include "logger.hh"
 #include <memory>
 #include "injector/injector.hpp"
+#include "injector/calling.hpp"
 #include <algorithm>
+#include <unordered_map>
+
+typedef injector::memory_pointer_raw memptr_t;
+HookManager *                        HookManager::mInstance = nullptr;
 
 /*******************************************************/
 // Stolen shamelessly from https://stackoverflow.com/a/26221725
@@ -37,30 +42,120 @@ string_format (const std::string &format, Args... args)
     snprintf (buf.get (), size, format.c_str (), args...);
     return std::string (buf.get (), buf.get () + size);
 }
+/*******************************************************/
+void
+HookManager::Initialise ()
+{
+    Logger::GetLogger ()->LogMessage ("Initialised Delayed Hooks");
+    RegisterHooks (
+        {{HOOK_CALL, 0x5BFA90, (void *) &HookManager::InstallDelayedHooks}});
+
+    Logger::GetLogger ()->LogMessage ("Intialised HookManager");
+}
 
 /*******************************************************/
 void
-RegisterHooks (std::vector<HookProperties> hooks)
+HookManager::DestroyInstance ()
+{
+    if (HookManager::mInstance)
+        delete HookManager::mInstance;
+}
+
+/*******************************************************/
+HookManager *
+HookManager::GetInstance ()
+{
+    if (!HookManager::mInstance)
+        {
+            HookManager::mInstance = new HookManager ();
+            atexit (&HookManager::DestroyInstance);
+        }
+    return HookManager::mInstance;
+}
+
+/*******************************************************/
+void
+HookManager::RegisterHooks (std::vector<HookProperties> hooks)
 {
     for (auto hook : hooks)
         {
+            memptr_t original;
             switch (hook.type)
                 {
                 case HOOK_JUMP:
-                    injector::MakeJMP (hook.src, hook.dest);
+                    original = injector::MakeJMP (hook.src, hook.dest);
                     Logger::GetLogger ()->LogMessage (
                         string_format ("JUMP: Hooking %X => %X", hook.src,
                                        hook.dest));
                     break;
 
                 case HOOK_CALL:
-                    injector::MakeCALL (hook.src, hook.dest);
+                    original = injector::MakeCALL (hook.src, hook.dest);
                     Logger::GetLogger ()->LogMessage (
                         string_format ("CALL: Hooking %X => %X", hook.src,
                                        hook.dest));
                     break;
                 }
+
+            mHooks[(int) hook.dest] = original.as_int ();
         }
+}
+
+/*******************************************************/
+int
+HookManager::GetOriginalCall (void *newCall)
+{
+    auto hookManager = HookManager::GetInstance ();
+    return hookManager->mHooks[(int) newCall];
+};
+
+/*******************************************************/
+int
+HookManager::InstallDelayedHooks ()
+{
+    auto hookManager = HookManager::GetInstance ();
+    ::RegisterHooks (hookManager->mDelayedHooks);
+    for (auto i : hookManager->mDelayedFuncs)
+        i ();
+
+    return injector::cstd<int ()>::call (
+        GetOriginalCall ((void *) &HookManager::InstallDelayedHooks));
+}
+
+/*******************************************************/
+void
+HookManager::RegisterDelayedFunction (std::function<void ()> func)
+{
+    mDelayedFuncs.push_back (func);
+}
+
+/*******************************************************/
+void
+HookManager::RegisterDelayedHooks (std::vector<HookProperties> hooks)
+{
+    for (auto i : hooks)
+        mDelayedHooks.push_back (i);
+}
+
+/*******************************************************/
+void
+RegisterHooks (std::vector<HookProperties> hooks)
+{
+    HookManager::GetInstance ()->RegisterHooks (hooks);
+}
+
+/*******************************************************/
+void
+RegisterDelayedHooks (std::vector<HookProperties> hooks)
+{
+    HookManager::GetInstance ()->RegisterDelayedHooks (hooks);
+}
+
+/*******************************************************/
+void
+RegisterDelayedFunction (std::function<void ()> func)
+{
+    HookManager::GetInstance ()->RegisterDelayedFunction (func);
 }
 
 /*******************************************************/

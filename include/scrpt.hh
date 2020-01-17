@@ -76,19 +76,19 @@ public:
     }
 
     /*******************************************************/
-    template <typename ... Args>
+    template <typename... Args>
     static void
-    CallOpcode(short opcodeId, const char* name, Args... args)
-        {
-            CRunningScript scr;
-            scr.Init();
+    CallOpcode (short opcodeId, const char *name, Args... args)
+    {
+        CRunningScript scr;
+        scr.Init ();
 
-            Scrpt opcode = Scrpt(opcodeId);
-            opcode.Pack(args...);
+        Scrpt opcode = Scrpt (opcodeId);
+        opcode.Pack (args...);
 
-            scr.m_pBaseIP = opcode.GetData();
-            scr.m_pCurrentIP = scr.m_pBaseIP;
+        scr.m_pBaseIP    = opcode.GetData ();
+        scr.m_pCurrentIP = scr.m_pBaseIP;
 
-            scr.ProcessOneCommand();
-        }
+        scr.ProcessOneCommand ();
+    }
 };

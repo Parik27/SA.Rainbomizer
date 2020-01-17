@@ -107,7 +107,7 @@ struct TrafficConfig : public BaseConfig
 };
 
 /*******************************************************/
-struct CarColConfig : public BaseConfig
+struct ColourConfig : public BaseConfig
 {
 
     std::vector<int64_t> exceptions = {0, 1};
@@ -243,7 +243,7 @@ struct Configs
 {
     GeneralConfig       general;
     TrafficConfig       traffic;
-    CarColConfig        carcol;
+    ColourConfig        colours;
     PoliceHeliConfig    policeHeli;
     CheatConfig         cheat;
     HandlingConfig      handling;

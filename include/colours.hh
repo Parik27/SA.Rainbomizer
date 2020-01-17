@@ -32,16 +32,16 @@ void __fastcall RandomizeVehicleColour (void *info, void *edx, uint8_t *prim,
                                         uint8_t *quat, int variation);
 int RandomizeColourTables ();
 
-class CarColRandomizer
+class ColourRandomizer
 {
-    static CarColRandomizer *mInstance;
+    static ColourRandomizer *mInstance;
 
-    CarColRandomizer (){};
+    ColourRandomizer (){};
     static void DestroyInstance ();
 
 public:
     /// Returns the static instance for CarColRandomizer.
-    static CarColRandomizer *GetInstance ();
+    static ColourRandomizer *GetInstance ();
 
     void Initialise ();
 };

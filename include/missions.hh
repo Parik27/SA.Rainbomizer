@@ -4,7 +4,7 @@ struct CRunningScript;
 
 struct CitiesInfo
 {
-    int citiesUnlocked;
+    int  citiesUnlocked;
     bool SFBarriers;
     bool LVBarriers;
 };
@@ -26,8 +26,8 @@ class MissionRandomizer
     void ApplyMissionSpecificFixes (unsigned char *data);
     void TeleportPlayerAfterMission ();
     int  GetCorrectedMissionNo ();
-    void StoreCityInfo();
-    void RestoreCityInfo(const CitiesInfo &info);
+    void StoreCityInfo ();
+    void RestoreCityInfo (const CitiesInfo &info);
 
 public:
     CRunningScript *mRandomizedScript        = nullptr;

@@ -48,7 +48,7 @@ EnableTrailers = true
 DefaultModel = 0
 
 #######################################################
-[CarColRandomizer]
+[ColourRandomizer]
 
 Enabled = true
 RandomizeFades = false

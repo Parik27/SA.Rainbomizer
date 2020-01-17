@@ -19,7 +19,7 @@
  */
 
 #include <cstdlib>
-#include "carcols.hh"
+#include "colours.hh"
 #include "base.hh"
 #include "functions.hh"
 #include <cmath>
@@ -30,7 +30,7 @@
 #include <chrono>
 #include <string>
 
-CarColRandomizer *CarColRandomizer::mInstance = nullptr;
+ColourRandomizer *ColourRandomizer::mInstance = nullptr;
 
 /*******************************************************/
 void
@@ -85,22 +85,22 @@ HSVtoRGB (int H, double S, double V, int output[3])
 
 /*******************************************************/
 void
-CarColRandomizer::DestroyInstance ()
+ColourRandomizer::DestroyInstance ()
 {
-    if (CarColRandomizer::mInstance)
-        delete CarColRandomizer::mInstance;
+    if (ColourRandomizer::mInstance)
+        delete ColourRandomizer::mInstance;
 }
 
 /*******************************************************/
-CarColRandomizer *
-CarColRandomizer::GetInstance ()
+ColourRandomizer *
+ColourRandomizer::GetInstance ()
 {
-    if (!CarColRandomizer::mInstance)
+    if (!ColourRandomizer::mInstance)
         {
-            CarColRandomizer::mInstance = new CarColRandomizer ();
-            atexit (&CarColRandomizer::DestroyInstance);
+            ColourRandomizer::mInstance = new ColourRandomizer ();
+            atexit (&ColourRandomizer::DestroyInstance);
         }
-    return CarColRandomizer::mInstance;
+    return ColourRandomizer::mInstance;
 }
 
 /*******************************************************/
@@ -134,9 +134,9 @@ CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
                                     uint8_t g, uint8_t b, uint8_t a)
 {
     static bool hueCycle
-        = ConfigManager::GetInstance ()->GetConfigs ().carcol.hueCycle;
+        = ConfigManager::GetInstance ()->GetConfigs ().colours.hueCycle;
     static bool crazyMode
-        = ConfigManager::GetInstance ()->GetConfigs ().carcol.crazyMode;
+        = ConfigManager::GetInstance ()->GetConfigs ().colours.crazyMode;
     static int offset = random (0, 10000);
     float      time = (!hueCycle) ? offset : 1000.0 * clock () / CLOCKS_PER_SEC;
 
@@ -163,9 +163,9 @@ CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
 
 /*******************************************************/
 void
-CarColRandomizer::Initialise ()
+ColourRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().carcol;
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().colours;
 
     if (!config.enabled)
         return;
@@ -183,7 +183,7 @@ CarColRandomizer::Initialise ()
             injector::MakeRangedNOP (0x50BF22 + 5, 0x50BF33);
         }
 
-    Logger::GetLogger ()->LogMessage ("Initialised CarColRandomizer");
+    Logger::GetLogger ()->LogMessage ("Initialised ColourRandomizzer");
 }
 
 /*******************************************************/
@@ -203,7 +203,7 @@ RandomizeColourTables ()
 {
     int ret = CModelInfo::LoadVehicleColours ();
 
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().carcol;
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().colours;
 
     for (int i = 0; i < 128; i++)
         {

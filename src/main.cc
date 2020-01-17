@@ -21,7 +21,7 @@
 #include "base.hh"
 #include "logger.hh"
 #include "traffic.hh"
-#include "carcols.hh"
+#include "colours.hh"
 #include "heli.hh"
 #include "cgen.hh"
 #include <ctime>
@@ -73,7 +73,7 @@ public:
         HookManager::GetInstance ()->Initialise ();
 
         TrafficRandomizer::GetInstance ()->Initialise ();
-        CarColRandomizer::GetInstance ()->Initialise ();
+        ColourRandomizer::GetInstance ()->Initialise ();
         ParkedCarRandomizer::GetInstance ()->Initialise ();
         PoliceHeliRandomizer::GetInstance ()->Initialise ();
         ScriptVehicleRandomizer::GetInstance ()->Initialise ();

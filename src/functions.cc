@@ -475,9 +475,9 @@ CRunningScript::CheckName (const char *name)
 
 /*******************************************************/
 char
-CRunningScript::ProcessOneCommand()
+CRunningScript::ProcessOneCommand ()
 {
-    return CallMethodAndReturn<char, 0x469EB0>(this);
+    return CallMethodAndReturn<char, 0x469EB0> (this);
 }
 
 /*******************************************************/
@@ -489,9 +489,9 @@ CRunningScript::EndThread ()
 
 /*******************************************************/
 void
-CRunningScript::Init()
+CRunningScript::Init ()
 {
-    CallMethod<0x4648E0>(this);
+    CallMethod<0x4648E0> (this);
 }
 
 /*******************************************************/
@@ -616,9 +616,9 @@ CStats::GetStatValue (short id)
 
 /*******************************************************/
 int
-CIplStore::FindIplSlot(char *name)
+CIplStore::FindIplSlot (char *name)
 {
-    return CallAndReturn<int, 0x404AC0>(name);
+    return CallAndReturn<int, 0x404AC0> (name);
 }
 
 /*******************************************************/

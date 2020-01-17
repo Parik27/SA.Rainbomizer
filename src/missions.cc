@@ -12,11 +12,13 @@
 #include "autosave.hh"
 #include "missions_data.hh"
 #include <stdexcept>
+#include <array>
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 
 const int START_MISSIONS = 11;
 const int END_MISSIONS   = 112;
+const int UNLOCKED_CITY_STAT = 181;
 
 /*******************************************************/
 void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
@@ -92,11 +94,14 @@ MissionRandomizer::GetRandomMission (int originalMission)
 bool
 MissionRandomizer::ShouldJump (CRunningScript *scr)
 {
+    const int OPCODE_END_THREAD = 78;
+    const int OPCODE_RETURN = 81;
+    
     int currentOffset = scr->m_pCurrentIP - scr->m_pBaseIP;
     if (currentOffset != this->mPrevOffset)
         {
             short opCode = *reinterpret_cast<uint16_t *> (scr->m_pCurrentIP);
-            if (opCode == 0x51 && mScriptReplaced)
+            if (opCode == OPCODE_RETURN && mScriptReplaced)
                 {
                     // Restore original base ip
                     scr->m_pBaseIP = mOriginalBaseIP;
@@ -107,8 +112,14 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
 
                     mScriptReplaced = false;
 
+                    RestoreCityInfo(this->mCityInfo);
                     this->mRandomizedScript = nullptr;
                 }
+            else if(opCode == OPCODE_END_THREAD)
+            {
+                RestoreCityInfo(this->mCityInfo);
+                this->mRandomizedScript = nullptr;
+            }
 
             this->mPrevOffset = currentOffset;
         }
@@ -220,7 +231,7 @@ JumpOnMissionEnd ()
 {
     static int addr = HookManager::GetOriginalCall ((void *) &JumpOnMissionEnd);
     auto       missionRandomizer = MissionRandomizer::GetInstance ();
-
+    
     if (missionRandomizer->mRandomizedScript
         && missionRandomizer->ShouldJump (missionRandomizer->mRandomizedScript))
         missionRandomizer->MoveScriptToOriginalOffset (
@@ -239,6 +250,74 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
 }
 
 /*******************************************************/
+bool
+IsIPLEnabled(char* name)
+{
+    int index = CIplStore::FindIplSlot(name);
+    IplDef* def = CIplStore::ms_pPool->GetAt<IplDef>(index);
+    if(!def->field2D || !def->m_bDisableDynamicStreaming)
+        return false;
+
+    return true;
+}
+
+/*******************************************************/
+void
+MissionRandomizer::StoreCityInfo()
+{
+    this->mCityInfo.citiesUnlocked = CStats::GetStatValue (UNLOCKED_CITY_STAT);
+    this->mCityInfo.LVBarriers     = IsIPLEnabled ((char *) "BARRIERS2");
+    this->mCityInfo.SFBarriers     = IsIPLEnabled ((char *) "BARRIERS1");
+
+    printf("Cities Unlocked: %d\n", this->mCityInfo.citiesUnlocked);
+    printf("LV Bars: %d\n", this->mCityInfo.LVBarriers);
+    printf("SF Bars: %d\n", this->mCityInfo.SFBarriers);
+}
+
+/*******************************************************/
+void
+MissionRandomizer::RestoreCityInfo (const CitiesInfo &info)
+{
+    printf("%d -> %d", info.citiesUnlocked, info.citiesUnlocked);
+    Scrpt::CallOpcode (0x629, "change_int_stat", UNLOCKED_CITY_STAT,
+                       info.citiesUnlocked);
+
+    static auto handleBridge = [] (bool bridge, const char *id) {
+        if (bridge)
+            Scrpt::CallOpcode (0x776, "create_objects", id);
+        else
+            Scrpt::CallOpcode (0x777, "remove_objects", id);
+    };
+
+    handleBridge (info.LVBarriers, "BARRIERS2");
+    handleBridge (info.SFBarriers, "BARRIERS1");
+}
+
+/*******************************************************/
+void
+MissionRandomizer::UnlockCitiesBasedOnMissionID(int missionId)
+{
+    static std::array<std::pair<int, CitiesInfo>, 4> cities
+        = {{{92, {3, false, false}},
+            {63, {2, false, false}},
+            {38, {1, false, true}},
+            {0, {0, true, true}}}};
+
+    if(!this->mRandomizedScript)
+        StoreCityInfo();
+    
+    for(auto i : cities)
+    {
+        if (i.first < missionId)
+            {
+                RestoreCityInfo (i.second);
+                return;
+            }
+    }
+    
+}
+
+/*******************************************************/
 CRunningScript *
 StoreRandomizedScript (uint8_t *startIp)
 {
@@ -249,9 +328,14 @@ StoreRandomizedScript (uint8_t *startIp)
         startIp);
 
     if (missionRandomizer->mStoreNextMission)
-        missionRandomizer->mRandomizedScript = out;
+    {
+        missionRandomizer->ApplyMissionStartSpecificFixes (startIp);
+        missionRandomizer->UnlockCitiesBasedOnMissionID (
+            missionRandomizer->mRandomizedMissionNumber);
 
-    missionRandomizer->ApplyMissionStartSpecificFixes (startIp);
+        missionRandomizer->mRandomizedScript = out;
+        
+    }
 
     missionRandomizer->mStoreNextMission = false;
     return out;

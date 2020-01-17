@@ -31,6 +31,7 @@ struct CVector;
 struct CBox;
 struct CColModel;
 struct CPed;
+struct CPool;
 
 enum eVehicleClass
 {
@@ -167,9 +168,18 @@ public:
     char  ProcessCommands0to99 (int opcode);
     void  UpdateCompareFlag (char flag);
     int   EndThread ();
+    char ProcessOneCommand();
 
+    void Init();
+    
     static void SetCharCoordinates (CPed *ped, CVector pos, bool bWarpGang,
                                     bool bOffset);
+};
+
+struct CIplStore
+{
+    static int FindIplSlot(char* name);
+    static CPool* ms_pPool;
 };
 
 struct CRunningScripts
@@ -220,10 +230,26 @@ struct CText
     char  LoadMissionText (const char *table);
 };
 
+struct IplDef
+{
+    unsigned char __pad00[0x2D];
+    bool field2D;
+    bool m_bLoadRequest;
+    bool m_bDisableDynamicStreaming;
+    bool field30;
+    bool field31;
+    unsigned char __pad32[2];
+};
+
 struct CPool
 {
-    void **m_pObjects;
-    void * GetAt (signed int handle, int size);
+    char **m_pObjects;
+
+    template<typename T>
+    T* GetAt (signed int handle)
+        {
+            return (T*) (*this->m_pObjects + sizeof(T) * handle);
+        }
 };
 
 struct CPad
@@ -322,6 +348,7 @@ struct CGenericGameStorage
 
 struct CStats
 {
+    static double GetStatValue(short id);
     static void IncrementStat (short id, float val);
 };
 

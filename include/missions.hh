@@ -2,6 +2,13 @@
 
 struct CRunningScript;
 
+struct CitiesInfo
+{
+    int citiesUnlocked;
+    bool SFBarriers;
+    bool LVBarriers;
+};
+
 class MissionRandomizer
 {
     static MissionRandomizer *mInstance;
@@ -14,10 +21,13 @@ class MissionRandomizer
     bool           mScriptReplaced  = false;
     unsigned char *mTempMissionData = nullptr;
     int *          mLocalVariables  = nullptr;
+    CitiesInfo     mCityInfo;
 
     void ApplyMissionSpecificFixes (unsigned char *data);
     void TeleportPlayerAfterMission ();
     int  GetCorrectedMissionNo ();
+    void StoreCityInfo();
+    void RestoreCityInfo(const CitiesInfo &info);
 
 public:
     CRunningScript *mRandomizedScript        = nullptr;
@@ -42,4 +52,9 @@ public:
 
     /// Jumps the script to the original offset
     void MoveScriptToOriginalOffset (CRunningScript *src);
+
+    /// Unlocks the cities based on the mission number
+    /// Why do I bother writing these documentations when all they do it restate
+    /// the function name
+    void UnlockCitiesBasedOnMissionID (int missionId);
 };

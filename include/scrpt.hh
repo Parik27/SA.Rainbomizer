@@ -1,5 +1,7 @@
 #include <cstring>
 #include <cstdio>
+#include "base.hh"
+#include "functions.hh"
 
 struct GlobalVar
 {
@@ -12,6 +14,7 @@ struct LocalVar
     LocalVar (short val) { this->val = val; }
 };
 
+/*******************************************************/
 class Scrpt
 {
     unsigned char *data;
@@ -69,11 +72,23 @@ public:
         opcode.Pack (args...);
 
         memcpy (dst, opcode.GetData (), opcode.offset);
-        for (int i = 0; i < opcode.offset; i++)
-            {
-                printf ("%x ", opcode.GetData ()[i]);
-            }
-        printf ("\n");
         return dst + opcode.offset;
     }
+
+    /*******************************************************/
+    template <typename ... Args>
+    static void
+    CallOpcode(short opcodeId, const char* name, Args... args)
+        {
+            CRunningScript scr;
+            scr.Init();
+
+            Scrpt opcode = Scrpt(opcodeId);
+            opcode.Pack(args...);
+
+            scr.m_pBaseIP = opcode.GetData();
+            scr.m_pCurrentIP = scr.m_pBaseIP;
+
+            scr.ProcessOneCommand();
+        }
 };

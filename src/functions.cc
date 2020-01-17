@@ -402,13 +402,6 @@ CPickups::GenerateNewOne (float x, float y, float z, unsigned int modelId,
 }
 
 /*******************************************************/
-void *
-CPool::GetAt (int handle, int size)
-{
-    return this->m_pObjects + size * (handle >> 8);
-}
-
-/*******************************************************/
 void
 CStreaming::SetMissionDoesntRequireModel (int index)
 {
@@ -481,10 +474,24 @@ CRunningScript::CheckName (const char *name)
 }
 
 /*******************************************************/
+char
+CRunningScript::ProcessOneCommand()
+{
+    return CallMethodAndReturn<char, 0x469EB0>(this);
+}
+
+/*******************************************************/
 int
 CRunningScript::EndThread ()
 {
     return CallMethodAndReturn<int, 0x465AA0> (this);
+}
+
+/*******************************************************/
+void
+CRunningScript::Init()
+{
+    CallMethod<0x4648E0>(this);
 }
 
 /*******************************************************/
@@ -601,6 +608,20 @@ CStats::IncrementStat (short id, float val)
 }
 
 /*******************************************************/
+double
+CStats::GetStatValue (short id)
+{
+    return CallAndReturn<double, 0x558E40> (id);
+}
+
+/*******************************************************/
+int
+CIplStore::FindIplSlot(char *name)
+{
+    return CallAndReturn<int, 0x404AC0>(name);
+}
+
+/*******************************************************/
 std::mt19937 &
 rand_engine ()
 {
@@ -634,3 +655,4 @@ int *            ScriptSpace                    = (int *) 0xA49960;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
 CPool *          ms_pPedPool                    = (CPool *) 0xB74490;
 CRunningScript *&CRunningScripts::pActiveScript = *(CRunningScript **) 0xA8B42C;
+CPool *          CIplStore::ms_pPool            = (CPool *) 0x8E3FB0;

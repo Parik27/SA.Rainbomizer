@@ -632,6 +632,7 @@ CMatrix *RwFrameGetLTM (void *frame);
 
 int random (int max);
 int random (int min, int max);
+float randomFloat (float min, float max);
 
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;

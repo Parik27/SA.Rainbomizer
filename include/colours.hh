@@ -27,10 +27,15 @@
 // - Initialise car colour tables
 
 // Hooked Functions
+
+struct CRGBA;
+
 void __fastcall RandomizeVehicleColour (void *info, void *edx, uint8_t *prim,
                                         uint8_t *secn, uint8_t *tert,
                                         uint8_t *quat, int variation);
 int RandomizeColourTables ();
+
+CRGBA GetRainbowColour(int offset = 0);
 
 class ColourRandomizer
 {

@@ -107,36 +107,28 @@ ColourRandomizer::GetInstance ()
 void
 RandomizeFadeColour ()
 {
-    struct CColour
-    {
-        uint8_t r, g, b;
-    };
-    double time = 1000.0 * clock () / CLOCKS_PER_SEC;
-
-    int colour[3];
-    HSVtoRGB ((int) (time / 10) % 360, 0.7, 0.7, colour);
-
-    injector::WriteMemory<CColour> (0xC3EFA8,
-                                    {(uint8_t) colour[0], (uint8_t) colour[1],
-                                     (uint8_t) colour[2]});
+    injector::WriteMemory<CRGBA> (0xC3EFA8, GetRainbowColour ());
 }
 
-struct CRGBA
+/*******************************************************/
+CRGBA GetRainbowColour(int offset)
 {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t a;
-};
+    int colour[3];
+    double time = 1000.0 * clock () / CLOCKS_PER_SEC;
+
+    HSVtoRGB(int(time / 10 + offset) % 360, 0.7, 0.7, colour);
+    
+    return {colour[0], colour[1], colour[2]};
+}
 
 /*******************************************************/
 CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
                                     uint8_t g, uint8_t b, uint8_t a)
 {
-    static bool hueCycle
-        = ConfigManager::GetInstance ()->GetConfigs ().colours.hueCycle;
-    static bool crazyMode
-        = ConfigManager::GetInstance ()->GetConfigs ().colours.crazyMode;
+    static auto config = ConfigManager::GetInstance ()->GetConfigs ().colours;
+    static bool hueCycle = config.hueCycle;
+    static bool crazyMode = config.crazyMode;
+
     static int offset = random (0, 10000);
     float      time = (!hueCycle) ? offset : 1000.0 * clock () / CLOCKS_PER_SEC;
 

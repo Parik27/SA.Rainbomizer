@@ -75,7 +75,37 @@ public:
     void RegisterDelayedFunction (std::function<void ()> func);
     void RegisterDelayedHooks (std::vector<HookProperties> hooks);
 
-    static int GetOriginalCall (void *newCall);
+    static int GetOriginalCall (int call);
+
+    template <typename T, int addr, typename... Args>
+    static void
+    CallOriginal (Args... args)
+    {
+        static int branch = GetOriginalCall (addr);
+        if (branch)
+            T::call (branch, args...);
+    }
+
+    template <typename T, int addr, typename... Args>
+    static auto
+    CallOriginalAndReturn (std::function<typename T::result_type ()> fallback,
+                           Args... args)
+    {
+        static int branch = GetOriginalCall (addr);
+        if (branch)
+            return T::call (branch, args...);
+        return fallback ();
+    }
+
+    template <typename T, int addr, typename... Args>
+    static auto
+    CallOriginalAndReturn (typename T::result_type fallback, Args... args)
+    {
+        int branch = GetOriginalCall (addr);
+        if (branch)
+            return T::call (branch, args...);
+        return fallback;
+    }
 };
 
 void RegisterHooks (std::vector<HookProperties> hooks);

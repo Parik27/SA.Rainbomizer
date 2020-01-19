@@ -605,6 +605,51 @@ struct cSimpleTransform
     float   m_fAngle;
 };
 
+enum eFontAlignment
+{
+    ALIGN_CENTRE,
+    ALIGN_LEFT,
+    ALIGN_RIGHT
+};
+
+struct CRGBA
+{
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a;
+    CRGBA (int r, int g, int b, int a = 255)
+    {
+        this->r = r;
+        this->g = g;
+        this->b = b;
+        this->a = a;
+    }
+};
+
+struct CFont
+{
+    static void SetOrientation (eFontAlignment alignment);
+    static void SetColor(CRGBA col);
+    static void SetAlphaFade(float alpha);
+    static void SetFontStyle(short style);
+    static void SetWrapx(float value);
+    static void SetDropShadowPosition(short value);
+    static void SetBackground(bool enable, bool includeWrap);
+    static void SetBackgroundColor(CRGBA col);
+    static void SetScaleForCurrentlanguage(float w, float h);
+    static void SetJustify(bool on);
+    static void PrintString(float x, float y, char *text);
+};
+
+struct CRect
+{
+    float left;
+    float bottom;
+    float right;
+    float top;
+};
+
 struct CMatrixLink
 {
     CMatrix matrix;
@@ -618,6 +663,13 @@ struct CEntity
 
     cSimpleTransform *GetPosition ();
     int               SetHeading (float heading);
+};
+
+struct RsGlobalType
+{
+    char* appName;
+    int MaximumWidth;
+    int MaximumHeight;
 };
 
 template <typename T> struct ListItem_c
@@ -647,6 +699,7 @@ struct FxManager_c
 };
 
 CVector  FindPlayerCoors (int playerId = -1);
+CVehicle* FindPlayerVehicle (int playerId = -1, bool bIncludeRemote = false);
 CPed *   FindPlayerPed (int playerId = -1);
 CEntity *FindPlayerEntity (int playerId = -1);
 float    Dist (CVector a, CVector b);
@@ -667,3 +720,5 @@ extern RwRGBA *         ms_vehicleColourTable;
 extern int *            ScriptParams;
 extern int *            ScriptSpace;
 extern CPool *          ms_pPedPool;
+extern RsGlobalType *   RsGlobal;
+extern float *          ms_fTimeStep;

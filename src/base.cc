@@ -97,16 +97,16 @@ HookManager::RegisterHooks (std::vector<HookProperties> hooks)
                     break;
                 }
 
-            mHooks[(int) hook.dest] = original.as_int ();
+            mHooks[hook.src] = original.as_int ();
         }
 }
 
 /*******************************************************/
 int
-HookManager::GetOriginalCall (void *newCall)
+HookManager::GetOriginalCall (int newCall)
 {
     auto hookManager = HookManager::GetInstance ();
-    return hookManager->mHooks[(int) newCall];
+    return hookManager->mHooks[newCall];
 };
 
 /*******************************************************/
@@ -118,8 +118,7 @@ HookManager::InstallDelayedHooks ()
     for (auto i : hookManager->mDelayedFuncs)
         i ();
 
-    return injector::cstd<int ()>::call (
-        GetOriginalCall ((void *) &HookManager::InstallDelayedHooks));
+    return CallOriginalAndReturn<injector::cstd<int ()>, 0x5BFA90> (0);
 }
 
 /*******************************************************/

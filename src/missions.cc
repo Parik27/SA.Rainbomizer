@@ -293,8 +293,7 @@ void
 MissionRandomizer::RestoreCityInfo (const CitiesInfo &info)
 {
     printf ("%d -> %d", info.citiesUnlocked, info.citiesUnlocked);
-    Scrpt::CallOpcode (0x629, "change_int_stat", UNLOCKED_CITY_STAT,
-                       info.citiesUnlocked);
+    this->mCurrentCitiesUnlocked = info.citiesUnlocked;
 
     static auto handleBridge = [] (bool bridge, const char *id) {
         if (bridge)
@@ -354,6 +353,18 @@ StoreRandomizedScript (uint8_t *startIp)
 }
 
 /*******************************************************/
+float
+UnlockCities(int statsId)
+{
+    auto missionRandomizer = MissionRandomizer::GetInstance ();
+    if(missionRandomizer->mRandomizedScript)
+        return missionRandomizer->mCurrentCitiesUnlocked;
+
+    return HookManager::CallOriginalAndReturn<injector::cstd<float (int)>,
+                                              0x4417F5> (3, 181);
+}
+
+/*******************************************************/
 void
 MissionRandomizer::Initialise ()
 {
@@ -369,7 +380,9 @@ MissionRandomizer::Initialise ()
         mLocalVariables = new int[1024];
 
     RegisterHooks ({{HOOK_CALL, 0x489929, (void *) &RandomizeMissionToStart},
-                    {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript}});
+                    {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript},
+                    {HOOK_CALL, 0x441869, (void *) &UnlockCities},
+                    {HOOK_CALL, 0x4417F5, (void *) &UnlockCities}});
 
     RegisterDelayedHooks ({{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd}});
     RegisterDelayedFunction ([] { injector::MakeNOP (0x469fb5, 2); });

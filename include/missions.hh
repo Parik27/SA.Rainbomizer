@@ -35,7 +35,8 @@ public:
     int             mOriginalMissionNumber   = -1;
     int             mSkipMissionNumber       = 0;
     bool            mStoreNextMission        = false;
-
+    int             mCurrentCitiesUnlocked   = 0;
+    
     /// Returns the static instance for MissionRandomizer.
     static MissionRandomizer *GetInstance ();
 

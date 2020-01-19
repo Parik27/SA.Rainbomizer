@@ -97,8 +97,8 @@ AutoSave::DrawMessage (const char *text)
     CFont::SetDropShadowPosition (0);
     CFont::SetWrapx (mDisplayDrawPosX + CalculateScreenOffsetX (500));
     CFont::SetAlphaFade (255);
-    CFont::SetBackgroundColor ({0, 0, 0, 180});
-    CFont::SetColor (GetRainbowColour ());
+    CFont::SetBackgroundColor (GetRainbowColour ());
+    CFont::SetColor ({00, 0, 0, 255});
     CFont::PrintString (this->mDisplayDrawPosX, this->mDisplayDrawPosY,
                         (char *) text);
 }

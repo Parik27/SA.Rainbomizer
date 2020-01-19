@@ -4,9 +4,10 @@
 void
 Scrpt::Append (const void *bytes, int size)
 {
-    if (offset + size >= 32)
+    if (offset + size >= 128)
         return;
     memcpy (this->data + offset, bytes, size);
+
     this->offset += size;
 }
 
@@ -16,7 +17,7 @@ Scrpt::~Scrpt () { delete[] data; }
 /*******************************************************/
 Scrpt::Scrpt (short opcodeId)
 {
-    this->data   = new unsigned char[32];
+    this->data = new unsigned char[128];
     this->offset = 0;
 
     Append (&opcodeId, sizeof (short));
@@ -36,6 +37,22 @@ Scrpt::operator<< (const char *str)
 }
 
 /*******************************************************/
+void
+Scrpt::operator<< (int* ptr)
+{
+    *this << LocalVar(this->savedParams.size());
+    this->savedParams.push_back(ptr);
+}
+
+/*******************************************************/
+void Scrpt::StoreParameters(CRunningScript* scr)
+{
+    int j = 0;
+    for(auto i : savedParams)
+        *i = scr->m_aLocalVars[j++];
+}
+
+/*******************************************************/
 #define operator(ID, TYPE)                                                     \
     void Scrpt::operator<< (TYPE n)                                            \
     {                                                                          \
@@ -44,6 +61,9 @@ Scrpt::operator<< (const char *str)
         Append (&n, sizeof (TYPE));                                            \
     }
 
-operator(4, char) operator(1, int) operator(2, short) operator(6, float)
-                                                      operator(2, GlobalVar)
-                                                      operator(3, LocalVar)
+operator(4, char);
+operator(1, int);
+operator(2, short);
+operator(6, float);
+operator(2, GlobalVar);
+operator(3, LocalVar);

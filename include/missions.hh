@@ -33,6 +33,7 @@ public:
     CRunningScript *mRandomizedScript        = nullptr;
     int             mRandomizedMissionNumber = -1;
     int             mOriginalMissionNumber   = -1;
+    int             mSkipMissionNumber       = 0;
     bool            mStoreNextMission        = false;
 
     /// Returns the static instance for MissionRandomizer.

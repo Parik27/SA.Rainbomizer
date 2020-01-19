@@ -552,6 +552,13 @@ FindPlayerCoors (int playerId)
 }
 
 /*******************************************************/
+CVehicle*
+FindPlayerVehicle (int playerId, bool bIncludeRemote)
+{
+    return CallAndReturn<CVehicle*, 0x56E0D0>(playerId, bIncludeRemote);
+}
+
+/*******************************************************/
 CPed *
 FindPlayerPed (int playerId)
 {
@@ -608,6 +615,73 @@ CStats::IncrementStat (short id, float val)
 }
 
 /*******************************************************/
+void CFont::SetFontStyle(short style)
+{
+    Call<0x719490>(style);
+}
+
+/*******************************************************/
+void CFont::SetWrapx(float value)
+{
+    Call<0x7194D0>(value);
+}
+
+/*******************************************************/
+void CFont::SetDropShadowPosition(short value)
+{
+    Call<0x719570>(value);
+}
+
+/*******************************************************/
+void CFont::SetBackground(bool enable, bool includeWrap)
+{
+	((void (__cdecl *)(bool, bool))0x7195C0)(enable, includeWrap);
+}
+
+/*******************************************************/
+void CFont::SetBackgroundColor(CRGBA col)
+{
+    Call<0x7195E0>(col);
+}
+
+/*******************************************************/
+void CFont::SetColor(CRGBA col)
+{
+    Call<0x719430>(col);
+}
+
+/*******************************************************/
+void CFont::SetJustify(bool on)
+{
+	((void (__cdecl *)(bool))0x719600)(on);
+}
+
+/*******************************************************/
+void CFont::SetOrientation(eFontAlignment alignment)
+{
+	((void (__cdecl *)(eFontAlignment))0x719610)(alignment);
+}
+
+/*******************************************************/
+void CFont::PrintString(float x, float y, char *text)
+{
+	((void (__cdecl *)(float, float, char *))0x71A700)(x, y, text);
+}
+
+/*******************************************************/
+void CFont::SetScaleForCurrentlanguage(float w, float h)
+{
+	((void (__cdecl *)(float, float))0x7193A0)(w, h);
+}
+
+
+/*******************************************************/
+void CFont::SetAlphaFade(float alpha)
+{
+	((void (__cdecl *)(float))0x719500)(alpha);
+}
+
+/*******************************************************/
 double
 CStats::GetStatValue (short id)
 {
@@ -656,3 +730,5 @@ CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
 CPool *          ms_pPedPool                    = (CPool *) 0xB74490;
 CRunningScript *&CRunningScripts::pActiveScript = *(CRunningScript **) 0xA8B42C;
 CPool *          CIplStore::ms_pPool            = (CPool *) 0x8E3FB0;
+RsGlobalType*    RsGlobal                       = (RsGlobalType*) 0xC17040;
+float *          ms_fTimeStep                   = (float *) 0xB7CB5C;

@@ -2,11 +2,12 @@
 #include <cstdio>
 #include "base.hh"
 #include "functions.hh"
+#include <vector>
 
 struct GlobalVar
 {
     short val;
-    GlobalVar (short val) { this->val = val; }
+    GlobalVar (short val) { this->val = val * 4; }
 };
 struct LocalVar
 {
@@ -17,8 +18,9 @@ struct LocalVar
 /*******************************************************/
 class Scrpt
 {
-    unsigned char *data;
-    int            offset;
+    unsigned char *      data;
+    int                  offset;
+    std::vector<int *>   savedParams;
 
     void Append (const void *bytes, int size);
 
@@ -38,7 +40,10 @@ public:
     void operator<< (float n);
     void operator<< (GlobalVar n);
     void operator<< (LocalVar n);
+    void operator<< (int* n);
     void operator<< (const char *str);
+
+    void StoreParameters(CRunningScript* scr);
 
     /*******************************************************/
     template <typename T>
@@ -90,5 +95,6 @@ public:
         scr.m_pCurrentIP = scr.m_pBaseIP;
 
         scr.ProcessOneCommand ();
+        opcode.StoreParameters(&scr);
     }
 };

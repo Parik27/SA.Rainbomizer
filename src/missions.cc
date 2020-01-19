@@ -29,7 +29,8 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
     scr->CollectParameters (count);
     if (ScriptParams[0] >= START_MISSIONS && ScriptParams[0] <= END_MISSIONS)
         {
-            missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
+            if (missionRandomizer->mSkipMissionNumber != ScriptParams[0])
+                missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
 
             ScriptParams[0]
                 = missionRandomizer->GetRandomMission (ScriptParams[0]);
@@ -94,8 +95,9 @@ MissionRandomizer::GetRandomMission (int originalMission)
 bool
 MissionRandomizer::ShouldJump (CRunningScript *scr)
 {
-    const int OPCODE_END_THREAD = 78;
-    const int OPCODE_RETURN     = 81;
+    const int OPCODE_END_THREAD           = 78;
+    const int OPCODE_RETURN               = 81;
+    const int OPCODE_STORE_CAR_CHAR_IS_IN = 0xD9;
 
     int currentOffset = scr->m_pCurrentIP - scr->m_pBaseIP;
     if (currentOffset != this->mPrevOffset)
@@ -120,7 +122,18 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                     RestoreCityInfo (this->mCityInfo);
                     this->mRandomizedScript = nullptr;
                 }
-
+            else if (opCode == OPCODE_STORE_CAR_CHAR_IS_IN)
+                {
+                    // Put player in a random vehicle
+                    if(!FindPlayerVehicle())
+                    {
+                        Scrpt::CallOpcode (0xa5, "create_car", 567, 0.0f, 0.0f,
+                                           0.0f, GlobalVar (2197));
+                        Scrpt::CallOpcode (0x036A, "put_actor_in_car",
+                                           GlobalVar (3), ScriptSpace[2197]);
+                    }
+                }
+            
             this->mPrevOffset = currentOffset;
         }
     if (scr == this->mRandomizedScript)
@@ -229,24 +242,29 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
 void
 JumpOnMissionEnd ()
 {
-    static int addr = HookManager::GetOriginalCall ((void *) &JumpOnMissionEnd);
-    auto       missionRandomizer = MissionRandomizer::GetInstance ();
+    auto missionRandomizer = MissionRandomizer::GetInstance ();
 
     if (missionRandomizer->mRandomizedScript
         && missionRandomizer->ShouldJump (missionRandomizer->mRandomizedScript))
         missionRandomizer->MoveScriptToOriginalOffset (
             missionRandomizer->mRandomizedScript);
 
-    if (addr)
-        injector::cstd<void ()>::call (addr);
-    else
-        (*((int *) 0xA447F4))++;
+    HookManager::CallOriginalAndReturn<injector::cstd<void ()>, 0x469FB0> (
+        [] { (*((int *) 0xA447F4))++; });
 }
 
 /*******************************************************/
 void
 MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
 {
+    switch(this->mRandomizedMissionNumber)
+    {
+    case 36:
+        ScriptSpace[457] = 0;
+        if(!CRunningScripts::CheckForRunningScript("cesar"))
+            Scrpt::CallOpcode(0x4F, "create_thread", 64462);
+        break;
+    }
 }
 
 /*******************************************************/
@@ -318,9 +336,9 @@ StoreRandomizedScript (uint8_t *startIp)
 {
     auto missionRandomizer = MissionRandomizer::GetInstance ();
 
-    auto out = injector::cstd<CRunningScript *(uint8_t *)>::call (
-        HookManager::GetOriginalCall ((void *) &StoreRandomizedScript),
-        startIp);
+    auto out = HookManager::CallOriginalAndReturn<
+        injector::cstd<CRunningScript *(uint8_t *)>, 0x489A7A> (nullptr,
+                                                                startIp);
 
     if (missionRandomizer->mStoreNextMission)
         {

@@ -2,17 +2,14 @@
 
 class WeaponStatsRandomizer
 {
-	static WeaponStatsRandomizer *mInstance;
+    static WeaponStatsRandomizer *mInstance;
 
-	WeaponStatsRandomizer(){}
+    WeaponStatsRandomizer () {}
 
-	static void DestroyInstance();
+    static void DestroyInstance ();
 
 public:
-	static WeaponStatsRandomizer *GetInstance();
+    static WeaponStatsRandomizer *GetInstance ();
 
-	int RandomizeWeaponStats(int weaponId);
-
-	void Initialise();
+    void Initialise ();
 };
-

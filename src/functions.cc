@@ -626,10 +626,13 @@ random (int max)
     return random (0, max);
 }
 
-/******************************************************/
+/*******************************************************/
 float
-randomFloat(float min, float max){
-    return (min + static_cast <float> (random(RAND_MAX)) / (static_cast <float> (RAND_MAX / (max - min))));
+randomFloat (float min, float max)
+{
+    return (min
+            + static_cast<float> (random (RAND_MAX))
+                  / (static_cast<float> (RAND_MAX / (max - min))));
 }
 
 CStreamingInfo * ms_aInfoForModel               = (CStreamingInfo *) 0x8E4CC0;

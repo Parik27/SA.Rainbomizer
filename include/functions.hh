@@ -344,7 +344,10 @@ struct CVector
 struct CGenericGameStorage
 {
     static char *MakeValidSaveFileName (int saveNum);
+    static int   SaveDataToWorkBuffer (void *pSource, int size);
+    static int   LoadDataFromWorkBuffer (void *pSource, int size);
     static char  GenericSave ();
+    static int & length;
 };
 
 struct CStats
@@ -630,16 +633,16 @@ struct CRGBA
 struct CFont
 {
     static void SetOrientation (eFontAlignment alignment);
-    static void SetColor(CRGBA col);
-    static void SetAlphaFade(float alpha);
-    static void SetFontStyle(short style);
-    static void SetWrapx(float value);
-    static void SetDropShadowPosition(short value);
-    static void SetBackground(bool enable, bool includeWrap);
-    static void SetBackgroundColor(CRGBA col);
-    static void SetScaleForCurrentlanguage(float w, float h);
-    static void SetJustify(bool on);
-    static void PrintString(float x, float y, char *text);
+    static void SetColor (CRGBA col);
+    static void SetAlphaFade (float alpha);
+    static void SetFontStyle (short style);
+    static void SetWrapx (float value);
+    static void SetDropShadowPosition (short value);
+    static void SetBackground (bool enable, bool includeWrap);
+    static void SetBackgroundColor (CRGBA col);
+    static void SetScaleForCurrentlanguage (float w, float h);
+    static void SetJustify (bool on);
+    static void PrintString (float x, float y, char *text);
 };
 
 struct CRect
@@ -667,9 +670,9 @@ struct CEntity
 
 struct RsGlobalType
 {
-    char* appName;
-    int MaximumWidth;
-    int MaximumHeight;
+    char *appName;
+    int   MaximumWidth;
+    int   MaximumHeight;
 };
 
 template <typename T> struct ListItem_c
@@ -698,11 +701,11 @@ struct FxManager_c
     List_c<FxSystemBP_c> SystemBlueprints;
 };
 
-CVector  FindPlayerCoors (int playerId = -1);
-CVehicle* FindPlayerVehicle (int playerId = -1, bool bIncludeRemote = false);
-CPed *   FindPlayerPed (int playerId = -1);
-CEntity *FindPlayerEntity (int playerId = -1);
-float    Dist (CVector a, CVector b);
+CVector   FindPlayerCoors (int playerId = -1);
+CVehicle *FindPlayerVehicle (int playerId = -1, bool bIncludeRemote = false);
+CPed *    FindPlayerPed (int playerId = -1);
+CEntity * FindPlayerEntity (int playerId = -1);
+float     Dist (CVector a, CVector b);
 
 struct CGame
 {

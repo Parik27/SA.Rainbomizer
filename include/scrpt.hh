@@ -18,9 +18,9 @@ struct LocalVar
 /*******************************************************/
 class Scrpt
 {
-    unsigned char *      data;
-    int                  offset;
-    std::vector<int *>   savedParams;
+    unsigned char *    data;
+    int                offset;
+    std::vector<int *> savedParams;
 
     void Append (const void *bytes, int size);
 
@@ -40,10 +40,10 @@ public:
     void operator<< (float n);
     void operator<< (GlobalVar n);
     void operator<< (LocalVar n);
-    void operator<< (int* n);
+    void operator<< (int *n);
     void operator<< (const char *str);
 
-    void StoreParameters(CRunningScript* scr);
+    void StoreParameters (CRunningScript *scr);
 
     /*******************************************************/
     template <typename T>
@@ -95,6 +95,6 @@ public:
         scr.m_pCurrentIP = scr.m_pBaseIP;
 
         scr.ProcessOneCommand ();
-        opcode.StoreParameters(&scr);
+        opcode.StoreParameters (&scr);
     }
 };

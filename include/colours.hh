@@ -35,7 +35,7 @@ void __fastcall RandomizeVehicleColour (void *info, void *edx, uint8_t *prim,
                                         uint8_t *quat, int variation);
 int RandomizeColourTables ();
 
-CRGBA GetRainbowColour(int offset = 0);
+CRGBA GetRainbowColour (int offset = 0);
 
 class ColourRandomizer
 {

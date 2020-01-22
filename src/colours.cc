@@ -111,13 +111,14 @@ RandomizeFadeColour ()
 }
 
 /*******************************************************/
-CRGBA GetRainbowColour(int offset)
+CRGBA
+GetRainbowColour (int offset)
 {
-    int colour[3];
+    int    colour[3];
     double time = 1000.0 * clock () / CLOCKS_PER_SEC;
 
-    HSVtoRGB(int(time / 10 + offset) % 360, 0.7, 0.7, colour);
-    
+    HSVtoRGB (int (time / 10 + offset) % 360, 0.7, 0.7, colour);
+
     return {colour[0], colour[1], colour[2]};
 }
 
@@ -125,7 +126,7 @@ CRGBA GetRainbowColour(int offset)
 CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
                                     uint8_t g, uint8_t b, uint8_t a)
 {
-    static auto config = ConfigManager::GetInstance ()->GetConfigs ().colours;
+    static auto config   = ConfigManager::GetInstance ()->GetConfigs ().colours;
     static bool hueCycle = config.hueCycle;
     static bool crazyMode = config.crazyMode;
 

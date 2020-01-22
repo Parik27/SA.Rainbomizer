@@ -18,10 +18,10 @@ class AutoSave
     float mDisplayDrawPosY = 0;
 
     int mLastSave = 0;
-    
-    void DrawMessage(const char* text);
-    void HandleTransitions(float &counter, const float& target);
-    
+
+    void DrawMessage (const char *text);
+    void HandleTransitions (float &counter, const float &target);
+
     AutoSave (){};
     static void DestroyInstance ();
 
@@ -30,8 +30,8 @@ public:
     static AutoSave *GetInstance ();
 
     /// Draws the autosave message
-    void DrawAutosaveMessage();
-    
+    void DrawAutosaveMessage ();
+
     bool
     ShouldSave ()
     {
@@ -39,7 +39,7 @@ public:
     };
 
     void SetShouldSave (bool shouldSave);
-    
+
     /// Initialises Hooks/etc.
     void Initialise ();
 
@@ -48,7 +48,7 @@ public:
     {
         x = (x == -1) ? mDrawPosX : x;
         y = (y == -1) ? mDrawPosY : y;
-        
+
         if (this->mDrawPosX == -1 || this->mDrawPosY == -1)
             {
                 this->mDisplayDrawPosX = x;

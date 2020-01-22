@@ -17,7 +17,7 @@ Scrpt::~Scrpt () { delete[] data; }
 /*******************************************************/
 Scrpt::Scrpt (short opcodeId)
 {
-    this->data = new unsigned char[128];
+    this->data   = new unsigned char[128];
     this->offset = 0;
 
     Append (&opcodeId, sizeof (short));
@@ -38,17 +38,18 @@ Scrpt::operator<< (const char *str)
 
 /*******************************************************/
 void
-Scrpt::operator<< (int* ptr)
+Scrpt::operator<< (int *ptr)
 {
-    *this << LocalVar(this->savedParams.size());
-    this->savedParams.push_back(ptr);
+    *this << LocalVar (this->savedParams.size ());
+    this->savedParams.push_back (ptr);
 }
 
 /*******************************************************/
-void Scrpt::StoreParameters(CRunningScript* scr)
+void
+Scrpt::StoreParameters (CRunningScript *scr)
 {
     int j = 0;
-    for(auto i : savedParams)
+    for (auto i : savedParams)
         *i = scr->m_aLocalVars[j++];
 }
 

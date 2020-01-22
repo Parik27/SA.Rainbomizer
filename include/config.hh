@@ -208,6 +208,10 @@ struct MissionConfig : public BaseConfig
     bool enabled              = false;
     bool forcedMissionEnabled = false;
     int  forcedMissionID      = -1;
+    bool shufflingEnabled     = true;
+    int  shufflingSeed        = -1;
+    bool forceShufflingSeed   = false;
+
     void Read (std::shared_ptr<cpptoml::table> table);
 };
 

@@ -63,6 +63,9 @@ MissionConfig::Read (std::shared_ptr<cpptoml::table> table)
     CONFIG (table, enabled, "Enabled", bool);
     CONFIG (table, forcedMissionEnabled, "ForcedMissionEnabled", bool);
     CONFIG (table, forcedMissionID, "ForcedMissionID", int);
+    CONFIG (table, shufflingEnabled, "RandomizeOnce", bool);
+    CONFIG (table, shufflingSeed, "RandomizeOnceSeed", int);
+    CONFIG (table, forceShufflingSeed, "ForceRandomizeOnceSeed", bool);
 }
 
 /*******************************************************/

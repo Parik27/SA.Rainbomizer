@@ -630,9 +630,8 @@ random (int max)
 float
 randomFloat (float min, float max)
 {
-    return (min
-            + static_cast<float> (random (RAND_MAX))
-                  / (static_cast<float> (RAND_MAX / (max - min))));
+    std::uniform_real_distribution<float> dist{min, max};
+    return dist (rand_engine ());
 }
 
 CStreamingInfo * ms_aInfoForModel               = (CStreamingInfo *) 0x8E4CC0;
@@ -643,3 +642,4 @@ int *            ScriptSpace                    = (int *) 0xA49960;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
 CPool *          ms_pPedPool                    = (CPool *) 0xB74490;
 CRunningScript *&CRunningScripts::pActiveScript = *(CRunningScript **) 0xA8B42C;
+CWeaponInfo *    aWeaponInfos                   = (CWeaponInfo *) 0xC8AAB8;

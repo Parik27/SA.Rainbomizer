@@ -27,21 +27,26 @@
 // - Initialise car colour tables
 
 // Hooked Functions
+
+struct CRGBA;
+
 void __fastcall RandomizeVehicleColour (void *info, void *edx, uint8_t *prim,
                                         uint8_t *secn, uint8_t *tert,
                                         uint8_t *quat, int variation);
 int RandomizeColourTables ();
 
-class CarColRandomizer
-{
-    static CarColRandomizer *mInstance;
+CRGBA GetRainbowColour (int offset = 0);
 
-    CarColRandomizer (){};
+class ColourRandomizer
+{
+    static ColourRandomizer *mInstance;
+
+    ColourRandomizer (){};
     static void DestroyInstance ();
 
 public:
     /// Returns the static instance for CarColRandomizer.
-    static CarColRandomizer *GetInstance ();
+    static ColourRandomizer *GetInstance ();
 
     void Initialise ();
 };

@@ -41,6 +41,8 @@ namespace injector
     template<class Ret, class ...Args>
     struct cstd<Ret(Args...)>
     {
+        typedef Ret result_type;
+        
         // Call function at @p returning @Ret with args @Args
         static Ret call(memory_pointer_tr p, Args... a)
         {
@@ -61,6 +63,8 @@ namespace injector
     template<class Ret, class ...Args>
     struct stdcall<Ret(Args...)>
     {
+        typedef Ret result_type;
+        
         // Call function at @p returning @Ret with args @Args
         static Ret call(memory_pointer_tr p, Args... a)
         {
@@ -81,6 +85,8 @@ namespace injector
     template<class Ret, class ...Args>
     struct fastcall<Ret(Args...)>
     {
+        typedef Ret result_type;
+        
         // Call function at @p returning @Ret with args @Args
         static Ret call(memory_pointer_tr p, Args... a)
         {
@@ -101,6 +107,8 @@ namespace injector
     template<class Ret, class ...Args>
     struct thiscall<Ret(Args...)>
     {
+        typedef Ret result_type;
+        
         // Call function at @p returning @Ret with args @Args
         static Ret call(memory_pointer_tr p, Args... a)
         {

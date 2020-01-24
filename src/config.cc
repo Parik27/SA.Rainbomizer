@@ -63,6 +63,9 @@ MissionConfig::Read (std::shared_ptr<cpptoml::table> table)
     CONFIG (table, enabled, "Enabled", bool);
     CONFIG (table, forcedMissionEnabled, "ForcedMissionEnabled", bool);
     CONFIG (table, forcedMissionID, "ForcedMissionID", int);
+    CONFIG (table, shufflingEnabled, "RandomizeOnce", bool);
+    CONFIG (table, shufflingSeed, "RandomizeOnceSeed", int);
+    CONFIG (table, forceShufflingSeed, "ForceRandomizeOnceSeed", bool);
 }
 
 /*******************************************************/
@@ -199,7 +202,7 @@ TrafficConfig::Read (std::shared_ptr<cpptoml::table> table)
 
 /*******************************************************/
 void
-CarColConfig::Read (std::shared_ptr<cpptoml::table> table)
+ColourConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
     if (!table)
         return;
@@ -438,7 +441,7 @@ ConfigManager::Initialise (const std::string &file)
 
     mConfigs.general.Read (config);
     mConfigs.traffic.Read (config->get_table ("TrafficRandomizer"));
-    mConfigs.carcol.Read (config->get_table ("CarColRandomizer"));
+    mConfigs.colours.Read (config->get_table ("ColourRandomizer"));
     mConfigs.policeHeli.Read (config->get_table ("PoliceHeliRandomizer"));
     mConfigs.cheat.Read (config->get_table ("CheatRandomizer"));
     mConfigs.handling.Read (config->get_table ("HandlingRandomizer"));

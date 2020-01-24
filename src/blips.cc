@@ -33,6 +33,17 @@ RandomizeBlipsOnStart ()
 
 /*******************************************************/
 void
+FixLegendCrash (float x, float y, char *text)
+{
+    if (int (text) < 0x2000)
+        text = (char *) "Boohoo";
+
+    HookManager::CallOriginal<injector::cstd<void (float, float, char *)>,
+                              0x582DEE> (x, y, text);
+}
+
+/*******************************************************/
+void
 BlipRandomizer::Initialise ()
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().blips;
@@ -40,7 +51,8 @@ BlipRandomizer::Initialise ()
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised BlipRandomizer");
-    RegisterHooks ({{HOOK_CALL, 0x5D1948, (void *) RandomizeBlipsOnStart}});
+    RegisterHooks ({{HOOK_CALL, 0x5D1948, (void *) RandomizeBlipsOnStart},
+                    {HOOK_CALL, 0x582DEE, (void *) FixLegendCrash}});
     for (auto i : {0x444403, 0x47F7FE, 0x48BCA8, 0x48DBE1, 0x5775DD})
         injector::MakeCALL (i, (void *) RandomizeBlipSprite);
 }

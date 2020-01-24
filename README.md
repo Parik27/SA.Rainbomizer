@@ -7,15 +7,21 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 ## Features 🌈
 
 - **Traffic Randomizer**: Randomizes cars that spawn on traffic including law enforcement vehicles.
-- **Car Col Randomizer**: Randomizes the colours that cars can spawn in. This includes 128 colours hue cycle.
+- **Parked Car Randomizer**: Randomizes cars which are found parked around the map including airplanes at airports with entirely random spawns.
+- **Script Vehicle Randomizer**: Randomizes the vehicles you are given in missions. The randomizer makes sure that you get vehicles that are usable for the mission.
+- **(NEW) Colour Randomizer**: Randomizes the colours of various in-game elements, including cars, the HUD, and fades. Includes 128 colours hue cycle. The intensity of this randomizer can be modified extensively in the configuration file.
+- **(NEW) Mission Randomizer**: Randomizes which mission is started by each mission marker. When the randomized mission is complete, the game progresses as if you completed the original. Additional features include missions that take place in locked-out areas unlocking during the mission, the ability for the same mission marker to always give the same randomized mission, and the ability for the player to be teleported back to the original mission's end point upon mission completion.
+- **Weapons Randomizer**: Randomizes the weapons that are dropped/wielded by the player/enemies.
+- **Pickup Randomizer**: Randomizes weapon pickups scattered around the map, as well as the appearance of certain other types of pickups.
+- **Voice Line Randomizer**: Randomizes dialogues spoken by characters in missions. *(Requires original AudioEvents.txt)*
+- **(NEW) Cutscene Randomizer**: Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
+- **(NEW) Blip Randomizer**: Randomizes every radar blip on the map with a different icon.
+- **(NEW) Particle Randomizer**: Randomizes all of the game's particle effects.
 - **Police Helicopters Randomizer**: Randomizes the helicopters that the police spawn in with working spotlight and gun.
 - **Cheat Randomizer**: Randomizes which cheat activates when you enter a cheat.
-- **Parked Car Randomizer**: Randomizes cars which are found parked around the map including airplanes at airports with entirely random spawns.
 - **License Plate Randomizer**: Randomizes the license plates of vehicles to a random word.
-- **Voice Line Randomizer**: Randomizes dialogues spoken by characters in missions. *(Requires original AudioEvents.txt)*
-- **Script Vehicle Randomizer**: Randomizes the vehicles you are given in missions. The randomizer makes sure that you get vehicles that are usable for the mission.
-- **Weapons Randomizer**: Randomizes the weapons that are dropped/weilded by the player/enemies and also the pickups scattered around the map.
 - *(Experimental)* **Handling Randomizer**: Shuffles the handlings of vehicles.
+- *(Experimental)* **(NEW) Object Randomizer**: Randomizes objects spawned by mission scripts into other objects.
 
 ## Supported Versions 🌈
 

@@ -31,6 +31,7 @@ struct CVector;
 struct CBox;
 struct CColModel;
 struct CPed;
+struct CPool;
 
 enum eVehicleClass
 {
@@ -167,9 +168,18 @@ public:
     char  ProcessCommands0to99 (int opcode);
     void  UpdateCompareFlag (char flag);
     int   EndThread ();
+    char  ProcessOneCommand ();
+
+    void Init ();
 
     static void SetCharCoordinates (CPed *ped, CVector pos, bool bWarpGang,
                                     bool bOffset);
+};
+
+struct CIplStore
+{
+    static int    FindIplSlot (char *name);
+    static CPool *ms_pPool;
 };
 
 struct CRunningScripts
@@ -220,10 +230,27 @@ struct CText
     char  LoadMissionText (const char *table);
 };
 
+struct IplDef
+{
+    unsigned char __pad00[0x2D];
+    bool          field2D;
+    bool          m_bLoadRequest;
+    bool          m_bDisableDynamicStreaming;
+    bool          field30;
+    bool          field31;
+    unsigned char __pad32[2];
+};
+
 struct CPool
 {
-    void **m_pObjects;
-    void * GetAt (signed int handle, int size);
+    char **m_pObjects;
+
+    template <typename T>
+    T *
+    GetAt (signed int handle)
+    {
+        return (T *) (*this->m_pObjects + sizeof (T) * handle);
+    }
 };
 
 struct CPad
@@ -317,12 +344,16 @@ struct CVector
 struct CGenericGameStorage
 {
     static char *MakeValidSaveFileName (int saveNum);
+    static int   SaveDataToWorkBuffer (void *pSource, int size);
+    static int   LoadDataFromWorkBuffer (void *pSource, int size);
     static char  GenericSave ();
+    static int & length;
 };
 
 struct CStats
 {
-    static void IncrementStat (short id, float val);
+    static double GetStatValue (short id);
+    static void   IncrementStat (short id, float val);
 };
 
 struct CBox
@@ -609,6 +640,51 @@ struct cSimpleTransform
     float   m_fAngle;
 };
 
+enum eFontAlignment
+{
+    ALIGN_CENTRE,
+    ALIGN_LEFT,
+    ALIGN_RIGHT
+};
+
+struct CRGBA
+{
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a;
+    CRGBA (int r, int g, int b, int a = 255)
+    {
+        this->r = r;
+        this->g = g;
+        this->b = b;
+        this->a = a;
+    }
+};
+
+struct CFont
+{
+    static void SetOrientation (eFontAlignment alignment);
+    static void SetColor (CRGBA col);
+    static void SetAlphaFade (float alpha);
+    static void SetFontStyle (short style);
+    static void SetWrapx (float value);
+    static void SetDropShadowPosition (short value);
+    static void SetBackground (bool enable, bool includeWrap);
+    static void SetBackgroundColor (CRGBA col);
+    static void SetScaleForCurrentlanguage (float w, float h);
+    static void SetJustify (bool on);
+    static void PrintString (float x, float y, char *text);
+};
+
+struct CRect
+{
+    float left;
+    float bottom;
+    float right;
+    float top;
+};
+
 struct CMatrixLink
 {
     CMatrix matrix;
@@ -622,6 +698,13 @@ struct CEntity
 
     cSimpleTransform *GetPosition ();
     int               SetHeading (float heading);
+};
+
+struct RsGlobalType
+{
+    char *appName;
+    int   MaximumWidth;
+    int   MaximumHeight;
 };
 
 template <typename T> struct ListItem_c
@@ -650,10 +733,11 @@ struct FxManager_c
     List_c<FxSystemBP_c> SystemBlueprints;
 };
 
-CVector  FindPlayerCoors (int playerId = -1);
-CPed *   FindPlayerPed (int playerId = -1);
-CEntity *FindPlayerEntity (int playerId = -1);
-float    Dist (CVector a, CVector b);
+CVector   FindPlayerCoors (int playerId = -1);
+CVehicle *FindPlayerVehicle (int playerId = -1, bool bIncludeRemote = false);
+CPed *    FindPlayerPed (int playerId = -1);
+CEntity * FindPlayerEntity (int playerId = -1);
+float     Dist (CVector a, CVector b);
 
 struct CGame
 {
@@ -673,3 +757,5 @@ extern int *            ScriptParams;
 extern int *            ScriptSpace;
 extern CPool *          ms_pPedPool;
 extern CWeaponInfo *    aWeaponInfos;
+extern RsGlobalType *   RsGlobal;
+extern float *          ms_fTimeStep;

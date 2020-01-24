@@ -6,6 +6,8 @@
 #include "functions.hh"
 #include <algorithm>
 #include "config.hh"
+#include "scrpt.hh"
+#include "injector/calling.hpp"
 
 CutsceneRandomizer *CutsceneRandomizer::mInstance = nullptr;
 
@@ -41,6 +43,45 @@ CutsceneRandomizer::GetRandomModel (std::string model)
 
 /*******************************************************/
 void
+RandomizeCutsceneOffset (char *Str, char *format, float *x, float *y, float *z)
+{
+
+    auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
+
+    sscanf (Str, format, x, y, z);
+    COffset offset = cutsceneRandomizer->GetRandomOffset (*x, *y, *z);
+
+    if (offset.x == -1 && offset.interior == -1)
+        return;
+
+    *x = offset.x;
+    *y = offset.y;
+    *z = offset.z;
+
+    cutsceneRandomizer->originalLevel = injector::ReadMemory<int> (0x48B99C);
+
+    Scrpt::CallOpcode (0x4BB, "select_interior", offset.interior);
+}
+
+/*******************************************************/
+COffset
+CutsceneRandomizer::GetRandomOffset (float x, float y, float z)
+{
+    return mOffsets[random (mOffsets.size () - 1)];
+}
+
+// /*******************************************************/
+// void
+// RestoreCutsceneInterior ()
+// {
+//     auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
+//     Scrpt::CallOpcode (0x4BB, "select_interior",
+//                        cutsceneRandomizer->originalLevel);
+//     HookManager::CallOriginal<injector::cstd<void ()>, 0x48078A> ();
+// }
+
+/*******************************************************/
+void
 CutsceneRandomizer::Initialise ()
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().cutscenes;
@@ -66,8 +107,31 @@ CutsceneRandomizer::Initialise ()
     else
         return;
 
-    RegisterHooks (
-        {{HOOK_CALL, 0x5B0B30, (void *) &RandomizeCutsceneObject_2}});
+    FILE *offsetFile = fopen ("Cutscene_Locations.txt", "r");
+    if (offsetFile)
+        {
+            char line[512] = {0};
+            while (fgets (line, 512, offsetFile))
+                {
+                    if (strlen (line) < 2)
+                        continue;
+
+                    COffset offset;
+
+                    sscanf (line, " %f, %f, %f, %d, %d ", &offset.x, &offset.y,
+                            &offset.z, &offset.interior, &offset.extraCol);
+
+                    mOffsets.push_back (offset);
+                }
+        }
+    else
+        return;
+
+    RegisterHooks ({
+        {HOOK_CALL, 0x5B0B30, (void *) &RandomizeCutsceneObject_2},
+        {HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},
+        //{HOOK_CALL, 0x48078A, (void *) &RestoreCutsceneInterior}
+    });
     Logger::GetLogger ()->LogMessage ("Intialised CutsceneRandomizer");
 }
 

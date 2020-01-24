@@ -12,11 +12,14 @@
 #include "autosave.hh"
 #include "missions_data.hh"
 #include <stdexcept>
+#include <array>
+#include <random>
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 
-const int START_MISSIONS = 11;
-const int END_MISSIONS   = 112;
+const int START_MISSIONS     = 11;
+const int END_MISSIONS       = 112;
+const int UNLOCKED_CITY_STAT = 181;
 
 /*******************************************************/
 void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
@@ -27,7 +30,8 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
     scr->CollectParameters (count);
     if (ScriptParams[0] >= START_MISSIONS && ScriptParams[0] <= END_MISSIONS)
         {
-            missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
+            if (missionRandomizer->mSkipMissionNumber != ScriptParams[0])
+                missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
 
             ScriptParams[0]
                 = missionRandomizer->GetRandomMission (ScriptParams[0]);
@@ -44,14 +48,35 @@ MissionRandomizer::TeleportPlayerAfterMission ()
 {
     try
         {
-            Position pos = missionEndPos.at (mOriginalMissionNumber)[0];
+            int status   = GetStatusForTwoPartMissions (mOriginalMissionNumber);
+            Position pos = missionEndPos.at (mOriginalMissionNumber)[status];
             pos.z        = (mRandomizedMissionNumber == 80) ? 100 : pos.z;
+
             CRunningScript::SetCharCoordinates (FindPlayerPed (),
                                                 {pos.x, pos.y, pos.z}, 1, 1);
             FindPlayerEntity ()->SetHeading (pos.heading * 3.1415926 / 180.0);
         }
     catch (const std::out_of_range &e)
         {
+        }
+}
+
+/*******************************************************/
+int
+MissionRandomizer::GetStatusForTwoPartMissions (int index)
+{
+    switch (index)
+        {
+        // House Party
+        case 34: printf ("%d\n", ScriptSpace[455]); return ScriptSpace[455] > 3;
+
+        // Wu Zi Mu and Farewell My Love
+        case 48: return ScriptSpace[492] > 5;
+
+        // Jizzy
+        case 59: return ScriptSpace[545] > 1;
+
+        default: return 0;
         }
 }
 
@@ -75,28 +100,55 @@ MissionRandomizer::GetRandomMission (int originalMission)
     if (config.forcedMissionEnabled)
         return config.forcedMissionID;
 
-    const int MAX_RETRIES = 20;
-    for (int i = 0; i < MAX_RETRIES; i++)
+    if (config.shufflingEnabled)
         {
-            int randomMission = random (START_MISSIONS, END_MISSIONS);
-            if (std::find (std::begin (exceptions), std::end (exceptions),
-                           randomMission)
-                == std::end (exceptions))
-                return randomMission;
+            if (mShuffledOrder.count (originalMission))
+                {
+                    int index = GetStatusForTwoPartMissions (originalMission);
+                    if (mShuffledOrder[originalMission].size () <= index)
+                        {
+                            printf ("The value of originalMission: %d\n",
+                                    originalMission);
+                            printf ("The size of originalMission: %d\n",
+                                    mShuffledOrder[originalMission].size ());
+                            index = 0;
+                        }
+
+                    return mShuffledOrder[originalMission][index];
+                }
         }
 
-    return originalMission;
+    std::vector<uint8_t> missionList;
+    for (int i = START_MISSIONS; i < END_MISSIONS; i++)
+        {
+            if (std::find (std::begin (exceptions), std::end (exceptions), i)
+                != std::end (exceptions))
+                continue;
+
+            if (mSaveInfo.missionStatus[i])
+                missionList.push_back (i);
+        }
+    printf ("missionList Size: %d\n", missionList.size ());
+
+    if (missionList.size () == 0)
+        return originalMission;
+
+    return missionList[random (missionList.size () - 1)];
 }
 
 /*******************************************************/
 bool
 MissionRandomizer::ShouldJump (CRunningScript *scr)
 {
+    const int OPCODE_END_THREAD           = 78;
+    const int OPCODE_RETURN               = 81;
+    const int OPCODE_STORE_CAR_CHAR_IS_IN = 0xD9;
+
     int currentOffset = scr->m_pCurrentIP - scr->m_pBaseIP;
     if (currentOffset != this->mPrevOffset)
         {
             short opCode = *reinterpret_cast<uint16_t *> (scr->m_pCurrentIP);
-            if (opCode == 0x51 && mScriptReplaced)
+            if (opCode == OPCODE_RETURN && mScriptReplaced)
                 {
                     // Restore original base ip
                     scr->m_pBaseIP = mOriginalBaseIP;
@@ -105,9 +157,25 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                     memcpy ((int *) 0xA48960, this->mLocalVariables,
                             0x400 * sizeof (uint32_t));
 
-                    mScriptReplaced = false;
-
+                    mScriptReplaced         = false;
                     this->mRandomizedScript = nullptr;
+                }
+            else if (opCode == OPCODE_END_THREAD)
+                {
+                    RestoreCityInfo (this->mCityInfo);
+                    this->mRandomizedScript = nullptr;
+                }
+            else if (opCode == OPCODE_STORE_CAR_CHAR_IS_IN)
+                {
+                    // Put player in a random vehicle
+                    if (!FindPlayerVehicle ())
+                        {
+                            Scrpt::CallOpcode (0xa5, "create_car", 567, 0.0f,
+                                               0.0f, 0.0f, GlobalVar (2197));
+                            Scrpt::CallOpcode (0x036A, "put_actor_in_car",
+                                               GlobalVar (3),
+                                               ScriptSpace[2197]);
+                        }
                 }
 
             this->mPrevOffset = currentOffset;
@@ -192,8 +260,9 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
 {
     int *missionOffsets = (int *) 0xA444C8;
 
-    int baseOffset = missionOffsets[this->GetCorrectedMissionNo ()];
-    int offset     = threadFinishes[this->GetCorrectedMissionNo ()][0];
+    int baseOffset = missionOffsets[GetCorrectedMissionNo ()];
+    int status     = GetStatusForTwoPartMissions (mOriginalMissionNumber);
+    int offset     = threadFinishes[GetCorrectedMissionNo ()][status];
 
     FILE *scm = fopen (GetGameDirRelativePathA ("data/script/main.scm"), "rb");
     fseek (scm, baseOffset, SEEK_SET);
@@ -207,6 +276,9 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
 
     this->ApplyMissionSpecificFixes (this->mTempMissionData);
     this->TeleportPlayerAfterMission ();
+    RestoreCityInfo (this->mCityInfo);
+
+    mSaveInfo.missionStatus[mRandomizedMissionNumber]--;
 
     memcpy (this->mLocalVariables, (int *) 0xA48960, 0x400 * sizeof (uint32_t));
     memset ((int *) 0xA48960, 0, 0x400 * sizeof (uint32_t));
@@ -218,24 +290,91 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
 void
 JumpOnMissionEnd ()
 {
-    static int addr = HookManager::GetOriginalCall ((void *) &JumpOnMissionEnd);
-    auto       missionRandomizer = MissionRandomizer::GetInstance ();
+    auto missionRandomizer = MissionRandomizer::GetInstance ();
 
     if (missionRandomizer->mRandomizedScript
         && missionRandomizer->ShouldJump (missionRandomizer->mRandomizedScript))
         missionRandomizer->MoveScriptToOriginalOffset (
             missionRandomizer->mRandomizedScript);
 
-    if (addr)
-        injector::cstd<void ()>::call (addr);
-    else
-        (*((int *) 0xA447F4))++;
+    HookManager::CallOriginalAndReturn<injector::cstd<void ()>, 0x469FB0> (
+        [] { (*((int *) 0xA447F4))++; });
 }
 
 /*******************************************************/
 void
 MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
 {
+    switch (this->mRandomizedMissionNumber)
+        {
+        case 36:
+            ScriptSpace[457] = 0;
+            if (!CRunningScripts::CheckForRunningScript ("cesar"))
+                Scrpt::CallOpcode (0x4F, "create_thread", 64462);
+            break;
+        }
+}
+
+/*******************************************************/
+bool
+IsIPLEnabled (char *name)
+{
+    int     index = CIplStore::FindIplSlot (name);
+    IplDef *def   = CIplStore::ms_pPool->GetAt<IplDef> (index);
+    if (!def->field2D || !def->m_bDisableDynamicStreaming)
+        return false;
+
+    return true;
+}
+
+/*******************************************************/
+void
+MissionRandomizer::StoreCityInfo ()
+{
+    this->mCityInfo.citiesUnlocked = CStats::GetStatValue (UNLOCKED_CITY_STAT);
+    this->mCityInfo.LVBarriers     = IsIPLEnabled ((char *) "BARRIERS2");
+    this->mCityInfo.SFBarriers     = IsIPLEnabled ((char *) "BARRIERS1");
+}
+
+/*******************************************************/
+void
+MissionRandomizer::RestoreCityInfo (const CitiesInfo &info)
+{
+    printf ("%d -> %d", info.citiesUnlocked, info.citiesUnlocked);
+    this->mCurrentCitiesUnlocked = info.citiesUnlocked;
+
+    static auto handleBridge = [] (bool bridge, const char *id) {
+        if (bridge)
+            Scrpt::CallOpcode (0x776, "create_objects", id);
+        else
+            Scrpt::CallOpcode (0x777, "remove_objects", id);
+    };
+
+    handleBridge (info.LVBarriers, "BARRIERS2");
+    handleBridge (info.SFBarriers, "BARRIERS1");
+}
+
+/*******************************************************/
+void
+MissionRandomizer::UnlockCitiesBasedOnMissionID (int missionId)
+{
+    static std::array<std::pair<int, CitiesInfo>, 4> cities
+        = {{{92, {3, false, false}},
+            {63, {2, false, false}},
+            {38, {1, false, true}},
+            {0, {0, true, true}}}};
+
+    if (!this->mRandomizedScript)
+        StoreCityInfo ();
+
+    for (auto i : cities)
+        {
+            if (i.first < missionId)
+                {
+                    RestoreCityInfo (i.second);
+                    return;
+                }
+        }
 }
 
 /*******************************************************/
@@ -244,17 +383,107 @@ StoreRandomizedScript (uint8_t *startIp)
 {
     auto missionRandomizer = MissionRandomizer::GetInstance ();
 
-    auto out = injector::cstd<CRunningScript *(uint8_t *)>::call (
-        HookManager::GetOriginalCall ((void *) &StoreRandomizedScript),
-        startIp);
+    auto out = HookManager::CallOriginalAndReturn<
+        injector::cstd<CRunningScript *(uint8_t *)>, 0x489A7A> (nullptr,
+                                                                startIp);
 
     if (missionRandomizer->mStoreNextMission)
-        missionRandomizer->mRandomizedScript = out;
+        {
+            missionRandomizer->ApplyMissionStartSpecificFixes (startIp);
+            missionRandomizer->UnlockCitiesBasedOnMissionID (
+                missionRandomizer->mRandomizedMissionNumber);
 
-    missionRandomizer->ApplyMissionStartSpecificFixes (startIp);
+            missionRandomizer->mRandomizedScript = out;
+        }
 
     missionRandomizer->mStoreNextMission = false;
     return out;
+}
+
+/*******************************************************/
+float
+UnlockCities (int statsId)
+{
+    auto missionRandomizer = MissionRandomizer::GetInstance ();
+    if (missionRandomizer->mRandomizedScript)
+        return missionRandomizer->mCurrentCitiesUnlocked;
+
+    return HookManager::CallOriginalAndReturn<injector::cstd<float (int)>,
+                                              0x4417F5> (3, 181);
+}
+
+/*******************************************************/
+void
+SaveMissionData ()
+{
+    // CTheScripts::Save
+    HookManager::CallOriginal<injector::cstd<void ()>, 0x5D15A6> ();
+    MissionRandomizer::GetInstance ()->Save ();
+}
+
+/*******************************************************/
+void
+LoadMissionData ()
+{
+    HookManager::CallOriginal<injector::cstd<void ()>, 0x5D19CE> ();
+    MissionRandomizer::GetInstance ()->Load ();
+}
+
+/*******************************************************/
+void
+InitAtNewGame ()
+{
+    HookManager::CallOriginal<injector::cstd<void ()>, 0x53BE76> ();
+    MissionRandomizer::GetInstance ()->ResetSaveData ();
+    MissionRandomizer::GetInstance ()->InitShuffledMissionOrder ();
+}
+
+/*******************************************************/
+void
+MissionRandomizer::ResetSaveData ()
+{
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
+    this->mRandomizedScript = nullptr;
+
+    mSaveInfo.randomSeed = config.shufflingSeed;
+    if (config.shufflingEnabled && config.shufflingSeed == -1)
+        mSaveInfo.randomSeed = random (INT_MAX);
+
+    for (auto &i : mSaveInfo.missionStatus.data)
+        i = 1;
+
+    mSaveInfo.missionStatus[34]++; // House Party
+    mSaveInfo.missionStatus[48]++; // Wu Zi Mu and Farewell My Love
+    mSaveInfo.missionStatus[59]++; // Jizzy
+}
+
+/*******************************************************/
+void
+MissionRandomizer::Save ()
+{
+    CGenericGameStorage::SaveDataToWorkBuffer (&mSaveInfo, sizeof (mSaveInfo));
+}
+
+/*******************************************************/
+void
+MissionRandomizer::Load ()
+{
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
+    MissionRandomizerSaveStructure saveInfo;
+    CGenericGameStorage::LoadDataFromWorkBuffer (&saveInfo, sizeof (saveInfo));
+
+    ResetSaveData ();
+    if (strncmp (saveInfo.signature, "RAINBOMIZER",
+                 sizeof (saveInfo.signature)))
+        return InitShuffledMissionOrder ();
+
+    mSaveInfo.randomSeed = saveInfo.randomSeed;
+    if (config.forceShufflingSeed && config.shufflingSeed != -1)
+        mSaveInfo.randomSeed = config.shufflingSeed;
+
+    InitShuffledMissionOrder ();
+
+    mSaveInfo = saveInfo;
 }
 
 /*******************************************************/
@@ -273,12 +502,64 @@ MissionRandomizer::Initialise ()
         mLocalVariables = new int[1024];
 
     RegisterHooks ({{HOOK_CALL, 0x489929, (void *) &RandomizeMissionToStart},
-                    {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript}});
+                    {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript},
+                    {HOOK_CALL, 0x441869, (void *) &UnlockCities},
+                    {HOOK_CALL, 0x4417F5, (void *) &UnlockCities},
+                    {HOOK_CALL, 0x5D15A6, (void *) &SaveMissionData},
+                    {HOOK_CALL, 0x5D19CE, (void *) &LoadMissionData}});
 
-    RegisterDelayedHooks ({{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd}});
+    RegisterDelayedHooks ({{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
+                           {HOOK_CALL, 0x53BE76, (void *) &InitAtNewGame}});
+
     RegisterDelayedFunction ([] { injector::MakeNOP (0x469fb5, 2); });
 
+    this->ResetSaveData ();
+    this->InitShuffledMissionOrder ();
+
     Logger::GetLogger ()->LogMessage ("Intialised MissionRandomizer");
+}
+
+/*******************************************************/
+void
+MissionRandomizer::InitShuffledMissionOrder ()
+{
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
+    mShuffledOrder.clear ();
+    if (!config.shufflingEnabled)
+        return;
+
+    std::mt19937 engine{mSaveInfo.randomSeed};
+
+    std::vector<uint8_t> remainingMissions;
+    int                  index = START_MISSIONS;
+    for (auto i : mSaveInfo.missionStatus.data)
+        {
+            for (int j = 0; j < i; j++)
+                remainingMissions.push_back (index);
+            index++;
+        }
+
+    index = START_MISSIONS;
+    for (auto i : mSaveInfo.missionStatus.data)
+        {
+            printf ("Index: %d, Size: %d\n", index, i);
+            for (int j = 0; j < i; j++)
+                {
+                    if (remainingMissions.size () <= 0)
+                        continue;
+
+                    std::uniform_int_distribution<unsigned int> dist{
+                        0, remainingMissions.size () - 1};
+
+                    auto randomMission = dist (engine);
+                    mShuffledOrder[index].push_back (
+                        remainingMissions[randomMission]);
+
+                    remainingMissions.erase (remainingMissions.begin ()
+                                             + randomMission);
+                }
+            index++;
+        }
 }
 
 /*******************************************************/

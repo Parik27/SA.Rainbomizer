@@ -107,7 +107,7 @@ struct TrafficConfig : public BaseConfig
 };
 
 /*******************************************************/
-struct CarColConfig : public BaseConfig
+struct ColourConfig : public BaseConfig
 {
 
     std::vector<int64_t> exceptions = {0, 1};
@@ -208,6 +208,10 @@ struct MissionConfig : public BaseConfig
     bool enabled              = false;
     bool forcedMissionEnabled = false;
     int  forcedMissionID      = -1;
+    bool shufflingEnabled     = true;
+    int  shufflingSeed        = -1;
+    bool forceShufflingSeed   = false;
+
     void Read (std::shared_ptr<cpptoml::table> table);
 };
 
@@ -248,7 +252,7 @@ struct Configs
 {
     GeneralConfig       general;
     TrafficConfig       traffic;
-    CarColConfig        carcol;
+    ColourConfig        colours;
     PoliceHeliConfig    policeHeli;
     CheatConfig         cheat;
     HandlingConfig      handling;

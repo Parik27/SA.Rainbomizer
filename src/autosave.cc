@@ -5,6 +5,10 @@
 #include "functions.hh"
 #include "config.hh"
 #include "injector/injector.hpp"
+#include "injector/calling.hpp"
+#include "colours.hh"
+#include <cmath>
+#include <ctime>
 
 AutoSave *AutoSave::mInstance = nullptr;
 
@@ -60,6 +64,128 @@ char *__fastcall SetShouldSaveGlobalVars (CRunningScript *scr, void *edx,
 
 /*******************************************************/
 void
+DrawAutosaveMessage ()
+{
+    HookManager::CallOriginal<injector::cstd<void ()>, 0x58FCFA> ();
+    AutoSave::GetInstance ()->DrawAutosaveMessage ();
+}
+
+/*******************************************************/
+inline float
+CalculateScreenOffsetX (float value, float width = 1600)
+{
+    return value / width * RsGlobal->MaximumWidth;
+}
+
+/*******************************************************/
+inline float
+CalculateScreenOffsetY (float value, float height = 900)
+{
+    return value / height * RsGlobal->MaximumHeight;
+}
+
+/*******************************************************/
+void
+AutoSave::DrawMessage (const char *text)
+{
+    CFont::SetOrientation (ALIGN_LEFT);
+    CFont::SetJustify (0);
+    CFont::SetFontStyle (1);
+    CFont::SetScaleForCurrentlanguage (CalculateScreenOffsetX (1),
+                                       CalculateScreenOffsetY (1.5));
+    CFont::SetBackground (true, true);
+    CFont::SetDropShadowPosition (0);
+    CFont::SetWrapx (mDisplayDrawPosX + CalculateScreenOffsetX (500));
+    CFont::SetAlphaFade (255);
+    CFont::SetBackgroundColor (GetRainbowColour ());
+    CFont::SetColor ({00, 0, 0, 255});
+    CFont::PrintString (this->mDisplayDrawPosX, this->mDisplayDrawPosY,
+                        (char *) text);
+}
+
+/*******************************************************/
+void
+AutoSave::HandleTransitions (float &counter, const float &target)
+{
+    if (int (target) != int (counter))
+        {
+            float offset = *ms_fTimeStep;
+            offset *= (target - counter) / 10.0f;
+            counter += offset;
+        }
+}
+
+/*******************************************************/
+void
+AutoSave::DrawAutosaveMessage ()
+{
+    const int MESSAGE_DURATION = 5;
+
+    DrawMessage ("Autosave Complete");
+
+    if (!mLastSave || time (nullptr) - mLastSave > MESSAGE_DURATION)
+        {
+            SetDrawXY (CalculateScreenOffsetX (-600), -1);
+            mLastSave = 0;
+        }
+    else
+        SetDrawXY (CalculateScreenOffsetX (64), -1);
+
+    HandleTransitions (mDisplayDrawPosX, mDrawPosX);
+    HandleTransitions (mDisplayDrawPosY, mDrawPosY);
+
+    SetDrawXY (-1, RsGlobal->MaximumHeight - CalculateScreenOffsetY (64));
+}
+
+/*******************************************************/
+
+void
+AutoSave::SetShouldSave (bool shouldSave)
+{
+    if (!shouldSave)
+        mLastSave = time (nullptr);
+
+    m_shouldSave = shouldSave;
+};
+
+/*******************************************************/
+int __fastcall HookDrawRadarRing (void *sprite, void *edx, CRect *rect,
+                                  void *color)
+{
+    float offset = CalculateScreenOffsetY (48);
+    AutoSave::GetInstance ()->SetDrawXY (-1, rect->top - offset);
+
+    return HookManager::CallOriginalAndReturn<
+        injector::thiscall<int (void *, CRect *, void *)>, 0x58A823> (1, sprite,
+                                                                      rect,
+                                                                      color);
+}
+
+/*******************************************************/
+void
+HookDrawWideScreenBorders (CRect *rect, CRGBA *colour)
+{
+    float offset = CalculateScreenOffsetY (48);
+    AutoSave::GetInstance ()->SetDrawXY (-1, rect->bottom - offset);
+
+    HookManager::CallOriginal<injector::cstd<void (CRect *, CRGBA *)>,
+                              0x514947> (rect, colour);
+}
+
+/*******************************************************/
+void __stdcall HookDrawVitals (CRect *rect, char *title, char fadeState,
+                               CRGBA rgba, int a5, char a6)
+{
+    float offset = CalculateScreenOffsetY (78);
+    AutoSave::GetInstance ()->SetDrawXY (-1, rect->top - offset);
+
+    HookManager::CallOriginal<
+        injector::stdcall<void (CRect *, char *, char, CRGBA, int, char)>,
+        0x589808> (rect, title, fadeState, rgba, a5, a6);
+}
+
+/*******************************************************/
+void
 AutoSave::Initialise ()
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
@@ -70,6 +196,13 @@ AutoSave::Initialise ()
     RegisterHooks (
         {{HOOK_CALL, 0x480D11, (void *) &::SetShouldSave},
          {HOOK_CALL, 0x465FC3, (void *) &::SetShouldSaveGlobalVars}});
+
+    RegisterDelayedHooks (
+        {{HOOK_CALL, 0x58FCFA, (void *) &::DrawAutosaveMessage},
+         {HOOK_CALL, 0x58A823, (void *) &HookDrawRadarRing},
+         {HOOK_CALL, 0x514947, (void *) &HookDrawWideScreenBorders},
+         {HOOK_CALL, 0x589808, (void *) &HookDrawVitals},
+         {HOOK_CALL, 0x5898B2, (void *) &HookDrawVitals}});
 
     Logger::GetLogger ()->LogMessage ("Intialised AutoSave");
 }

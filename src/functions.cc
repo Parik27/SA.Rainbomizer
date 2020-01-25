@@ -745,6 +745,14 @@ random (int max)
     return random (0, max);
 }
 
+/*******************************************************/
+float
+randomFloat (float min, float max)
+{
+    std::uniform_real_distribution<float> dist{min, max};
+    return dist (rand_engine ());
+}
+
 CStreamingInfo * ms_aInfoForModel               = (CStreamingInfo *) 0x8E4CC0;
 RwRGBA *         ms_vehicleColourTable          = (RwRGBA *) 0xB4E480;
 CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;
@@ -753,6 +761,7 @@ int *            ScriptSpace                    = (int *) 0xA49960;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
 CPool *          ms_pPedPool                    = (CPool *) 0xB74490;
 CRunningScript *&CRunningScripts::pActiveScript = *(CRunningScript **) 0xA8B42C;
+CWeaponInfo *    aWeaponInfos                   = (CWeaponInfo *) 0xC8AAB8;
 CPool *          CIplStore::ms_pPool            = (CPool *) 0x8E3FB0;
 RsGlobalType *   RsGlobal                       = (RsGlobalType *) 0xC17040;
 float *          ms_fTimeStep                   = (float *) 0xB7CB5C;

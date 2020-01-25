@@ -456,6 +456,7 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.blips.Read (config->get_table ("BlipsRandomizer"));
     mConfigs.particles.Read (config->get_table ("ParticleRandomizer"));
     mConfigs.cutscenes.Read (config->get_table ("CutsceneRandomizer"));
+    mConfigs.weaponStats.Read(config -> get_table ("WeaponStatsRandomizer")); 
 }
 
 /*******************************************************/

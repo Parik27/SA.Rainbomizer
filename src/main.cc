@@ -39,6 +39,7 @@
 #include "cutscenes.hh"
 #include "particles.hh"
 #include "blips.hh"
+#include "weaponstats.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -88,6 +89,7 @@ public:
         CutsceneRandomizer::GetInstance ()->Initialise ();
         ParticleRandomizer::GetInstance ()->Initialise ();
         BlipRandomizer::GetInstance ()->Initialise ();
+        WeaponStatsRandomizer::GetInstance () -> Initialise();
 
         AutoSave::GetInstance ()->Initialise ();
     }

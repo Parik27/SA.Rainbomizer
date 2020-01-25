@@ -117,6 +117,10 @@ Enabled = true
 RandomizeFixedSpawns = true
 RandomizeRandomSpawns = true
 
+########################################################
+[WeaponStatsRandomizer]
+Enabled = false
+
 #######################################################
 [MissionRandomizer]
 

@@ -74,3 +74,5 @@ More information about how to configure specific randomizers is provided in the 
 You can contribute to the project by reporting any crashes/issues you encounter in the [Issues](https://github.com/Zarig/Rainbomizer/issues) section of the repository
 
 Pull requests are welcome but are required to follow the current style used in the project.
+
+You can also keep up with or contribute to development as it happens by [joining the linked Discord](http://discord.gg/3dRXnjC) and following the #rainbomizer-and-coding channel.

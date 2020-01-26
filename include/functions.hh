@@ -503,6 +503,38 @@ public:
     float             m_fCurrentSpeed;
 };
 
+struct CWeaponInfo
+{
+public:
+    unsigned int m_eWeaponFire;
+    float        m_fTargetingRange;
+    float        m_fFiringRange;
+    long         m_nModel1;
+    long         m_nModel2;
+    unsigned int m_nWeaponSlot;
+    unsigned int m_nFlags;
+    unsigned int m_nAssocGroupId;
+    short        m_nAmmoClipSize;
+    short        m_nDamage;
+    CVector      m_vecFireOffset;
+    unsigned int m_nSkillLevel;
+    unsigned int m_nRequiredStatValue;
+    float        m_fAccuracy;
+    float        m_fMoveSpeed;
+    float        m_fAnimLoopStart;
+    float        m_fAnimLoopEnd;
+    float        m_fAnimFrameFire;
+    float        m_fAnim2LoopStart;
+    float        m_fAnim2LoopEnd;
+    float        m_fAnim2FrameFire;
+    float        m_fAnimBreakout;
+    float        m_fSpeed;
+    float        m_fRadius;
+    float        m_fLifeSpan;
+    float        m_fSpread;
+    int          m_nUndefined;
+};
+
 struct tHandlingData
 {
     int           m_nVehicleId;
@@ -714,8 +746,9 @@ struct CGame
 
 CMatrix *RwFrameGetLTM (void *frame);
 
-int random (int max);
-int random (int min, int max);
+int   random (int max);
+int   random (int min, int max);
+float randomFloat (float min, float max);
 
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
@@ -723,5 +756,6 @@ extern RwRGBA *         ms_vehicleColourTable;
 extern int *            ScriptParams;
 extern int *            ScriptSpace;
 extern CPool *          ms_pPedPool;
+extern CWeaponInfo *    aWeaponInfos;
 extern RsGlobalType *   RsGlobal;
 extern float *          ms_fTimeStep;

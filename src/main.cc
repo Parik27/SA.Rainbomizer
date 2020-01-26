@@ -40,6 +40,7 @@
 #include "particles.hh"
 #include "blips.hh"
 #include "credits.hh"
+#include "weaponstats.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -89,6 +90,7 @@ public:
         CutsceneRandomizer::GetInstance ()->Initialise ();
         ParticleRandomizer::GetInstance ()->Initialise ();
         BlipRandomizer::GetInstance ()->Initialise ();
+        WeaponStatsRandomizer::GetInstance () -> Initialise();
 
         CreditsExtender::Initialise();
         

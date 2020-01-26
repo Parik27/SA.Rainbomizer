@@ -242,6 +242,11 @@ struct BlipsConfig : public BaseConfig
 {
 };
 
+/******************************************************/
+struct WeaponStatsRandomizerConfig : public BaseConfig
+{
+};
+
 /*******************************************************/
 struct Configs
 {
@@ -262,6 +267,7 @@ struct Configs
     CutsceneConfig      cutscenes;
     BlipsConfig         blips;
     ParticlesConfig     particles;
+    WeaponStatsRandomizerConfig weaponStats;
 };
 
 /*******************************************************/

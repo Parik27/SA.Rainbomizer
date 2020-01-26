@@ -51,8 +51,7 @@ PrintCredits (float scaleX, float scaleY, char *text, int *position,
     PrintGroup (contribs, "Additional Contributors", position, currentOffset);
     PrintGroup (beta_testers, "Beta Testers", position, currentOffset);
 
-    PrintCreditText (1.6, 1.6, text, position, currentOffset,
-                     bHighlighted);
+    PrintCreditText (1.6, 1.6, text, position, currentOffset, bHighlighted);
 }
 
 /*******************************************************/

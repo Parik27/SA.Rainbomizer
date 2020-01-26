@@ -5,11 +5,11 @@
 
 /*******************************************************/
 void
-HighStakesStartFix(MissionRandomizer* rand)
+HighStakesStartFix (MissionRandomizer *rand)
 {
     rand->SetContinuedMission (35);
-    rand->SetCorrectedMissionStatusIndex(35, 36);
-    
+    rand->SetCorrectedMissionStatusIndex (35, 36);
+
     // Reset $457 once the mission ends
     rand->AddToMissionCleanup (
         [original_status (ScriptSpace[457])] {
@@ -31,7 +31,7 @@ HighStakesStartFix(MissionRandomizer* rand)
 
 /*******************************************************/
 void
-WuZiMuStartFix(MissionRandomizer* rand, bool fml = false)
+WuZiMuStartFix (MissionRandomizer *rand, bool fml = false)
 {
     rand->SetContinuedMission (35);
     rand->SetCorrectedMissionStatusIndex (35, 48);
@@ -61,9 +61,9 @@ WuZiMuStartFix(MissionRandomizer* rand, bool fml = false)
             return ScriptSpace[2196] != 1 && rand->mOriginalMissionNumber != 48;
         });
 
-    if(rand->mOriginalMissionNumber != 48)
+    if (rand->mOriginalMissionNumber != 48)
         ScriptSpace[492] = fml ? 5 : 0;
-    
+
     // Create the 'bcesar' thread
 
     if (!CRunningScripts::CheckForRunningScript ("bcesar"))
@@ -71,8 +71,8 @@ WuZiMuStartFix(MissionRandomizer* rand, bool fml = false)
             Scrpt::CallOpcode (0x4F, "create_thread", 66700);
             // Terminates cesar when the mission ends
             rand->AddToMissionCleanup (
-            [] { Scrpt::CallOpcode (0x459, "terminate_thread", "bcesar"); },
-            true, true, [] { return ScriptSpace[2196] != 1; });
+                [] { Scrpt::CallOpcode (0x459, "terminate_thread", "bcesar"); },
+                true, true, [] { return ScriptSpace[2196] != 1; });
         }
 }
 
@@ -86,15 +86,15 @@ MissionRandomizer::HandleGoSubAlternativeForMission (int index)
             Scrpt::CallOpcode (0x68D, "get_camera_pos_to", GlobalVar (69),
                                GlobalVar (70), GlobalVar (71));
             Scrpt::CallOpcode (0x9, "add_float", GlobalVar (71), 1.5f);
-            Scrpt::CallOpcode (0xa1, "Actor.PutAt", GlobalVar(3), GlobalVar (69),
-                               GlobalVar (70), GlobalVar (71));
+            Scrpt::CallOpcode (0xa1, "Actor.PutAt", GlobalVar (3),
+                               GlobalVar (69), GlobalVar (70), GlobalVar (71));
         }
 }
 
 /*******************************************************/
 void
 MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
-{    
+{
     switch (this->mRandomizedMissionNumber)
         {
         case 36: HighStakesStartFix (this); break;

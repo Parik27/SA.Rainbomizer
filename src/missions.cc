@@ -60,18 +60,18 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
     if (ScriptParams[0] >= START_MISSIONS && ScriptParams[0] <= END_MISSIONS)
         {
             if (missionRandomizer->mContinuedMission != ScriptParams[0])
-            {
-                missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
-                missionRandomizer->ClearMissionCleanup ();
-            }
+                {
+                    missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
+                    missionRandomizer->ClearMissionCleanup ();
+                }
             else
-                missionRandomizer->SetContinuedMission(-1);
+                missionRandomizer->SetContinuedMission (-1);
 
             ScriptParams[0]
                 = missionRandomizer->GetRandomMission (ScriptParams[0]);
 
             missionRandomizer->mRandomizedMissionNumber = ScriptParams[0];
-            if(ScriptParams[0] != missionRandomizer->mOriginalMissionNumber)
+            if (ScriptParams[0] != missionRandomizer->mOriginalMissionNumber)
                 missionRandomizer->TeleportPlayerBeforeMission ();
 
             missionRandomizer->mStoreNextMission = true;
@@ -214,13 +214,13 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                 }
             else if (opCode == OPCODE_END_THREAD)
                 {
-                    for(auto i : mMissionCleanups)
-                    {
-                        if (i.onMissionFailed
-                            && (!i.condition || i.condition ()))
-                            i.cleanup();
-                    }
-                    
+                    for (auto i : mMissionCleanups)
+                        {
+                            if (i.onMissionFailed
+                                && (!i.condition || i.condition ()))
+                                i.cleanup ();
+                        }
+
                     RestoreCityInfo (this->mCityInfo);
                     this->mRandomizedScript = nullptr;
                 }
@@ -236,18 +236,19 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                                                ScriptSpace[2197]);
                         }
                 }
-            else if(opCode == 0x735)
-            {
-                mRandomizedScript->m_pCurrentIP += 2;
-                mRandomizedScript->CollectParameters(1);
-                bool flag = false;
-                if(ScriptParams[0] == 83) {
-                    if(GetAsyncKeyState(VK_F4))
-                        flag = true;
-                }
+            else if (opCode == 0x735)
+                {
+                    mRandomizedScript->m_pCurrentIP += 2;
+                    mRandomizedScript->CollectParameters (1);
+                    bool flag = false;
+                    if (ScriptParams[0] == 83)
+                        {
+                            if (GetAsyncKeyState (VK_F4))
+                                flag = true;
+                        }
 
-                mRandomizedScript->UpdateCompareFlag(flag);
-            }
+                    mRandomizedScript->UpdateCompareFlag (flag);
+                }
 
             this->mPrevOffset = currentOffset;
         }
@@ -302,7 +303,7 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
 
     mSaveInfo.missionStatus[GetCorrectedMissionStatusIndex (
         mRandomizedMissionNumber)]--;
-    SetCorrectedMissionStatusIndex(-1, -1);
+    SetCorrectedMissionStatusIndex (-1, -1);
 
     memcpy (this->mLocalVariables, (int *) 0xA48960, 0x400 * sizeof (uint32_t));
     memset ((int *) 0xA48960, 0, 0x400 * sizeof (uint32_t));
@@ -312,10 +313,11 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
 
 /*******************************************************/
 int
-MissionRandomizer::GetCorrectedMissionStatusIndex(int index)
+MissionRandomizer::GetCorrectedMissionStatusIndex (int index)
 {
-    if(index != this->mCorrectedMissionStatus.first) return index;
-    return this->mCorrectedMissionStatus.second;    
+    if (index != this->mCorrectedMissionStatus.first)
+        return index;
+    return this->mCorrectedMissionStatus.second;
 }
 
 /*******************************************************/
@@ -324,31 +326,33 @@ JumpOnMissionEnd ()
 {
     auto missionRandomizer = MissionRandomizer::GetInstance ();
 
-    static int missionid = START_MISSIONS;
-    static bool pressed = false;
-    if(GetAsyncKeyState(0x43))
+    static int  missionid = START_MISSIONS;
+    static bool pressed   = false;
+    if (GetAsyncKeyState (0x43))
         pressed = true;
-    if(pressed && !GetAsyncKeyState(0x43))
-    {
-        pressed = false;
-        std::string message = "";
-
-        if(missionStartPos.count(missionid))
+    if (pressed && !GetAsyncKeyState (0x43))
         {
-            Teleport(missionStartPos[missionid]);
-            message = std::to_string(missionid);
-        }
-        else
-            message = "Start pos for ~g~" + std::to_string(missionid) + "~w~ doesn't exist";
-        
-        injector::cstd<void (const char *, bool, bool, bool)>::call (0x588BE0, message.c_str (), false, true, false);
+            pressed             = false;
+            std::string message = "";
 
-        missionid++;
-        if(missionid > END_MISSIONS)
-            missionid = START_MISSIONS;
-        //0x588F60
-    }
-    
+            if (missionStartPos.count (missionid))
+                {
+                    Teleport (missionStartPos[missionid]);
+                    message = std::to_string (missionid);
+                }
+            else
+                message = "Start pos for ~g~" + std::to_string (missionid)
+                          + "~w~ doesn't exist";
+
+            injector::cstd<void (const char *, bool, bool, bool)>::call (
+                0x588BE0, message.c_str (), false, true, false);
+
+            missionid++;
+            if (missionid > END_MISSIONS)
+                missionid = START_MISSIONS;
+            // 0x588F60
+        }
+
     if (missionRandomizer->mRandomizedScript
         && missionRandomizer->ShouldJump (missionRandomizer->mRandomizedScript))
         missionRandomizer->MoveScriptToOriginalOffset (
@@ -387,14 +391,14 @@ MissionRandomizer::RestoreCityInfo (const CitiesInfo &info,
     // Basically the expected variable is to handle missions
     // unlocking the cities, so that the mission cleanup doesn't re-lock the
     // cities that were unlocked by a storyline mission
-    
+
     CitiesInfo current;
     StoreCityInfo (current);
 
     if (!expected)
         expected = &current;
 
-    if(current.citiesUnlocked == expected->citiesUnlocked)
+    if (current.citiesUnlocked == expected->citiesUnlocked)
         this->mCurrentCitiesUnlocked = info.citiesUnlocked;
 
     static auto handleBridge = [] (bool bridge, const char *id) {
@@ -404,7 +408,7 @@ MissionRandomizer::RestoreCityInfo (const CitiesInfo &info,
             Scrpt::CallOpcode (0x777, "remove_objects", id);
     };
 
-    if(current.LVBarriers == expected->LVBarriers)
+    if (current.LVBarriers == expected->LVBarriers)
         handleBridge (info.LVBarriers, "BARRIERS2");
     if (current.SFBarriers == expected->SFBarriers)
         handleBridge (info.SFBarriers, "BARRIERS1");

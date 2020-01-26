@@ -250,23 +250,23 @@ struct WeaponStatsRandomizerConfig : public BaseConfig
 /*******************************************************/
 struct Configs
 {
-    GeneralConfig       general;
-    TrafficConfig       traffic;
-    ColourConfig        colours;
-    PoliceHeliConfig    policeHeli;
-    CheatConfig         cheat;
-    HandlingConfig      handling;
-    WeaponConfig        weapon;
-    PickupsConfig       pickups;
-    ParkedCarConfig     parkedCar;
-    LicensePlateConfig  licensePlate;
-    SoundsConfig        sounds;
-    ScriptVehicleConfig scriptVehicle;
-    MissionConfig       missions;
-    ObjectConfig        objects;
-    CutsceneConfig      cutscenes;
-    BlipsConfig         blips;
-    ParticlesConfig     particles;
+    GeneralConfig               general;
+    TrafficConfig               traffic;
+    ColourConfig                colours;
+    PoliceHeliConfig            policeHeli;
+    CheatConfig                 cheat;
+    HandlingConfig              handling;
+    WeaponConfig                weapon;
+    PickupsConfig               pickups;
+    ParkedCarConfig             parkedCar;
+    LicensePlateConfig          licensePlate;
+    SoundsConfig                sounds;
+    ScriptVehicleConfig         scriptVehicle;
+    MissionConfig               missions;
+    ObjectConfig                objects;
+    CutsceneConfig              cutscenes;
+    BlipsConfig                 blips;
+    ParticlesConfig             particles;
     WeaponStatsRandomizerConfig weaponStats;
 };
 

@@ -96,11 +96,11 @@ public:
         scr.m_pCurrentIP = scr.m_pBaseIP;
 
         static std::unique_ptr<int> originalScriptParams (new int[10]);
-        memcpy(originalScriptParams.get(), ScriptParams, 10 * sizeof(int));
+        memcpy (originalScriptParams.get (), ScriptParams, 10 * sizeof (int));
 
         scr.ProcessOneCommand ();
         opcode.StoreParameters (&scr);
 
-        memcpy(ScriptParams, originalScriptParams.get(), 10 * sizeof(int));
+        memcpy (ScriptParams, originalScriptParams.get (), 10 * sizeof (int));
     }
 };

@@ -2,5 +2,5 @@
 
 struct CreditsExtender
 {
-	static void Initialise();
+    static void Initialise ();
 };

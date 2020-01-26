@@ -65,7 +65,7 @@ class MissionRandomizer
     unsigned char *mTempMissionData = nullptr;
     int *          mLocalVariables  = nullptr;
     CitiesInfo     mCityInfo;
-    
+
     MissionRandomizerSaveStructure                mSaveInfo;
     std::unordered_map<int, std::vector<uint8_t>> mShuffledOrder;
     std::vector<MissionCleanup>                   mMissionCleanups;
@@ -79,7 +79,7 @@ class MissionRandomizer
     int  GetStatusForTwoPartMissions (int index);
     void HandleGoSubAlternativeForMission (int index);
 
-    int GetCorrectedMissionStatusIndex(int index);
+    int GetCorrectedMissionStatusIndex (int index);
 
 public:
     CRunningScript *    mRandomizedScript        = nullptr;

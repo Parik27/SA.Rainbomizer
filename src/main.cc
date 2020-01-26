@@ -90,10 +90,10 @@ public:
         CutsceneRandomizer::GetInstance ()->Initialise ();
         ParticleRandomizer::GetInstance ()->Initialise ();
         BlipRandomizer::GetInstance ()->Initialise ();
-        WeaponStatsRandomizer::GetInstance () -> Initialise();
+        WeaponStatsRandomizer::GetInstance ()->Initialise ();
 
-        CreditsExtender::Initialise();
-        
+        CreditsExtender::Initialise ();
+
         AutoSave::GetInstance ()->Initialise ();
     }
 

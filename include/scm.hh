@@ -100,7 +100,7 @@ public:
     {
         mSanchezDrivingOverride = newSanchez;
     };
-
+    
     /// Returns the static instance for ScriptVehicleRandomizer.
     static ScriptVehicleRandomizer *GetInstance ();
 

@@ -3,6 +3,7 @@
 #include "base.hh"
 #include "functions.hh"
 #include <vector>
+#include <memory>
 
 struct GlobalVar
 {
@@ -94,7 +95,12 @@ public:
         scr.m_pBaseIP    = opcode.GetData ();
         scr.m_pCurrentIP = scr.m_pBaseIP;
 
+        static std::unique_ptr<int> originalScriptParams (new int[10]);
+        memcpy(originalScriptParams.get(), ScriptParams, 10 * sizeof(int));
+
         scr.ProcessOneCommand ();
         opcode.StoreParameters (&scr);
+
+        memcpy(ScriptParams, originalScriptParams.get(), 10 * sizeof(int));
     }
 };

@@ -25,6 +25,12 @@
 Logger *    Logger::mInstance = nullptr;
 std::string Logger::mFileName = "rainbomizer.log.txt";
 
+#ifndef NDEBUG
+#define RAINBOMIZER_BUILD "Debug Build: " __DATE__ " " __TIME__
+#else
+#define RAINBOMIZER_BUILD "Build v2.0 - Alpha"
+#endif
+
 /*******************************************************/
 Logger::Logger ()
 {
@@ -36,6 +42,7 @@ Logger::Logger ()
     // Print initial message/time
     fprintf (mFile, "===========================================\n");
     fprintf (mFile, "%d\n", (int) time (NULL));
+    fprintf (mFile, "Rainbomizer Build: %s \n", RAINBOMIZER_BUILD);
     fprintf (mFile, "===========================================\n");
 }
 

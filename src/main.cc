@@ -39,6 +39,7 @@
 #include "cutscenes.hh"
 #include "particles.hh"
 #include "blips.hh"
+#include "credits.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -89,6 +90,8 @@ public:
         ParticleRandomizer::GetInstance ()->Initialise ();
         BlipRandomizer::GetInstance ()->Initialise ();
 
+        CreditsExtender::Initialise();
+        
         AutoSave::GetInstance ()->Initialise ();
     }
 

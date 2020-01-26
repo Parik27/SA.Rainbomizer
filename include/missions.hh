@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <cstring>
+#include <functional>
 
 struct CRunningScript;
 
@@ -43,6 +44,14 @@ struct MissionRandomizerSaveStructure
     }
 };
 
+struct MissionCleanup
+{
+    bool                   onMissionPassed;
+    bool                   onMissionFailed;
+    std::function<bool ()> condition;
+    std::function<void ()> cleanup;
+};
+
 class MissionRandomizer
 {
     static MissionRandomizer *mInstance;
@@ -56,24 +65,31 @@ class MissionRandomizer
     unsigned char *mTempMissionData = nullptr;
     int *          mLocalVariables  = nullptr;
     CitiesInfo     mCityInfo;
-
+    
     MissionRandomizerSaveStructure                mSaveInfo;
     std::unordered_map<int, std::vector<uint8_t>> mShuffledOrder;
+    std::vector<MissionCleanup>                   mMissionCleanups;
 
     void ApplyMissionSpecificFixes (unsigned char *data);
     void TeleportPlayerAfterMission ();
     int  GetCorrectedMissionNo ();
-    void StoreCityInfo ();
-    void RestoreCityInfo (const CitiesInfo &info);
+    void StoreCityInfo (CitiesInfo &out);
+    void RestoreCityInfo (const CitiesInfo &info,
+                          CitiesInfo *      expected = nullptr);
     int  GetStatusForTwoPartMissions (int index);
+    void HandleGoSubAlternativeForMission (int index);
+
+    int GetCorrectedMissionStatusIndex(int index);
 
 public:
-    CRunningScript *mRandomizedScript        = nullptr;
-    int             mRandomizedMissionNumber = -1;
-    int             mOriginalMissionNumber   = -1;
-    int             mSkipMissionNumber       = 0;
-    bool            mStoreNextMission        = false;
-    int             mCurrentCitiesUnlocked   = 0;
+    CRunningScript *    mRandomizedScript        = nullptr;
+    int                 mRandomizedMissionNumber = -1;
+    int                 mOriginalMissionNumber   = -1;
+    bool                mStoreNextMission        = false;
+    int                 mCurrentCitiesUnlocked   = 0;
+    int                 mContinuedMission        = -1;
+    int                 mSkipNextMission         = -1;
+    std::pair<int, int> mCorrectedMissionStatus  = {-1, -1};
 
     /// Returns the static instance for MissionRandomizer.
     static MissionRandomizer *GetInstance ();
@@ -87,6 +103,27 @@ public:
     /// Applies Mission Specific Fixes (start)
     void ApplyMissionStartSpecificFixes (unsigned char *data);
 
+    /// Sets continued mission
+    void
+    SetContinuedMission (int mission)
+    {
+        this->mContinuedMission = mission;
+    }
+
+    /// Sets the randomizer to skip the next mission with this index
+    void
+    SetSkippedMission (int mission)
+    {
+        this->mSkipNextMission = mission;
+    }
+
+    /// Sets the randomizer to use a different mission status
+    void
+    SetCorrectedMissionStatusIndex (int mission, int newStatus)
+    {
+        this->mCorrectedMissionStatus = {mission, newStatus};
+    }
+
     /// Returns a random mission
     int GetRandomMission (int originalMission);
 
@@ -98,9 +135,35 @@ public:
     /// the function name
     void UnlockCitiesBasedOnMissionID (int missionId);
 
+    void TeleportPlayerBeforeMission ();
+
     /// Reset save data
     void ResetSaveData ();
     void InitShuffledMissionOrder ();
+
+    /// Add to mission cleanup
+    void
+    AddToMissionCleanup (MissionCleanup cleanup)
+    {
+        mMissionCleanups.push_back (cleanup);
+    }
+
+    /// Add to mission cleanup
+    void
+    AddToMissionCleanup (std::function<void ()> function,
+                         bool                   onMissionPassed = true,
+                         bool                   onMissionFailed = true,
+                         std::function<bool ()> condition       = nullptr)
+    {
+        mMissionCleanups.push_back (
+            {onMissionPassed, onMissionFailed, condition, function});
+    }
+
+    void
+    ClearMissionCleanup ()
+    {
+        mMissionCleanups.clear ();
+    }
 
     void Load ();
     void Save ();

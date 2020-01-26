@@ -82,11 +82,10 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
 void
 MissionRandomizer::TeleportPlayerBeforeMission ()
 {
-    Position pos = missionStartPos[-1];
     if (missionStartPos.count (mRandomizedMissionNumber))
-        pos = missionStartPos[mRandomizedMissionNumber];
+        Teleport (missionStartPos[mRandomizedMissionNumber]);
 
-    Teleport (pos);
+    
 }
 
 /*******************************************************/
@@ -187,6 +186,8 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
     if (currentOffset != this->mPrevOffset)
         {
             short opCode = *reinterpret_cast<uint16_t *> (scr->m_pCurrentIP);
+            printf("%d - %x\n", currentOffset, opCode);
+            
             if (opCode == OPCODE_RETURN && mScriptReplaced)
                 {
                     // Restore original base ip
@@ -249,6 +250,15 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
 
                     mRandomizedScript->UpdateCompareFlag (flag);
                 }
+            else if (opCode == 0x1096)
+            {
+                mRandomizedScript->m_pCurrentIP += 2;
+                mRandomizedScript->CollectParameters (1);
+
+                mRandomizedScript->ProcessCommands0to99(0x4E);
+                
+                Scrpt::CallOpcode(0x417, "start_mission", ScriptParams[0]);
+            }
 
             this->mPrevOffset = currentOffset;
         }
@@ -328,6 +338,7 @@ JumpOnMissionEnd ()
 
     static int  missionid = START_MISSIONS;
     static bool pressed   = false;
+    
     if (GetAsyncKeyState (0x43))
         pressed = true;
     if (pressed && !GetAsyncKeyState (0x43))
@@ -560,7 +571,7 @@ MissionRandomizer::Initialise ()
         mTempMissionData = new unsigned char[69000];
     if (!mLocalVariables)
         mLocalVariables = new int[1024];
-
+    
     RegisterHooks ({{HOOK_CALL, 0x489929, (void *) &RandomizeMissionToStart},
                     {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript},
                     {HOOK_CALL, 0x441869, (void *) &UnlockCities},

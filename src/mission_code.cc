@@ -2,78 +2,41 @@
 #include "functions.hh"
 #include "scrpt.hh"
 #include "autosave.hh"
+#include "logger.hh"
 
 /*******************************************************/
 void
-HighStakesStartFix (MissionRandomizer *rand)
+InsertRaceJumpAt(unsigned char* data, int index)
 {
-    rand->SetContinuedMission (35);
-    rand->SetCorrectedMissionStatusIndex (35, 36);
-
-    // Reset $457 once the mission ends
-    rand->AddToMissionCleanup (
-        [original_status (ScriptSpace[457])] {
-            ScriptSpace[457] = (ScriptSpace[457] == 0) ? original_status : 1;
-        },
-        true, true, [] { return ScriptSpace[2336] != 1; });
-
-    ScriptSpace[457] = 0;
-    // Create the 'cesar' thread
-    if (!CRunningScripts::CheckForRunningScript ("cesar"))
-        {
-            Scrpt::CallOpcode (0x4F, "create_thread", 64462);
-            // Terminates cesar when the mission ends
-            rand->AddToMissionCleanup (
-                [] { Scrpt::CallOpcode (0x459, "terminate_thread", "cesar"); },
-                true, true, [] { return ScriptSpace[2336] != 1; });
-        }
+    data = Scrpt::CreateOpcode (0x004, "= const", data, GlobalVar (352), index);
+    data = Scrpt::CreateOpcode (0x004, "= const", data, GlobalVar (121), 0);
+    data = Scrpt::CreateOpcode (0x1096, "jump_to_mission", data, 35);
 }
 
 /*******************************************************/
 void
-WuZiMuStartFix (MissionRandomizer *rand, bool fml = false)
+HighStakesStartFix (MissionRandomizer *rand, unsigned char* data)
+{
+    rand->SetContinuedMission (35);
+    rand->SetCorrectedMissionStatusIndex (35, 36);
+
+    Scrpt::CreateOpcode (0x2, "jmp", data + 4999, -5008);
+
+    InsertRaceJumpAt (data + 5079, 0);
+}
+
+/*******************************************************/
+void
+WuZiMuStartFix (MissionRandomizer *rand, unsigned char *data, bool fml = false)
 {
     rand->SetContinuedMission (35);
     rand->SetCorrectedMissionStatusIndex (35, 48);
 
-    rand->AddToMissionCleanup (
-        [original (ScriptSpace[64])] {
-            if (ScriptSpace[64] - 10 == 1)
-                ScriptSpace[64] = original + 1;
-            else if (ScriptSpace[64] - 10 == 0)
-                ScriptSpace[64] = original;
-        },
-        true, true,
-        [rand] {
-            return ScriptSpace[2196] != 1 && rand->mOriginalMissionNumber != 48;
-        });
+    int offset = fml ? 76 : 2037;
+    Scrpt::CreateOpcode (0x002, "jmp", data + 54, -offset);
 
-    ScriptSpace[64] = 10;
-
-    // Reset $457 once the mission ends
-    rand->AddToMissionCleanup (
-        [original (ScriptSpace[492]), fml] {
-            if (ScriptSpace[492] == (fml ? 9 : 4))
-                ScriptSpace[492] = original;
-        },
-        true, true,
-        [rand] {
-            return ScriptSpace[2196] != 1 && rand->mOriginalMissionNumber != 48;
-        });
-
-    if (rand->mOriginalMissionNumber != 48)
-        ScriptSpace[492] = fml ? 5 : 0;
-
-    // Create the 'bcesar' thread
-
-    if (!CRunningScripts::CheckForRunningScript ("bcesar"))
-        {
-            Scrpt::CallOpcode (0x4F, "create_thread", 66700);
-            // Terminates cesar when the mission ends
-            rand->AddToMissionCleanup (
-                [] { Scrpt::CallOpcode (0x459, "terminate_thread", "bcesar"); },
-                true, true, [] { return ScriptSpace[2196] != 1; });
-        }
+    InsertRaceJumpAt (data + 315, 7);
+    InsertRaceJumpAt (data + 2208, 8);
 }
 
 /*******************************************************/
@@ -93,12 +56,25 @@ MissionRandomizer::HandleGoSubAlternativeForMission (int index)
 
 /*******************************************************/
 void
+JizzyStartFix (MissionRandomizer *rand, unsigned char *data, bool cutscene)
+{
+    int offset = (cutscene) ? 2896 : 2875;
+    Scrpt::CreateOpcode(0x2, "jmp", data + 2857, -offset);
+}
+
+/*******************************************************/
+void
 MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
 {
     switch (this->mRandomizedMissionNumber)
         {
-        case 36: HighStakesStartFix (this); break;
-        case 48: WuZiMuStartFix (this, mSaveInfo.missionStatus[48] == 1); break;
+        case 36: HighStakesStartFix (this, data); break;
+        case 48:
+            WuZiMuStartFix (this, data, mSaveInfo.missionStatus[48] == 2);
+            break;
+        case 59:
+            JizzyStartFix (this, data, mSaveInfo.missionStatus[59] == 2);
+            break;
         }
 }
 

@@ -74,8 +74,7 @@ class MissionRandomizer
     void TeleportPlayerAfterMission ();
     int  GetCorrectedMissionNo ();
     void StoreCityInfo (CitiesInfo &out);
-    void RestoreCityInfo (const CitiesInfo &info,
-                          CitiesInfo *      expected = nullptr);
+    void RestoreCityInfo (const CitiesInfo &info);
     int  GetStatusForTwoPartMissions (int index);
     void HandleGoSubAlternativeForMission (int index);
 
@@ -131,10 +130,10 @@ public:
     void MoveScriptToOriginalOffset (CRunningScript *src);
 
     /// Unlocks the cities based on the mission number
-    /// Why do I bother writing these documentations when all they do it restate
-    /// the function name
     void UnlockCitiesBasedOnMissionID (int missionId);
-
+    void SetGangTerritoriesForMission (int index);
+    void SetRiotModeForMission (int index);
+    
     void TeleportPlayerBeforeMission ();
 
     /// Reset save data

@@ -74,7 +74,8 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
             if (ScriptParams[0] != missionRandomizer->mOriginalMissionNumber)
                 missionRandomizer->TeleportPlayerBeforeMission ();
 
-            missionRandomizer->mStoreNextMission = true;
+            if(threadFinishes.count(ScriptParams[0]))
+                missionRandomizer->mStoreNextMission = true;
         }
 }
 
@@ -83,7 +84,12 @@ void
 MissionRandomizer::TeleportPlayerBeforeMission ()
 {
     if (missionStartPos.count (mRandomizedMissionNumber))
+    {
+        Logger::GetLogger ()->LogMessage (
+            "Teleporting player to the start of mission: " +
+            std::to_string (missionStartPos[mRandomizedMissionNumber].x));
         Teleport (missionStartPos[mRandomizedMissionNumber]);
+    }
 
     
 }
@@ -99,6 +105,9 @@ MissionRandomizer::TeleportPlayerAfterMission ()
             pos.z        = (mRandomizedMissionNumber == 80) ? 100 : pos.z;
 
             Teleport (pos);
+            Logger::GetLogger ()->LogMessage (
+            "Teleporting player to the end of mission: " +
+            std::to_string (missionStartPos[mOriginalMissionNumber].x));
         }
     catch (const std::out_of_range &e)
         {
@@ -186,7 +195,6 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
     if (currentOffset != this->mPrevOffset)
         {
             short opCode = *reinterpret_cast<uint16_t *> (scr->m_pCurrentIP);
-            printf("%d - %x\n", currentOffset, opCode);
             
             if (opCode == OPCODE_RETURN && mScriptReplaced)
                 {
@@ -223,9 +231,12 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                         }
 
                     RestoreCityInfo (this->mCityInfo);
+                    SetGangTerritoriesForMission (mOriginalMissionNumber);
+                    SetRiotModeForMission (mOriginalMissionNumber);
                     this->mRandomizedScript = nullptr;
                 }
-            else if (opCode == OPCODE_STORE_CAR_CHAR_IS_IN)
+            else if (opCode == OPCODE_STORE_CAR_CHAR_IS_IN &&
+                mRandomizedMissionNumber == 36)
                 {
                     // Put player in a random vehicle
                     if (!FindPlayerVehicle ())
@@ -297,6 +308,8 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
     int status     = GetStatusForTwoPartMissions (mOriginalMissionNumber);
     int offset     = threadFinishes[GetCorrectedMissionNo ()][status];
 
+    Logger::GetLogger ()->LogMessage ("Jumping to original script cleanup");
+    
     FILE *scm = fopen (GetGameDirRelativePathA ("data/script/main.scm"), "rb");
     fseek (scm, baseOffset, SEEK_SET);
 
@@ -310,6 +323,8 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
     this->ApplyMissionSpecificFixes (this->mTempMissionData);
     this->TeleportPlayerAfterMission ();
     RestoreCityInfo (this->mCityInfo);
+    this->SetGangTerritoriesForMission (this->mOriginalMissionNumber);
+    this->SetRiotModeForMission (this->mOriginalMissionNumber);
 
     mSaveInfo.missionStatus[GetCorrectedMissionStatusIndex (
         mRandomizedMissionNumber)]--;
@@ -396,21 +411,9 @@ MissionRandomizer::StoreCityInfo (CitiesInfo &out)
 
 /*******************************************************/
 void
-MissionRandomizer::RestoreCityInfo (const CitiesInfo &info,
-                                    CitiesInfo *      expected)
+MissionRandomizer::RestoreCityInfo (const CitiesInfo &info)
 {
-    // Basically the expected variable is to handle missions
-    // unlocking the cities, so that the mission cleanup doesn't re-lock the
-    // cities that were unlocked by a storyline mission
-
-    CitiesInfo current;
-    StoreCityInfo (current);
-
-    if (!expected)
-        expected = &current;
-
-    if (current.citiesUnlocked == expected->citiesUnlocked)
-        this->mCurrentCitiesUnlocked = info.citiesUnlocked;
+    this->mCurrentCitiesUnlocked = info.citiesUnlocked;
 
     static auto handleBridge = [] (bool bridge, const char *id) {
         if (bridge)
@@ -419,10 +422,30 @@ MissionRandomizer::RestoreCityInfo (const CitiesInfo &info,
             Scrpt::CallOpcode (0x777, "remove_objects", id);
     };
 
-    if (current.LVBarriers == expected->LVBarriers)
-        handleBridge (info.LVBarriers, "BARRIERS2");
-    if (current.SFBarriers == expected->SFBarriers)
-        handleBridge (info.SFBarriers, "BARRIERS1");
+    handleBridge (info.LVBarriers, "BARRIERS2");
+    handleBridge (info.SFBarriers, "BARRIERS1");
+}
+
+/*******************************************************/
+void MissionRandomizer::SetRiotModeForMission (int index)
+{
+    bool riot = false;
+    if(index >= 108 && index <= 112)
+        riot = true;
+
+    Scrpt::CallOpcode (0x6C8, "enable_riot", riot ? 1 : 0);        
+}
+
+/*******************************************************/
+void
+MissionRandomizer::SetGangTerritoriesForMission (int index)
+{
+    bool wars = false;
+
+    if((index > 21 && index <= 38) || index > 104)
+        wars = true;
+
+    Scrpt::CallOpcode (0x879, "enable_gang_wars", wars ? 1 : 0);
 }
 
 /*******************************************************/
@@ -464,6 +487,10 @@ StoreRandomizedScript (uint8_t *startIp)
             missionRandomizer->UnlockCitiesBasedOnMissionID (
                 missionRandomizer->mRandomizedMissionNumber);
 
+            missionRandomizer->SetGangTerritoriesForMission (
+                missionRandomizer->mRandomizedMissionNumber);
+            missionRandomizer->SetRiotModeForMission (
+                missionRandomizer->mRandomizedMissionNumber);
             missionRandomizer->mRandomizedScript = out;
         }
 

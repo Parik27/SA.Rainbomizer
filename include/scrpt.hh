@@ -43,7 +43,7 @@ public:
     void operator<< (LocalVar n);
     void operator<< (int *n);
     void operator<< (const char *str);
-
+    
     void StoreParameters (CRunningScript *scr);
 
     /*******************************************************/
@@ -80,6 +80,9 @@ public:
         memcpy (dst, opcode.GetData (), opcode.offset);
         return dst + opcode.offset;
     }
+
+    static unsigned char *CreateNop (unsigned char *dst, int size);
+    static unsigned char *CreateNop (unsigned char* dst, int start, int end);    
 
     /*******************************************************/
     template <typename... Args>

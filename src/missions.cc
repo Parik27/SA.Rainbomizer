@@ -15,7 +15,6 @@
 #include <array>
 #include <random>
 #include <memory>
-#include <windows.h>
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 
@@ -248,19 +247,6 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                                                ScriptSpace[2197]);
                         }
                 }
-            else if (opCode == 0x735)
-                {
-                    mRandomizedScript->m_pCurrentIP += 2;
-                    mRandomizedScript->CollectParameters (1);
-                    bool flag = false;
-                    if (ScriptParams[0] == 83)
-                        {
-                            if (GetAsyncKeyState (VK_F4))
-                                flag = true;
-                        }
-
-                    mRandomizedScript->UpdateCompareFlag (flag);
-                }
             else if (opCode == 0x1096)
             {
                 mRandomizedScript->m_pCurrentIP += 2;
@@ -350,34 +336,6 @@ void
 JumpOnMissionEnd ()
 {
     auto missionRandomizer = MissionRandomizer::GetInstance ();
-
-    static int  missionid = START_MISSIONS;
-    static bool pressed   = false;
-    
-    if (GetAsyncKeyState (0x43))
-        pressed = true;
-    if (pressed && !GetAsyncKeyState (0x43))
-        {
-            pressed             = false;
-            std::string message = "";
-
-            if (missionStartPos.count (missionid))
-                {
-                    Teleport (missionStartPos[missionid]);
-                    message = std::to_string (missionid);
-                }
-            else
-                message = "Start pos for ~g~" + std::to_string (missionid)
-                          + "~w~ doesn't exist";
-
-            injector::cstd<void (const char *, bool, bool, bool)>::call (
-                0x588BE0, message.c_str (), false, true, false);
-
-            missionid++;
-            if (missionid > END_MISSIONS)
-                missionid = START_MISSIONS;
-            // 0x588F60
-        }
 
     if (missionRandomizer->mRandomizedScript
         && missionRandomizer->ShouldJump (missionRandomizer->mRandomizedScript))

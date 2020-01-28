@@ -21,12 +21,12 @@ jobs:
         cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release ../
         nmake
         mkdir output
-		mkdir output/rainbomizer
-		mkdir output/scripts
+        mkdir output/rainbomizer
+        mkdir output/scripts
         cp rainbomizer.asi output/scripts/SA.Rainbomizer.asi
         cp ../config.toml output/rainbomizer/
-		cp ../Cutscene_Models.txt output/rainbomizer/
-		cp ../README.md output/readme.txt
+        cp ../Cutscene_Models.txt output/rainbomizer/
+        cp ../README.md output/readme.txt
         
     - name: Upload
       uses: actions/upload-artifact@v1

@@ -1,7 +1,7 @@
 ########################################################
 
 # Rainbomizer - A (probably fun) Grand Theft Auto San Andreas Mod that
-#               randomizes stuff
+#				randomizes stuff
 # Copyright (C) 2019 - Parik
 
 # This program is free software: you can redistribute it and/or modify
@@ -11,18 +11,18 @@
 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program.	If not, see <https://www.gnu.org/licenses/>.
 #
 #######################################################
 
 # General Configuration
 
-Enabled   = true
-Seed      = -1 # -1 for random
+Enabled	  = true
+Seed	  = -1 # -1 for random
 
 Unprotect = true
 AutosaveSlot = 8 # Set it to a non-existant slot (eg. -1 or 9) to disable
@@ -59,6 +59,7 @@ Exceptions = [0, 1] # These colours will not be randomized
 
 #######################################################
 [PoliceHeliRandomizer]
+
 Enabled = true
 
 #######################################################
@@ -79,7 +80,7 @@ Enabled = false
 Enabled = true
 RandomizePlayerWeapons = true
 SkipChecks = false # Checks related to weapons required for certain missions
-                   # You might not be able to complete some missions
+				   # You might not be able to complete some missions
 				   # without this enabled.
 
 # Pattern checks
@@ -119,12 +120,18 @@ RandomizeRandomSpawns = true
 
 ########################################################
 [WeaponStatsRandomizer]
+
 Enabled = false
 
 #######################################################
 [MissionRandomizer]
 
 Enabled = false
+ForceMissionEnabled = false
+ForcedMissionID = 11
+RandomizeOnce = true
+RandomizeOnceSeed = -1
+ForceRandomizeOnceSeed = false
 
 #######################################################
 [CutsceneRandomizer]
@@ -160,17 +167,17 @@ ForceAudioLine = 0
 [ScriptVehicleRandomizer]
 
 Enabled = true
-SkipChecks = false  # Don't enable this if you don't want to softlock every
-                    # other mission :P
+SkipChecks = false	# Don't enable this if you don't want to softlock every
+					# other mission :P
 Patterns = [
 
 	# Mission specific-patterns
 
 	{vehicle = 487, allowed = ["helis", "planes"], thread = "cprace", seat_check = false},
 	{thread = "dschool", vehicle = 429, allowed = [429, 541, 480, 494, 506, 451]},
-	{coords  = [-2584, 2213, 0], vehicle = 539, allowed = [460, 539]},
+	{coords	 = [-2584, 2213, 0], vehicle = 539, allowed = [460, 539]},
 	{thread = "boat", vehicle = 539, allowed = ["460", "539", "boats"], move  = [-60, 0, 0, 0]},
-    {vehicle = 487, allowed = ["all"], seat_check = false},
+	{vehicle = 487, allowed = ["all"], seat_check = false},
 	{vehicle = 406, allowed = [406]},
 	{vehicle = 486, allowed = [486]},
 	{vehicle = 489, allowed = ["cars"]},
@@ -189,9 +196,9 @@ Patterns = [
 	{vehicle = 403, allowed = [514, 515, 403]},
 	{vehicle = 478, coords = [2107, 1409, 9], allowed = [
 			602, 496, 401, 518, 527, 419, 587, 533, 526, 474, 600, 445, 507,
-            439, 549, 491, 422, 605, 572, 478, 554, 536, 575, 534, 534, 567,
-            535, 576, 412, 402, 542, 603, 475, 429, 541, 415, 480, 562, 434,
-            494, 502, 503, 411, 559, 560, 506, 541, 558, 555, 477, 546, 550
+			439, 549, 491, 422, 605, 572, 478, 554, 536, 575, 534, 534, 567,
+			535, 576, 412, 402, 542, 603, 475, 429, 541, 415, 480, 562, 434,
+			494, 502, 503, 411, 559, 560, 506, 541, 558, 555, 477, 546, 550
 	], seat_check = false},
 	{vehicle = 544, allowed = ["all"], seat_check = false, denied = ["trains", "boats"]},
 	{vehicle = 567, coords = [2644, -2028, 12], allowed = [

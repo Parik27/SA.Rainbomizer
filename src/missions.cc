@@ -22,7 +22,7 @@ const int START_MISSIONS     = 11;
 const int END_MISSIONS       = 112;
 const int UNLOCKED_CITY_STAT = 181;
 
-auto exceptions = {
+int exceptions[] = {
     40, // First Date
     35, // Race Tournament / 8-track / Dirt Track
     83, // Learning to Fly
@@ -498,8 +498,8 @@ MissionRandomizer::ResetSaveData ()
     if (config.shufflingEnabled && config.shufflingSeed == -1)
         mSaveInfo.randomSeed = random (INT_MAX);
 
-    for (auto &i : mSaveInfo.missionStatus.data)
-        i = 1;
+    memset (mSaveInfo.missionStatus.data, 1,
+            sizeof (mSaveInfo.missionStatus.data));
 
     mSaveInfo.missionStatus[34]++; // House Party
     mSaveInfo.missionStatus[48]++; // Wu Zi Mu and Farewell My Love
@@ -595,8 +595,7 @@ MissionRandomizer::InitShuffledMissionOrder ()
             index++;
         }
 
-    FILE *log = fopen ("rainbomizer.missions.txt", "w");
-    index     = START_MISSIONS;
+    index = START_MISSIONS;
     for (auto i : mSaveInfo.missionStatus.data)
         {
             for (int j = 0; j < i; j++)
@@ -611,15 +610,11 @@ MissionRandomizer::InitShuffledMissionOrder ()
                     mShuffledOrder[index].push_back (
                         remainingMissions[randomMission]);
 
-                    fprintf (log, "%d -> %d\n", index,
-                             remainingMissions[randomMission]);
-
                     remainingMissions.erase (remainingMissions.begin ()
                                              + randomMission);
                 }
             index++;
         }
-    fclose (log);
 }
 
 /*******************************************************/

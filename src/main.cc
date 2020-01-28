@@ -57,8 +57,10 @@ public:
     /*******************************************************/
     Rainbomizer ()
     {
+        CreateRainbomizerFolder ();
+
         auto config = ConfigManager::GetInstance ();
-        config->Initialise ("rainbomizer.toml");
+        config->Initialise ("config.toml");
 
         if (!config->GetConfigs ().general.enabled)
             return;

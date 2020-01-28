@@ -88,7 +88,7 @@ CutsceneRandomizer::Initialise ()
     if (!config.enabled)
         return;
 
-    FILE *modelFile = fopen (config.cutsceneFile.c_str (), "r");
+    FILE *modelFile = OpenRainbomizerFile (config.cutsceneFile, "r");
     if (modelFile)
         {
             char line[512] = {0};

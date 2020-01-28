@@ -6,7 +6,7 @@
 
 /*******************************************************/
 void
-InsertRaceJumpAt(unsigned char* data, int index)
+InsertRaceJumpAt (unsigned char *data, int index)
 {
     data = Scrpt::CreateOpcode (0x004, "= const", data, GlobalVar (352), index);
     data = Scrpt::CreateOpcode (0x004, "= const", data, GlobalVar (121), 0);
@@ -15,15 +15,15 @@ InsertRaceJumpAt(unsigned char* data, int index)
 
 /*******************************************************/
 void
-NopRange(unsigned char* data, int start, int end)
+NopRange (unsigned char *data, int start, int end)
 {
-    for(int i = start; i < end; i++)
-        Scrpt::CreateOpcode(0x0, "nop", data + i);
+    for (int i = start; i < end; i++)
+        Scrpt::CreateOpcode (0x0, "nop", data + i);
 }
 
 /*******************************************************/
 void
-HighStakesStartFix (MissionRandomizer *rand, unsigned char* data)
+HighStakesStartFix (MissionRandomizer *rand, unsigned char *data)
 {
     rand->SetContinuedMission (35);
     rand->SetCorrectedMissionStatusIndex (35, 36);
@@ -52,7 +52,7 @@ void
 JizzyStartFix (unsigned char *data, bool cutscene)
 {
     int offset = (cutscene) ? 2896 : 2875;
-    Scrpt::CreateOpcode(0x2, "jmp", data + 2857, -offset);
+    Scrpt::CreateOpcode (0x2, "jmp", data + 2857, -offset);
 }
 
 /*******************************************************/
@@ -60,25 +60,25 @@ void
 HousePartyStartFix (unsigned char *data, bool cutscene)
 {
     int offset = (cutscene) ? 421 : 609;
-    Scrpt::CreateOpcode(0x2, "jmp", data + 403, -offset);
+    Scrpt::CreateOpcode (0x2, "jmp", data + 403, -offset);
 
     offset = (cutscene) ? 1099 : 1112;
-    Scrpt::CreateOpcode(0x2, "jmp", data + 1081, -offset);
+    Scrpt::CreateOpcode (0x2, "jmp", data + 1081, -offset);
 }
 
 /*******************************************************/
 void
-GreenSabreStartFix (unsigned char* data)
+GreenSabreStartFix (unsigned char *data)
 {
-    Scrpt::CreateNop(data, 19773, 19780);
-    Scrpt::CreateNop(data, 22262, 22275);   
+    Scrpt::CreateNop (data, 19773, 19780);
+    Scrpt::CreateNop (data, 22262, 22275);
 }
 
 /*******************************************************/
 void
-CustomsFastTrackStartFix(unsigned char* data)
+CustomsFastTrackStartFix (unsigned char *data)
 {
-    Scrpt::CreateNop(data, 38, 45);
+    Scrpt::CreateNop (data, 38, 45);
 }
 
 /*******************************************************/
@@ -97,7 +97,7 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
 
         case 36: HighStakesStartFix (this, data); break;
         case 38: GreenSabreStartFix (data); break;
-        case 69: CustomsFastTrackStartFix(data); break;
+        case 69: CustomsFastTrackStartFix (data); break;
         }
 }
 

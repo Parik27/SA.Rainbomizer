@@ -27,6 +27,7 @@
 #include "config_default.hh"
 #include <sstream>
 #include "scm.hh"
+#include "base.hh"
 
 ConfigManager *ConfigManager::mInstance = nullptr;
 
@@ -128,6 +129,16 @@ WeaponConfig::ReadTable (std::shared_ptr<cpptoml::table> pattern,
                         }
                 }
         }
+}
+
+/*******************************************************/
+void
+WeaponStatsConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
 }
 
 /*******************************************************/
@@ -391,7 +402,7 @@ ScriptVehicleConfig::Read (std::shared_ptr<cpptoml::table> table)
 bool
 DoesFileExist (const std::string &file)
 {
-    FILE *f = fopen (file.c_str (), "r");
+    FILE *f = OpenRainbomizerFile (file, "r");
     if (f)
         {
             fclose (f);
@@ -404,9 +415,12 @@ DoesFileExist (const std::string &file)
 void
 ConfigManager::WriteDefaultConfig (const std::string &file)
 {
-    FILE *f = fopen (file.c_str (), "wb");
-    fwrite (config_toml, config_toml_len, 1, f);
-    fclose (f);
+    FILE *f = OpenRainbomizerFile (file.c_str (), "wb");
+    if (f)
+        {
+            fwrite (config_toml, config_toml_len, 1, f);
+            fclose (f);
+        }
 }
 
 /*******************************************************/
@@ -428,7 +442,7 @@ ConfigManager::Initialise (const std::string &file)
     std::shared_ptr<cpptoml::table> config;
     try
         {
-            config = cpptoml::parse_file (file);
+            config = cpptoml::parse_file (GetRainbomizerFileName (file));
         }
     catch (const std::exception &e)
         {

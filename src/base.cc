@@ -54,6 +54,27 @@ HookManager::Initialise ()
 }
 
 /*******************************************************/
+std::string
+GetRainbomizerFileName (std::string name)
+{
+    return GetGameDirRelativePathA (("rainbomizer/" + name).c_str ());
+}
+
+/*******************************************************/
+void
+CreateRainbomizerFolder ()
+{
+    CreateDirectory (GetRainbomizerFileName ("").c_str (), NULL);
+}
+
+/*******************************************************/
+FILE *
+OpenRainbomizerFile (std::string name, std::string mode)
+{
+    return fopen (GetRainbomizerFileName (name).c_str (), mode.c_str ());
+}
+
+/*******************************************************/
 void
 HookManager::DestroyInstance ()
 {

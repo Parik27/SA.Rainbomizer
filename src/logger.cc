@@ -21,6 +21,7 @@
 #include "logger.hh"
 #include <cstdio>
 #include <ctime>
+#include "base.hh"
 
 Logger *    Logger::mInstance = nullptr;
 std::string Logger::mFileName = "rainbomizer.log.txt";
@@ -34,7 +35,7 @@ std::string Logger::mFileName = "rainbomizer.log.txt";
 /*******************************************************/
 Logger::Logger ()
 {
-    mFile = fopen ("rainbomizer.log.txt", "a+");
+    mFile = OpenRainbomizerFile ("log.txt", "a+");
 
     if (!mFile)
         return;

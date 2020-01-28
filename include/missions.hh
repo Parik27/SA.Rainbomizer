@@ -18,10 +18,7 @@ struct MissionStatus
 {
     unsigned char data[102];
 
-    unsigned char &operator[] (int index)
-    {
-        return data[index - 11];
-    }
+    unsigned char &operator[] (int index) { return data[index - 11]; }
 };
 
 struct MissionRandomizerSaveStructure
@@ -132,7 +129,7 @@ public:
     void UnlockCitiesBasedOnMissionID (int missionId);
     void SetGangTerritoriesForMission (int index);
     void SetRiotModeForMission (int index);
-    
+
     void TeleportPlayerBeforeMission ();
 
     /// Reset save data

@@ -243,31 +243,33 @@ struct BlipsConfig : public BaseConfig
 };
 
 /******************************************************/
-struct WeaponStatsRandomizerConfig : public BaseConfig
+struct WeaponStatsConfig : public BaseConfig
 {
+    bool enabled = false;
+    void Read (std::shared_ptr<cpptoml::table> table);
 };
 
 /*******************************************************/
 struct Configs
 {
-    GeneralConfig               general;
-    TrafficConfig               traffic;
-    ColourConfig                colours;
-    PoliceHeliConfig            policeHeli;
-    CheatConfig                 cheat;
-    HandlingConfig              handling;
-    WeaponConfig                weapon;
-    PickupsConfig               pickups;
-    ParkedCarConfig             parkedCar;
-    LicensePlateConfig          licensePlate;
-    SoundsConfig                sounds;
-    ScriptVehicleConfig         scriptVehicle;
-    MissionConfig               missions;
-    ObjectConfig                objects;
-    CutsceneConfig              cutscenes;
-    BlipsConfig                 blips;
-    ParticlesConfig             particles;
-    WeaponStatsRandomizerConfig weaponStats;
+    GeneralConfig       general;
+    TrafficConfig       traffic;
+    ColourConfig        colours;
+    PoliceHeliConfig    policeHeli;
+    CheatConfig         cheat;
+    HandlingConfig      handling;
+    WeaponConfig        weapon;
+    PickupsConfig       pickups;
+    ParkedCarConfig     parkedCar;
+    LicensePlateConfig  licensePlate;
+    SoundsConfig        sounds;
+    ScriptVehicleConfig scriptVehicle;
+    MissionConfig       missions;
+    ObjectConfig        objects;
+    CutsceneConfig      cutscenes;
+    BlipsConfig         blips;
+    ParticlesConfig     particles;
+    WeaponStatsConfig   weaponStats;
 };
 
 /*******************************************************/

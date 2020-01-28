@@ -41,21 +41,16 @@ int __fastcall RandomizeStats (int *address, int weaponid)
     unsigned int properties;
 
     if (weaponid == 18 || weaponid == 16 || weaponid == 39 || weaponid == 17)
-        {
-            properties = 0x100;
-        }
+        properties = 0x100;
+
     else if (weaponid == 35 || weaponid == 36)
-        {
-            properties = 0x48214;
-        }
+        properties = 0x48214;
+
     else if (weaponid == 38)
-        {
-            properties = 0x238;
-        }
+        properties = 0x238;
+
     else
-        {
-            properties = hexFlags[random (0, 16)];
-        }
+        properties = hexFlags[random (0, 16)];
 
     if (quality < 10)
         {
@@ -100,31 +95,19 @@ int __fastcall RandomizeStats (int *address, int weaponid)
             if (id == 0)
                 break;
 
-            aWeaponInfos[id].m_nFlags = properties;
-
-            aWeaponInfos[id].m_nAmmoClipSize = ammoClip;
-
-            aWeaponInfos[id].m_nDamage = damage;
-
-            aWeaponInfos[id].m_fAccuracy = accuracy;
-
-            aWeaponInfos[id].m_fSpeed = moveSpeed;
-
+            aWeaponInfos[id].m_nFlags          = properties;
+            aWeaponInfos[id].m_nAmmoClipSize   = ammoClip;
+            aWeaponInfos[id].m_nDamage         = damage;
+            aWeaponInfos[id].m_fAccuracy       = accuracy;
+            aWeaponInfos[id].m_fSpeed          = moveSpeed;
             aWeaponInfos[id].m_fTargetingRange = range;
-
-            aWeaponInfos[id].m_fFiringRange = range;
-
-            aWeaponInfos[id].m_fAnimLoopStart = animValues[2];
-
-            aWeaponInfos[id].m_fAnimFrameFire = animValues[1];
-
-            aWeaponInfos[id].m_fAnimLoopEnd = animValues[0];
-
+            aWeaponInfos[id].m_fFiringRange    = range;
+            aWeaponInfos[id].m_fAnimLoopStart  = animValues[2];
+            aWeaponInfos[id].m_fAnimFrameFire  = animValues[1];
+            aWeaponInfos[id].m_fAnimLoopEnd    = animValues[0];
             aWeaponInfos[id].m_fAnim2LoopStart = animValues[2];
-
             aWeaponInfos[id].m_fAnim2FrameFire = animValues[1];
-
-            aWeaponInfos[id].m_fAnim2LoopEnd = animValues[0];
+            aWeaponInfos[id].m_fAnim2LoopEnd   = animValues[0];
         }
 
     return 0;

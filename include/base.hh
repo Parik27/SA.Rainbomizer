@@ -48,7 +48,10 @@ struct GamePathA
     GamePathA ();
 };
 
-char *GetGameDirRelativePathA (const char *subpath);
+char *      GetGameDirRelativePathA (const char *subpath);
+std::string GetRainbomizerFileName (std::string name);
+FILE *      OpenRainbomizerFile (std::string name, std::string mode);
+void        CreateRainbomizerFolder ();
 
 /*******************************************************/
 class HookManager

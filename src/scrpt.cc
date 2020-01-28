@@ -15,7 +15,7 @@ Scrpt::Append (const void *bytes, int size)
 unsigned char *
 Scrpt::CreateNop (unsigned char *dst, int size)
 {
-    if(size > 4)
+    if (size > 4)
         {
             Scrpt         opcode = Scrpt (0x661);
             unsigned char typeId = 0xE;
@@ -27,17 +27,17 @@ Scrpt::CreateNop (unsigned char *dst, int size)
             memcpy (dst, opcode.GetData (), opcode.offset);
         }
     else
-    {
-        Scrpt opcode = Scrpt (0x0);
-        memcpy (dst, opcode.GetData (), opcode.offset);
-    }
-        
+        {
+            Scrpt opcode = Scrpt (0x0);
+            memcpy (dst, opcode.GetData (), opcode.offset);
+        }
+
     return dst + size;
 }
 
 /*******************************************************/
-unsigned char*
-Scrpt::CreateNop (unsigned char* dst, int start, int end)
+unsigned char *
+Scrpt::CreateNop (unsigned char *dst, int start, int end)
 {
     return CreateNop (dst + start, end - start);
 }

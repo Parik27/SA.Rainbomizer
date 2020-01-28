@@ -311,7 +311,8 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
     RestoreCityInfo (this->mCityInfo);
     this->SetGangTerritoriesForMission (this->mOriginalMissionNumber);
     this->SetRiotModeForMission (this->mOriginalMissionNumber);
-
+    AutoSave::GetInstance()->SetShouldSave(true);
+    
     mSaveInfo.missionStatus[GetCorrectedMissionStatusIndex (
         mRandomizedMissionNumber)]--;
     SetCorrectedMissionStatusIndex (-1, -1);
@@ -529,11 +530,11 @@ MissionRandomizer::Load ()
     CGenericGameStorage::LoadDataFromWorkBuffer (&saveInfo, sizeof (saveInfo));
 
     ResetSaveData ();
-    if (strncmp (saveInfo.signature, "RAINBOMIZER",
-                 sizeof (saveInfo.signature)))
+    if (std::string(saveInfo.signature, 11) != "RAINBOMIZER")
         return InitShuffledMissionOrder ();
 
     mSaveInfo.randomSeed = saveInfo.randomSeed;
+    Logger::GetLogger()->LogMessage("Setting seed " + std::to_string(mSaveInfo.randomSeed) + " from save file");
     if (config.forceShufflingSeed && config.shufflingSeed != -1)
         mSaveInfo.randomSeed = config.shufflingSeed;
 
@@ -600,10 +601,10 @@ MissionRandomizer::InitShuffledMissionOrder ()
             index++;
         }
 
+    FILE* log = fopen("rainbomizer.missions.txt", "w");
     index = START_MISSIONS;
     for (auto i : mSaveInfo.missionStatus.data)
         {
-            printf ("Index: %d, Size: %d\n", index, i);
             for (int j = 0; j < i; j++)
                 {
                     if (remainingMissions.size () <= 0)
@@ -616,11 +617,14 @@ MissionRandomizer::InitShuffledMissionOrder ()
                     mShuffledOrder[index].push_back (
                         remainingMissions[randomMission]);
 
+                    fprintf(log, "%d -> %d\n", index, remainingMissions[randomMission]);
+                    
                     remainingMissions.erase (remainingMissions.begin ()
                                              + randomMission);
                 }
             index++;
         }
+    fclose(log);
 }
 
 /*******************************************************/

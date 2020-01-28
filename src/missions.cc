@@ -73,7 +73,7 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
             if (ScriptParams[0] != missionRandomizer->mOriginalMissionNumber)
                 missionRandomizer->TeleportPlayerBeforeMission ();
 
-            if(threadFinishes.count(ScriptParams[0]))
+            if (threadFinishes.count (ScriptParams[0]))
                 missionRandomizer->mStoreNextMission = true;
         }
 }
@@ -83,14 +83,12 @@ void
 MissionRandomizer::TeleportPlayerBeforeMission ()
 {
     if (missionStartPos.count (mRandomizedMissionNumber))
-    {
-        Logger::GetLogger ()->LogMessage (
-            "Teleporting player to the start of mission: " +
-            std::to_string (missionStartPos[mRandomizedMissionNumber].x));
-        Teleport (missionStartPos[mRandomizedMissionNumber]);
-    }
-
-    
+        {
+            Logger::GetLogger ()->LogMessage (
+                "Teleporting player to the start of mission: "
+                + std::to_string (missionStartPos[mRandomizedMissionNumber].x));
+            Teleport (missionStartPos[mRandomizedMissionNumber]);
+        }
 }
 
 /*******************************************************/
@@ -105,8 +103,8 @@ MissionRandomizer::TeleportPlayerAfterMission ()
 
             Teleport (pos);
             Logger::GetLogger ()->LogMessage (
-            "Teleporting player to the end of mission: " +
-            std::to_string (missionStartPos[mOriginalMissionNumber].x));
+                "Teleporting player to the end of mission: "
+                + std::to_string (missionStartPos[mOriginalMissionNumber].x));
         }
     catch (const std::out_of_range &e)
         {
@@ -151,13 +149,7 @@ MissionRandomizer::GetRandomMission (int originalMission)
                 {
                     int index = GetStatusForTwoPartMissions (originalMission);
                     if (mShuffledOrder[originalMission].size () <= index)
-                        {
-                            printf ("The value of originalMission: %d\n",
-                                    originalMission);
-                            printf ("The size of originalMission: %d\n",
-                                    mShuffledOrder[originalMission].size ());
-                            index = 0;
-                        }
+                        index = 0;
 
                     return mShuffledOrder[originalMission][index];
                 }
@@ -173,7 +165,6 @@ MissionRandomizer::GetRandomMission (int originalMission)
             if (mSaveInfo.missionStatus[i])
                 missionList.push_back (i);
         }
-    printf ("missionList Size: %d\n", missionList.size ());
 
     if (missionList.size () == 0)
         return originalMission;
@@ -194,7 +185,7 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
     if (currentOffset != this->mPrevOffset)
         {
             short opCode = *reinterpret_cast<uint16_t *> (scr->m_pCurrentIP);
-            
+
             if (opCode == OPCODE_RETURN && mScriptReplaced)
                 {
                     // Restore original base ip
@@ -234,8 +225,8 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                     SetRiotModeForMission (mOriginalMissionNumber);
                     this->mRandomizedScript = nullptr;
                 }
-            else if (opCode == OPCODE_STORE_CAR_CHAR_IS_IN &&
-                mRandomizedMissionNumber == 36)
+            else if (opCode == OPCODE_STORE_CAR_CHAR_IS_IN
+                     && mRandomizedMissionNumber == 36)
                 {
                     // Put player in a random vehicle
                     if (!FindPlayerVehicle ())
@@ -248,14 +239,14 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                         }
                 }
             else if (opCode == 0x1096)
-            {
-                mRandomizedScript->m_pCurrentIP += 2;
-                mRandomizedScript->CollectParameters (1);
+                {
+                    mRandomizedScript->m_pCurrentIP += 2;
+                    mRandomizedScript->CollectParameters (1);
 
-                mRandomizedScript->ProcessCommands0to99(0x4E);
-                
-                Scrpt::CallOpcode(0x417, "start_mission", ScriptParams[0]);
-            }
+                    mRandomizedScript->ProcessCommands0to99 (0x4E);
+
+                    Scrpt::CallOpcode (0x417, "start_mission", ScriptParams[0]);
+                }
 
             this->mPrevOffset = currentOffset;
         }
@@ -295,7 +286,7 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
     int offset     = threadFinishes[GetCorrectedMissionNo ()][status];
 
     Logger::GetLogger ()->LogMessage ("Jumping to original script cleanup");
-    
+
     FILE *scm = fopen (GetGameDirRelativePathA ("data/script/main.scm"), "rb");
     fseek (scm, baseOffset, SEEK_SET);
 
@@ -311,8 +302,8 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
     RestoreCityInfo (this->mCityInfo);
     this->SetGangTerritoriesForMission (this->mOriginalMissionNumber);
     this->SetRiotModeForMission (this->mOriginalMissionNumber);
-    AutoSave::GetInstance()->SetShouldSave(true);
-    
+    AutoSave::GetInstance ()->SetShouldSave (true);
+
     mSaveInfo.missionStatus[GetCorrectedMissionStatusIndex (
         mRandomizedMissionNumber)]--;
     SetCorrectedMissionStatusIndex (-1, -1);
@@ -386,13 +377,14 @@ MissionRandomizer::RestoreCityInfo (const CitiesInfo &info)
 }
 
 /*******************************************************/
-void MissionRandomizer::SetRiotModeForMission (int index)
+void
+MissionRandomizer::SetRiotModeForMission (int index)
 {
     bool riot = false;
-    if(index >= 108 && index <= 112)
+    if (index >= 108 && index <= 112)
         riot = true;
 
-    Scrpt::CallOpcode (0x6C8, "enable_riot", riot ? 1 : 0);        
+    Scrpt::CallOpcode (0x6C8, "enable_riot", riot ? 1 : 0);
 }
 
 /*******************************************************/
@@ -401,7 +393,7 @@ MissionRandomizer::SetGangTerritoriesForMission (int index)
 {
     bool wars = false;
 
-    if((index > 21 && index <= 38) || index > 104)
+    if ((index > 21 && index <= 38) || index > 104)
         wars = true;
 
     Scrpt::CallOpcode (0x879, "enable_gang_wars", wars ? 1 : 0);
@@ -512,6 +504,11 @@ MissionRandomizer::ResetSaveData ()
     mSaveInfo.missionStatus[34]++; // House Party
     mSaveInfo.missionStatus[48]++; // Wu Zi Mu and Farewell My Love
     mSaveInfo.missionStatus[59]++; // Jizzy
+
+    for (auto i : exceptions)
+        {
+            mSaveInfo.missionStatus[i] = 0;
+        }
 }
 
 /*******************************************************/
@@ -530,11 +527,13 @@ MissionRandomizer::Load ()
     CGenericGameStorage::LoadDataFromWorkBuffer (&saveInfo, sizeof (saveInfo));
 
     ResetSaveData ();
-    if (std::string(saveInfo.signature, 11) != "RAINBOMIZER")
+    if (std::string (saveInfo.signature, 11) != "RAINBOMIZER")
         return InitShuffledMissionOrder ();
 
     mSaveInfo.randomSeed = saveInfo.randomSeed;
-    Logger::GetLogger()->LogMessage("Setting seed " + std::to_string(mSaveInfo.randomSeed) + " from save file");
+    Logger::GetLogger ()->LogMessage ("Setting seed "
+                                      + std::to_string (mSaveInfo.randomSeed)
+                                      + " from save file");
     if (config.forceShufflingSeed && config.shufflingSeed != -1)
         mSaveInfo.randomSeed = config.shufflingSeed;
 
@@ -557,7 +556,7 @@ MissionRandomizer::Initialise ()
         mTempMissionData = new unsigned char[69000];
     if (!mLocalVariables)
         mLocalVariables = new int[1024];
-    
+
     RegisterHooks ({{HOOK_CALL, 0x489929, (void *) &RandomizeMissionToStart},
                     {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript},
                     {HOOK_CALL, 0x441869, (void *) &UnlockCities},
@@ -591,18 +590,13 @@ MissionRandomizer::InitShuffledMissionOrder ()
     int                  index = START_MISSIONS;
     for (auto i : mSaveInfo.missionStatus.data)
         {
-            if (std::find (std::begin (exceptions), std::end (exceptions),
-                           index)
-                != std::end (exceptions))
-                continue;
-
             for (int j = 0; j < i; j++)
                 remainingMissions.push_back (index);
             index++;
         }
 
-    FILE* log = fopen("rainbomizer.missions.txt", "w");
-    index = START_MISSIONS;
+    FILE *log = fopen ("rainbomizer.missions.txt", "w");
+    index     = START_MISSIONS;
     for (auto i : mSaveInfo.missionStatus.data)
         {
             for (int j = 0; j < i; j++)
@@ -617,14 +611,15 @@ MissionRandomizer::InitShuffledMissionOrder ()
                     mShuffledOrder[index].push_back (
                         remainingMissions[randomMission]);
 
-                    fprintf(log, "%d -> %d\n", index, remainingMissions[randomMission]);
-                    
+                    fprintf (log, "%d -> %d\n", index,
+                             remainingMissions[randomMission]);
+
                     remainingMissions.erase (remainingMissions.begin ()
                                              + randomMission);
                 }
             index++;
         }
-    fclose(log);
+    fclose (log);
 }
 
 /*******************************************************/

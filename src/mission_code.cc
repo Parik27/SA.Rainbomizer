@@ -120,7 +120,6 @@ MissionRandomizer::HandleGoSubAlternativeForMission (int index)
 void
 MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
 {
-    printf ("%d\n", this->mOriginalMissionNumber);
     switch (this->mOriginalMissionNumber)
         {
 

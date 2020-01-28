@@ -16,11 +16,10 @@ struct CitiesInfo
 
 struct MissionStatus
 {
-    unsigned char data[101];
+    unsigned char data[102];
 
     unsigned char &operator[] (int index)
     {
-        printf ("Accessing index: %d\n", index);
         return data[index - 11];
     }
 };

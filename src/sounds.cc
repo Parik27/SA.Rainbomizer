@@ -13,15 +13,6 @@
 SoundRandomizer *SoundRandomizer::mInstance = nullptr;
 
 /*******************************************************/
-bool __fastcall AudioHasFinishedHook (CAudioEngine *audio, void *edx,
-                                      uint8_t id)
-{
-    bool status = audio->IsMissionAudioSampleFinished (id);
-    printf ("%s\n", status ? "True" : "False");
-    return status;
-}
-
-/*******************************************************/
 void __fastcall RandomizeAudioLoad (CAudioEngine *audio, void *edx,
                                     unsigned char slot, int id)
 {

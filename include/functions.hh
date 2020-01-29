@@ -733,6 +733,11 @@ struct FxManager_c
     List_c<FxSystemBP_c> SystemBlueprints;
 };
 
+struct CWorld
+{
+    static double FindGroundZedForCoord(float x, float y);
+};
+
 CVector   FindPlayerCoors (int playerId = -1);
 CVehicle *FindPlayerVehicle (int playerId = -1, bool bIncludeRemote = false);
 CPed *    FindPlayerPed (int playerId = -1);

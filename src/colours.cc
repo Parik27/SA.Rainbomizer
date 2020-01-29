@@ -155,6 +155,18 @@ CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
 }
 
 /*******************************************************/
+CRGBA *__fastcall SkipRandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
+                                        uint8_t g, uint8_t b, uint8_t a)
+{
+    thisCol->r = r;
+    thisCol->g = g;
+    thisCol->b = b;
+    thisCol->a = a;
+    
+    return thisCol;
+}
+
+/*******************************************************/
 void
 ColourRandomizer::Initialise ()
 {
@@ -167,7 +179,8 @@ ColourRandomizer::Initialise ()
                     {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}});
 
     if (config.texts)
-        RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours}});
+        RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
+                        {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours}});
 
     if (config.fades)
         {

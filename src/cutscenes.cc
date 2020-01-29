@@ -11,21 +11,24 @@
 
 CutsceneRandomizer *CutsceneRandomizer::mInstance = nullptr;
 
+static std::string model = "";
+
 /*******************************************************/
 char *
-RandomizeCutsceneObject_2 (char *dst, char *src)
+RandomizeCutsceneObject (char *dst, char *src)
 {
     char *ret = CallAndReturn<char *, 0x82244B> (dst, src);
-    return (char *) CutsceneRandomizer::GetInstance ()->GetRandomModel (ret);
+    return CutsceneRandomizer::GetInstance ()->GetRandomModel (ret);
 }
 
 /*******************************************************/
-const char *
+char *
 CutsceneRandomizer::GetRandomModel (std::string model)
 {
     std::transform (std::begin (model), std::end (model), model.begin (),
                     [] (unsigned char c) { return std::tolower (c); });
     std::string logMessage = model;
+    mLastModel             = model;
 
     for (auto i : mModels)
         {
@@ -35,10 +38,10 @@ CutsceneRandomizer::GetRandomModel (std::string model)
                     logMessage += " -> " + replaced;
 
                     Logger::GetLogger ()->LogMessage (logMessage);
-                    return replaced.c_str ();
+                    mLastModel = replaced;
                 }
         }
-    return model.c_str ();
+    return (char *) mLastModel.c_str ();
 }
 
 /*******************************************************/
@@ -49,36 +52,25 @@ RandomizeCutsceneOffset (char *Str, char *format, float *x, float *y, float *z)
     auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
 
     sscanf (Str, format, x, y, z);
-    COffset offset = cutsceneRandomizer->GetRandomOffset (*x, *y, *z);
 
-    if (offset.x == -1 && offset.interior == -1)
-        return;
-
-    *x = offset.x;
-    *y = offset.y;
-    *z = offset.z;
-
+    *x = randomFloat(-3000, 3000);
+    *y = randomFloat(-3000, 3000);
+    *z = CWorld::FindGroundZedForCoord(*x, *y) - 17.582066;
+    
     cutsceneRandomizer->originalLevel = injector::ReadMemory<int> (0x48B99C);
 
-    Scrpt::CallOpcode (0x4BB, "select_interior", offset.interior);
+    Scrpt::CallOpcode (0x4BB, "select_interior", 0);
 }
 
 /*******************************************************/
-COffset
-CutsceneRandomizer::GetRandomOffset (float x, float y, float z)
+void
+RestoreCutsceneInterior ()
 {
-    return mOffsets[random (mOffsets.size () - 1)];
+    auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
+    Scrpt::CallOpcode (0x4BB, "select_interior",
+                       cutsceneRandomizer->originalLevel);
+    HookManager::CallOriginal<injector::cstd<void ()>, 0x48078A> ();
 }
-
-// /*******************************************************/
-// void
-// RestoreCutsceneInterior ()
-// {
-//     auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
-//     Scrpt::CallOpcode (0x4BB, "select_interior",
-//                        cutsceneRandomizer->originalLevel);
-//     HookManager::CallOriginal<injector::cstd<void ()>, 0x48078A> ();
-// }
 
 /*******************************************************/
 void
@@ -107,28 +99,8 @@ CutsceneRandomizer::Initialise ()
     else
         return;
 
-    FILE *offsetFile = fopen ("Cutscene_Locations.txt", "r");
-    if (offsetFile)
-        {
-            char line[512] = {0};
-            while (fgets (line, 512, offsetFile))
-                {
-                    if (strlen (line) < 2)
-                        continue;
-
-                    COffset offset;
-
-                    sscanf (line, " %f, %f, %f, %d, %d ", &offset.x, &offset.y,
-                            &offset.z, &offset.interior, &offset.extraCol);
-
-                    mOffsets.push_back (offset);
-                }
-        }
-    else
-        return;
-
     RegisterHooks ({
-        {HOOK_CALL, 0x5B0B30, (void *) &RandomizeCutsceneObject_2},
+        {HOOK_CALL, 0x5B0B30, (void *) &RandomizeCutsceneObject},
         {HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},
         //{HOOK_CALL, 0x48078A, (void *) &RestoreCutsceneInterior}
     });

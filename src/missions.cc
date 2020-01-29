@@ -121,7 +121,7 @@ MissionRandomizer::GetStatusForTwoPartMissions (int index)
         case 34: return ScriptSpace[455] > 3;
 
         // Wu Zi Mu and Farewell My Love
-        case 48: return ScriptSpace[492] > 5;
+        case 48: return ScriptSpace[492] > 4;
 
         // Jizzy
         case 59: return ScriptSpace[545] > 1;

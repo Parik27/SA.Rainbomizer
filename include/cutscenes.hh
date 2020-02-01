@@ -31,7 +31,7 @@ public:
     /// Returns the static instance for CutsceneRandomizer.
     static CutsceneRandomizer *GetInstance ();
 
-    char* GetRandomModel (std::string model);
+    char *GetRandomModel (std::string model);
 
     COffset GetRandomOffset (float x, float y, float z);
 

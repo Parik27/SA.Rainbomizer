@@ -546,9 +546,9 @@ CText::Load (char a2)
 
 /*******************************************************/
 double
-CWorld::FindGroundZedForCoord(float x, float y)
+CWorld::FindGroundZedForCoord (float x, float y)
 {
-    return CallAndReturn<double, 0x569660>(x, y);
+    return CallAndReturn<double, 0x569660> (x, y);
 }
 
 /*******************************************************/

@@ -15,14 +15,6 @@ InsertRaceJumpAt (unsigned char *data, int index)
 
 /*******************************************************/
 void
-NopRange (unsigned char *data, int start, int end)
-{
-    for (int i = start; i < end; i++)
-        Scrpt::CreateOpcode (0x0, "nop", data + i);
-}
-
-/*******************************************************/
-void
 HighStakesStartFix (MissionRandomizer *rand, unsigned char *data)
 {
     rand->SetContinuedMission (35);
@@ -83,6 +75,14 @@ CustomsFastTrackStartFix (unsigned char *data)
 
 /*******************************************************/
 void
+FixRaces (MissionRandomizer *rand, unsigned char *data)
+{
+    Scrpt::CreateNop (data, 19642, 19649);
+    Scrpt::CreateNop (data, 19649, 19706);
+}
+
+/*******************************************************/
+void
 MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
 {
     switch (this->mRandomizedMissionNumber)
@@ -98,6 +98,7 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 36: HighStakesStartFix (this, data); break;
         case 38: GreenSabreStartFix (data); break;
         case 69: CustomsFastTrackStartFix (data); break;
+        case 35: FixRaces (this, data); break;
         }
 }
 
@@ -123,14 +124,15 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
     switch (this->mOriginalMissionNumber)
         {
 
-        // CESAR1
+        // High Stakes
         case 36:
-            data += 19711;
+            data += 5520;
             data = Scrpt::CreateOpcode (0x8, "incrmt_var", data,
                                         GlobalVar (457), 1);
-            data = Scrpt::CreateOpcode (0x30C, "player_made_progress", data, 1);
             data = Scrpt::CreateOpcode (0x318, "set_latest_mission_passed",
                                         data, "CESAR_1");
+            data = Scrpt::CreateOpcode (0x164, "disable_marker", data,
+                                        GlobalVar (440));
             data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
 
@@ -145,7 +147,7 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
 
         // Wu Zi Mu / Farewell My Love
         case 48:
-            if (mRandomizedMissionNumber != 37)
+            if (mRandomizedMissionNumber != 48)
                 ScriptSpace[492] += 5;
 
             AutoSave::GetInstance ()->SetShouldSave (true);
@@ -157,12 +159,15 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
             data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
 
-            // Customs Fast Track
+        // Customs Fast Track
         case 69:
             // STEAL4_25110
             data += 30814;
             data = Scrpt::CreateOpcode (0x2, "jmp", data, -25110);
 
             break;
+
+        // Outrider
+        case 60: Scrpt::CreateNop (data, 19211, 19216);
         }
 }

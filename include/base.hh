@@ -53,6 +53,8 @@ std::string GetRainbomizerFileName (std::string name);
 FILE *      OpenRainbomizerFile (std::string name, std::string mode);
 void        CreateRainbomizerFolder ();
 
+bool VerifyGameVersion ();
+
 /*******************************************************/
 class HookManager
 {

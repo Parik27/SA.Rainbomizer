@@ -231,11 +231,27 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
                     // Put player in a random vehicle
                     if (!FindPlayerVehicle ())
                         {
-                            Scrpt::CallOpcode (0xa5, "create_car", 567, 0.0f,
-                                               0.0f, 0.0f, GlobalVar (2197));
-                            Scrpt::CallOpcode (0x036A, "put_actor_in_car",
-                                               GlobalVar (3),
-                                               ScriptSpace[2197]);
+                            constexpr int vehicle = 567;
+
+                            CStreaming::RequestModel (vehicle, 0);
+                            CStreaming::LoadAllRequestedModels (0);
+                            if (ms_aInfoForModel[vehicle].m_nLoadState == 1)
+                                {
+                                    Scrpt::CallOpcode (0xa5, "create_car", 567,
+                                                       0.0f, 0.0f, 0.0f,
+                                                       GlobalVar (2197));
+                                    Scrpt::CallOpcode (0x036A,
+                                                       "put_actor_in_car",
+                                                       GlobalVar (3),
+                                                       ScriptSpace[2197]);
+                                }
+                            else
+                                {
+                                    Logger::GetLogger ()->LogMessage (
+                                        "High Stakes failed to successfully "
+                                        "spawn a random vehicle for the "
+                                        "player");
+                                }
                         }
                 }
             else if (opCode == 0x1096)
@@ -271,8 +287,7 @@ void __fastcall UpdatePCHook (CRunningScript *scr, void *edx, int a2)
 int
 MissionRandomizer::GetCorrectedMissionNo ()
 {
-    return this->mOriginalMissionNumber == 36 ? 35
-                                              : this->mOriginalMissionNumber;
+    return this->mOriginalMissionNumber;
 }
 
 /*******************************************************/
@@ -297,11 +312,11 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
     scr->m_pBaseIP    = this->mTempMissionData;
     scr->m_pCurrentIP = scr->m_pBaseIP + offset;
 
-    this->ApplyMissionSpecificFixes (this->mTempMissionData);
     this->TeleportPlayerAfterMission ();
     RestoreCityInfo (this->mCityInfo);
     this->SetGangTerritoriesForMission (this->mOriginalMissionNumber);
     this->SetRiotModeForMission (this->mOriginalMissionNumber);
+    this->ApplyMissionSpecificFixes (this->mTempMissionData);
     AutoSave::GetInstance ()->SetShouldSave (true);
 
     mSaveInfo.missionStatus[GetCorrectedMissionStatusIndex (
@@ -309,7 +324,9 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
     SetCorrectedMissionStatusIndex (-1, -1);
 
     memcpy (this->mLocalVariables, (int *) 0xA48960, 0x400 * sizeof (uint32_t));
-    memset ((int *) 0xA48960, 0, 0x400 * sizeof (uint32_t));
+    // needn't reset local variables if we're jumping to the same mission
+    if (mRandomizedMissionNumber != mOriginalMissionNumber)
+        memset ((int *) 0xA48960, 0, 0x400 * sizeof (uint32_t));
 
     fclose (scm);
 }

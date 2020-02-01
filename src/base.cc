@@ -27,6 +27,8 @@
 #include "injector/calling.hpp"
 #include <algorithm>
 #include <unordered_map>
+#include <dbghelp.h>
+#include <sstream>
 
 typedef injector::memory_pointer_raw memptr_t;
 HookManager *                        HookManager::mInstance = nullptr;
@@ -65,6 +67,24 @@ void
 CreateRainbomizerFolder ()
 {
     CreateDirectory (GetRainbomizerFileName ("").c_str (), NULL);
+    CreateDirectory (GetRainbomizerFileName ("logs/").c_str (), NULL);
+}
+
+/*******************************************************/
+bool
+VerifyGameVersion ()
+{
+    // GTA SA v1.0 US
+    if (injector::ReadMemory<int> (0x82457C) == 0x94BF)
+        return true;
+
+    Logger::GetLogger ()->LogMessage (
+        "\n\nIncompatible GTA San Andreas version detected\n"
+        "Rainbomizer requires v1.0 US to work properly\n\n"
+        "Downgraders: https://gtaforums.com/topic/"
+        "936600-iii-iv-various-gta-downgraders/\n");
+
+    return false;
 }
 
 /*******************************************************/
@@ -204,6 +224,39 @@ ExceptionManager::RegisterHandler (
 }
 
 /*******************************************************/
+std::string
+GenerateBackTrace (CONTEXT *ctx)
+{
+    std::stringstream backtrace;
+
+    STACKFRAME stack;
+    memset (&stack, 0, sizeof (STACKFRAME));
+
+    auto process = GetCurrentProcess ();
+    auto thread  = GetCurrentThread ();
+
+    stack.AddrPC.Offset    = (*ctx).Eip;
+    stack.AddrPC.Mode      = AddrModeFlat;
+    stack.AddrStack.Offset = (*ctx).Esp;
+    stack.AddrStack.Mode   = AddrModeFlat;
+    stack.AddrFrame.Offset = (*ctx).Ebp;
+    stack.AddrFrame.Mode   = AddrModeFlat;
+
+    backtrace << "crash";
+    for (int i = 0;; i++)
+        {
+            if (!StackWalk (IMAGE_FILE_MACHINE_I386, process, thread, &stack,
+                            NULL, NULL, SymFunctionTableAccess,
+                            SymGetModuleBase, NULL))
+                break;
+
+            backtrace << " <- 0x" << std::hex << stack.AddrPC.Offset;
+        }
+
+    return backtrace.str ();
+}
+
+/*******************************************************/
 long __stdcall ExceptionManager::RunExceptionHandler (_EXCEPTION_POINTERS *ep)
 {
     auto logger = Logger::GetLogger ();
@@ -223,6 +276,9 @@ long __stdcall ExceptionManager::RunExceptionHandler (_EXCEPTION_POINTERS *ep)
         logger->LogMessage (
             string_format ("Inaccessible memory address: 0x%X",
                            ep->ExceptionRecord->ExceptionInformation[1]));
+
+    // Back Trace
+    logger->LogMessage (GenerateBackTrace (ep->ContextRecord));
 
     for (auto callback : GetExceptionManager ()->mExceptionHandlers)
         callback (ep);

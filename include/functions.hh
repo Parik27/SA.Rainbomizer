@@ -735,7 +735,7 @@ struct FxManager_c
 
 struct CWorld
 {
-    static double FindGroundZedForCoord(float x, float y);
+    static double FindGroundZedForCoord (float x, float y);
 };
 
 CVector   FindPlayerCoors (int playerId = -1);

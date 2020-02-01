@@ -162,7 +162,7 @@ CRGBA *__fastcall SkipRandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
     thisCol->g = g;
     thisCol->b = b;
     thisCol->a = a;
-    
+
     return thisCol;
 }
 

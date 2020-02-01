@@ -52,14 +52,13 @@ RandomizeCutsceneOffset (char *Str, char *format, float *x, float *y, float *z)
     auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
 
     sscanf (Str, format, x, y, z);
-
-    *x = randomFloat(-3000, 3000);
-    *y = randomFloat(-3000, 3000);
-    *z = CWorld::FindGroundZedForCoord(*x, *y) - 17.582066;
-    
-    cutsceneRandomizer->originalLevel = injector::ReadMemory<int> (0x48B99C);
-
     Scrpt::CallOpcode (0x4BB, "select_interior", 0);
+
+    *x = randomFloat (-3000, 3000);
+    *y = randomFloat (-3000, 3000);
+    *z = CWorld::FindGroundZedForCoord (*x, *y);
+
+    cutsceneRandomizer->originalLevel = injector::ReadMemory<int> (0x48B99C);
 }
 
 /*******************************************************/

@@ -74,6 +74,9 @@ public:
         ExceptionManager::GetExceptionManager ()->RegisterExceptionManager ();
         logger->LogMessage ("Registered Exception Manager");
 
+        if (!VerifyGameVersion ())
+            return;
+
         HookManager::GetInstance ()->Initialise ();
 
         TrafficRandomizer::GetInstance ()->Initialise ();

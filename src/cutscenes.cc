@@ -91,13 +91,18 @@ RandomizeCutsceneOffset (char *Str, char *format, float *x, float *y, float *z)
 }
 
 /*******************************************************/
-void
+bool
 RestoreCutsceneInterior ()
 {
-    auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
-    Scrpt::CallOpcode (0x4BB, "select_interior",
-                       cutsceneRandomizer->originalLevel);
-    HookManager::CallOriginal<injector::cstd<void ()>, 0x48078A> ();
+    bool ret = HookManager::CallOriginalAndReturn<injector::cstd<bool ()>,
+                                                  0x480761> (false);
+    if (ret)
+        {
+            auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
+            Scrpt::CallOpcode (0x4BB, "select_interior",
+                               cutsceneRandomizer->originalLevel);
+        }
+    return ret;
 }
 
 /*******************************************************/
@@ -109,7 +114,7 @@ CutsceneRandomizer::Initialise ()
         return;
 
     FILE *modelFile = OpenRainbomizerFile (config.cutsceneFile, "r");
-    if (modelFile)
+    if (modelFile && config.randomizeModels)
         {
             char line[512] = {0};
             mModels.push_back (std::vector<std::string> ());
@@ -123,14 +128,25 @@ CutsceneRandomizer::Initialise ()
                     line[strcspn (line, "\n")] = 0;
                     mModels.back ().push_back (line);
                 }
+            RegisterHooks (
+                {{HOOK_CALL, 0x5B0B30, (void *) &RandomizeCutsceneObject}});
         }
-    else
-        return;
+    else if (!modelFile)
+        {
+            // Log a message if file wasn't found
+            Logger::GetLogger ()->LogMessage (
+                "Failed to read file: rainbomizer/" + config.cutsceneFile);
+            Logger::GetLogger ()->LogMessage (
+                "Cutscene models will not be randomized");
+        }
 
-    RegisterHooks ({{HOOK_CALL, 0x5B0B30, (void *) &RandomizeCutsceneObject},
-                    {HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},
-                    {HOOK_CALL, 0x48078A, (void *) &RestoreCutsceneInterior}});
-    injector::MakeNOP (0x5B09D2, 5);
+    if (config.randomizeLocations)
+        {
+            RegisterHooks (
+                {{HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},
+                 {HOOK_CALL, 0x480761, (void *) &RestoreCutsceneInterior}});
+            injector::MakeNOP (0x5B09D2, 5);
+        }
 
     Logger::GetLogger ()->LogMessage ("Intialised CutsceneRandomizer");
 }

@@ -225,8 +225,10 @@ struct ObjectConfig : public BaseConfig
 /*******************************************************/
 struct CutsceneConfig : public BaseConfig
 {
-    bool        enabled      = false;
-    std::string cutsceneFile = "Cutscene_Models.txt";
+    bool        enabled            = false;
+    std::string cutsceneFile       = "Cutscene_Models.txt";
+    bool        randomizeModels    = true;
+    bool        randomizeLocations = true;
     void        Read (std::shared_ptr<cpptoml::table> table);
 };
 

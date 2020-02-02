@@ -93,6 +93,8 @@ CutsceneConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     CONFIG (table, enabled, "Enabled", bool);
     CONFIG (table, cutsceneFile, "CutsceneFile", std::string);
+    CONFIG (table, randomizeModels, "RandomizeModels", bool);
+    CONFIG (table, randomizeLocations, "RandomizeLocations", bool);
 }
 
 /*******************************************************/

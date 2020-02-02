@@ -34,7 +34,6 @@ TrafficRandomizer *TrafficRandomizer::mInstance = nullptr;
 void
 TrafficRandomizer::MakeRCsEnterable ()
 {
-    injector::MakeNOP (0x6D6AA7, 2);
     injector::WriteMemory<uint8_t> (0x6D5409 + 2, -1); // cmp eax, 11
     injector::WriteMemory<uint8_t> (0x6D5425, 0xEB);   // jns short loc_6D542D
 }

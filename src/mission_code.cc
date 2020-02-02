@@ -167,6 +167,9 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
 
             break;
 
+        // New Model Army
+        case 74: Scrpt::CreateNop(data, 27236, 27254);
+            
         // Outrider
         case 60: Scrpt::CreateNop (data, 19211, 19216);
         }

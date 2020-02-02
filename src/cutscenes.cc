@@ -8,6 +8,7 @@
 #include "config.hh"
 #include "scrpt.hh"
 #include "injector/calling.hpp"
+#include "loader.hh"
 
 CutsceneRandomizer *CutsceneRandomizer::mInstance = nullptr;
 
@@ -22,25 +23,48 @@ RandomizeCutsceneObject (char *dst, char *src)
 }
 
 /*******************************************************/
+int
+LoadModelForCutscene (std::string name)
+{
+    // Set ms_cutsceneProcessing to 0 before loading.
+    // The game doesn't load the models without this for some reason
+    injector::WriteMemory (0xB5F852, 0);
+    int ret = 1;
+
+    short modelIndex;
+    CModelInfo::GetModelInfo (name.c_str (), &modelIndex);
+
+    if (StreamingManager::AttemptToLoadVehicle (modelIndex) == ERR_FAILED)
+        {
+            Logger::GetLogger ()->LogMessage ("Failed to load Cutscene Model: "
+                                              + name);
+            ret = 0;
+        }
+
+    injector::WriteMemory (0xB5F852, 1);
+    return ret;
+}
+
+/*******************************************************/
 char *
 CutsceneRandomizer::GetRandomModel (std::string model)
 {
     std::transform (std::begin (model), std::end (model), model.begin (),
                     [] (unsigned char c) { return std::tolower (c); });
-    std::string logMessage = model;
-    mLastModel             = model;
+    mLastModel = model;
 
     for (auto i : mModels)
         {
             if (std::find (std::begin (i), std::end (i), model) != std::end (i))
                 {
                     auto replaced = i[random (i.size () - 1)];
-                    logMessage += " -> " + replaced;
-
-                    Logger::GetLogger ()->LogMessage (logMessage);
-                    mLastModel = replaced;
+                    mLastModel    = replaced;
+                    break;
                 }
         }
+    if (!LoadModelForCutscene (mLastModel))
+        mLastModel = model;
+
     return (char *) mLastModel.c_str ();
 }
 
@@ -52,13 +76,18 @@ RandomizeCutsceneOffset (char *Str, char *format, float *x, float *y, float *z)
     auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
 
     sscanf (Str, format, x, y, z);
+
+    cutsceneRandomizer->originalLevel = injector::ReadMemory<int> (0xB72914);
     Scrpt::CallOpcode (0x4BB, "select_interior", 0);
 
     *x = randomFloat (-3000, 3000);
     *y = randomFloat (-3000, 3000);
-    *z = CWorld::FindGroundZedForCoord (*x, *y);
 
-    cutsceneRandomizer->originalLevel = injector::ReadMemory<int> (0x48B99C);
+    Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", *x, *y);
+    Scrpt::CallOpcode (0x3CB, "set_render_origin", *x, *y, 20);
+    Scrpt::CallOpcode (0x15f, "set_pos", *x, *y, 20, 0, 0, 0);
+
+    *z = CWorld::FindGroundZedForCoord (*x, *y);
 }
 
 /*******************************************************/
@@ -98,11 +127,11 @@ CutsceneRandomizer::Initialise ()
     else
         return;
 
-    RegisterHooks ({
-        {HOOK_CALL, 0x5B0B30, (void *) &RandomizeCutsceneObject},
-        {HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},
-        //{HOOK_CALL, 0x48078A, (void *) &RestoreCutsceneInterior}
-    });
+    RegisterHooks ({{HOOK_CALL, 0x5B0B30, (void *) &RandomizeCutsceneObject},
+                    {HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},
+                    {HOOK_CALL, 0x48078A, (void *) &RestoreCutsceneInterior}});
+    injector::MakeNOP (0x5B09D2, 5);
+
     Logger::GetLogger ()->LogMessage ("Intialised CutsceneRandomizer");
 }
 

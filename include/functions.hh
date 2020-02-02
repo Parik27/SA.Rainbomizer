@@ -290,6 +290,7 @@ struct CModelInfo
     static bool IsRCModel (int modelId);
     static int  LoadVehicleColours ();
     static int  GetMaximumNumberOfPassengersFromNumberOfDoors (int modelIndex);
+    static void GetModelInfo (const char *modelName, short *index);
 };
 
 struct CAEVehicleAudioEntity

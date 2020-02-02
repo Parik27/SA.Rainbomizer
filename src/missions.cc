@@ -15,6 +15,7 @@
 #include <array>
 #include <random>
 #include <memory>
+#include "loader.hh"
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 

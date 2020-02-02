@@ -313,6 +313,13 @@ CModelInfo::GetMaximumNumberOfPassengersFromNumberOfDoors (int modelIndex)
 }
 
 /*******************************************************/
+void
+CModelInfo::GetModelInfo (const char *modelName, short *index)
+{
+    Call<0x4C5940> (modelName, index);
+}
+
+/*******************************************************/
 char
 CText::LoadMissionText (const char *table)
 {

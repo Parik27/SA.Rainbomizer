@@ -28,12 +28,15 @@ LoadModelForCutscene (std::string name)
 {
     // Set ms_cutsceneProcessing to 0 before loading.
     // The game doesn't load the models without this for some reason
-    injector::WriteMemory (0xB5F852, 0);
+    injector::WriteMemory<uint8_t> (0xB5F852, 0);
     int ret = 1;
 
     short modelIndex;
     CModelInfo::GetModelInfo (name.c_str (), &modelIndex);
 
+    Logger::GetLogger ()->LogMessage ("Loading Cutscene Model: "
+                                      + name + " " + std::to_string(modelIndex));
+    
     if (modelIndex && StreamingManager::AttemptToLoadVehicle (modelIndex) == ERR_FAILED)
         {
             Logger::GetLogger ()->LogMessage ("Failed to load Cutscene Model: "
@@ -41,7 +44,7 @@ LoadModelForCutscene (std::string name)
             ret = 0;
         }
 
-    injector::WriteMemory (0xB5F852, 1);
+    injector::WriteMemory<uint8_t> (0xB5F852, 1);
     return ret;
 }
 

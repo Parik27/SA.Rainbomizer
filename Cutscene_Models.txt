@@ -1089,9 +1089,7 @@ cspornmag
 
 cssuitcase
 csashtray
-csbarbq
 csbball
-csbcard
 csbeerbottle
 csbong
 csbottle
@@ -1112,7 +1110,6 @@ csflower
 csframe
 csgirliecase
 csjar
-csmopbucket
 csnewspaper
 csnotepad
 csoilcan
@@ -1120,7 +1117,6 @@ cspaperbag
 cspen
 cspencil
 cspornmag
-csremote
 csryderbrew
 cssuitcase
 cstacoplate

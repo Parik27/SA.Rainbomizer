@@ -70,7 +70,9 @@ GreenSabreStartFix (unsigned char *data)
 void
 CustomsFastTrackStartFix (unsigned char *data)
 {
-    Scrpt::CreateNop (data, 38, 45);
+    data += 25110;
+    data = Scrpt::CreateOpcode(0x6, "set_lvar", data, LocalVar(36), 1);
+    data = Scrpt::CreateOpcode(0x51, "return", data);
 }
 
 /*******************************************************/
@@ -162,8 +164,8 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         // Customs Fast Track
         case 69:
             // STEAL4_25110
-            data += 30814;
-            data = Scrpt::CreateOpcode (0x2, "jmp", data, -25110);
+            data += 25743;
+            data = Scrpt::CreateOpcode(0x2, "jump", data, -30732);
 
             break;
 

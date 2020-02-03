@@ -34,7 +34,7 @@ LoadModelForCutscene (std::string name)
     short modelIndex;
     CModelInfo::GetModelInfo (name.c_str (), &modelIndex);
 
-    if (StreamingManager::AttemptToLoadVehicle (modelIndex) == ERR_FAILED)
+    if (modelIndex && StreamingManager::AttemptToLoadVehicle (modelIndex) == ERR_FAILED)
         {
             Logger::GetLogger ()->LogMessage ("Failed to load Cutscene Model: "
                                               + name);

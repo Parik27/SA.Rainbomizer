@@ -31,7 +31,7 @@ LoadModelForCutscene (std::string name)
     injector::WriteMemory<uint8_t> (0xB5F852, 0);
     int ret = 1;
 
-    short modelIndex;
+    short modelIndex = 0;
     CModelInfo::GetModelInfo (name.c_str (), &modelIndex);
 
     Logger::GetLogger ()->LogMessage ("Loading Cutscene Model: "

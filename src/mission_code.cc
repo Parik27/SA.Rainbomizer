@@ -10,7 +10,7 @@ InsertRaceJumpAt (unsigned char *data, int index)
 {
     data = Scrpt::CreateOpcode (0x004, "= const", data, GlobalVar (352), index);
     data = Scrpt::CreateOpcode (0x004, "= const", data, GlobalVar (121), 0);
-    data = Scrpt::CreateOpcode (0x1096, "jump_to_mission", data, 35);
+    data = Scrpt::CreateOpcode (OPCODE_REPLACE_MISSION, "", data, 35);
 }
 
 /*******************************************************/
@@ -71,8 +71,8 @@ void
 CustomsFastTrackStartFix (unsigned char *data)
 {
     data += 25110;
-    data = Scrpt::CreateOpcode(0x6, "set_lvar", data, LocalVar(36), 1);
-    data = Scrpt::CreateOpcode(0x51, "return", data);
+    data = Scrpt::CreateOpcode (0x6, "set_lvar", data, LocalVar (36), 1);
+    data = Scrpt::CreateOpcode (0x51, "return", data);
 }
 
 /*******************************************************/
@@ -81,6 +81,13 @@ FixRaces (MissionRandomizer *rand, unsigned char *data)
 {
     Scrpt::CreateNop (data, 19642, 19649);
     Scrpt::CreateNop (data, 19649, 19706);
+}
+
+/*******************************************************/
+void
+FixCatalinaMissions (unsigned char *data, std::vector<int> offsets)
+{
+    data[offsets[random (offsets.size () - 1)] + 6] = ScriptSpace[64];
 }
 
 /*******************************************************/
@@ -101,6 +108,12 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 38: GreenSabreStartFix (data); break;
         case 69: CustomsFastTrackStartFix (data); break;
         case 35: FixRaces (this, data); break;
+        case 41:
+            FixCatalinaMissions (data, {22837, 23853, 24305, 24580});
+            break;
+        case 42:
+            FixCatalinaMissions (data, {28469, 28849, 29055, 29174});
+            break;
         }
 }
 
@@ -165,13 +178,13 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         case 69:
             // STEAL4_25110
             data += 25743;
-            data = Scrpt::CreateOpcode(0x2, "jump", data, -30732);
+            data = Scrpt::CreateOpcode (0x2, "jump", data, -30732);
 
             break;
 
         // New Model Army
-        case 74: Scrpt::CreateNop(data, 27236, 27254);
-            
+        case 74: Scrpt::CreateNop (data, 27236, 27254);
+
         // Outrider
         case 60: Scrpt::CreateNop (data, 19211, 19216);
         }

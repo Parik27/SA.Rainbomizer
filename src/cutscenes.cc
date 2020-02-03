@@ -32,12 +32,9 @@ LoadModelForCutscene (std::string name)
     int ret = 1;
 
     short modelIndex = 0;
-    CModelInfo::GetModelInfo (name.c_str (), &modelIndex);
 
-    Logger::GetLogger ()->LogMessage ("Loading Cutscene Model: "
-                                      + name + " " + std::to_string(modelIndex));
-    
-    if (modelIndex && StreamingManager::AttemptToLoadVehicle (modelIndex) == ERR_FAILED)
+    if (CModelInfo::GetModelInfo (name.c_str (), &modelIndex)
+        && StreamingManager::AttemptToLoadVehicle (modelIndex) == ERR_FAILED)
         {
             Logger::GetLogger ()->LogMessage ("Failed to load Cutscene Model: "
                                               + name);
@@ -73,6 +70,26 @@ CutsceneRandomizer::GetRandomModel (std::string model)
 
 /*******************************************************/
 void
+SelectCutsceneOffset (char *name)
+{
+    auto    cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
+    COffset offset;
+
+    offset.x = randomFloat (-3000, 3000);
+    offset.y = randomFloat (-3000, 3000);
+
+    Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", offset.x, offset.y);
+    Scrpt::CallOpcode (0x3CB, "set_render_origin", offset.x, offset.y, 20);
+    Scrpt::CallOpcode (0x15f, "set_pos", offset.x, offset.y, 20, 0, 0, 0);
+
+    offset.z = CWorld::FindGroundZedForCoord (offset.x, offset.y);
+    cutsceneRandomizer->offset = offset;
+
+    HookManager::CallOriginal<injector::cstd<void (char *)>, 0x480714> (name);
+}
+
+/*******************************************************/
+void
 RandomizeCutsceneOffset (char *Str, char *format, float *x, float *y, float *z)
 {
 
@@ -83,14 +100,9 @@ RandomizeCutsceneOffset (char *Str, char *format, float *x, float *y, float *z)
     cutsceneRandomizer->originalLevel = injector::ReadMemory<int> (0xB72914);
     Scrpt::CallOpcode (0x4BB, "select_interior", 0);
 
-    *x = randomFloat (-3000, 3000);
-    *y = randomFloat (-3000, 3000);
-
-    Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", *x, *y);
-    Scrpt::CallOpcode (0x3CB, "set_render_origin", *x, *y, 20);
-    Scrpt::CallOpcode (0x15f, "set_pos", *x, *y, 20, 0, 0, 0);
-
-    *z = CWorld::FindGroundZedForCoord (*x, *y);
+    *x = cutsceneRandomizer->offset.x;
+    *y = cutsceneRandomizer->offset.y;
+    *z = cutsceneRandomizer->offset.z;
 }
 
 /*******************************************************/
@@ -147,7 +159,8 @@ CutsceneRandomizer::Initialise ()
         {
             RegisterHooks (
                 {{HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},
-                 {HOOK_CALL, 0x480761, (void *) &RestoreCutsceneInterior}});
+                 {HOOK_CALL, 0x480761, (void *) &RestoreCutsceneInterior},
+                 {HOOK_CALL, 0x480714, (void *) &SelectCutsceneOffset}});
             injector::MakeNOP (0x5B09D2, 5);
         }
 

@@ -122,6 +122,12 @@ GetRainbowColour (int offset)
     return {colour[0], colour[1], colour[2]};
 }
 
+constexpr int
+HashColour (const CRGBA &colour)
+{
+    return (colour.r * 255 + colour.g) * 255 + colour.b;
+}
+
 /*******************************************************/
 CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
                                     uint8_t g, uint8_t b, uint8_t a)
@@ -134,7 +140,7 @@ CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
     float      time = (!hueCycle) ? offset : 1000.0 * clock () / CLOCKS_PER_SEC;
 
     int colour[3];
-    int hash = (r * 255 + g) * 255 + b;
+    int hash = HashColour ({r, g, b, a});
     HSVtoRGB ((int) (time / 10 + hash) % 360, 0.7, 0.7, colour);
 
     if ((r != g && g != b) || crazyMode)
@@ -167,6 +173,19 @@ CRGBA *__fastcall SkipRandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
 }
 
 /*******************************************************/
+void __fastcall RandomizeMarkers (C3dMarker *marker)
+{
+    auto colour      = marker->colour;
+    marker->colour   = GetRainbowColour (HashColour (colour));
+    marker->colour.a = colour.a;
+
+    HookManager::CallOriginal<injector::thiscall<void (C3dMarker *)>,
+                              0x7250B1> (marker);
+
+    marker->colour = colour;
+}
+
+/*******************************************************/
 void
 ColourRandomizer::Initialise ()
 {
@@ -180,7 +199,8 @@ ColourRandomizer::Initialise ()
 
     if (config.texts)
         RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
-                        {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours}});
+                        {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours},
+                        {HOOK_CALL, 0x7250B1, (void *) &RandomizeMarkers}});
 
     if (config.fades)
         {

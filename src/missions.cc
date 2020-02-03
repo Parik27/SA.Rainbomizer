@@ -174,6 +174,113 @@ MissionRandomizer::GetRandomMission (int originalMission)
 }
 
 /*******************************************************/
+void
+MissionRandomizer::HandleReturnOpcode (CRunningScript *scr, short opcode)
+{
+    const int OPCODE_RETURN = 81;
+    if (opcode != OPCODE_RETURN || !mScriptReplaced)
+        return;
+
+    // Restore original base ip
+    scr->m_pBaseIP = mOriginalBaseIP;
+
+    // Restore local variables
+    memcpy ((int *) 0xA48960, this->mLocalVariables, 0x400 * sizeof (uint32_t));
+
+    mScriptReplaced         = false;
+    this->mRandomizedScript = nullptr;
+
+    for (auto i : mMissionCleanups)
+        {
+            if (i.onMissionPassed && (!i.condition || i.condition ()))
+                i.cleanup ();
+        }
+}
+
+/*******************************************************/
+void
+MissionRandomizer::HandleGoSubOpcode (CRunningScript *scr, short &opcode)
+{
+    const int OPCODE_GOSUB = 0x50;
+    if (opcode != OPCODE_GOSUB || !mScriptReplaced)
+        return;
+
+    scr->m_pCurrentIP += 2;
+    mRandomizedScript->CollectParameters (1); // skip
+    HandleGoSubAlternativeForMission (mOriginalMissionNumber);
+
+    opcode = *reinterpret_cast<uint16_t *> (scr->m_pCurrentIP);
+}
+
+/*******************************************************/
+void
+MissionRandomizer::HandleStoreCarOpcode (CRunningScript *scr, short opcode)
+{
+    const int OPCODE_STORE_CAR_CHAR_IS_IN = 0xD9;
+    if (opcode != OPCODE_STORE_CAR_CHAR_IS_IN || mRandomizedMissionNumber != 36)
+        return;
+
+    // Put player in a random vehicle
+    if (!FindPlayerVehicle ())
+        {
+            constexpr int vehicle = 567;
+
+            CStreaming::RequestModel (vehicle, 0);
+            CStreaming::LoadAllRequestedModels (0);
+            if (ms_aInfoForModel[vehicle].m_nLoadState == 1)
+                {
+                    Scrpt::CallOpcode (0xa5, "create_car", 567, 0.0f, 0.0f,
+                                       0.0f, GlobalVar (2197));
+                    Scrpt::CallOpcode (0x036A, "put_actor_in_car",
+                                       GlobalVar (3), ScriptSpace[2197]);
+                }
+            else
+                {
+                    Logger::GetLogger ()->LogMessage (
+                        "High Stakes failed to successfully "
+                        "spawn a random vehicle for the "
+                        "player");
+                }
+        }
+}
+
+/*******************************************************/
+void
+MissionRandomizer::HandleReplaceMissionOpcode (CRunningScript *scr,
+                                               short           opcode)
+{
+    if (opcode != OPCODE_REPLACE_MISSION)
+        return;
+
+    mRandomizedScript->m_pCurrentIP += 2;
+    mRandomizedScript->CollectParameters (1);
+
+    mRandomizedScript->ProcessCommands0to99 (0x4E);
+
+    Scrpt::CallOpcode (0x417, "start_mission", ScriptParams[0]);
+}
+
+/*******************************************************/
+void
+MissionRandomizer::HandleEndThreadOpcode (CRunningScript *scr, short opcode)
+{
+    const int OPCODE_END_THREAD = 78;
+    if (opcode != OPCODE_END_THREAD)
+        return;
+
+    for (auto i : mMissionCleanups)
+        {
+            if (i.onMissionFailed && (!i.condition || i.condition ()))
+                i.cleanup ();
+        }
+
+    RestoreCityInfo (this->mCityInfo);
+    SetGangTerritoriesForMission (mOriginalMissionNumber);
+    SetRiotModeForMission (mOriginalMissionNumber);
+    this->mRandomizedScript = nullptr;
+}
+
+/*******************************************************/
 bool
 MissionRandomizer::ShouldJump (CRunningScript *scr)
 {
@@ -187,85 +294,12 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
         {
             short opCode = *reinterpret_cast<uint16_t *> (scr->m_pCurrentIP);
 
-            if (opCode == OPCODE_RETURN && mScriptReplaced)
-                {
-                    // Restore original base ip
-                    scr->m_pBaseIP = mOriginalBaseIP;
+            HandleGoSubOpcode (scr, opCode);
+            HandleEndThreadOpcode (scr, opCode);
+            HandleStoreCarOpcode (scr, opCode);
+            HandleReturnOpcode (scr, opCode);
 
-                    // Restore local variables
-                    memcpy ((int *) 0xA48960, this->mLocalVariables,
-                            0x400 * sizeof (uint32_t));
-
-                    mScriptReplaced         = false;
-                    this->mRandomizedScript = nullptr;
-
-                    for (auto i : mMissionCleanups)
-                        {
-                            if (i.onMissionPassed
-                                && (!i.condition || i.condition ()))
-                                i.cleanup ();
-                        }
-                }
-            else if (opCode == OPCODE_GOSUB && mScriptReplaced)
-                {
-                    scr->m_pCurrentIP += 2;
-                    mRandomizedScript->CollectParameters (1); // skip
-                    HandleGoSubAlternativeForMission (mOriginalMissionNumber);
-                }
-            else if (opCode == OPCODE_END_THREAD)
-                {
-                    for (auto i : mMissionCleanups)
-                        {
-                            if (i.onMissionFailed
-                                && (!i.condition || i.condition ()))
-                                i.cleanup ();
-                        }
-
-                    RestoreCityInfo (this->mCityInfo);
-                    SetGangTerritoriesForMission (mOriginalMissionNumber);
-                    SetRiotModeForMission (mOriginalMissionNumber);
-                    this->mRandomizedScript = nullptr;
-                }
-            else if (opCode == OPCODE_STORE_CAR_CHAR_IS_IN
-                     && mRandomizedMissionNumber == 36)
-                {
-                    // Put player in a random vehicle
-                    if (!FindPlayerVehicle ())
-                        {
-                            constexpr int vehicle = 567;
-
-                            CStreaming::RequestModel (vehicle, 0);
-                            CStreaming::LoadAllRequestedModels (0);
-                            if (ms_aInfoForModel[vehicle].m_nLoadState == 1)
-                                {
-                                    Scrpt::CallOpcode (0xa5, "create_car", 567,
-                                                       0.0f, 0.0f, 0.0f,
-                                                       GlobalVar (2197));
-                                    Scrpt::CallOpcode (0x036A,
-                                                       "put_actor_in_car",
-                                                       GlobalVar (3),
-                                                       ScriptSpace[2197]);
-                                }
-                            else
-                                {
-                                    Logger::GetLogger ()->LogMessage (
-                                        "High Stakes failed to successfully "
-                                        "spawn a random vehicle for the "
-                                        "player");
-                                }
-                        }
-                }
-            else if (opCode == 0x1096)
-                {
-                    mRandomizedScript->m_pCurrentIP += 2;
-                    mRandomizedScript->CollectParameters (1);
-
-                    mRandomizedScript->ProcessCommands0to99 (0x4E);
-
-                    Scrpt::CallOpcode (0x417, "start_mission", ScriptParams[0]);
-                }
-
-            this->mPrevOffset = currentOffset;
+            this->mPrevOffset = scr->m_pCurrentIP - scr->m_pBaseIP;
         }
     if (scr == this->mRandomizedScript)
         {

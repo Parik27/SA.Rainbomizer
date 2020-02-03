@@ -7,6 +7,8 @@
 
 struct CRunningScript;
 
+const int OPCODE_REPLACE_MISSION = 0x1096; // custom opcode used in race scripts
+
 struct CitiesInfo
 {
     int  citiesUnlocked;
@@ -75,6 +77,12 @@ class MissionRandomizer
     void HandleGoSubAlternativeForMission (int index);
 
     int GetCorrectedMissionStatusIndex (int index);
+
+    void HandleReturnOpcode (CRunningScript *scr, short opcode);
+    void HandleGoSubOpcode (CRunningScript *scr, short &opcode);
+    void HandleStoreCarOpcode (CRunningScript *scr, short opcode);
+    void HandleReplaceMissionOpcode (CRunningScript *scr, short opcode);
+    void HandleEndThreadOpcode (CRunningScript *scr, short opcode);
 
 public:
     CRunningScript *    mRandomizedScript        = nullptr;

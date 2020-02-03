@@ -290,7 +290,7 @@ struct CModelInfo
     static bool IsRCModel (int modelId);
     static int  LoadVehicleColours ();
     static int  GetMaximumNumberOfPassengersFromNumberOfDoors (int modelIndex);
-    static void GetModelInfo (const char *modelName, short *index);
+    static int  GetModelInfo (const char *modelName, short *index);
 };
 
 struct CAEVehicleAudioEntity
@@ -744,6 +744,12 @@ CVehicle *FindPlayerVehicle (int playerId = -1, bool bIncludeRemote = false);
 CPed *    FindPlayerPed (int playerId = -1);
 CEntity * FindPlayerEntity (int playerId = -1);
 float     Dist (CVector a, CVector b);
+
+struct C3dMarker
+{
+    char  __pad00[0x58];
+    CRGBA colour;
+};
 
 struct CGame
 {

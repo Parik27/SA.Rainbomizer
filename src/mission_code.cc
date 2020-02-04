@@ -102,8 +102,9 @@ RyderStartFix (unsigned char *data)
 void
 NewModelArmyStartFix (unsigned char *data)
 {
-    data = Scrpt::CreateOpcode (0x50, "gosub", data + 26926, -27317);
-    data = Scrpt::CreateOpcode (0x2, "jump", data, -27224);
+    auto _data = Scrpt::CreateOpcode (0x50, "gosub", data + 26926, -27317);
+    Scrpt::CreateOpcode (0x2, "jump", _data, -27062);
+    Scrpt::CreateOpcode (0x2, "jump", data + 27086, -27224);
 }
 
 /*******************************************************/
@@ -126,6 +127,7 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 69: CustomsFastTrackStartFix (data); break;
         case 35: FixRaces (this, data); break;
         case 12: RyderStartFix (data); break;
+        case 74: NewModelArmyStartFix (data); break;
         }
 }
 

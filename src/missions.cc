@@ -297,12 +297,20 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
             HandleGoSubOpcode (scr, opCode);
             HandleEndThreadOpcode (scr, opCode);
             HandleStoreCarOpcode (scr, opCode);
+            HandleReplaceMissionOpcode (scr, opCode);
             HandleReturnOpcode (scr, opCode);
 
             this->mPrevOffset = scr->m_pCurrentIP - scr->m_pBaseIP;
         }
+
     if (scr == this->mRandomizedScript)
         {
+            if (mScriptByPass)
+                {
+                    SetScriptByPass (false);
+                    return true;
+                }
+
             for (auto i : threadFinishes[this->mRandomizedMissionNumber])
                 {
                     if (i == currentOffset)
@@ -596,6 +604,47 @@ MissionRandomizer::Load ()
 
 /*******************************************************/
 void
+ScriptByPassCheat ()
+{
+    if (MissionRandomizer::GetInstance ()->mRandomizedScript)
+        MissionRandomizer::GetInstance ()->SetScriptByPass ();
+}
+
+/*******************************************************/
+void
+BringBackMyMarkersCheat ()
+{
+    ScriptSpace[409] = 0;
+}
+
+/*******************************************************/
+void
+MissionRandomizer::InstallCheat (void *func, uint32_t hash)
+{
+    const int total_cheats    = 92;
+    void **   cheat_functions = reinterpret_cast<void **> (0x8A5B58);
+    int *     cheat_hashes    = reinterpret_cast<int *> (0x8A5CC8);
+
+    for (int i = 0; i < total_cheats; i++)
+        {
+            if (cheat_hashes[i] == 0)
+                {
+                    cheat_hashes[i]    = hash;
+                    cheat_functions[i] = func;
+                    Logger::GetLogger ()->LogMessage (
+                        "Successfully registered cheat "
+                        + std::to_string (hash));
+                    return;
+                }
+        }
+
+    Logger::GetLogger ()->LogMessage ("Failed to register cheat "
+                                      + std::to_string (hash));
+    return;
+}
+
+/*******************************************************/
+void
 MissionRandomizer::Initialise ()
 {
 
@@ -623,6 +672,9 @@ MissionRandomizer::Initialise ()
 
     this->ResetSaveData ();
     this->InitShuffledMissionOrder ();
+
+    this->InstallCheat ((void *) &ScriptByPassCheat, 0xBB5ADFD7);
+    this->InstallCheat ((void *) &BringBackMyMarkersCheat, 0xFD7F4A34);
 
     Logger::GetLogger ()->LogMessage ("Intialised MissionRandomizer");
 }

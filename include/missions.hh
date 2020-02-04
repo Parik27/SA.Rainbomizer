@@ -63,6 +63,7 @@ class MissionRandomizer
     unsigned char *mTempMissionData = nullptr;
     int *          mLocalVariables  = nullptr;
     CitiesInfo     mCityInfo;
+    bool           mScriptByPass = false;
 
     MissionRandomizerSaveStructure                mSaveInfo;
     std::unordered_map<int, std::vector<uint8_t>> mShuffledOrder;
@@ -83,6 +84,8 @@ class MissionRandomizer
     void HandleStoreCarOpcode (CRunningScript *scr, short opcode);
     void HandleReplaceMissionOpcode (CRunningScript *scr, short opcode);
     void HandleEndThreadOpcode (CRunningScript *scr, short opcode);
+
+    void InstallCheat (void *func, uint32_t hash);
 
 public:
     CRunningScript *    mRandomizedScript        = nullptr;
@@ -149,6 +152,12 @@ public:
     AddToMissionCleanup (MissionCleanup cleanup)
     {
         mMissionCleanups.push_back (cleanup);
+    }
+
+    void
+    SetScriptByPass (bool status = true)
+    {
+        mScriptByPass = status;
     }
 
     /// Add to mission cleanup

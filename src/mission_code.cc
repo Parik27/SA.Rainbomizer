@@ -85,9 +85,25 @@ FixRaces (MissionRandomizer *rand, unsigned char *data)
 
 /*******************************************************/
 void
-FixCatalinaMissions (unsigned char *data, std::vector<int> offsets)
+CatalinaStartFix (unsigned char *data, std::vector<int> offsets)
 {
     data[offsets[random (offsets.size () - 1)] + 6] = ScriptSpace[64];
+}
+
+/*******************************************************/
+void
+RyderStartFix (unsigned char *data)
+{
+    Scrpt::CreateNop (data, 1391, 1469);
+    Scrpt::CreateNop (data, 11509, 11522);
+}
+
+/*******************************************************/
+void
+NewModelArmyStartFix (unsigned char *data)
+{
+    data = Scrpt::CreateOpcode (0x50, "gosub", data + 26926, -27317);
+    data = Scrpt::CreateOpcode (0x2, "jump", data, -27224);
 }
 
 /*******************************************************/
@@ -103,17 +119,13 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 34:
             HousePartyStartFix (data, mSaveInfo.missionStatus[34] == 2);
             break;
-
+        case 41: CatalinaStartFix (data, {22837, 23853, 24305, 24580}); break;
+        case 42: CatalinaStartFix (data, {28469, 28849, 29055, 29174}); break;
         case 36: HighStakesStartFix (this, data); break;
         case 38: GreenSabreStartFix (data); break;
         case 69: CustomsFastTrackStartFix (data); break;
         case 35: FixRaces (this, data); break;
-        case 41:
-            FixCatalinaMissions (data, {22837, 23853, 24305, 24580});
-            break;
-        case 42:
-            FixCatalinaMissions (data, {28469, 28849, 29055, 29174});
-            break;
+        case 12: RyderStartFix (data); break;
         }
 }
 
@@ -183,9 +195,17 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
             break;
 
         // New Model Army
-        case 74: Scrpt::CreateNop (data, 27236, 27254);
+        case 74:
+            Scrpt::CreateNop (data, 27236, 27254);
+            Scrpt::CreateOpcode (0x2, "jump", data + 27317, -26926);
+            Scrpt::CreateOpcode (0x51, "return", data + 27193);
+            break;
 
         // Outrider
-        case 60: Scrpt::CreateNop (data, 19211, 19216);
+        case 60:
+
+            // remove code setting max wanted level to 0
+            Scrpt::CreateNop (data, 19211, 19216);
+            break;
         }
 }

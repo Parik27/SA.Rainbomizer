@@ -100,7 +100,7 @@ MissionRandomizer::TeleportPlayerAfterMission ()
         {
             int status   = GetStatusForTwoPartMissions (mOriginalMissionNumber);
             Position pos = missionEndPos.at (mOriginalMissionNumber)[status];
-            pos.z        = (mRandomizedMissionNumber == 80) ? 100 : pos.z;
+            pos.z        = (mRandomizedMissionNumber == 80) ? 1500 : pos.z;
 
             Teleport (pos);
             Logger::GetLogger ()->LogMessage (

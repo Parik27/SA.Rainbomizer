@@ -12,6 +12,7 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 - **(NEW) Colour Randomizer**: Randomizes the colours of various in-game elements, including cars, the HUD, and fades. Includes 128 colours hue cycle. The intensity of this randomizer can be modified extensively in the configuration file.
 - **(NEW) Mission Randomizer**: Randomizes which mission is started by each mission marker. When the randomized mission is complete, the game progresses as if you completed the original. Additional features include missions that take place in locked-out areas unlocking during the mission, the ability for the same mission marker to always give the same randomized mission, and the ability for the player to be teleported back to the original mission's end point upon mission completion.
 - **Weapons Randomizer**: Randomizes the weapons that are dropped/wielded by the player/enemies.
+- **(NEW) Weapon Stats Randomizer**: Randomizes properties of all weapons, including their damage, fire rate, and clip size.
 - **Pickup Randomizer**: Randomizes weapon pickups scattered around the map, as well as the appearance of certain other types of pickups.
 - **Voice Line Randomizer**: Randomizes dialogues spoken by characters in missions. *(Requires original AudioEvents.txt)*
 - **(NEW) Cutscene Randomizer**: Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
@@ -56,13 +57,30 @@ More information about how to configure specific randomizers is provided in the 
 
 ## Credits 🌈
 
-- [NABN00B](https://www.twitch.tv/nabn00b) - For the original idea for a car randomizer for San Andreas.
-- [GTA Madman](https://twitch.tv/gta_madman) - For contributing fixes and extensive testing
-- [123robot](https://www.twitch.tv/123robot) - For support through the development and streaming Rainbomizer playthroughs
-- [Veigar](https://gtaforums.com/profile/685882-veigar/) - Idea for the Parked Car/Texture Randomizer and support throughout the development phase
+### Lead Developers
+
+- [Parik](https://github.com/Parik27) - Creation and implementation of the ASI.
+- [123robot](https://www.twitch.tv/123robot) - Creating external files, gathering data, providing ideas, lots of testing, and general support throughout development.
+- [GTA Madman](https://github.com/GTAMadman) - Contributed fixes and extensive testing.
+
+### Original Concept
+
+- [NABN00B](https://www.twitch.tv/nabn00b) - Gave the original idea for a car randomizer for San Andreas.
 - [MrMateczko](https://www.twitch.tv/mrmateczko_) - Special mention for sharing a modded cargrp file that led to the original idea.
-- [Waris](https://www.twitch.tv/wariscoach) - Streaming a playthrough of the Rainbomizer.
-- [Lordmau5](https://www.twitch.tv/lordmau5/) - Special mention for supporting and testing.
+- [Veigar](https://gtaforums.com/profile/685882-veigar/) - Idea for the Parked Car/Texture Randomizer and support during early development.
+
+### Additional Contributors
+
+- [iguana](https://www.twitch.tv/iguana_) - Assisted with looking through code and helped inspire the mission randomizer.
+- [SRewo](https://github.com/SRewo) - Creating the Weapon Stats Randomizer.
+
+### Beta Testers
+
+- [Fryterp23](https://www.twitch.tv/fryterp23/)
+- [Hugo_One](https://www.twitch.tv/hugo_one)
+- [Lordmau5](https://www.twitch.tv/lordmau5/)
+- [SpeedyFolf](https://www.twitch.tv/speedyfolf)
+- [Waris](https://www.twitch.tv/wariscoach)
 
 ## Used Libraries 🌈
 

@@ -1,3 +1,4 @@
+![Build](https://github.com/Parik27/Rainbomizer/workflows/Build/badge.svg)
 # Rainbomizer 🌈
 
 <img src="https://media.discordapp.net/attachments/419957309192536066/602097860292509718/spinning.gif">
@@ -57,24 +58,24 @@ More information about how to configure specific randomizers is provided in the 
 
 ## Credits 🌈
 
-### Lead Developers
+#### Lead Developers
 
 - [Parik](https://github.com/Parik27) - Creation and implementation of the ASI.
 - [123robot](https://www.twitch.tv/123robot) - Creating external files, gathering data, providing ideas, lots of testing, and general support throughout development.
 - [GTA Madman](https://github.com/GTAMadman) - Contributed fixes and extensive testing.
 
-### Original Concept
+#### Original Concept
 
 - [NABN00B](https://www.twitch.tv/nabn00b) - Gave the original idea for a car randomizer for San Andreas.
 - [MrMateczko](https://www.twitch.tv/mrmateczko_) - Special mention for sharing a modded cargrp file that led to the original idea.
 - [Veigar](https://gtaforums.com/profile/685882-veigar/) - Idea for the Parked Car/Texture Randomizer and support during early development.
 
-### Additional Contributors
+#### Additional Contributors
 
 - [iguana](https://www.twitch.tv/iguana_) - Assisted with looking through code and helped inspire the mission randomizer.
 - [SRewo](https://github.com/SRewo) - Creating the Weapon Stats Randomizer.
 
-### Beta Testers
+#### Beta Testers
 
 - [Fryterp23](https://www.twitch.tv/fryterp23/)
 - [Hugo_One](https://www.twitch.tv/hugo_one)

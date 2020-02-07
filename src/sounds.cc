@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "config.hh"
+#include "injector/injector.hpp"
 
 SoundRandomizer *SoundRandomizer::mInstance = nullptr;
 
@@ -255,6 +256,8 @@ SoundRandomizer::Initialise ()
          {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
          {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
          {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList}});
+
+    injector::WriteMemory<uint8_t> (0x4EC302 + 2, 3);
     InitaliseSoundTable ();
 }
 

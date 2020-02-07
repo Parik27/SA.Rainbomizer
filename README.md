@@ -18,11 +18,11 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 - **Voice Line Randomizer**: Randomizes dialogues spoken by characters in missions. *(Requires original AudioEvents.txt)*
 - **(NEW) Cutscene Randomizer**: Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
 - **(NEW) Blip Randomizer**: Randomizes every radar blip on the map with a different icon.
-- **(NEW) Particle Randomizer**: Randomizes all of the game's particle effects.
 - **Police Helicopters Randomizer**: Randomizes the helicopters that the police spawn in with working spotlight and gun.
 - **Cheat Randomizer**: Randomizes which cheat activates when you enter a cheat.
 - **License Plate Randomizer**: Randomizes the license plates of vehicles to a random word.
 - *(Experimental)* **Handling Randomizer**: Shuffles the handlings of vehicles.
+- *(Experimental)* **(NEW) Particle Randomizer**: Randomizes all of the game's particle effects.
 - *(Experimental)* **(NEW) Object Randomizer**: Randomizes objects spawned by mission scripts into other objects.
 
 ## Supported Versions 🌈

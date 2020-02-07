@@ -41,14 +41,14 @@ Installation requires an ASI Loader to be installed.
 
 If you already have mods like CLEO, you probably already have an ASI Loader installed. 
 
-1. To install the Ultimate ASI Loader, simply extract the Ultimate ASI Loader's dinput8.dll file to the game's root directory (with gta_sa.exe), and rename it to `vorbisFile.dll` if necessary (For Example, while using dinput8.dll for mouse fix already)
-2. To install Rainbomizer, download the release archive from [Releases](https://github.com/Zarig/Rainbomizer/releases) and extract the asi and the toml file to the `scripts` folder or the root directory.
+1. To install the Ultimate ASI Loader, simply extract the Ultimate ASI Loader's dinput8.dll file to the game's root directory (Folder where the game is installed)
+2. To install Rainbomizer, download the release archive from [Releases](https://github.com/Parik27/Rainbomizer/releases) and extract the archive to the root directory.
 
 ## Configuration 🌈
 
-If you wish to change any of the mod's functionalities, for example to disable a specific randomizer, a configuration file (`rainbomizer.toml`) has been provided with the mod.
+If you wish to change any of the mod's functionalities, for example to disable a specific randomizer, a configuration file (`config.toml`) has been provided with the mod. The config file is located in the `rainbomizer` folder in the game's root directory.
 
-The default configuration file is in the main repository, `config.toml`, but it is automatically created by the mod if it doesn't exist in the same folder as the asi file.
+The default configuration file is in the main repository, `config.toml`, and is automatically created by the mod if it doesn't exist in the rainbomizer folder.
 
 The configuration file is in the TOML format. It is similar in structure to ini's but with a defined and better structure. 
 
@@ -90,7 +90,7 @@ More information about how to configure specific randomizers is provided in the 
 
 ## Contribution 🌈
 
-You can contribute to the project by reporting any crashes/issues you encounter in the [Issues](https://github.com/Zarig/Rainbomizer/issues) section of the repository
+You can contribute to the project by reporting any crashes/issues you encounter in the [Issues](https://github.com/Parik27/Rainbomizer/issues) section of the repository
 
 Pull requests are welcome but are required to follow the current style used in the project.
 

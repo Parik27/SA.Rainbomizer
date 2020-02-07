@@ -28,15 +28,17 @@ Unprotect = true
 AutosaveSlot = 8 # Set it to a non-existant slot (eg. -1 or 9) to disable
 
 #######################################################
-# Traffic Randomizer
+# Traffic Randomizer - Randomizes cars that spawn on traffic including law enforcement vehicles
+
 [TrafficRandomizer]
 
 Enabled = true
 
-# This will make a specific vehicle spawn on streets
+# This will make a specific vehicle spawn in traffic
 ForcedVehicleEnabled = false
 ForcedVehicleID = 500
 
+# Change these options to disable certain types of vehicles from spawning in traffic
 EnableTrains = true
 EnableBoats = true
 EnableAircrafts = true
@@ -44,46 +46,66 @@ EnableCars = true
 EnableBikes = true
 EnableTrailers = true
 
-# For special vehicles on street that can't spawn peds
+# Ped to spawn in odd Ambulances and Fire Truck
 DefaultModel = 0
 
 #######################################################
+# Colour Randomizer - Randomizes the colours of various in-game elements, including cars, the HUD, and fades. 
 [ColourRandomizer]
 
 Enabled = true
-RandomizeFades = false
-RainbowText = true
-RainbowHueCycle = false
-CrazyMode = false # You don't want this, trust me ;)
-Exceptions = [0, 1] # These colours will not be randomized
+
+# TODO: RandomizeCarCols = true # (Car Colours)
+# TODO: RandomizeMarkers = true # (Mission Markers and Arrows)
+RandomizeFades = false # (In-game fade-in/outs. WARNING: Hard on eyes)
+RainbowText = true # (HUD elements and menu text)
+
+RainbowHueCycle = false # (All randomized elements will have transition between rainbow colours)
+
+CrazyMode = false # Changes images and menu background (WARNING: VERY hard on eyes)
+Exceptions = [0, 1] # These are exceptions to car colours. (Default: Black and white car colours)
 
 #######################################################
+# Police Heli Randomizer - Randomizes the helicopters that the police spawn in with working spotlight and gun.
 [PoliceHeliRandomizer]
 
 Enabled = true
 
 #######################################################
+# Cheat Randomizer - Randomizes which cheat activates when you enter a cheat.
 [CheatRandomizer]
 
-Enabled = true
+Enabled = false
 EnableEasterEgg = true
 
 #######################################################
-# Experimental - Crashes are quite often
+# Handling Randomizer (EXPERIMENTAL) - Shuffles the handlings of vehicles.
 [HandlingRandomizer]
 
 Enabled = false
 
 #######################################################
+# Weapon Randomizer - Randomizes the weapons that are dropped/wielded by the player/enemies.
 [WeaponRandomizer]
 
 Enabled = true
 RandomizePlayerWeapons = true
 SkipChecks = false # Checks related to weapons required for certain missions
-				   # You might not be able to complete some missions
-				   # without this enabled.
+		   # You might not be able to complete some missions
+		   # without this enabled.
 
-# Pattern checks
+# -----------------------------------------------------------------------------
+# Don't change this unless you know what you're doing
+# These patterns dictate what weapons you get during the missions.
+# Description of the format: (all sections are optional)
+
+# thread => main.scm thread name (in small case) for missions this pattern is applicable for
+# ped => (0 for player-only)
+# weapon => The actual weapon to replace
+# allowed => A list of allowed weapons. (Special strings: "slot": allows only weapons of the same slot)
+
+#-------------------------------------------------------
+
 Patterns = [
 	{ thread = "drugs4", ped = 0, weapon = 30, allowed = ["slot"]},
 	{ thread = "finalec", ped = 0, weapon = 28, allowed = ["slot"]},
@@ -106,71 +128,111 @@ Patterns = [
 ]
 
 #######################################################
+# Pickups Randomizer - Randomizes weapon pickups scattered around the map, as well as the appearance of certain other types of pickups.
+# WARNING: May make missions difficult to progress with
 [PickupsRandomizer]
 
 Enabled = false
 ReplaceWithWeaponsOnly = true # Does nothing yet
 
 #######################################################
+# Parked Car Randomizer - Randomizes cars which are found parked around the map including airplanes at airports with entirely random spawns.
 [ParkedCarRandomizer]
 
 Enabled = true
-RandomizeFixedSpawns = true
-RandomizeRandomSpawns = true
+RandomizeFixedSpawns = true # (Fixed spawns like Sweet's car)
+RandomizeRandomSpawns = true # (For example: Car Parks)
 
 ########################################################
+# Weapon Stats Randomizer (EXPERIMENTAL)  - Randomizes properties of all weapons, including their damage, fire rate, and clip size.
+# Thanks to SRewo for creating the randomizer
 [WeaponStatsRandomizer]
 
 Enabled = false
 
 #######################################################
+# Mission Randomizer: Randomizes which mission is started by each mission marker
 [MissionRandomizer]
 
 Enabled = true
+
+# Makes every misssion a specific mission. (Take mission number from main.scm)
 ForcedMissionEnabled = false
 ForcedMissionID = 11
+
+# RandomizeOnce - means the starting a specific mission will give the same mission for every new game/load game
 RandomizeOnce = true
-RandomizeOnceSeed = -1
-ForceRandomizeOnceSeed = false
+RandomizeOnceSeed = "" # https://en.wikipedia.org/wiki/Random_seed - useful for races
+ForcedRandomizeOnceSeed = false # Force the seed on existing save files
 
 #######################################################
+# Cutscene Randomizer - Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
 [CutsceneRandomizer]
 
 Enabled = true
+
 RandomizeModels = true
 RandomizeLocations = true
+
+# Relative to rainbomizer/. 
 CutsceneFile = "Cutscene_Models.txt"
 
 #######################################################
+# Blip Randomizer - Randomizes every radar blip on the map with a different icon.
+# WARNING: Blips are permanently saved in the save file
 [BlipsRandomizer]
 
-Enabled = true
+Enabled = false
 
 #######################################################
+# Particle Randomizer (EXPERIMENTAL) - Randomizes all of the game's particle effects
 [ParticleRandomizer]
 
 Enabled = false
 
 #######################################################
+# Object Randomizer (EXPERIMENTAL) - Randomizes objects spawned by mission scripts into other objects
+[ObjectRandomizer]
+
+Enabled = false
+
+#######################################################
+# License Plate Randomizer - Randomizes the license plates of vehicles to a random word.
 [LicensePlateRandomizer]
 
 Enabled = true
 
 #######################################################
+# Voice Line Randomizer - Randomizes dialogues spoken by characters in missions. (Requires original AudioEvents.txt)
 [SoundsRandomizer] # Random Dialogues for now
 
 Enabled = true
 MatchSubtitles = true
 AudioEventsFile = "data/AudioEvents.txt" # Relative to game directory
-ForceAudioLineEnabled = false
-ForceAudioLine = 0
+ForcedAudioLineEnabled = false
+ForcedAudioLine = 0
 
 #######################################################
+# Script Vehicle Randomizer - Randomizes the vehicles you are given in missions.
 [ScriptVehicleRandomizer]
 
 Enabled = true
-SkipChecks = false	# Don't enable this if you don't want to softlock every
-					# other mission :P
+
+# Gives you any vehicle for every mission (You might not be able to proceed with missions with this enabled)
+SkipChecks = false
+
+# --------------------------------------------------------------
+# List that decides what vehicles will spawn in a specific mission.
+# Format Description:
+
+# thread => Mission thread (from main.scm, in lower case)
+# vehicle => the actual vehicle to replace. Can be a special string ("bmx", "planes", "bikes", "bmx" etc.)
+# allowed => Vehicles allowed to spawn for this vehicle. (Can use the same special strings as above)
+# denied => Vehicles that will be exempt from the allowed list.
+# coords => A list of *integer* coordinates for matching vehicles at a specific coordinates
+# move [x, y, z, unused] => Move the vehicle to a different position (relative to original)
+# --------------------------------------------------------------
+
 Patterns = [
 
 	# Mission specific-patterns

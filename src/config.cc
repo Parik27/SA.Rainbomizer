@@ -65,7 +65,7 @@ MissionConfig::Read (std::shared_ptr<cpptoml::table> table)
     CONFIG (table, forcedMissionEnabled, "ForcedMissionEnabled", bool);
     CONFIG (table, forcedMissionID, "ForcedMissionID", int);
     CONFIG (table, shufflingEnabled, "RandomizeOnce", bool);
-    CONFIG (table, forceShufflingSeed, "ForceRandomizeOnceSeed", bool);
+    CONFIG (table, forceShufflingSeed, "ForcedRandomizeOnceSeed", bool);
 
     std::string seed
         = table->get_as<std::string> ("RandomizeOnceSeed").value_or ("");
@@ -285,8 +285,8 @@ SoundsConfig::Read (std::shared_ptr<cpptoml::table> table)
 
     CONFIG (table, matchSubtitles, "MatchSubtitles", bool);
     CONFIG (table, audioEventsFile, "AudioEventsFile", std::string);
-    CONFIG (table, forceAudioEnabled, "ForceAudioLineEnabled", bool);
-    CONFIG (table, forceAudioID, "ForceAudioLine", int);
+    CONFIG (table, forceAudioEnabled, "ForcedAudioLineEnabled", bool);
+    CONFIG (table, forceAudioID, "ForcedAudioLine", int);
 }
 
 /*******************************************************/

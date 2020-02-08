@@ -13,7 +13,6 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 - **(NEW) Colour Randomizer**: Randomizes the colours of various in-game elements, including cars, the HUD, and fades. Includes 128 colours hue cycle. The intensity of this randomizer can be modified extensively in the configuration file.
 - **(NEW) Mission Randomizer**: Randomizes which mission is started by each mission marker. When the randomized mission is complete, the game progresses as if you completed the original. Additional features include missions that take place in locked-out areas unlocking during the mission, the ability for the same mission marker to always give the same randomized mission, and the ability for the player to be teleported back to the original mission's end point upon mission completion.
 - **Weapons Randomizer**: Randomizes the weapons that are dropped/wielded by the player/enemies.
-- **(NEW) Weapon Stats Randomizer**: Randomizes properties of all weapons, including their damage, fire rate, and clip size.
 - **Pickup Randomizer**: Randomizes weapon pickups scattered around the map, as well as the appearance of certain other types of pickups.
 - **Voice Line Randomizer**: Randomizes dialogues spoken by characters in missions. *(Requires original AudioEvents.txt)*
 - **(NEW) Cutscene Randomizer**: Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
@@ -23,6 +22,7 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 - **License Plate Randomizer**: Randomizes the license plates of vehicles to a random word.
 - *(Experimental)* **Handling Randomizer**: Shuffles the handlings of vehicles.
 - *(Experimental)* **(NEW) Particle Randomizer**: Randomizes all of the game's particle effects.
+- *(Experimental)* **(NEW) Weapon Stats Randomizer**: Randomizes properties of all weapons, including their damage, fire rate, and clip size.
 - *(Experimental)* **(NEW) Object Randomizer**: Randomizes objects spawned by mission scripts into other objects.
 
 ## Supported Versions 🌈

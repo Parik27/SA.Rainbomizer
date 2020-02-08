@@ -662,6 +662,8 @@ MissionRandomizer::Initialise ()
                     {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript},
                     {HOOK_CALL, 0x441869, (void *) &UnlockCities},
                     {HOOK_CALL, 0x4417F5, (void *) &UnlockCities},
+                    {HOOK_CALL, 0x60C943, (void *) &UnlockCities},
+                    {HOOK_CALL, 0x60C95D, (void *) &UnlockCities},
                     {HOOK_CALL, 0x5D15A6, (void *) &SaveMissionData},
                     {HOOK_CALL, 0x5D19CE, (void *) &LoadMissionData}});
 

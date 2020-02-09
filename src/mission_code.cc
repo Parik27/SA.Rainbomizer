@@ -63,6 +63,8 @@ void
 GreenSabreStartFix (unsigned char *data)
 {
     Scrpt::CreateNop (data, 19773, 19780);
+    Scrpt::CreateNop (data, 19791, 19811);
+    Scrpt::CreateNop (data, 19567, 19587);
     Scrpt::CreateNop (data, 22262, 22275);
 }
 
@@ -109,6 +111,22 @@ NewModelArmyStartFix (unsigned char *data)
 
 /*******************************************************/
 void
+MaddDoggRhymesFix (unsigned char* data)
+{
+    if (CEnterExit::GetInteriorStatus ("MADDOGS"))
+        Scrpt::CreateNop (data, 10596, 10622);
+}
+
+/*******************************************************/
+void
+LosDesperadosFix (unsigned char* data)
+{
+    Scrpt::CallOpcode(0x076C, "set_zone_gang_density", "GAN1", 1, 25);
+    Scrpt::CallOpcode(0x076C, "set_zone_gang_density", "GAN2", 1, 25);
+}
+
+/*******************************************************/
+void
 MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
 {
     switch (this->mRandomizedMissionNumber)
@@ -128,6 +146,8 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 35: FixRaces (this, data); break;
         case 12: RyderStartFix (data); break;
         case 74: NewModelArmyStartFix (data); break;
+        case 32: MaddDoggRhymesFix(data); break;
+        case 109: LosDesperadosFix(data); break;
         }
 }
 
@@ -143,6 +163,19 @@ MissionRandomizer::HandleGoSubAlternativeForMission (int index)
             Scrpt::CallOpcode (0x9, "add_float", GlobalVar (71), 1.5f);
             Scrpt::CallOpcode (0xa1, "Actor.PutAt", GlobalVar (3),
                                GlobalVar (69), GlobalVar (70), GlobalVar (71));
+        }
+}
+
+/*******************************************************/
+void
+MissionRandomizer::ApplyMissionFailFixes()
+{
+    switch (this->mOriginalMissionNumber)
+        {
+        // King in Exile
+        case 45:
+            ScriptSpace[719] = 1;
+            break;
         }
 }
 

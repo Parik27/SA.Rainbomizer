@@ -42,14 +42,6 @@ struct MissionRandomizerSaveStructure
     }
 };
 
-struct MissionCleanup
-{
-    bool                   onMissionPassed;
-    bool                   onMissionFailed;
-    std::function<bool ()> condition;
-    std::function<void ()> cleanup;
-};
-
 class MissionRandomizer
 {
     static MissionRandomizer *mInstance;
@@ -67,9 +59,9 @@ class MissionRandomizer
 
     MissionRandomizerSaveStructure                mSaveInfo;
     std::unordered_map<int, std::vector<uint8_t>> mShuffledOrder;
-    std::vector<MissionCleanup>                   mMissionCleanups;
 
     void ApplyMissionSpecificFixes (unsigned char *data);
+    void ApplyMissionFailFixes ();
     void TeleportPlayerAfterMission ();
     int  GetCorrectedMissionNo ();
     void StoreCityInfo (CitiesInfo &out);
@@ -147,34 +139,10 @@ public:
     void ResetSaveData ();
     void InitShuffledMissionOrder ();
 
-    /// Add to mission cleanup
-    void
-    AddToMissionCleanup (MissionCleanup cleanup)
-    {
-        mMissionCleanups.push_back (cleanup);
-    }
-
     void
     SetScriptByPass (bool status = true)
     {
         mScriptByPass = status;
-    }
-
-    /// Add to mission cleanup
-    void
-    AddToMissionCleanup (std::function<void ()> function,
-                         bool                   onMissionPassed = true,
-                         bool                   onMissionFailed = true,
-                         std::function<bool ()> condition       = nullptr)
-    {
-        mMissionCleanups.push_back (
-            {onMissionPassed, onMissionFailed, condition, function});
-    }
-
-    void
-    ClearMissionCleanup ()
-    {
-        mMissionCleanups.clear ();
     }
 
     void Load ();

@@ -244,6 +244,8 @@ struct IplDef
 struct CPool
 {
     char **m_pObjects;
+    char* m_byteMap;
+    int m_nSize;
 
     template <typename T>
     T *
@@ -733,6 +735,56 @@ struct FxManager_c
 {
     List_c<FxSystemBP_c> SystemBlueprints;
 };
+
+union ShoppingHash
+{
+    int32_t hash;
+    int32_t weaponType;
+    int16_t modelId;
+    char    data[6];
+};
+
+struct CShopping
+{
+    void LoadShop (const char *name); // 0x49BBE0
+
+    int m_nCurrentShoppingType;
+    int m_nTotalItems;
+
+    static ShoppingHash *m_aTextureModels;
+
+    static union
+    {
+        char nameTag[8];
+        char data[24];
+
+    } * m_aNames;
+
+    static ShoppingHash *m_aModels;
+    static ShoppingHash *m_aType;
+};
+
+struct CEnterExit
+{
+    char m_szInteriorName[8];
+    CRect m_rEnterRect;
+    float m_fEnterZ;
+    float m_fEnterAngle;
+    CVector m_vExitPos;
+    float m_fExitAngle;
+    int16_t m_wFlags;
+    int8_t m_bInteriorId;
+    int8_t m_bSkyColour;
+    int8_t m_bTimeOff;
+    int8_t m_bTimeOn;
+    int8_t m_nNumSpawnedPedsInInterior;
+    int8_t padding0037[2];
+
+    static CPool* mp_poolEntryExits;
+    static bool GetInteriorStatus(const char *name);
+};
+
+static_assert(sizeof(CEnterExit) == 0x3C, "CEnterExit is the wrong size");
 
 struct CWorld
 {

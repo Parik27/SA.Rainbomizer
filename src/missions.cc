@@ -62,7 +62,6 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
             if (missionRandomizer->mContinuedMission != ScriptParams[0])
                 {
                     missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
-                    missionRandomizer->ClearMissionCleanup ();
                 }
             else
                 missionRandomizer->SetContinuedMission (-1);
@@ -189,12 +188,6 @@ MissionRandomizer::HandleReturnOpcode (CRunningScript *scr, short opcode)
 
     mScriptReplaced         = false;
     this->mRandomizedScript = nullptr;
-
-    for (auto i : mMissionCleanups)
-        {
-            if (i.onMissionPassed && (!i.condition || i.condition ()))
-                i.cleanup ();
-        }
 }
 
 /*******************************************************/
@@ -268,15 +261,11 @@ MissionRandomizer::HandleEndThreadOpcode (CRunningScript *scr, short opcode)
     if (opcode != OPCODE_END_THREAD)
         return;
 
-    for (auto i : mMissionCleanups)
-        {
-            if (i.onMissionFailed && (!i.condition || i.condition ()))
-                i.cleanup ();
-        }
-
     RestoreCityInfo (this->mCityInfo);
     SetGangTerritoriesForMission (mOriginalMissionNumber);
     SetRiotModeForMission (mOriginalMissionNumber);
+
+    this->ApplyMissionFailFixes ();
     this->mRandomizedScript = nullptr;
 }
 
@@ -522,6 +511,23 @@ UnlockCities (int statsId)
 }
 
 /*******************************************************/
+int
+CorrectMaxNumberOfGroupMembers()
+{
+    auto missionRandomizer = MissionRandomizer::GetInstance ();
+    
+    int max
+        = HookManager::CallOriginalAndReturn<injector::cstd<int ()>, 0x60C925> (
+            3);
+
+    if (missionRandomizer->mRandomizedScript
+        && missionRandomizer->mRandomizedMissionNumber == 109)
+        return std::max(3, max);
+
+    return max;
+}
+
+/*******************************************************/
 void
 SaveMissionData ()
 {
@@ -658,14 +664,16 @@ MissionRandomizer::Initialise ()
     if (!mLocalVariables)
         mLocalVariables = new int[1024];
 
-    RegisterHooks ({{HOOK_CALL, 0x489929, (void *) &RandomizeMissionToStart},
-                    {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript},
-                    {HOOK_CALL, 0x441869, (void *) &UnlockCities},
-                    {HOOK_CALL, 0x4417F5, (void *) &UnlockCities},
-                    {HOOK_CALL, 0x60C943, (void *) &UnlockCities},
-                    {HOOK_CALL, 0x60C95D, (void *) &UnlockCities},
-                    {HOOK_CALL, 0x5D15A6, (void *) &SaveMissionData},
-                    {HOOK_CALL, 0x5D19CE, (void *) &LoadMissionData}});
+    RegisterHooks (
+        {{HOOK_CALL, 0x489929, (void *) &RandomizeMissionToStart},
+         {HOOK_CALL, 0x489A7A, (void *) &StoreRandomizedScript},
+         {HOOK_CALL, 0x441869, (void *) &UnlockCities},
+         {HOOK_CALL, 0x4417F5, (void *) &UnlockCities},
+         {HOOK_CALL, 0x60C943, (void *) &UnlockCities},
+         {HOOK_CALL, 0x60C95D, (void *) &UnlockCities},
+         {HOOK_CALL, 0x5D15A6, (void *) &SaveMissionData},
+         {HOOK_CALL, 0x5D19CE, (void *) &LoadMissionData},
+         {HOOK_CALL, 0x60C925, (void *) &CorrectMaxNumberOfGroupMembers}});
 
     RegisterDelayedHooks ({{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
                            {HOOK_CALL, 0x53BE76, (void *) &InitAtNewGame}});

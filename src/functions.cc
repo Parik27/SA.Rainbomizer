@@ -559,6 +559,18 @@ CWorld::FindGroundZedForCoord (float x, float y)
 }
 
 /*******************************************************/
+bool CEnterExit::GetInteriorStatus (const char *name)
+{
+    for (int i = 0; i < mp_poolEntryExits->m_nSize; i++)
+        {
+            auto object = mp_poolEntryExits->GetAt<CEnterExit> (i);
+            if (std::string (name) == object->m_szInteriorName)
+                return object->m_wFlags & 0x4000;
+        }
+    return true;
+}
+
+/*******************************************************/
 CVector
 FindPlayerCoors (int playerId)
 {
@@ -780,3 +792,4 @@ CPool *          CIplStore::ms_pPool            = (CPool *) 0x8E3FB0;
 RsGlobalType *   RsGlobal                       = (RsGlobalType *) 0xC17040;
 float *          ms_fTimeStep                   = (float *) 0xB7CB5C;
 int &            CGenericGameStorage::length    = *(int *) 0xC16EEC;
+CPool *          CEnterExit::mp_poolEntryExits  = (CPool *) 0x96A7D8;

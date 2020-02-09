@@ -35,6 +35,7 @@ add_library("rainbomizer" SHARED ${SOURCES})
 # Properties
 set_target_properties("rainbomizer" PROPERTIES SUFFIX ".asi")
 target_link_libraries("rainbomizer" PUBLIC dbghelp)
+target_compile_definitions("rainbomizer" PUBLIC NOMINMAX)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   
 else()

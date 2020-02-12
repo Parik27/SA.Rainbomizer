@@ -270,6 +270,19 @@ MissionRandomizer::HandleEndThreadOpcode (CRunningScript *scr, short opcode)
 }
 
 /*******************************************************/
+void
+MissionRandomizer::HandleOverrideRestartOpcode (CRunningScript *scr,
+                                                short           opcode)
+{
+    const int OPCODE_OVERRIDE_RESTART = 0x16E;
+    if (opcode != OPCODE_OVERRIDE_RESTART)
+        return;
+
+    scr->m_pCurrentIP += 2;
+    scr->CollectParameters (4);
+}
+
+/*******************************************************/
 bool
 MissionRandomizer::ShouldJump (CRunningScript *scr)
 {
@@ -283,6 +296,7 @@ MissionRandomizer::ShouldJump (CRunningScript *scr)
         {
             short opCode = *reinterpret_cast<uint16_t *> (scr->m_pCurrentIP);
 
+            HandleOverrideRestartOpcode (scr, opCode);
             HandleGoSubOpcode (scr, opCode);
             HandleEndThreadOpcode (scr, opCode);
             HandleStoreCarOpcode (scr, opCode);
@@ -403,9 +417,10 @@ IsIPLEnabled (char *name)
 void
 MissionRandomizer::StoreCityInfo (CitiesInfo &out)
 {
-    this->mCityInfo.citiesUnlocked = CStats::GetStatValue (UNLOCKED_CITY_STAT);
-    this->mCityInfo.LVBarriers     = IsIPLEnabled ((char *) "BARRIERS2");
-    this->mCityInfo.SFBarriers     = IsIPLEnabled ((char *) "BARRIERS1");
+    out.citiesUnlocked = CStats::GetStatValue (UNLOCKED_CITY_STAT);
+    out.LVBarriers     = IsIPLEnabled ((char *) "BARRIERS2");
+    out.SFBarriers     = IsIPLEnabled ((char *) "BARRIERS1");
+    Scrpt::CallOpcode (0x50F, "get_max_wanted_level", &out.maxWanted);
 }
 
 /*******************************************************/
@@ -423,6 +438,8 @@ MissionRandomizer::RestoreCityInfo (const CitiesInfo &info)
 
     handleBridge (info.LVBarriers, "BARRIERS2");
     handleBridge (info.SFBarriers, "BARRIERS1");
+
+    Scrpt::CallOpcode (0x1F0, "set_max_wanted_level", info.maxWanted);
 }
 
 /*******************************************************/
@@ -453,10 +470,10 @@ void
 MissionRandomizer::UnlockCitiesBasedOnMissionID (int missionId)
 {
     static std::array<std::pair<int, CitiesInfo>, 4> cities
-        = {{{92, {3, false, false}},
-            {63, {2, false, false}},
-            {38, {1, false, true}},
-            {0, {0, true, true}}}};
+        = {{{92, {3, false, false, 6}},
+            {63, {2, false, false, 6}},
+            {38, {1, false, true, 6}},
+            {0, {0, true, true, 6}}}};
 
     if (!this->mRandomizedScript)
         StoreCityInfo (this->mCityInfo);
@@ -650,6 +667,27 @@ MissionRandomizer::InstallCheat (void *func, uint32_t hash)
 }
 
 /*******************************************************/
+void __fastcall
+OverrideHospitalEndPosition(CRunningScript* scr)
+{
+    HookManager::CallOriginal<
+        injector::thiscall<void (CRunningScript *)>, 0x469F5B> (
+        scr);
+    
+    auto missionRandomizer = MissionRandomizer::GetInstance ();
+    if(scr->m_bWastedOrBusted && scr == missionRandomizer->mRandomizedScript)
+        {
+            int i = missionRandomizer->mOriginalMissionNumber;
+            if (missionStartPos.count (i))
+                {
+                    auto pos = missionStartPos[i];
+                    Scrpt::CallOpcode(0x9FF, "set_restart_closest_to",
+                                      pos.x, pos.y, pos.z);
+                }
+        }
+}
+
+/*******************************************************/
 void
 MissionRandomizer::Initialise ()
 {
@@ -675,8 +713,10 @@ MissionRandomizer::Initialise ()
          {HOOK_CALL, 0x5D19CE, (void *) &LoadMissionData},
          {HOOK_CALL, 0x60C925, (void *) &CorrectMaxNumberOfGroupMembers}});
 
-    RegisterDelayedHooks ({{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
-                           {HOOK_CALL, 0x53BE76, (void *) &InitAtNewGame}});
+    RegisterDelayedHooks (
+        {{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
+         {HOOK_CALL, 0x53BE76, (void *) &InitAtNewGame},
+         {HOOK_CALL, 0x469F5B, (void *) &OverrideHospitalEndPosition}});
 
     RegisterDelayedFunction ([] { injector::MakeNOP (0x469fb5, 2); });
 

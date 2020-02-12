@@ -26,6 +26,9 @@ class AutoSave
     static void DestroyInstance ();
 
 public:
+
+    bool mSaveVehicleCoords = false;
+    
     /// Returns the static instance for AutoSave.
     static AutoSave *GetInstance ();
 

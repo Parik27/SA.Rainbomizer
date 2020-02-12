@@ -6,11 +6,26 @@
 #include "config.hh"
 #include "injector/injector.hpp"
 #include "injector/calling.hpp"
+#include "injector/hooking.hpp"
 #include "colours.hh"
 #include <cmath>
 #include <ctime>
 
 AutoSave *AutoSave::mInstance = nullptr;
+
+/*******************************************************/
+void __fastcall SaveFixedCoordinates(char* out, void* edx, CPed* ped)
+{
+    HookManager::CallOriginal<injector::thiscall<void (char *, CPed *)>,
+                              0x5D577E> (out, ped);
+    
+    if(AutoSave::GetInstance()->mSaveVehicleCoords && ped == FindPlayerPed())
+        {
+            auto translation = ped->m_pVehicle->GetPosition();
+            memcpy(out, &translation->m_vPosn, sizeof(CVector));
+            AutoSave::GetInstance ()->mSaveVehicleCoords = false;
+        }
+}
 
 /*******************************************************/
 int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
@@ -24,12 +39,18 @@ int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
             scr->m_bIsActive = false;
 
             auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
-
+            
             // Save in a vehicle
-            int *playerFlags   = (int *) (((char *) FindPlayerPed (0)) + 0x46C);
-            int  originalFlags = playerFlags[0];
-            playerFlags[0] &= ~0x100;
+            int *playerFlags   = FindPlayerPed (0)->flags;
+            auto vehicleCoords = FindPlayerEntity ()->GetPosition ();
 
+            int originalFlags = playerFlags[0];
+
+            if (playerFlags[0] & 0x100)
+                AutoSave::GetInstance ()->mSaveVehicleCoords = true;
+            
+            playerFlags[0] &= ~0x100;
+            
             // Save
             CGenericGameStorage::MakeValidSaveFileName (config.save_slot - 1);
             CGenericGameStorage::GenericSave ();
@@ -193,9 +214,9 @@ AutoSave::Initialise ()
         return;
 
     this->InstallHooks ();
-    RegisterHooks (
-        {{HOOK_CALL, 0x480D11, (void *) &::SetShouldSave},
-         {HOOK_CALL, 0x465FC3, (void *) &::SetShouldSaveGlobalVars}});
+    RegisterHooks ({{HOOK_CALL, 0x480D11, (void *) &::SetShouldSave},
+                    {HOOK_CALL, 0x465FC3, (void *) &::SetShouldSaveGlobalVars},
+                    {HOOK_CALL, 0x5D577E, (void *) &SaveFixedCoordinates}});
 
     RegisterDelayedHooks (
         {{HOOK_CALL, 0x58FCFA, (void *) &::DrawAutosaveMessage},

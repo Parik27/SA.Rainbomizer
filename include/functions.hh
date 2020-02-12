@@ -32,6 +32,7 @@ struct CBox;
 struct CColModel;
 struct CPed;
 struct CPool;
+struct CEntity;
 
 enum eVehicleClass
 {
@@ -179,7 +180,7 @@ public:
 struct CIplStore
 {
     static int    FindIplSlot (char *name);
-    static CPool *ms_pPool;
+    static CPool *&ms_pPool;
 };
 
 struct CRunningScripts
@@ -243,15 +244,15 @@ struct IplDef
 
 struct CPool
 {
-    char **m_pObjects;
-    char* m_byteMap;
-    int m_nSize;
+    char *m_pObjects;
+    char * m_byteMap;
+    int    m_nSize;
 
     template <typename T>
     T *
     GetAt (signed int handle)
     {
-        return (T *) (*this->m_pObjects + sizeof (T) * handle);
+        return (T *) (this->m_pObjects + sizeof (T) * handle);
     }
 };
 
@@ -391,7 +392,13 @@ struct CVehicle
 
 struct CPed
 {
+    char __pad00[0x46C];
+    int flags[4];
+    char __pad47C[272];
+    CEntity *m_pVehicle;
+
     int   GiveWeapon (int weapon, int ammo, int slot);
+    void  SetCurrentWeapon (int slot);
     void *CCopPed__CCopPed (int type);
 };
 
@@ -766,25 +773,25 @@ struct CShopping
 
 struct CEnterExit
 {
-    char m_szInteriorName[8];
-    CRect m_rEnterRect;
-    float m_fEnterZ;
-    float m_fEnterAngle;
-    CVector m_vExitPos;
-    float m_fExitAngle;
-    int16_t m_wFlags;
-    int8_t m_bInteriorId;
-    int8_t m_bSkyColour;
-    int8_t m_bTimeOff;
-    int8_t m_bTimeOn;
-    int8_t m_nNumSpawnedPedsInInterior;
-    int8_t padding0037[2];
+    char     m_szInteriorName[8];
+    CRect    m_rEnterRect;
+    float    m_fEnterZ;
+    float    m_fEnterAngle;
+    CVector  m_vExitPos;
+    float    m_fExitAngle;
+    uint16_t m_wFlags;
+    int8_t   m_bInteriorId;
+    int8_t   m_bSkyColour;
+    int8_t   m_bTimeOff;
+    int8_t   m_bTimeOn;
+    int8_t   m_nNumSpawnedPedsInInterior;
+    int8_t   padding0037[2];
 
-    static CPool* mp_poolEntryExits;
-    static bool GetInteriorStatus(const char *name);
+    static CPool *&mp_poolEntryExits;
+    static bool    GetInteriorStatus (const char *name);
 };
 
-static_assert(sizeof(CEnterExit) == 0x3C, "CEnterExit is the wrong size");
+static_assert (sizeof (CEnterExit) == 0x3C, "CEnterExit is the wrong size");
 
 struct CWorld
 {
@@ -819,7 +826,8 @@ extern CBaseModelInfo **ms_modelInfoPtrs;
 extern RwRGBA *         ms_vehicleColourTable;
 extern int *            ScriptParams;
 extern int *            ScriptSpace;
-extern CPool *          ms_pPedPool;
+extern CPool *&         ms_pPedPool;
+extern CPool *&         ms_pVehiclePool;
 extern CWeaponInfo *    aWeaponInfos;
 extern RsGlobalType *   RsGlobal;
 extern float *          ms_fTimeStep;

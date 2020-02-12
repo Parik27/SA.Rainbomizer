@@ -114,7 +114,7 @@ Patterns = [
 	{ weapon = 44, allowed = [44, 45]},
 	{ thread = "sweet1", weapon = 41, allowed = [41]},
 	{ thread = "heist5", weapon = 38, allowed = ["slot"]},
-	{ thread = "zero1", weapon = 38, allowed = ["slot"]},
+	{ thread = "zero1", weapon = 38, allowed = [38]},
 	{ thread = "casino6", weapon = 37, allowed = [37]},
 	{ thread = "casino6", weapon = 37, allowed = [37]},
 	{ thread = "shrange", allowed = ["slot"]},
@@ -238,7 +238,7 @@ Patterns = [
 	# Mission specific-patterns
 
 	{vehicle = 487, allowed = ["helis", "planes"], thread = "cprace", seat_check = false},
-	{thread = "dschool", vehicle = 429, allowed = [429, 541, 480, 494, 506, 451]},
+	{thread = "dskool", vehicle = 429, allowed = [429, 541, 480, 494, 506, 451]},
 	{coords	 = [-2584, 2213, 0], vehicle = 539, allowed = [460, 539]},
 	{thread = "boat", vehicle = 539, allowed = ["460", "539", "boats"], move  = [-60, 0, 0, 0]},
 	{vehicle = 487, allowed = ["all"], seat_check = false},

@@ -177,6 +177,13 @@ CPed::GiveWeapon (int weapon, int ammo, int slot)
 }
 
 /*******************************************************/
+void
+CPed::SetCurrentWeapon (int slot)
+{
+    CallMethodAndReturn<int, 0x5E61F0> (this, slot);
+}
+
+/*******************************************************/
 void *
 CPed::CCopPed__CCopPed (int type)
 {
@@ -563,9 +570,12 @@ bool CEnterExit::GetInteriorStatus (const char *name)
 {
     for (int i = 0; i < mp_poolEntryExits->m_nSize; i++)
         {
-            auto object = mp_poolEntryExits->GetAt<CEnterExit> (i);
-            if (std::string (name) == object->m_szInteriorName)
-                return object->m_wFlags & 0x4000;
+            if((mp_poolEntryExits->m_byteMap[i] & 0x80u) == 0)
+                {
+                    auto object = mp_poolEntryExits->GetAt<CEnterExit> (i);
+                    if (std::string (name) == object->m_szInteriorName)
+                        return object->m_wFlags & 0x4000;
+                }
         }
     return true;
 }
@@ -785,11 +795,12 @@ CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;
 int *            ScriptParams                   = (int *) 0xA43C78;
 int *            ScriptSpace                    = (int *) 0xA49960;
 CLoadedCarGroup *CStreaming::ms_nVehiclesLoaded = (CLoadedCarGroup *) 0x8E4C24;
-CPool *          ms_pPedPool                    = (CPool *) 0xB74490;
+CPool *&         ms_pPedPool                    = *(CPool **) 0xB74490;
 CRunningScript *&CRunningScripts::pActiveScript = *(CRunningScript **) 0xA8B42C;
 CWeaponInfo *    aWeaponInfos                   = (CWeaponInfo *) 0xC8AAB8;
-CPool *          CIplStore::ms_pPool            = (CPool *) 0x8E3FB0;
+CPool *&         CIplStore::ms_pPool            = *(CPool **) 0x8E3FB0;
 RsGlobalType *   RsGlobal                       = (RsGlobalType *) 0xC17040;
 float *          ms_fTimeStep                   = (float *) 0xB7CB5C;
 int &            CGenericGameStorage::length    = *(int *) 0xC16EEC;
-CPool *          CEnterExit::mp_poolEntryExits  = (CPool *) 0x96A7D8;
+CPool *&         CEnterExit::mp_poolEntryExits  = *(CPool **) 0x96A7D8;
+CPool *&         ms_pVehiclePool                = *(CPool **) 0xB74494;

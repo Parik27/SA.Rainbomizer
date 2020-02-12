@@ -28,6 +28,9 @@
 #include "config.hh"
 #include <cmath>
 #include <unordered_map>
+#include "injector/hooking.hpp"
+#include <windows.h>
+#include <dbghelp.h>
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
@@ -403,6 +406,85 @@ InitialiseCacheForRandomization (void *fileName)
 }
 
 /*******************************************************/
+void *__fastcall TaskCrashDebug (void *task, void *edx, void *vehicle, int a3,
+                                 int a4, char a5, char a6)
+{
+    static bool                 hook_initialised = false;
+    static injector::scoped_jmp hook (0x63B8C0, (void *) TaskCrashDebug);
+
+    if (!hook_initialised)
+        {
+            hook_initialised = true;
+            return nullptr;
+        }
+    hook.restore ();
+    uint8_t instruction[]
+        = {0xC7, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    if (!vehicle)
+        {
+            for (auto i :
+                 {0x0041C7C9, 0x0041C84E, 0x0046F393, 0x004905A2, 0x0049204E,
+                  0x00496423, 0x004BB7A6, 0x004BB98E, 0x004BBCA8, 0x004BCD30,
+                  0x004C16CE, 0x004C1C2D, 0x005703F7, 0x0057049C, 0x005F91DA,
+                  0x005F92E7, 0x005F958D, 0x005F9662, 0x00625FFF, 0x00628849,
+                  0x00629187, 0x0062F1B8, 0x0062F215, 0x00630358, 0x0063BD47,
+                  0x0063BF3A, 0x0063C160, 0x0063DA2D, 0x0063E2E8, 0x0063F5E9,
+                  0x0063F77C, 0x00640C9B, 0x00644C71, 0x006487FB, 0x00658F00,
+                  0x00664CF4, 0x00665423, 0x00666243, 0x006663E7, 0x006684B5,
+                  0x00669108, 0x0066976B, 0x0067069E, 0x00671E06, 0x00673226,
+                  0x0068505A, 0x0068C1A7, 0x0068CB35, 0x0068E017, 0x0068F7CF,
+                  0x006963F5, 0x0069742A, 0x00697CF6, 0x0069BEAF, 0x0069C12F,
+                  0x0069C5EF})
+                {
+                    memcpy ((void *) (i + 5), instruction,
+                            sizeof (instruction));
+                }
+        }
+    void *val
+        = CallMethodAndReturn<void *, 0x63B8C0> (task, vehicle, a3, a4, a5, a6);
+
+    hook.make_jmp (0x63B8C0, (void *) TaskCrashDebug);
+    return val;
+}
+
+/*******************************************************/
+void
+SetMaddDoggOffset(CVehicle* vehicle, float* out, float offset)
+{
+    *out = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+               ->m_pColModel->m_boundBox.m_vecMax.z
+           + offset;
+}
+
+/*******************************************************/
+void __fastcall
+FixMaddDogg(CRunningScript* scr, void* edx, short count)
+{
+    scr->CollectParameters(count);
+
+    if (scr->CheckName ("doc2"))
+        {
+            CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
+                                              + 0xA18 * (ScriptParams[0] >> 8));
+
+            SetMaddDoggOffset(vehicle, (float*) &ScriptParams[3], 0.5);
+        }
+}
+
+/*******************************************************/
+void __fastcall
+FixMaddDoggBoxes(CRunningScript* scr, void* edx, short count)
+{
+    scr->CollectParameters(count);
+    if (scr->CheckName ("doc2"))
+        {
+            CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
+                                              + 0xA18 * (ScriptParams[1] >> 8));
+            SetMaddDoggOffset(vehicle, (float*) &ScriptParams[4], 0);
+        }
+}
+
+/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -426,7 +508,11 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x49128C, (void *) &FixGTAMadman},
          {HOOK_CALL, 0x475BBC, (void *) &FixGearUp},
          {HOOK_CALL, 0x53BCD9, (void *) &InitialiseCacheForRandomization},
+         {HOOK_CALL, 0x489835, (void *) &FixMaddDogg},
+         {HOOK_CALL, 0x495429, (void *) &FixMaddDoggBoxes},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
+
+    TaskCrashDebug (nullptr, nullptr, nullptr, 0, 0, 0, 0);
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 }

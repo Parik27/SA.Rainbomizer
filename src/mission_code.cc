@@ -66,6 +66,7 @@ GreenSabreStartFix (unsigned char *data)
     Scrpt::CreateNop (data, 19791, 19811);
     Scrpt::CreateNop (data, 19567, 19587);
     Scrpt::CreateNop (data, 22262, 22275);
+    Scrpt::CreateNop (data, 19861, 19866);
 }
 
 /*******************************************************/
@@ -119,6 +120,21 @@ MaddDoggRhymesFix (unsigned char* data)
 
 /*******************************************************/
 void
+DobermanStartFix (unsigned char* data)
+{
+    if (CEnterExit::GetInteriorStatus("AMMUN1"))
+        Scrpt::CreateNop (data, 6243, 6308);
+}
+
+/*******************************************************/
+void
+EOTL3StartFix(unsigned char* data)
+{
+    Scrpt::CreateNop(data, 40988, 40998);
+}
+
+/*******************************************************/
+void
 LosDesperadosFix (unsigned char* data)
 {
     Scrpt::CallOpcode(0x076C, "set_zone_gang_density", "GAN1", 1, 25);
@@ -148,6 +164,8 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 74: NewModelArmyStartFix (data); break;
         case 32: MaddDoggRhymesFix(data); break;
         case 109: LosDesperadosFix(data); break;
+        case 112: EOTL3StartFix(data); break;
+        case 21: DobermanStartFix(data); break;
         }
 }
 
@@ -204,6 +222,8 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
             data = Scrpt::CreateOpcode (0x629, "change_int_stat", data, 181, 1);
             data = Scrpt::CreateOpcode (0x777, "delete_things", data,
                                         "BARRIERS1");
+            data = Scrpt::CreateOpcode (0x48F, "remove_weapons", data,
+                                        GlobalVar(3));
             data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
 
@@ -241,6 +261,26 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
 
             // remove code setting max wanted level to 0
             Scrpt::CreateNop (data, 19211, 19216);
+            break;
+
+        // End of the Line (3)
+        case 112:
+
+            Scrpt::CallOpcode(0x109, "add_score", GlobalVar(3), 250000);
+            break;
+        }
+
+    switch(this->mRandomizedMissionNumber)
+        {
+        // EOTL3 - Infinite ammo
+        case 112:
+            Scrpt::CallOpcode(0x555, "remove_weapon", GlobalVar(3), 28);
+            Scrpt::CallOpcode(0x1B2, "give_weapon", GlobalVar(3), 28, 120);
+            break;
+
+        // Tagging up Turf - Infinite ammo
+        case 13:
+            Scrpt::CallOpcode(0x555, "remove_weapon", GlobalVar(3), 41);
             break;
         }
 }

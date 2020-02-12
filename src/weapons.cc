@@ -109,6 +109,15 @@ int __fastcall RandomizeGiveWeaponDelayed (CPed *thisPed, void *edx, int weapon,
 }
 
 /*******************************************************/
+void __fastcall Opcode1B9Fix (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    CPed *ped = reinterpret_cast<CPed *> (ms_pPedPool->m_pObjects
+                                          + 0x7C4 * (ScriptParams[0] >> 8));
+    ped->SetCurrentWeapon(GetWeaponInfo(ScriptParams[1], 1)[5]);
+}
+
+/*******************************************************/
 void
 WeaponRandomizer::Initialise ()
 {
@@ -139,6 +148,8 @@ WeaponRandomizer::Initialise ()
 
     // CPed::GiveWeapon with Player exception
     injector::MakeCALL (0x5E899A, (void *) &RandomizeGiveWeaponDelayed);
+    injector::MakeCALL(0x47D4AC, (void*) &Opcode1B9Fix);
+    injector::MakeNOP (0x5E62D8, 4);
 
     Logger::GetLogger ()->LogMessage ("Intialised WeaponRandomizer");
 }

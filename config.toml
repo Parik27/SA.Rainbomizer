@@ -62,7 +62,7 @@ RainbowText = true # (HUD elements and menu text)
 
 RainbowHueCycle = false # (All randomized elements will have transition between rainbow colours)
 
-CrazyMode = false # Changes images and menu background (WARNING: VERY hard on eyes)
+# CrazyMode = false # Changes images and menu background (WARNING: VERY hard on eyes)
 Exceptions = [0, 1] # These are exceptions to car colours. (Default: Black and white car colours)
 
 #######################################################
@@ -258,12 +258,7 @@ Patterns = [
 	{vehicle = 514, allowed = [514, 515, 403]},
 	{vehicle = 515, allowed = [514, 515, 403]},
 	{vehicle = 403, allowed = [514, 515, 403]},
-	{vehicle = 478, coords = [2107, 1409, 9], allowed = [
-			602, 496, 401, 518, 527, 419, 587, 533, 526, 474, 600, 445, 507,
-			439, 549, 491, 422, 605, 572, 478, 554, 536, 575, 534, 534, 567,
-			535, 576, 412, 402, 542, 603, 475, 429, 541, 415, 480, 562, 434,
-			494, 502, 503, 411, 559, 560, 506, 541, 558, 555, 477, 546, 550
-	], seat_check = false},
+	{vehicle = 478, coords = [2107, 1409, 9], allowed = ["cars", "bikes", "593", "476", "511", "460", "513", "520", "512"], seat_check = false},
 	{vehicle = 544, allowed = ["all"], seat_check = false, denied = ["trains", "boats"]},
 	{vehicle = 567, coords = [2644, -2028, 12], allowed = [
 			536, 575, 534, 567, 535, 576, 412, 566

@@ -102,12 +102,12 @@ int __fastcall RandomizeStats (int *address, int weaponid)
             aWeaponInfos[id].m_fSpeed          = moveSpeed;
             aWeaponInfos[id].m_fTargetingRange = range;
             aWeaponInfos[id].m_fFiringRange    = range;
-            aWeaponInfos[id].m_fAnimLoopStart  = animValues[2];
-            aWeaponInfos[id].m_fAnimFrameFire  = animValues[1];
-            aWeaponInfos[id].m_fAnimLoopEnd    = animValues[0];
-            aWeaponInfos[id].m_fAnim2LoopStart = animValues[2];
-            aWeaponInfos[id].m_fAnim2FrameFire = animValues[1];
-            aWeaponInfos[id].m_fAnim2LoopEnd   = animValues[0];
+            //aWeaponInfos[id].m_fAnimLoopStart  = animValues[2];
+            //aWeaponInfos[id].m_fAnimFrameFire  = animValues[1];
+            //aWeaponInfos[id].m_fAnimLoopEnd    = animValues[0];
+            //aWeaponInfos[id].m_fAnim2LoopStart = animValues[2];
+            //aWeaponInfos[id].m_fAnim2FrameFire = animValues[1];
+            //aWeaponInfos[id].m_fAnim2LoopEnd   = animValues[0];
         }
 
     return 0;

@@ -28,7 +28,7 @@ set (CMAKE_CXX_STANDARD 14)
 
 # Sources
 include_directories(include)
-file(GLOB SOURCES src/*.cc)
+file(GLOB SOURCES src/*.cc src/util/*.cc)
 
 add_library("rainbomizer" SHARED ${SOURCES})
 

@@ -33,6 +33,8 @@ struct CColModel;
 struct CPed;
 struct CPool;
 struct CEntity;
+struct tHandlingData;
+struct tFlyingHandlingData;
 
 enum eVehicleClass
 {
@@ -179,7 +181,7 @@ public:
 
 struct CIplStore
 {
-    static int    FindIplSlot (char *name);
+    static int     FindIplSlot (char *name);
     static CPool *&ms_pPool;
 };
 
@@ -245,8 +247,8 @@ struct IplDef
 struct CPool
 {
     char *m_pObjects;
-    char * m_byteMap;
-    int    m_nSize;
+    char *m_byteMap;
+    int   m_nSize;
 
     template <typename T>
     T *
@@ -382,8 +384,12 @@ struct CColModel
 
 struct CVehicle
 {
-    uint8_t  pad[0x22];
+    uint8_t  __pad[0x22];
     uint16_t m_nModelIndex;
+    uint8_t __pad24[864];
+    tHandlingData *m_pHandling;
+    tFlyingHandlingData* m_pFlyingHandling;
+    uint8_t m_nFlags[8];
     int      GetVehicleAppearence ();
     void     AutomobilePlaceOnRoadProperly ();
     void     BikePlaceOnRoadProperly ();
@@ -392,9 +398,9 @@ struct CVehicle
 
 struct CPed
 {
-    char __pad00[0x46C];
-    int flags[4];
-    char __pad47C[272];
+    char     __pad00[0x46C];
+    int      flags[4];
+    char     __pad47C[272];
     CEntity *m_pVehicle;
 
     int   GiveWeapon (int weapon, int ammo, int slot);
@@ -496,23 +502,6 @@ struct tTransmissionGear
     float m_fChangeDownVelocity;
 };
 
-class cTransmission
-{
-public:
-    tTransmissionGear m_aGears[6];
-    unsigned char     m_nDriveType;
-    unsigned char     m_nEngineType;
-    unsigned char     m_nNumberOfGears;
-    char              field_4B;
-    unsigned int      m_nHandlingFlags;
-    float             m_fEngineAcceleration;
-    float             m_fEngineInertia;
-    float             m_fMaxGearVelocity;
-    int               field_5C;
-    float             m_fMinGearVelocity;
-    float             m_fCurrentSpeed;
-};
-
 struct CWeaponInfo
 {
 public:
@@ -545,103 +534,146 @@ public:
     int          m_nUndefined;
 };
 
+struct RwV3d
+{
+    float x;
+    float y;
+    float z;
+};
+
+struct CTransmissionGear
+{
+    int   m_fMaxVelocity;
+    float m_fChangeUpVelocity;
+    float m_fChangeDownVelocity;
+};
+
+struct cTransmission
+{
+    CTransmissionGear m_aGears[6];
+    char              m_nDriveType;
+    char              m_nEngineType;
+    char              m_nNumberOfGears;
+    char              field_4B;
+    int               m_dwHandlingFlags;
+    float             m_fEngineAcceleration;
+    float             m_fEngineInertia;
+    float             m_fMaxGearVelocity;
+    int               field_5C;
+    float             m_fMinGearVelocity;
+    float             m_fCurrentSpeed;
+};
+
 struct tHandlingData
 {
-    int           m_nVehicleId;
-    float         m_fMass;
+    int           index;
+    float         fMass;
     float         field_8;
-    float         m_fTurnMass;
-    float         m_fDragMult;
-    CVector       m_vecCentreOfMass;
-    unsigned char m_nPercentSubmerged;
-    float         m_fBuoyancyConstant;
-    float         m_fTractionMultiplier;
-    cTransmission m_transmissionData;
-    float         m_fBrakeDeceleration;
-    float         m_fBrakeBias;
-    char          m_bABS;
+    float         fTurnMass;
+    float         fDragMult;
+    RwV3d         centreOfMass;
+    char          nPercentSubmerged;
+    char          field_21;
+    char          field_22;
+    char          field_23;
+    float         fBuoyancyConstant;
+    int           fTractionMultiplier;
+    cTransmission transmissionData;
+    float         fBrakeDeceleration;
+    int           fBrakeBias;
+    char          bABS;
     char          field_9D;
     char          field_9E;
     char          field_9F;
-    float         m_fSteeringLock;
-    float         m_fTractionLoss;
-    float         m_fTractionBias;
-    float         m_fSuspensionForceLevel;
-    float         m_fSuspensionDampingLevel;
-    float         m_fSuspensionHighSpdComDamp;
-    float         m_fSuspensionUpperLimit;
-    float         m_fSuspensionLowerLimit;
-    float         m_fSuspensionBiasBetweenFrontAndRear;
-    float         m_fSuspensionAntiDiveMultiplier;
-    float         m_fCollisionDamageMultiplier;
-    int           m_nModelFlags;
-    int           m_nHandlingFlags;
-    float         m_fSeatOffsetDistance;
-    unsigned int  m_nMonetaryValue;
-    unsigned char m_nFrontLights;
-    unsigned char m_nRearLights;
-    unsigned char m_nAnimGroup;
-
-    tHandlingData &
-    operator= (const tHandlingData &rhs)
-    {
-        // Check for self-assignment!
-        if (this == &rhs)
-            return *this;
-
-        this->m_fMass                     = rhs.m_fMass;
-        this->m_fTurnMass                 = rhs.m_fTurnMass;
-        this->m_fDragMult                 = rhs.m_fDragMult;
-        this->m_vecCentreOfMass           = rhs.m_vecCentreOfMass;
-        this->m_nPercentSubmerged         = rhs.m_nPercentSubmerged;
-        this->m_fBuoyancyConstant         = rhs.m_fBuoyancyConstant;
-        this->m_fTractionMultiplier       = rhs.m_fTractionMultiplier;
-        this->m_transmissionData          = rhs.m_transmissionData;
-        this->m_fBrakeDeceleration        = rhs.m_fBrakeDeceleration;
-        this->m_fBrakeBias                = rhs.m_fBrakeBias;
-        this->m_bABS                      = rhs.m_bABS;
-        this->m_fSteeringLock             = rhs.m_fSteeringLock;
-        this->m_fTractionLoss             = rhs.m_fTractionLoss;
-        this->m_fTractionBias             = rhs.m_fTractionBias;
-        this->m_fSuspensionForceLevel     = rhs.m_fSuspensionForceLevel;
-        this->m_fSuspensionDampingLevel   = rhs.m_fSuspensionDampingLevel;
-        this->m_fSuspensionHighSpdComDamp = rhs.m_fSuspensionHighSpdComDamp;
-        this->m_fSuspensionUpperLimit     = rhs.m_fSuspensionUpperLimit;
-        this->m_fSuspensionLowerLimit     = rhs.m_fSuspensionLowerLimit;
-        this->m_fSuspensionBiasBetweenFrontAndRear
-            = rhs.m_fSuspensionBiasBetweenFrontAndRear;
-        this->m_fSuspensionAntiDiveMultiplier
-            = rhs.m_fSuspensionAntiDiveMultiplier;
-        this->m_fCollisionDamageMultiplier = rhs.m_fCollisionDamageMultiplier;
-        this->m_nMonetaryValue             = rhs.m_nMonetaryValue;
-        return *this;
-    }
+    float         fSteeringLock;
+    int           fTractionLoss;
+    int           fTractionBias;
+    float         fSuspensionForceLevel;
+    int           fSuspensionDampingLevel;
+    int           fSuspensionHighSpdComDamp;
+    float         fSuspensionUpperLimit;
+    float         fSuspensionLowerLimit;
+    int           fSuspensionBiasBetweenFrontAndRear;
+    int           fSuspensionAntiDiveMultiplier;
+    float         fCollisionDamageMultiplier;
+    unsigned int  modelFlags;
+    int           handlingFlags;
+    int           fSeatOffsetDistance;
+    int           nMonetaryValue;
+    char          frontLights;
+    char          rearLights;
+    char          animGroup;
+    char          field_DF;
 };
 
-struct tBikeHandlingData
+struct CHandlingBike
 {
-    unsigned char data[0x40];
+    int   index;
+    int   leanFwdCOM;
+    int   leanFwdForce;
+    int   leanBakCOM;
+    int   leanBakForce;
+    int   maxLean;
+    float fullAnimLean;
+    int   desLean;
+    int   speedSteer;
+    int   slipSteer;
+    int   noPlayerCOMz;
+    float wheelieAng;
+    float stoppieAng;
+    int   wheelieSteer;
+    int   wheelieStabMult;
+    int   stoppieStabMult;
 };
 
-struct tPlaneHandlingData
+struct CHandlingFlying
 {
-    unsigned char data[0x58];
+    int   index;
+    int   thrust;
+    int   thrustFallOff;
+    int   yaw;
+    int   yawStab;
+    int   sideSlip;
+    int   roll;
+    int   rollStab;
+    int   pitch;
+    int   pitchStab;
+    int   formLift;
+    int   attackLift;
+    int   gearUpR;
+    int   gearDownL;
+    int   windMult;
+    int   moveRes;
+    RwV3d turnRes;
+    RwV3d speedRes;
 };
 
 struct tBoatHandlingData
 {
-    unsigned char data[0x3C];
+    int   index;
+    float thrustY;
+    float thrustZ;
+    float thrustAppZ;
+    float aqPlaneForce;
+    float aqPlaneLimit;
+    float aqPlaneOffset;
+    float waveAudioMult;
+    int   look_L_R_BehindCamHeight;
+    RwV3d moveRes;
+    RwV3d turnRes;
 };
 
 struct cHandlingDataMgr
 {
-    int                unkFields[5];
-    tHandlingData      vehicleHandling[210];
-    tBikeHandlingData  bikeHandling[13];
-    tPlaneHandlingData planeHandling[24];
-    tBoatHandlingData  boatHandling[12];
-
-    int LoadHandlingData ();
+    float             field_0;
+    float             field_4;
+    int               field_8;
+    float             field_C;
+    int               field_10;
+    tHandlingData     vehicleHandling[210];
+    CHandlingBike     bikeHandling[13];
+    CHandlingFlying   flyingHandling[24];
+    tBoatHandlingData boatHandling[12];
 };
 
 struct cSimpleTransform
@@ -751,24 +783,26 @@ union ShoppingHash
     char    data[6];
 };
 
+struct CShoppingItem
+{
+    int textureName;
+    int unk;
+    int modelName;
+    int modelType;
+    char gxtEntry[8];
+};
+
+static_assert(sizeof(CShoppingItem) == 24, "incorrect size");
+
 struct CShopping
 {
-    void LoadShop (const char *name); // 0x49BBE0
+    static void LoadShop (const char *name); // 0x49BBE0
+    static void LoadShoppingType (const char* type);
 
-    int m_nCurrentShoppingType;
-    int m_nTotalItems;
+    static int& m_nCurrentShoppingType;
+    static int& m_nTotalItems;
 
-    static ShoppingHash *m_aTextureModels;
-
-    static union
-    {
-        char nameTag[8];
-        char data[24];
-
-    } * m_aNames;
-
-    static ShoppingHash *m_aModels;
-    static ShoppingHash *m_aType;
+    static CShoppingItem *m_aShoppingItems;
 };
 
 struct CEnterExit

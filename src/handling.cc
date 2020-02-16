@@ -28,21 +28,9 @@
 HandlingRandomizer *HandlingRandomizer::mInstance = nullptr;
 
 /*******************************************************/
-int __fastcall RandomizeHandling (cHandlingDataMgr *handling, void *edx)
+void __fastcall RandomizeHandling (CVehicle* vehicle, void *edx, CPed* ped)
 {
-    handling->LoadHandlingData ();
-    for (int i = 0; i < 210; i++)
-        {
-            auto handl                    = handling->vehicleHandling[i];
-            int  id                       = random (210 - 1);
-            handling->vehicleHandling[i]  = handling->vehicleHandling[id];
-            handling->vehicleHandling[id] = handl;
-        }
-    // RandomizeData(handling->vehicleHandling, 210);
-    // RandomizeData(handling->bikeHandling, 13);
-    // RandomizeData(handling->planeHandling, 24);
-    // RandomizeData(handling->boatHandling, 12);
-    return 0;
+    
 }
 
 /*******************************************************/
@@ -53,7 +41,7 @@ HandlingRandomizer::Initialise ()
     if (!config.enabled)
         return;
 
-    RegisterHooks ({{HOOK_CALL, 0x5BFA9A, (void *) &RandomizeHandling}});
+    RegisterHooks ({{HOOK_CALL, 0x64BB57, (void *) &RandomizeHandling}});
     Logger::GetLogger ()->LogMessage ("Intialised HandlingRandomizer");
 }
 

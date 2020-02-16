@@ -6,9 +6,9 @@
 #include "functions.hh"
 #include <algorithm>
 #include "config.hh"
-#include "scrpt.hh"
+#include "util/scrpt.hh"
 #include "injector/calling.hpp"
-#include "loader.hh"
+#include "util/loader.hh"
 
 CutsceneRandomizer *CutsceneRandomizer::mInstance = nullptr;
 

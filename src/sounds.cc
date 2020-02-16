@@ -4,7 +4,7 @@
 #include "functions.hh"
 #include "base.hh"
 #include <cctype>
-#include "text.hh"
+#include "util/text.hh"
 #include <ctime>
 #include <algorithm>
 #include <stdexcept>

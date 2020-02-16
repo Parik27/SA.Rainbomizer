@@ -1,6 +1,6 @@
 #include "missions.hh"
 #include "functions.hh"
-#include "scrpt.hh"
+#include "util/scrpt.hh"
 #include "autosave.hh"
 #include "logger.hh"
 

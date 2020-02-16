@@ -384,12 +384,12 @@ CHud::SetMessage (char *str)
     return Call<0x588F60> (str);
 }
 
-/*******************************************************/
-int
-cHandlingDataMgr::LoadHandlingData ()
-{
-    return CallMethodAndReturn<int, 0x5BD830> (this);
-}
+// /*******************************************************/
+// int
+// cHandlingDataMgr::LoadHandlingData ()
+// {
+//     return CallMethodAndReturn<int, 0x5BD830> (this);
+// }
 
 /*******************************************************/
 void
@@ -749,6 +749,20 @@ CStats::GetStatValue (short id)
 }
 
 /*******************************************************/
+void
+CShopping::LoadShop(const char *name)
+{
+    Call<0x49BBE0>(name);
+}
+
+/*******************************************************/
+void
+CShopping::LoadShoppingType(const char *name)
+{
+    Call<0x49B8D0>(name);
+}
+
+/*******************************************************/
 int
 CIplStore::FindIplSlot (char *name)
 {
@@ -804,3 +818,7 @@ float *          ms_fTimeStep                   = (float *) 0xB7CB5C;
 int &            CGenericGameStorage::length    = *(int *) 0xC16EEC;
 CPool *&         CEnterExit::mp_poolEntryExits  = *(CPool **) 0x96A7D8;
 CPool *&         ms_pVehiclePool                = *(CPool **) 0xB74494;
+
+int &         CShopping::m_nCurrentShoppingType = *(int *) 0xA9A7C8;
+int &         CShopping::m_nTotalItems          = *(int *) 0xA9A7CC;
+CShoppingItem *CShopping::m_aShoppingItems       = (CShoppingItem *) 0xA986F0;

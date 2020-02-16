@@ -24,7 +24,7 @@
 #include <windows.h>
 #include <ctime>
 #include "injector/injector.hpp"
-#include "loader.hh"
+#include "util/loader.hh"
 #include "config.hh"
 
 const int          LOG_MOST_RECENT_VEHICLES     = 5;

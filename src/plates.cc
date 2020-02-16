@@ -3,7 +3,7 @@
 #include "base.hh"
 #include "logger.hh"
 #include <cstring>
-#include "text.hh"
+#include "util/text.hh"
 #include "functions.hh"
 #include <algorithm>
 #include "config.hh"

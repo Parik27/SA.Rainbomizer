@@ -6,7 +6,7 @@
 #include <vector>
 #include "injector/injector.hpp"
 #include "config.hh"
-#include "scrpt.hh"
+#include "util/scrpt.hh"
 #include <algorithm>
 #include "injector/calling.hpp"
 #include "autosave.hh"
@@ -15,7 +15,7 @@
 #include <array>
 #include <random>
 #include <memory>
-#include "loader.hh"
+#include "util/loader.hh"
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 

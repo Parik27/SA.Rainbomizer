@@ -6,6 +6,7 @@
 #include "functions.hh"
 #include "util/scrpt.hh"
 #include <windows.h>
+#include "config.hh"
 
 ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 
@@ -79,6 +80,11 @@ ClothesRandomizer::GetRandomCRCForComponent(int componentId)
 void
 ClothesRandomizer::Initialise ()
 {
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().clothes;
+    if (!config.enabled)
+        return;
+
+    
     mInitialised = false;
     
     RegisterHooks ({{HOOK_CALL, 0x53EB9D, (void *) HandleClothesChange}});

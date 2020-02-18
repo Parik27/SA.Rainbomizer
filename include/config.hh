@@ -80,9 +80,10 @@ struct BaseConfig
 /*******************************************************/
 struct GeneralConfig : public BaseConfig
 {
-    int  seed      = -1;
-    bool unprotect = false;
-    int  save_slot = 8;
+    int  seed           = -1;
+    bool enable_credits = true;
+    bool unprotect      = false;
+    int  save_slot      = 8;
 
     void Read (std::shared_ptr<cpptoml::table> table);
 };
@@ -244,6 +245,11 @@ struct BlipsConfig : public BaseConfig
 {
 };
 
+/*******************************************************/
+struct ClothesConfig : public BaseConfig
+{
+};
+
 /******************************************************/
 struct WeaponStatsConfig : public BaseConfig
 {
@@ -272,6 +278,7 @@ struct Configs
     BlipsConfig         blips;
     ParticlesConfig     particles;
     WeaponStatsConfig   weaponStats;
+    ClothesConfig       clothes;
 };
 
 /*******************************************************/

@@ -26,6 +26,7 @@ Seed	  = -1 # -1 for random
 
 Unprotect = true
 AutosaveSlot = 8 # Set it to a non-existant slot (eg. -1 or 9) to disable
+ModifyCredits = true
 
 #######################################################
 # Traffic Randomizer - Randomizes cars that spawn on traffic including law enforcement vehicles
@@ -195,6 +196,12 @@ Enabled = false
 [ObjectRandomizer]
 
 Enabled = false
+
+#######################################################
+# Clothes Randomizer - Randomizes clothes every fade
+[ClothesRandomizer]
+
+Enabled = true
 
 #######################################################
 # License Plate Randomizer - Randomizes the license plates of vehicles to a random word.

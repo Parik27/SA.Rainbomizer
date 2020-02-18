@@ -3,6 +3,7 @@
 #include "base.hh"
 #include "injector/calling.hpp"
 #include <vector>
+#include "config.hh"
 
 std::vector<std::string> lead_devs = {"Parik", "123robot", "GTAMadman"};
 
@@ -58,6 +59,8 @@ PrintCredits (float scaleX, float scaleY, char *text, int *position,
 void
 CreditsExtender::Initialise ()
 {
-    // 0x5A88AC
-    RegisterHooks ({{HOOK_CALL, 0x5A88AC, (void *) PrintCredits}});
+    auto config = ConfigManager::GetInstance()->GetConfigs().general;
+    
+    if(config.enable_credits)
+        RegisterHooks ({{HOOK_CALL, 0x5A88AC, (void *) PrintCredits}});
 }

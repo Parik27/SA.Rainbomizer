@@ -196,6 +196,7 @@ GeneralConfig::Read (std::shared_ptr<cpptoml::table> table)
     BaseConfig::Read (table);
     CONFIG (table, seed, "Seed", int);
     CONFIG (table, unprotect, "Unprotect", int);
+    CONFIG (table, enable_credits, "ModifyCredits", bool);
     CONFIG (table, save_slot, "AutosaveSlot", int);
 }
 
@@ -478,6 +479,7 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.particles.Read (config->get_table ("ParticleRandomizer"));
     mConfigs.cutscenes.Read (config->get_table ("CutsceneRandomizer"));
     mConfigs.weaponStats.Read (config->get_table ("WeaponStatsRandomizer"));
+    mConfigs.clothes.Read (config->get_table ("ClothesRandomizer"));
 }
 
 /*******************************************************/

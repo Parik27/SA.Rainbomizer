@@ -8,9 +8,22 @@
 #include "config.hh"
 
 WeaponStatsRandomizer *WeaponStatsRandomizer::mInstance = nullptr;
-int                    hexFlags[]
-    = {0x3033, 0x3833, 0x7001, 0x7011,  0x7031,  0x2001, 0x2011, 0x2031, 0x3013,
-       0x3033, 0xA008, 0xA014, 0x48214, 0x30238, 0x238,  0x0038, 0x0431};
+// Hex flags used to define weapon properties. Values provided in comments
+// define single property. Every other value is combination of that properties.
+
+// 0x1- aim anywhere, 0x2 - aim with arm, 0x4 - 1st person, 0x8 - no auto aim
+int aimFlag[] = {0x1, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
+
+// 0x0 - none, 0x10 - can only aim while moving, 0x20 - can shoot while moving
+int movementFlag[] = {0x0, 0x10, 0x20, 0x30};
+
+// 0x0 -regular, 0x100 -throw, 0x200 - cant jump with weapon, 0x400 - continous
+// fire, 0x800 - dual-wield
+int otherFlag[]  = {0x0, 0x200, 0x400, 0x600, 0x800, 0xA00, 0xC00, 0xE00};
+
+// 0x0 - none, 0x1000 - reload, 0x2000 - can shoot while crouching, 0x4000 -
+// reload to start, 0x8000 - long reload
+int reloadFlag[] = {0x0, 0x2000, 0x3000, 0x4000, 0x5000, 0x6000, 0x8000, 0x9000, 0xA000, 0xB000, 0xC000, 0xD000, 0xE000, 0xF000};
 
 /*******************************************************/
 int __fastcall RandomizeStats (int *address, int weaponid)
@@ -18,7 +31,8 @@ int __fastcall RandomizeStats (int *address, int weaponid)
     CPed *player = FindPlayerPed ();
 
     if (address < (int *) player || address > (int *) (player + 0x764)
-        || weaponid == 41 || weaponid == 42 || weaponid == 43 || weaponid == 37)
+        || (weaponid <= 46 && weaponid >= 40) || weaponid == 36 || weaponid == 37
+        || weaponid < 22)
         return 0;
 
     int weaponids[] = {weaponid, 0, 0, 0};
@@ -48,9 +62,11 @@ int __fastcall RandomizeStats (int *address, int weaponid)
 
     else if (weaponid == 38)
         properties = 0x238;
-
+    // randomize SMG properties in the way which they can be used with jetpack
+    else if (weaponid == 28 || weaponid == 29 || weaponid == 32)
+        properties = aimFlag[1] + movementFlag[random(3)] + otherFlag[random(7)] + reloadFlag[2];
     else
-        properties = hexFlags[random (0, 16)];
+        properties = aimFlag[random(6)] + movementFlag[random(3)] + otherFlag[random(7)] + reloadFlag[random(13)];
 
     if (quality < 10)
         {

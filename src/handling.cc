@@ -28,10 +28,7 @@
 HandlingRandomizer *HandlingRandomizer::mInstance = nullptr;
 
 /*******************************************************/
-void __fastcall RandomizeHandling (CVehicle* vehicle, void *edx, CPed* ped)
-{
-    
-}
+void __fastcall RandomizeHandling (CVehicle *vehicle, void *edx, CPed *ped) {}
 
 /*******************************************************/
 void

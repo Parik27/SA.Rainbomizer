@@ -112,7 +112,7 @@ NewModelArmyStartFix (unsigned char *data)
 
 /*******************************************************/
 void
-MaddDoggRhymesFix (unsigned char* data)
+MaddDoggRhymesFix (unsigned char *data)
 {
     if (CEnterExit::GetInteriorStatus ("MADDOGS"))
         Scrpt::CreateNop (data, 10596, 10622);
@@ -120,25 +120,25 @@ MaddDoggRhymesFix (unsigned char* data)
 
 /*******************************************************/
 void
-DobermanStartFix (unsigned char* data)
+DobermanStartFix (unsigned char *data)
 {
-    if (CEnterExit::GetInteriorStatus("AMMUN1"))
+    if (CEnterExit::GetInteriorStatus ("AMMUN1"))
         Scrpt::CreateNop (data, 6243, 6308);
 }
 
 /*******************************************************/
 void
-EOTL3StartFix(unsigned char* data)
+EOTL3StartFix (unsigned char *data)
 {
-    Scrpt::CreateNop(data, 40988, 40998);
+    Scrpt::CreateNop (data, 40988, 40998);
 }
 
 /*******************************************************/
 void
-LosDesperadosFix (unsigned char* data)
+LosDesperadosFix (unsigned char *data)
 {
-    Scrpt::CallOpcode(0x076C, "set_zone_gang_density", "GAN1", 1, 25);
-    Scrpt::CallOpcode(0x076C, "set_zone_gang_density", "GAN2", 1, 25);
+    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN1", 1, 25);
+    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN2", 1, 25);
 }
 
 /*******************************************************/
@@ -162,10 +162,10 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 35: FixRaces (this, data); break;
         case 12: RyderStartFix (data); break;
         case 74: NewModelArmyStartFix (data); break;
-        case 32: MaddDoggRhymesFix(data); break;
-        case 109: LosDesperadosFix(data); break;
-        case 112: EOTL3StartFix(data); break;
-        case 21: DobermanStartFix(data); break;
+        case 32: MaddDoggRhymesFix (data); break;
+        case 109: LosDesperadosFix (data); break;
+        case 112: EOTL3StartFix (data); break;
+        case 21: DobermanStartFix (data); break;
         }
 }
 
@@ -186,14 +186,12 @@ MissionRandomizer::HandleGoSubAlternativeForMission (int index)
 
 /*******************************************************/
 void
-MissionRandomizer::ApplyMissionFailFixes()
+MissionRandomizer::ApplyMissionFailFixes ()
 {
     switch (this->mOriginalMissionNumber)
         {
         // King in Exile
-        case 45:
-            ScriptSpace[719] = 1;
-            break;
+        case 45: ScriptSpace[719] = 1; break;
         }
 }
 
@@ -223,7 +221,7 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
             data = Scrpt::CreateOpcode (0x777, "delete_things", data,
                                         "BARRIERS1");
             data = Scrpt::CreateOpcode (0x48F, "remove_weapons", data,
-                                        GlobalVar(3));
+                                        GlobalVar (3));
             data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
 
@@ -266,21 +264,21 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         // End of the Line (3)
         case 112:
 
-            Scrpt::CallOpcode(0x109, "add_score", GlobalVar(3), 250000);
+            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (3), 250000);
             break;
         }
 
-    switch(this->mRandomizedMissionNumber)
+    switch (this->mRandomizedMissionNumber)
         {
         // EOTL3 - Infinite ammo
         case 112:
-            Scrpt::CallOpcode(0x555, "remove_weapon", GlobalVar(3), 28);
-            Scrpt::CallOpcode(0x1B2, "give_weapon", GlobalVar(3), 28, 120);
+            Scrpt::CallOpcode (0x555, "remove_weapon", GlobalVar (3), 28);
+            Scrpt::CallOpcode (0x1B2, "give_weapon", GlobalVar (3), 28, 120);
             break;
 
         // Tagging up Turf - Infinite ammo
         case 13:
-            Scrpt::CallOpcode(0x555, "remove_weapon", GlobalVar(3), 41);
+            Scrpt::CallOpcode (0x555, "remove_weapon", GlobalVar (3), 41);
             break;
         }
 }

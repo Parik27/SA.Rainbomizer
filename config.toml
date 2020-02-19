@@ -176,7 +176,7 @@ RandomizeModels = true
 RandomizeLocations = true
 
 # Relative to rainbomizer/. 
-CutsceneFile = "Cutscene_Models.txt"
+CutsceneFile = "data/Cutscene_Models.txt"
 
 #######################################################
 # Blip Randomizer - Randomizes every radar blip on the map with a different icon.
@@ -202,6 +202,20 @@ Enabled = false
 [ClothesRandomizer]
 
 Enabled = true
+
+#######################################################
+# Wanted Level Randomizer - Randomizes how you get wanted level during and outside missions
+[WantedLevelRandomizer]
+
+Enabled = true
+
+# Randomizes number of wanted stars you get in missions like 2 stars in Drive-by
+RandomizeMissionWantedLevels = true
+
+# Randomizes how many "chaos points" you get for each crime.
+# You could, for example, get 3 stars for stealing a cop bike, but lose 1 star for killing
+# a cop.
+RandomizeChaosPoints = true
 
 #######################################################
 # License Plate Randomizer - Randomizes the license plates of vehicles to a random word.

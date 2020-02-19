@@ -404,7 +404,7 @@ InitialiseCacheForRandomization (void *fileName)
 
 /*******************************************************/
 void
-SetMaddDoggOffset(CVehicle* vehicle, float* out, float offset)
+SetMaddDoggOffset (CVehicle *vehicle, float *out, float offset)
 {
     *out = ms_modelInfoPtrs[vehicle->m_nModelIndex]
                ->m_pColModel->m_boundBox.m_vecMax.z
@@ -412,30 +412,28 @@ SetMaddDoggOffset(CVehicle* vehicle, float* out, float offset)
 }
 
 /*******************************************************/
-void __fastcall
-FixMaddDogg(CRunningScript* scr, void* edx, short count)
+void __fastcall FixMaddDogg (CRunningScript *scr, void *edx, short count)
 {
-    scr->CollectParameters(count);
+    scr->CollectParameters (count);
 
     if (scr->CheckName ("doc2"))
         {
             CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
                                               + 0xA18 * (ScriptParams[0] >> 8));
 
-            SetMaddDoggOffset(vehicle, (float*) &ScriptParams[3], 0.5);
+            SetMaddDoggOffset (vehicle, (float *) &ScriptParams[3], 0.5);
         }
 }
 
 /*******************************************************/
-void __fastcall
-FixMaddDoggBoxes(CRunningScript* scr, void* edx, short count)
+void __fastcall FixMaddDoggBoxes (CRunningScript *scr, void *edx, short count)
 {
-    scr->CollectParameters(count);
+    scr->CollectParameters (count);
     if (scr->CheckName ("doc2"))
         {
             CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
                                               + 0xA18 * (ScriptParams[1] >> 8));
-            SetMaddDoggOffset(vehicle, (float*) &ScriptParams[4], 0);
+            SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0);
         }
 }
 

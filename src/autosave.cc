@@ -14,15 +14,15 @@
 AutoSave *AutoSave::mInstance = nullptr;
 
 /*******************************************************/
-void __fastcall SaveFixedCoordinates(char* out, void* edx, CPed* ped)
+void __fastcall SaveFixedCoordinates (char *out, void *edx, CPed *ped)
 {
     HookManager::CallOriginal<injector::thiscall<void (char *, CPed *)>,
                               0x5D577E> (out, ped);
-    
-    if(AutoSave::GetInstance()->mSaveVehicleCoords && ped == FindPlayerPed())
+
+    if (AutoSave::GetInstance ()->mSaveVehicleCoords && ped == FindPlayerPed ())
         {
-            auto translation = ped->m_pVehicle->GetPosition();
-            memcpy(out, &translation->m_vPosn, sizeof(CVector));
+            auto translation = ped->m_pVehicle->GetPosition ();
+            memcpy (out, &translation->m_vPosn, sizeof (CVector));
             AutoSave::GetInstance ()->mSaveVehicleCoords = false;
         }
 }
@@ -39,7 +39,7 @@ int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
             scr->m_bIsActive = false;
 
             auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
-            
+
             // Save in a vehicle
             int *playerFlags   = FindPlayerPed (0)->flags;
             auto vehicleCoords = FindPlayerEntity ()->GetPosition ();
@@ -48,9 +48,9 @@ int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
 
             if (playerFlags[0] & 0x100)
                 AutoSave::GetInstance ()->mSaveVehicleCoords = true;
-            
+
             playerFlags[0] &= ~0x100;
-            
+
             // Save
             CGenericGameStorage::MakeValidSaveFileName (config.save_slot - 1);
             CGenericGameStorage::GenericSave ();

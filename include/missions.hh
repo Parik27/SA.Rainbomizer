@@ -11,10 +11,10 @@ const int OPCODE_REPLACE_MISSION = 0x1096; // custom opcode used in race scripts
 
 struct CitiesInfo
 {
-    int    citiesUnlocked;
-    bool   SFBarriers;
-    bool   LVBarriers;
-    int    maxWanted;
+    int  citiesUnlocked;
+    bool SFBarriers;
+    bool LVBarriers;
+    int  maxWanted;
 };
 
 struct MissionStatus

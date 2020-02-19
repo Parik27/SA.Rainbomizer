@@ -150,6 +150,18 @@ WeaponStatsConfig::Read (std::shared_ptr<cpptoml::table> table)
 
 /*******************************************************/
 void
+WantedLevelConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+    CONFIG (table, missions, "RandomizeMissionWantedLevels", bool);
+    CONFIG (table, chaos, "RandomizeChaosPoints", bool);
+}
+
+/*******************************************************/
+void
 WeaponConfig::ReadPattern (std::shared_ptr<cpptoml::table> pattern)
 {
     WeaponPattern _pattern;
@@ -480,6 +492,7 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.cutscenes.Read (config->get_table ("CutsceneRandomizer"));
     mConfigs.weaponStats.Read (config->get_table ("WeaponStatsRandomizer"));
     mConfigs.clothes.Read (config->get_table ("ClothesRandomizer"));
+    mConfigs.wanted.Read (config->get_table ("WantedLevelRandomizer"));
 }
 
 /*******************************************************/

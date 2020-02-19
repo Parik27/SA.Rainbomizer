@@ -51,6 +51,14 @@ Teleport (Position pos, bool refresh = true)
 }
 
 /*******************************************************/
+void
+RandomizePropertyToBuy ()
+{
+    int original_property = ScriptSpace[1735];
+    // if(origianl_property >
+}
+
+/*******************************************************/
 void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
                                          short count)
 {
@@ -76,6 +84,9 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
             if (threadFinishes.count (ScriptParams[0]))
                 missionRandomizer->mStoreNextMission = true;
         }
+
+    if (ScriptParams[0] == 134) // Buy Properties Mission
+        RandomizePropertyToBuy ();
 }
 
 /*******************************************************/
@@ -529,17 +540,17 @@ UnlockCities (int statsId)
 
 /*******************************************************/
 int
-CorrectMaxNumberOfGroupMembers()
+CorrectMaxNumberOfGroupMembers ()
 {
     auto missionRandomizer = MissionRandomizer::GetInstance ();
-    
+
     int max
         = HookManager::CallOriginalAndReturn<injector::cstd<int ()>, 0x60C925> (
             3);
 
     if (missionRandomizer->mRandomizedScript
         && missionRandomizer->mRandomizedMissionNumber == 109)
-        return std::max(3, max);
+        return std::max (3, max);
 
     return max;
 }
@@ -667,22 +678,20 @@ MissionRandomizer::InstallCheat (void *func, uint32_t hash)
 }
 
 /*******************************************************/
-void __fastcall
-OverrideHospitalEndPosition(CRunningScript* scr)
+void __fastcall OverrideHospitalEndPosition (CRunningScript *scr)
 {
-    HookManager::CallOriginal<
-        injector::thiscall<void (CRunningScript *)>, 0x469F5B> (
-        scr);
-    
+    HookManager::CallOriginal<injector::thiscall<void (CRunningScript *)>,
+                              0x469F5B> (scr);
+
     auto missionRandomizer = MissionRandomizer::GetInstance ();
-    if(scr->m_bWastedOrBusted && scr == missionRandomizer->mRandomizedScript)
+    if (scr->m_bWastedOrBusted && scr == missionRandomizer->mRandomizedScript)
         {
             int i = missionRandomizer->mOriginalMissionNumber;
             if (missionStartPos.count (i))
                 {
                     auto pos = missionStartPos[i];
-                    Scrpt::CallOpcode(0x9FF, "set_restart_closest_to",
-                                      pos.x, pos.y, pos.z);
+                    Scrpt::CallOpcode (0x9FF, "set_restart_closest_to", pos.x,
+                                       pos.y, pos.z);
                 }
         }
 }

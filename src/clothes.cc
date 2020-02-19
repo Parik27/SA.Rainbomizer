@@ -12,33 +12,33 @@ ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 
 /*******************************************************/
 void
-HandleClothesChange()
+HandleClothesChange ()
 {
     static int prevFadeValue = -1;
-    int fadeValue = injector::ReadMemory<uint8_t>(0xC3EFAB);
+    int        fadeValue     = injector::ReadMemory<uint8_t> (0xC3EFAB);
 
-    if(prevFadeValue != fadeValue && fadeValue == 255)
+    if (prevFadeValue != fadeValue && fadeValue == 255)
         {
             for (int i = 0; i < 17; i++)
                 {
                     auto cloth = ClothesRandomizer::GetInstance ()
                                      ->GetRandomCRCForComponent (i);
-                    
+
                     Scrpt::CallOpcode (0x784, "set_player_model_tex_crc",
-                                       GlobalVar(2),
-                                       cloth.second, cloth.first, i);
-                    Scrpt::CallOpcode(0x070D, "rebuild_player", GlobalVar(2));
+                                       GlobalVar (2), cloth.second, cloth.first,
+                                       i);
+                    Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
                 }
         }
-    
+
     prevFadeValue = fadeValue;
 
-    HookManager::CallOriginal<injector::cstd<void()>, 0x53EB9D>();
+    HookManager::CallOriginal<injector::cstd<void ()>, 0x53EB9D> ();
 }
 
 /*******************************************************/
 void
-ClothesRandomizer::InitialiseClothes()
+ClothesRandomizer::InitialiseClothes ()
 {
     std::vector<std::string> shops
         = {"CSchp", "CSsprt",  "LACS1",   "clothgp", "Csdesgn",
@@ -58,19 +58,19 @@ ClothesRandomizer::InitialiseClothes()
                         }
                 }
         }
-    
+
     mInitialised = true;
 }
 
 /*******************************************************/
 std::pair<int, int>
-ClothesRandomizer::GetRandomCRCForComponent(int componentId)
+ClothesRandomizer::GetRandomCRCForComponent (int componentId)
 {
-    if(!mInitialised)
-        InitialiseClothes();
+    if (!mInitialised)
+        InitialiseClothes ();
 
-    int randomId = random(mClothes[componentId].size()) - 1;
-    if(randomId < 0)
+    int randomId = random (mClothes[componentId].size ()) - 1;
+    if (randomId < 0)
         return {0, 0};
 
     return mClothes[componentId][randomId];
@@ -84,9 +84,8 @@ ClothesRandomizer::Initialise ()
     if (!config.enabled)
         return;
 
-    
     mInitialised = false;
-    
+
     RegisterHooks ({{HOOK_CALL, 0x53EB9D, (void *) HandleClothesChange}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ClothesRandomizer");

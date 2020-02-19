@@ -42,6 +42,7 @@
 #include "credits.hh"
 #include "weaponstats.hh"
 #include "clothes.hh"
+#include "wanted.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -98,6 +99,7 @@ public:
         BlipRandomizer::GetInstance ()->Initialise ();
         WeaponStatsRandomizer::GetInstance ()->Initialise ();
         ClothesRandomizer::GetInstance ()->Initialise ();
+        WantedLevelRandomizer::GetInstance ()->Initialise ();
 
         CreditsExtender::Initialise ();
 

@@ -227,7 +227,7 @@ struct ObjectConfig : public BaseConfig
 struct CutsceneConfig : public BaseConfig
 {
     bool        enabled            = false;
-    std::string cutsceneFile       = "Cutscene_Models.txt";
+    std::string cutsceneFile       = "data/Cutscene_Models.txt";
     bool        randomizeModels    = true;
     bool        randomizeLocations = true;
     void        Read (std::shared_ptr<cpptoml::table> table);
@@ -248,6 +248,15 @@ struct BlipsConfig : public BaseConfig
 /*******************************************************/
 struct ClothesConfig : public BaseConfig
 {
+};
+
+/*******************************************************/
+struct WantedLevelConfig : public BaseConfig
+{
+    bool missions = true;
+    bool chaos    = true;
+
+    void Read (std::shared_ptr<cpptoml::table> table);
 };
 
 /******************************************************/
@@ -279,6 +288,7 @@ struct Configs
     ParticlesConfig     particles;
     WeaponStatsConfig   weaponStats;
     ClothesConfig       clothes;
+    WantedLevelConfig   wanted;
 };
 
 /*******************************************************/

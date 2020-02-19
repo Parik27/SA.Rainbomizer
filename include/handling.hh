@@ -6,8 +6,8 @@ class HandlingRandomizer
 {
     static HandlingRandomizer *mInstance;
 
-    tHandlingData* data;
-    
+    tHandlingData *data;
+
     HandlingRandomizer (){};
     static void DestroyInstance ();
 

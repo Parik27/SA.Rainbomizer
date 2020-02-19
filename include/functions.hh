@@ -384,16 +384,16 @@ struct CColModel
 
 struct CVehicle
 {
-    uint8_t  __pad[0x22];
-    uint16_t m_nModelIndex;
-    uint8_t __pad24[864];
-    tHandlingData *m_pHandling;
-    tFlyingHandlingData* m_pFlyingHandling;
-    uint8_t m_nFlags[8];
-    int      GetVehicleAppearence ();
-    void     AutomobilePlaceOnRoadProperly ();
-    void     BikePlaceOnRoadProperly ();
-    char     SetGearUp ();
+    uint8_t              __pad[0x22];
+    uint16_t             m_nModelIndex;
+    uint8_t              __pad24[864];
+    tHandlingData *      m_pHandling;
+    tFlyingHandlingData *m_pFlyingHandling;
+    uint8_t              m_nFlags[8];
+    int                  GetVehicleAppearence ();
+    void                 AutomobilePlaceOnRoadProperly ();
+    void                 BikePlaceOnRoadProperly ();
+    char                 SetGearUp ();
 };
 
 struct CPed
@@ -785,22 +785,22 @@ union ShoppingHash
 
 struct CShoppingItem
 {
-    int textureName;
-    int unk;
-    int modelName;
-    int modelType;
+    int  textureName;
+    int  unk;
+    int  modelName;
+    int  modelType;
     char gxtEntry[8];
 };
 
-static_assert(sizeof(CShoppingItem) == 24, "incorrect size");
+static_assert (sizeof (CShoppingItem) == 24, "incorrect size");
 
 struct CShopping
 {
     static void LoadShop (const char *name); // 0x49BBE0
-    static void LoadShoppingType (const char* type);
+    static void LoadShoppingType (const char *type);
 
-    static int& m_nCurrentShoppingType;
-    static int& m_nTotalItems;
+    static int &m_nCurrentShoppingType;
+    static int &m_nTotalItems;
 
     static CShoppingItem *m_aShoppingItems;
 };
@@ -851,9 +851,10 @@ struct CGame
 
 CMatrix *RwFrameGetLTM (void *frame);
 
-int   random (int max);
-int   random (int min, int max);
-float randomFloat (float min, float max);
+int    random (int max);
+int    random (int min, int max);
+double randomNormal (double mean, double stddev);
+float  randomFloat (float min, float max);
 
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;

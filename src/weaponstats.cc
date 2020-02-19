@@ -19,11 +19,12 @@ int movementFlag[] = {0x0, 0x10, 0x20, 0x30};
 
 // 0x0 -regular, 0x100 -throw, 0x200 - cant jump with weapon, 0x400 - continous
 // fire, 0x800 - dual-wield
-int otherFlag[]  = {0x0, 0x200, 0x400, 0x600, 0x800, 0xA00, 0xC00, 0xE00};
+int otherFlag[] = {0x0, 0x200, 0x400, 0x600, 0x800, 0xA00, 0xC00, 0xE00};
 
 // 0x0 - none, 0x1000 - reload, 0x2000 - can shoot while crouching, 0x4000 -
 // reload to start, 0x8000 - long reload
-int reloadFlag[] = {0x0, 0x2000, 0x3000, 0x4000, 0x5000, 0x6000, 0x8000, 0x9000, 0xA000, 0xB000, 0xC000, 0xD000, 0xE000, 0xF000};
+int reloadFlag[] = {0x0,    0x2000, 0x3000, 0x4000, 0x5000, 0x6000, 0x8000,
+                    0x9000, 0xA000, 0xB000, 0xC000, 0xD000, 0xE000, 0xF000};
 
 /*******************************************************/
 int __fastcall RandomizeStats (int *address, int weaponid)
@@ -31,8 +32,8 @@ int __fastcall RandomizeStats (int *address, int weaponid)
     CPed *player = FindPlayerPed ();
 
     if (address < (int *) player || address > (int *) (player + 0x764)
-        || (weaponid <= 46 && weaponid >= 40) || weaponid == 36 || weaponid == 37
-        || weaponid < 22)
+        || (weaponid <= 46 && weaponid >= 40) || weaponid == 36
+        || weaponid == 37 || weaponid < 22)
         return 0;
 
     int weaponids[] = {weaponid, 0, 0, 0};
@@ -64,9 +65,11 @@ int __fastcall RandomizeStats (int *address, int weaponid)
         properties = 0x238;
     // randomize SMG properties in the way which they can be used with jetpack
     else if (weaponid == 28 || weaponid == 29 || weaponid == 32)
-        properties = aimFlag[1] + movementFlag[random(3)] + otherFlag[random(7)] + reloadFlag[2];
+        properties = aimFlag[1] + movementFlag[random (3)]
+                     + otherFlag[random (7)] + reloadFlag[2];
     else
-        properties = aimFlag[random(6)] + movementFlag[random(3)] + otherFlag[random(7)] + reloadFlag[random(13)];
+        properties = aimFlag[random (6)] + movementFlag[random (3)]
+                     + otherFlag[random (7)] + reloadFlag[random (13)];
 
     if (quality < 10)
         {
@@ -118,12 +121,12 @@ int __fastcall RandomizeStats (int *address, int weaponid)
             aWeaponInfos[id].m_fSpeed          = moveSpeed;
             aWeaponInfos[id].m_fTargetingRange = range;
             aWeaponInfos[id].m_fFiringRange    = range;
-            //aWeaponInfos[id].m_fAnimLoopStart  = animValues[2];
-            //aWeaponInfos[id].m_fAnimFrameFire  = animValues[1];
-            //aWeaponInfos[id].m_fAnimLoopEnd    = animValues[0];
-            //aWeaponInfos[id].m_fAnim2LoopStart = animValues[2];
-            //aWeaponInfos[id].m_fAnim2FrameFire = animValues[1];
-            //aWeaponInfos[id].m_fAnim2LoopEnd   = animValues[0];
+            // aWeaponInfos[id].m_fAnimLoopStart  = animValues[2];
+            // aWeaponInfos[id].m_fAnimFrameFire  = animValues[1];
+            // aWeaponInfos[id].m_fAnimLoopEnd    = animValues[0];
+            // aWeaponInfos[id].m_fAnim2LoopStart = animValues[2];
+            // aWeaponInfos[id].m_fAnim2FrameFire = animValues[1];
+            // aWeaponInfos[id].m_fAnim2LoopEnd   = animValues[0];
         }
 
     return 0;

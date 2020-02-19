@@ -59,8 +59,8 @@ PrintCredits (float scaleX, float scaleY, char *text, int *position,
 void
 CreditsExtender::Initialise ()
 {
-    auto config = ConfigManager::GetInstance()->GetConfigs().general;
-    
-    if(config.enable_credits)
+    auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
+
+    if (config.enable_credits)
         RegisterHooks ({{HOOK_CALL, 0x5A88AC, (void *) PrintCredits}});
 }

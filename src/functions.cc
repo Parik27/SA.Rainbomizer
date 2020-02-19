@@ -566,11 +566,12 @@ CWorld::FindGroundZedForCoord (float x, float y)
 }
 
 /*******************************************************/
-bool CEnterExit::GetInteriorStatus (const char *name)
+bool
+CEnterExit::GetInteriorStatus (const char *name)
 {
     for (int i = 0; i < mp_poolEntryExits->m_nSize; i++)
         {
-            if((mp_poolEntryExits->m_byteMap[i] & 0x80u) == 0)
+            if ((mp_poolEntryExits->m_byteMap[i] & 0x80u) == 0)
                 {
                     auto object = mp_poolEntryExits->GetAt<CEnterExit> (i);
                     if (std::string (name) == object->m_szInteriorName)
@@ -750,16 +751,16 @@ CStats::GetStatValue (short id)
 
 /*******************************************************/
 void
-CShopping::LoadShop(const char *name)
+CShopping::LoadShop (const char *name)
 {
-    Call<0x49BBE0>(name);
+    Call<0x49BBE0> (name);
 }
 
 /*******************************************************/
 void
-CShopping::LoadShoppingType(const char *name)
+CShopping::LoadShoppingType (const char *name)
 {
-    Call<0x49B8D0>(name);
+    Call<0x49B8D0> (name);
 }
 
 /*******************************************************/
@@ -796,6 +797,14 @@ random (int max)
 }
 
 /*******************************************************/
+double
+randomNormal (double mean, double stddev)
+{
+    std::normal_distribution<double> dist{mean, stddev};
+    return dist (rand_engine ());
+}
+
+/*******************************************************/
 float
 randomFloat (float min, float max)
 {
@@ -819,6 +828,6 @@ int &            CGenericGameStorage::length    = *(int *) 0xC16EEC;
 CPool *&         CEnterExit::mp_poolEntryExits  = *(CPool **) 0x96A7D8;
 CPool *&         ms_pVehiclePool                = *(CPool **) 0xB74494;
 
-int &         CShopping::m_nCurrentShoppingType = *(int *) 0xA9A7C8;
-int &         CShopping::m_nTotalItems          = *(int *) 0xA9A7CC;
+int &          CShopping::m_nCurrentShoppingType = *(int *) 0xA9A7C8;
+int &          CShopping::m_nTotalItems          = *(int *) 0xA9A7CC;
 CShoppingItem *CShopping::m_aShoppingItems       = (CShoppingItem *) 0xA986F0;

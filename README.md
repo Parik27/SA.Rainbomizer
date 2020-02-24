@@ -3,7 +3,7 @@
 
 <img src="https://media.discordapp.net/attachments/419957309192536066/602097860292509718/spinning.gif">
 
-Rainbomizer is a randomizer for Grand Theft Auto: San Andreas. 
+Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 
 ## Features 🌈
 
@@ -27,7 +27,7 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 
 ## Supported Versions 🌈
 
-* GTA San Andreas - v1.0
+* GTA San Andreas - v1.00
 
 Other versions of the game *will not* work and will most likely cause a crash.
 
@@ -35,7 +35,7 @@ Check this link if you wish to downgrade a later version to a compatible version
 
 ## Installation 🌈
 
-Installation requires an ASI Loader to be installed. 
+Installation requires an ASI Loader to be installed.
 
 [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader) by [ThirteenAG](https://github.com/ThirteenAG) is a popular option since it supports CrashDumps, which will be necessary if you want to report a crash.
 
@@ -50,7 +50,7 @@ If you wish to change any of the mod's functionalities, for example to disable a
 
 The default configuration file is in the main repository, `config.toml`, and is automatically created by the mod if it doesn't exist in the rainbomizer folder.
 
-The configuration file is in the TOML format. It is similar in structure to ini's but with a defined and better structure. 
+The configuration file is in the TOML format. It is similar in structure to ini's but with a defined and better structure.
 
 To configure a specific randomizer, search for its name in the configuration file. You can set the "Enabled" key to 'true' or 'false' to enable or disable it respectively.
 
@@ -68,7 +68,7 @@ More information about how to configure specific randomizers is provided in the 
 
 - [NABN00B](https://www.twitch.tv/nabn00b) - Gave the original idea for a car randomizer for San Andreas.
 - [MrMateczko](https://www.twitch.tv/mrmateczko_) - Special mention for sharing a modded cargrp file that led to the original idea.
-- [Veigar](https://gtaforums.com/profile/685882-veigar/) - Idea for the Parked Car/Texture Randomizer and support during early development.
+- [Veigar](https://gtaforums.com/profile/685882-veigar) - Idea for the Parked Car/Texture Randomizer and support during early development.
 
 #### Additional Contributors
 
@@ -77,9 +77,9 @@ More information about how to configure specific randomizers is provided in the 
 
 #### Beta Testers
 
-- [Fryterp23](https://www.twitch.tv/fryterp23/)
+- [Fryterp23](https://www.twitch.tv/fryterp23)
 - [Hugo_One](https://www.twitch.tv/hugo_one)
-- [Lordmau5](https://www.twitch.tv/lordmau5/)
+- [Lordmau5](https://www.twitch.tv/lordmau5)
 - [SpeedyFolf](https://www.twitch.tv/speedyfolf)
 - [Waris](https://www.twitch.tv/wariscoach)
 
@@ -90,7 +90,7 @@ More information about how to configure specific randomizers is provided in the 
 
 ## Contribution 🌈
 
-You can contribute to the project by reporting any crashes/issues you encounter in the [Issues](https://github.com/Parik27/Rainbomizer/issues) section of the repository
+You can contribute to the project by reporting any crashes/issues you encounter in the [Issues](https://github.com/Parik27/Rainbomizer/issues) section of the repository.
 
 Pull requests are welcome but are required to follow the current style used in the project.
 

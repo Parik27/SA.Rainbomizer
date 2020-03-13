@@ -36,6 +36,8 @@ Check this link if you wish to downgrade a later version to a compatible version
 
 ## Installation 🌈
 
+[Tutorial by SpeedyFolf](https://www.youtube.com/watch?v=HRz_zTuctKc)
+
 Installation requires an ASI Loader to be installed.
 
 [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader) by [ThirteenAG](https://github.com/ThirteenAG) is a popular option since it supports CrashDumps, which will be necessary if you want to report a crash.

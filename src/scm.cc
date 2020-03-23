@@ -416,12 +416,19 @@ void __fastcall FixMaddDogg (CRunningScript *scr, void *edx, short count)
 {
     scr->CollectParameters (count);
 
+    // Madd Dogg - move boxes
     if (scr->CheckName ("doc2"))
         {
             CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
                                               + 0xA18 * (ScriptParams[0] >> 8));
 
             SetMaddDoggOffset (vehicle, (float *) &ScriptParams[3], 0.5);
+        }
+    // HIghjack - Adjust truck requirements
+    else if (scr->CheckName ("toreno2"))
+        {
+            if(fabs(((float*)ScriptParams)[2] - 4.0) < 0.01)
+                ((float*)ScriptParams)[2] = 104.0;
         }
 }
 

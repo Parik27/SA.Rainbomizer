@@ -64,7 +64,6 @@ More information about how to configure specific randomizers is provided in the 
 #### Lead Developers
 
 - [Parik](https://github.com/Parik27) - Creation and implementation of the ASI.
-- [123robot](https://www.twitch.tv/123robot) - Creating external files, gathering data, providing ideas, lots of testing, and general support throughout development.
 - [GTA Madman](https://github.com/GTAMadman) - Contributed fixes and extensive testing.
 
 #### Original Concept
@@ -75,7 +74,9 @@ More information about how to configure specific randomizers is provided in the 
 
 #### Additional Contributors
 
+- [123robot](https://www.twitch.tv/123robot) - Creating external files, gathering data, providing ideas, lots of testing, and general support throughout development.
 - [iguana](https://www.twitch.tv/iguana_) - Assisted with looking through code and helped inspire the mission randomizer.
+- [SpeedyFolf](https://www.twitch.tv/speedyfolf) - For creating the tutorial video, beta testing and feedbacks during development.
 - [SRewo](https://github.com/SRewo) - Creating the Weapon Stats Randomizer.
 
 #### Beta Testers

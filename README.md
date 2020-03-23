@@ -8,7 +8,7 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 
 ## Features 🌈
 
-- **Traffic Randomizer**: Randomizes cars that spawn on traffic including law enforcement vehicles.
+- **Traffic Randomizer**: Randomizes cars that spawn in traffic including law enforcement vehicles.
 - **Parked Car Randomizer**: Randomizes cars which are found parked around the map including airplanes at airports with entirely random spawns.
 - **Script Vehicle Randomizer**: Randomizes the vehicles you are given in missions. The randomizer makes sure that you get vehicles that are usable for the mission.
 - **(NEW) Colour Randomizer**: Randomizes the colours of various in-game elements, including cars, the HUD, and fades. Includes 128 colours hue cycle. The intensity of this randomizer can be modified extensively in the configuration file.
@@ -53,7 +53,7 @@ If you wish to change any of the mod's functionalities, for example to disable a
 
 The default configuration file is in the main repository, `config.toml`, and is automatically created by the mod if it doesn't exist in the rainbomizer folder.
 
-The configuration file is in the TOML format. It is similar in structure to ini's but with a defined and better structure.
+The configuration file is in the TOML format. It is similar in structure to INI's, but with a defined and better structure.
 
 To configure a specific randomizer, search for its name in the configuration file. You can set the "Enabled" key to 'true' or 'false' to enable or disable it respectively.
 
@@ -95,6 +95,6 @@ More information about how to configure specific randomizers is provided in the 
 
 You can contribute to the project by reporting any crashes/issues you encounter in the [Issues](https://github.com/Parik27/Rainbomizer/issues) section of the repository.
 
-Pull requests are welcome but are required to follow the current style used in the project.
+Pull requests are welcome, but are required to follow the current style used in the project.
 
 You can also keep up with or contribute to development as it happens by [joining the official Rainbomizer Discord!](https://discord.gg/BYVBQw7) You can give #suggestions, ask for #support, or view current development in #sa.

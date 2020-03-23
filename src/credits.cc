@@ -12,7 +12,7 @@ std::vector<std::string> concept = {"NABN00B", "MrMateczko", "Veigar"};
 std::vector<std::string> contribs = {"123robot", "iguana", "SpeedyFolf", "SRewo"};
 
 std::vector<std::string> beta_testers
-    = {"Fryterp23", "Hugo_One", "Lordmau5", "SpeedyFolf", "Waris"};
+    = {"Fryterp23", "Hugo_One", "Lordmau5", "Waris"};
 
 /*******************************************************/
 void

@@ -76,7 +76,7 @@ More information about how to configure specific randomizers is provided in the 
 
 - [123robot](https://www.twitch.tv/123robot) - Creating external files, gathering data, providing ideas, lots of testing, and general support throughout development.
 - [iguana](https://www.twitch.tv/iguana_) - Assisted with looking through code and helped inspire the mission randomizer.
-- [SpeedyFolf](https://www.twitch.tv/speedyfolf) - For creating the tutorial video, beta testing and feedbacks during development.
+- [SpeedyFolf](https://www.twitch.tv/speedyfolf) - Creating the tutorial video, beta testing, and feedback during development.
 - [SRewo](https://github.com/SRewo) - Creating the Weapon Stats Randomizer.
 
 #### Beta Testers
@@ -84,7 +84,6 @@ More information about how to configure specific randomizers is provided in the 
 - [Fryterp23](https://www.twitch.tv/fryterp23)
 - [Hugo_One](https://www.twitch.tv/hugo_one)
 - [Lordmau5](https://www.twitch.tv/lordmau5)
-- [SpeedyFolf](https://www.twitch.tv/speedyfolf)
 - [Waris](https://www.twitch.tv/wariscoach)
 
 ## Used Libraries 🌈

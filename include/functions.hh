@@ -719,6 +719,11 @@ struct CFont
     static void PrintString (float x, float y, char *text);
 };
 
+struct CFileMgr
+{
+    static char* ms_dirName;
+};
+
 struct CRect
 {
     float left;
@@ -846,6 +851,7 @@ struct C3dMarker
 
 struct CGame
 {
+    static unsigned char& bMissionPackGame;
     static int Init3 (void *fileName);
 };
 

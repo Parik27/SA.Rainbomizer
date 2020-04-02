@@ -16,6 +16,7 @@
 #include <random>
 #include <memory>
 #include "util/loader.hh"
+#include "dyom.hh"
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 
@@ -402,11 +403,16 @@ void
 JumpOnMissionEnd ()
 {
     auto missionRandomizer = MissionRandomizer::GetInstance ();
+    auto dyomRandomizer    = DyomRandomizer::GetInstance ();
 
     if (missionRandomizer->mRandomizedScript
         && missionRandomizer->ShouldJump (missionRandomizer->mRandomizedScript))
         missionRandomizer->MoveScriptToOriginalOffset (
             missionRandomizer->mRandomizedScript);
+
+    if (DyomRandomizer::mEnabled && dyomRandomizer->mDyomScript)
+        dyomRandomizer->HandleDyomScript (
+            dyomRandomizer->mDyomScript);
 
     HookManager::CallOriginalAndReturn<injector::cstd<void ()>, 0x469FB0> (
         [] { (*((int *) 0xA447F4))++; });
@@ -590,7 +596,7 @@ MissionRandomizer::ResetSaveData ()
 
     mSaveInfo.randomSeed = config.shufflingSeed;
     if (config.shufflingEnabled && config.shufflingSeed == -1)
-        mSaveInfo.randomSeed = random (INT_MAX);
+        mSaveInfo.randomSeed = random (UINT_MAX);
 
     memset (mSaveInfo.missionStatus.data, 1,
             sizeof (mSaveInfo.missionStatus.data));

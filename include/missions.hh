@@ -146,7 +146,7 @@ public:
     {
         mScriptByPass = status;
     }
-
+    
     void Load ();
     void Save ();
 };

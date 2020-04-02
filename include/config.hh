@@ -253,6 +253,8 @@ struct ClothesConfig : public BaseConfig
 /*******************************************************/
 struct WantedLevelConfig : public BaseConfig
 {
+    bool enabled = false;
+    
     bool missions = true;
     bool chaos    = true;
 
@@ -261,6 +263,16 @@ struct WantedLevelConfig : public BaseConfig
 
 /******************************************************/
 struct WeaponStatsConfig : public BaseConfig
+{
+    bool enabled = false;
+    void Read (std::shared_ptr<cpptoml::table> table);
+};
+
+/*******************************************************/
+struct DyomConfig : public BaseConfig {};
+
+/*******************************************************/
+struct RespawnPointConfig : public BaseConfig
 {
     bool enabled = false;
     void Read (std::shared_ptr<cpptoml::table> table);
@@ -289,6 +301,8 @@ struct Configs
     WeaponStatsConfig   weaponStats;
     ClothesConfig       clothes;
     WantedLevelConfig   wanted;
+    RespawnPointConfig  respawnPoint;
+    DyomConfig          dyom;
 };
 
 /*******************************************************/

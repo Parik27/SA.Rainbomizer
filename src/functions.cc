@@ -831,3 +831,5 @@ CPool *&         ms_pVehiclePool                = *(CPool **) 0xB74494;
 int &          CShopping::m_nCurrentShoppingType = *(int *) 0xA9A7C8;
 int &          CShopping::m_nTotalItems          = *(int *) 0xA9A7CC;
 CShoppingItem *CShopping::m_aShoppingItems       = (CShoppingItem *) 0xA986F0;
+unsigned char &CGame::bMissionPackGame           = *(unsigned char *) 0xB72910;
+char *         CFileMgr::ms_dirName              = (char *) 0xB71A60;

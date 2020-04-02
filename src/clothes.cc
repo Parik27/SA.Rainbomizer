@@ -14,6 +14,9 @@ ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 void
 HandleClothesChange ()
 {
+    if(CGame::bMissionPackGame)
+        return HookManager::CallOriginal<injector::cstd<void ()>, 0x53EB9D> ();
+    
     static int prevFadeValue = -1;
     int        fadeValue     = injector::ReadMemory<uint8_t> (0xC3EFAB);
 
@@ -39,7 +42,7 @@ HandleClothesChange ()
 /*******************************************************/
 void
 ClothesRandomizer::InitialiseClothes ()
-{
+{    
     std::vector<std::string> shops
         = {"CSchp", "CSsprt",  "LACS1",   "clothgp", "Csdesgn",
            "Csexl", "barbers", "barber2", "barber3"};

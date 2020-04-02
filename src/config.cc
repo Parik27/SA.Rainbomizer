@@ -150,6 +150,16 @@ WeaponStatsConfig::Read (std::shared_ptr<cpptoml::table> table)
 
 /*******************************************************/
 void
+RespawnPointConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if(!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+}
+
+/*******************************************************/
+void
 WantedLevelConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
     if (!table)
@@ -486,6 +496,7 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.sounds.Read (config->get_table ("SoundsRandomizer"));
     mConfigs.scriptVehicle.Read (config->get_table ("ScriptVehicleRandomizer"));
     mConfigs.missions.Read (config->get_table ("MissionRandomizer"));
+    mConfigs.dyom.Read (config->get_table ("DyomRandomizer"));
     mConfigs.objects.Read (config->get_table ("ObjectRandomizer"));
     mConfigs.blips.Read (config->get_table ("BlipsRandomizer"));
     mConfigs.particles.Read (config->get_table ("ParticleRandomizer"));
@@ -493,6 +504,7 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.weaponStats.Read (config->get_table ("WeaponStatsRandomizer"));
     mConfigs.clothes.Read (config->get_table ("ClothesRandomizer"));
     mConfigs.wanted.Read (config->get_table ("WantedLevelRandomizer"));
+    mConfigs.respawnPoint.Read (config->get_table ("RespawnPointRandomizer"));
 }
 
 /*******************************************************/

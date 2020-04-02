@@ -198,6 +198,13 @@ Enabled = false
 Enabled = false
 
 #######################################################
+# DYOM Randomizer - Adds an option to download and play a random mission from the dyom website
+[DyomRandomizer]
+
+Enabled = true
+
+
+#######################################################
 # Clothes Randomizer - Randomizes clothes every fade
 [ClothesRandomizer]
 
@@ -207,7 +214,7 @@ Enabled = true
 # Wanted Level Randomizer - Randomizes how you get wanted level during and outside missions
 [WantedLevelRandomizer]
 
-Enabled = true
+Enabled = false
 
 # Randomizes number of wanted stars you get in missions like 2 stars in Drive-by
 RandomizeMissionWantedLevels = true
@@ -216,6 +223,13 @@ RandomizeMissionWantedLevels = true
 # You could, for example, get 3 stars for stealing a cop bike, but lose 1 star for killing
 # a cop.
 RandomizeChaosPoints = true
+
+#######################################################
+# Respawn Point Randomizer - Randomizes where you respawn after deatharrest
+[RespawnPointRandomizer]
+
+Enabled = false
+
 
 #######################################################
 # License Plate Randomizer - Randomizes the license plates of vehicles to a random word.

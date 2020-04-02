@@ -43,6 +43,8 @@
 #include "weaponstats.hh"
 #include "clothes.hh"
 #include "wanted.hh"
+#include "respawns.hh"
+#include "dyom.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -100,6 +102,8 @@ public:
         WeaponStatsRandomizer::GetInstance ()->Initialise ();
         ClothesRandomizer::GetInstance ()->Initialise ();
         WantedLevelRandomizer::GetInstance ()->Initialise ();
+        RespawnPointRandomizer::GetInstance ()->Initialise ();
+        DyomRandomizer::GetInstance ()->Initialise ();
 
         CreditsExtender::Initialise ();
 

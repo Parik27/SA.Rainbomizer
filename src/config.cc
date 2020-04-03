@@ -66,6 +66,7 @@ MissionConfig::Read (std::shared_ptr<cpptoml::table> table)
     CONFIG (table, forcedMissionID, "ForcedMissionID", int);
     CONFIG (table, shufflingEnabled, "RandomizeOnce", bool);
     CONFIG (table, forceShufflingSeed, "ForcedRandomizeOnceSeed", bool);
+    CONFIG (table, disableMainScmCheck, "DisableMainScmCheck", bool);
 
     std::string seed
         = table->get_as<std::string> ("RandomizeOnceSeed").value_or ("");
@@ -448,7 +449,7 @@ ConfigManager::WriteDefaultConfig (const std::string &file)
     FILE *f = OpenRainbomizerFile (file.c_str (), "wb");
     if (f)
         {
-            fwrite (config_toml, config_toml_len, 1, f);
+            fwrite (config_toml, sizeof(config_toml) - 1, 1, f);
             fclose (f);
         }
 }
@@ -459,7 +460,7 @@ ConfigManager::ParseDefaultConfig ()
 {
     // Read the default config file
     auto stream = std::istringstream (
-        std::string ((char *) config_toml, config_toml_len));
+        std::string ((char *) config_toml, sizeof (config_toml) - 1));
 
     cpptoml::parser p{stream};
     return p.parse ();

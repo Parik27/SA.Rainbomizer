@@ -79,6 +79,8 @@ class MissionRandomizer
     void HandleEndThreadOpcode (CRunningScript *scr, short opcode);
     void HandleOverrideRestartOpcode (CRunningScript *scr, short opcode);
 
+    bool VerifyMainSCM();
+
     void InstallCheat (void *func, uint32_t hash);
 
 public:

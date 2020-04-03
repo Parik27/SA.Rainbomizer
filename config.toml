@@ -25,11 +25,11 @@ Enabled	  = true
 Seed	  = -1 # -1 for random
 
 Unprotect = true
-AutosaveSlot = 8 # Set it to a non-existant slot (eg. -1 or 9) to disable
+AutosaveSlot = 8 # Set it to a non-existent slot (eg. -1 or 9) to disable
 ModifyCredits = true
 
 #######################################################
-# Traffic Randomizer - Randomizes cars that spawn on traffic including law enforcement vehicles
+# Traffic Randomizer - Randomizes cars that spawn in traffic including law enforcement vehicles
 
 [TrafficRandomizer]
 
@@ -165,6 +165,10 @@ ForcedMissionID = 11
 RandomizeOnce = true
 RandomizeOnceSeed = "" # https://en.wikipedia.org/wiki/Random_seed - useful for races
 ForcedRandomizeOnceSeed = false # Force the seed on existing save files
+
+DisableMainScmCheck = false # Allow custom main.scm's to run with mission randomizer.
+		      	    # Note: Missions might not progress properly with a custom
+			    #       main.scm file.
 
 #######################################################
 # Cutscene Randomizer - Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.

@@ -212,6 +212,7 @@ struct MissionConfig : public BaseConfig
     bool shufflingEnabled     = true;
     int  shufflingSeed        = -1;
     bool forceShufflingSeed   = false;
+    bool disableMainScmCheck  = false;
 
     void Read (std::shared_ptr<cpptoml::table> table);
 };

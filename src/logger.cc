@@ -29,7 +29,7 @@ std::string Logger::mFileName = "";
 #ifndef NDEBUG
 #define RAINBOMIZER_BUILD "Debug Build: " __DATE__ " " __TIME__
 #else
-#define RAINBOMIZER_BUILD "Build v2.1 - Beta"
+#define RAINBOMIZER_BUILD "Build v2.1"
 #endif
 
 /*******************************************************/

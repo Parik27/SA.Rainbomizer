@@ -12,8 +12,8 @@ class DyomRandomizer
     static void DestroyInstance ();
 
     bool ParseMission(HANDLE session, const std::string &url);
-    std::string GetRandomEntryFromPage(HANDLE session, int page);
-    int GetTotalNumberOfDYOMMissionPages(HANDLE session);
+    std::string GetRandomEntryFromPage(HANDLE session, std::string page);
+    int GetTotalNumberOfDYOMMissionPages(HANDLE session, std::string list);
     void DownloadRandomMission();
     
 public:

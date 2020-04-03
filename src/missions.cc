@@ -95,12 +95,7 @@ void
 MissionRandomizer::TeleportPlayerBeforeMission ()
 {
     if (missionStartPos.count (mRandomizedMissionNumber))
-        {
-            Logger::GetLogger ()->LogMessage (
-                "Teleporting player to the start of mission: "
-                + std::to_string (missionStartPos[mRandomizedMissionNumber].x));
-            Teleport (missionStartPos[mRandomizedMissionNumber]);
-        }
+        Teleport (missionStartPos[mRandomizedMissionNumber]);
 }
 
 /*******************************************************/
@@ -114,9 +109,6 @@ MissionRandomizer::TeleportPlayerAfterMission ()
             pos.z        = (mRandomizedMissionNumber == 80) ? 1500 : pos.z;
 
             Teleport (pos);
-            Logger::GetLogger ()->LogMessage (
-                "Teleporting player to the end of mission: "
-                + std::to_string (missionStartPos[mOriginalMissionNumber].x));
         }
     catch (const std::out_of_range &e)
         {

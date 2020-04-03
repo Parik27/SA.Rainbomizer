@@ -81,6 +81,7 @@ SelectCutsceneOffset (char *name)
     Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", offset.x, offset.y);
     Scrpt::CallOpcode (0x3CB, "set_render_origin", offset.x, offset.y, 20);
     Scrpt::CallOpcode (0x15f, "set_pos", offset.x, offset.y, 20, 0, 0, 0);
+    Scrpt::CallOpcode (0x4D7, "freeze_player", GlobalVar (3), 1);
 
     offset.z = CWorld::FindGroundZedForCoord (offset.x, offset.y);
     cutsceneRandomizer->offset = offset;
@@ -116,6 +117,7 @@ RestoreCutsceneInterior ()
             auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
             Scrpt::CallOpcode (0x4BB, "select_interior",
                                cutsceneRandomizer->originalLevel);
+            Scrpt::CallOpcode (0x4D7, "freeze_player", GlobalVar (3), 0);
         }
     return ret;
 }

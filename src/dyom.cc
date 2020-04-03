@@ -95,13 +95,19 @@ bool ReadRequestResponse(HANDLE request, std::vector<uint8_t> &out)
             
             if(!InternetQueryDataAvailable(request, &dwSize, 0, 0))
                 {
-                    printf("InternetQueryDataAvailable failed (%lu)\n", GetLastError());
+                    Logger::GetLogger ()->LogMessage (
+                        "InternetQueryDataAvailable failed "
+                        + std::to_string (GetLastError ()));
+                    
                     return false;
                 }
             auto lpszData = new TCHAR[dwSize+1];
             if(!InternetReadFile(request, lpszData, dwSize, &dwDownloaded))
                 {
-                    printf("InternetReadFile failed (%lu)\n", GetLastError());
+                    Logger::GetLogger ()->LogMessage (
+                        "InternetReadFile failed "
+                        + std::to_string (GetLastError ()));
+                    
                     delete[] lpszData;
                     break;
                 }
@@ -145,9 +151,9 @@ std::string ReadStringFromRequest(HANDLE request)
 
 /*******************************************************/
 int
-DyomRandomizer::GetTotalNumberOfDYOMMissionPages(HANDLE session)
+DyomRandomizer::GetTotalNumberOfDYOMMissionPages(HANDLE session, std::string list)
 {
-    HANDLE request = MakeRequest(session, "list");
+    HANDLE request = MakeRequest(session, list.c_str());
     std::string lists = ReadStringFromRequest(request);
 
     auto start = lists.find("... <span class=pagelink>");
@@ -193,10 +199,10 @@ GetNthOccurrenceOfString(const std::string& str, const std::string &substr, int 
 
 /*******************************************************/
 std::string
-DyomRandomizer::GetRandomEntryFromPage (HANDLE session, int page)
+DyomRandomizer::GetRandomEntryFromPage (HANDLE session, std::string page)
 {
     std::string entries = ReadStringFromRequest (
-        MakeRequest (session, ("list?page=" + std::to_string (page)).c_str ()));
+        MakeRequest (session, page.c_str ()));
 
     int entries_count = CountOccurrencesInString (entries, "<a href='show/");
     std::size_t start = GetNthOccurrenceOfString (entries, "<a href='show/",
@@ -234,11 +240,18 @@ DyomRandomizer::DownloadRandomMission ()
             
             HANDLE session = OpenSession(handle);
 
-            int total_pages = GetTotalNumberOfDYOMMissionPages(session);
-            while (!ParseMission (session,
-                                 GetRandomEntryFromPage (session,
-                                                         random (total_pages))))
+            std::string list = random (100) > 38 ? "list" : "list_d";
+
+            int total_pages = GetTotalNumberOfDYOMMissionPages (session, list);
+            while (!ParseMission (
+                session,
+                GetRandomEntryFromPage (session, list + "?page="
+                                                     + std::to_string (random (
+                                                         total_pages)))))
                 ;
+
+            CloseHandle(session);
+            CloseHandle(handle);
         }
 }
 

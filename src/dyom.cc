@@ -53,7 +53,6 @@ AdjustCodeForDYOM (FILE *file, void *buf, size_t len)
         {
             uint8_t *slots
                 = reinterpret_cast<uint8_t *> ((char *) buf + 0x18D90);
-            printf ("%d\n", *slots);
             *slots = 9;
 
             char *column_name = (char *) buf + 0x18E11;
@@ -275,13 +274,17 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
                     if ((char *) &ScriptSpace[10918] == "DYOM9.dat"s)
                         DownloadRandomMission ();
                 }
-            if (currentOffset == 101718)
+            if (currentOffset == 101718 || currentOffset == 101738)
                 {
                     if(ScriptSpace[11439] == 9)
                         {
                             //Random Mission
                             strcpy ((char *) ScriptSpace[9889],
                                     "~n~Random Mission");
+
+                            if(currentOffset == 101738)
+                                scr->m_pCurrentIP
+                                    = (unsigned char *) ScriptSpace + 101718;
                         }
                 }
         }

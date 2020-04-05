@@ -710,7 +710,6 @@ MissionRandomizer::VerifyMainSCM()
     
     fseek(mainScm, SEEK_SET, SEEK_END);
 
-    printf("%ld\n", ftell(mainScm));
     valid = ftell(mainScm) == MAIN_SIZE;
     fclose(mainScm);
 

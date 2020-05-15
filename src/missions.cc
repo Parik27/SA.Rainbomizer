@@ -66,12 +66,19 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
     auto missionRandomizer = MissionRandomizer::GetInstance ();
 
     scr->CollectParameters (count);
+
+    // Don't store missions that are exempt from randomizations unless they're
+    // required by a continued mission condition
+    if (std::find (std::begin (exceptions), std::end (exceptions),
+                   ScriptParams[0])
+            != std::end (exceptions)
+        && missionRandomizer->mContinuedMission == -1)
+        return;
+
     if (ScriptParams[0] >= START_MISSIONS && ScriptParams[0] <= END_MISSIONS)
         {
             if (missionRandomizer->mContinuedMission != ScriptParams[0])
-                {
                     missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
-                }
             else
                 missionRandomizer->SetContinuedMission (-1);
 
@@ -712,7 +719,7 @@ MissionRandomizer::VerifyMainSCM()
 
     valid = ftell(mainScm) == MAIN_SIZE;
     fclose(mainScm);
-
+    
     if(!valid)
         Logger::GetLogger ()->LogMessage (
             "main.scm is invalid size: expected: 3079599");

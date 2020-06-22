@@ -156,7 +156,7 @@ DyomRandomizer::GetTotalNumberOfDYOMMissionPages(HANDLE session, std::string lis
     std::string lists = ReadStringFromRequest(request);
 
     auto start = lists.find("... <span class=pagelink>");
-    start = lists.find("'>", start) + 2;
+    start = lists.find("\' >", start) + 3;
 
     auto end = lists.find("</a>", start);
 
@@ -215,7 +215,7 @@ DyomRandomizer::GetRandomEntryFromPage (HANDLE session, std::string page)
 bool DyomRandomizer::ParseMission(HANDLE session, const std::string &url)
 {
     std::string mission = ReadStringFromRequest(MakeRequest(session, url));
-    if(mission.find("<a title='download for slot 1' href='") == mission.npos)
+    if(mission.find("<a title='download for slot 1'  href='") == mission.npos)
         return false;
 
     std::vector<uint8_t> output;

@@ -264,7 +264,10 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         // End of the Line (3)
         case 112:
 
-            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (3), 250000);
+            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2), 250000);
+            Scrpt::CallOpcode (0x160, "put_actor", GlobalVar (3), 2538.45f,
+                               -1281.4f, 34.34f);
+
             break;
         }
 

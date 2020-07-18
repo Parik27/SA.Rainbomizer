@@ -33,7 +33,6 @@ struct MissionRandomizerSaveStructure
     MissionRandomizerSaveStructure &
     operator= (const MissionRandomizerSaveStructure &rhs)
     {
-        // Check for self-assignment!
         if (this == &rhs)
             return *this;
 

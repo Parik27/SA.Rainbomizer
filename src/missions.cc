@@ -78,7 +78,7 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
     if (ScriptParams[0] >= START_MISSIONS && ScriptParams[0] <= END_MISSIONS)
         {
             if (missionRandomizer->mContinuedMission != ScriptParams[0])
-                    missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
+                missionRandomizer->mOriginalMissionNumber = ScriptParams[0];
             else
                 missionRandomizer->SetContinuedMission (-1);
 
@@ -410,8 +410,7 @@ JumpOnMissionEnd ()
             missionRandomizer->mRandomizedScript);
 
     if (DyomRandomizer::mEnabled && dyomRandomizer->mDyomScript)
-        dyomRandomizer->HandleDyomScript (
-            dyomRandomizer->mDyomScript);
+        dyomRandomizer->HandleDyomScript (dyomRandomizer->mDyomScript);
 
     HookManager::CallOriginalAndReturn<injector::cstd<void ()>, 0x469FB0> (
         [] { (*((int *) 0xA447F4))++; });

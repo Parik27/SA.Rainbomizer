@@ -74,7 +74,7 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
             int target_slot = GetWeaponInfo (weapon, 1)[5];
 
             weapon = WeaponRandomizer::GetInstance ()->GetRandomWeapon (thisPed,
-                                                                        weapon);
+                                                                        weapon, false);
 
             StreamingManager::AttemptToLoadVehicle (
                 GetWeaponInfo (weapon, 1)[3]);
@@ -164,7 +164,7 @@ WeaponRandomizer::DestroyInstance ()
 
 /*******************************************************/
 int
-WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
+WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy)
 {
     auto &config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
 
@@ -193,7 +193,15 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
                             return weapon;
                         }
                     int              weapon;
-                    std::vector<int> buggy_weapons = {19, 20, 21, 14, 40, 39};
+                    std::vector<int> buggy_weapons;
+                    if (ignoreBuggy)
+                    {
+                            buggy_weapons = {19, 20, 21};
+                    }
+                    else
+                    {
+                            buggy_weapons = {19, 20, 21, 14, 40, 39};
+                    }
 
                     while ((weapon = random (1, 46),
 
@@ -209,6 +217,14 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon)
                     return weapon;
                 }
         }
+    return weapon;
+}
+
+/*******************************************************/
+// Currently irrelevant pls ignore
+int
+WeaponRandomizer::GetRandomPickup (CPed *ped, int weapon, bool ignoreBuggy)
+{
     return weapon;
 }
 

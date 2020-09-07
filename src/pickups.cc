@@ -17,13 +17,17 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().pickups;
 
-    if (ammo && modelId != 1212 && modelId != 367 && modelId != 344
-        && modelId != 366)
+    if (modelId != 1212 && modelId != 367 && modelId != 344
+        && modelId != 366 && modelId != 371 && modelId != 363
+        && modelId != 953 && modelId != 954 && modelId != 1253
+        && modelId != 370 && modelId != 1247 && modelId != 1240
+        && modelId != 1242 && modelId != 1277)
         {
             modelId
                 = WeaponRandomizer::GetInstance ()->GetRandomWeapon (nullptr,
-                                                                     0);
-            modelId = GetWeaponInfo (modelId, 1)[3];
+                                                                     0, true);
+
+           modelId = GetWeaponInfo (modelId, 1)[3];
         }
 
     return CPickups::GenerateNewOne (x, y, z, modelId, pickupType, ammo,

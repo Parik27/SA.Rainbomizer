@@ -318,6 +318,7 @@ Patterns = [
 	{coords = [1479, 1758, 12], vehicle = 519, allowed = ["planes"], denied = ["rc"]},
 	{coords = [2322, 73, 26], vehicle = 523, move = [0, 18, 0, 0], allowed = ["cars", "bikes", "helis"]}, # Catalina (STB)
 	{coords = [2323, 70, 26], vehicle = 523, move = [0, 18, 0, 0], allowed = ["cars", "bikes", "helis"]}, # Player (STB)
+	{vehicle = 468, allowed = ["bikes"]},
 	
 	# General Patterns
 	{vehicle = "cars", allowed = ["cars", "bikes"]},

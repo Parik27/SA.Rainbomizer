@@ -26,6 +26,7 @@
 #include <functional>
 #include <cstring>
 #include <unordered_map>
+#include <string>
 
 enum eHookType
 {

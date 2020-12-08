@@ -58,6 +58,7 @@ public:
 
     static void ExceptionHandlerCallback (_EXCEPTION_POINTERS *ep);
 
+    void UnloadHelis ();
     void RandomizeHelis (bool disableRandomization = true);
     void UpdatePatches ();
 

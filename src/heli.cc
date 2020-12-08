@@ -40,7 +40,16 @@ GetRandomHeliID ()
 void
 RandomizeHelisOnUnload ()
 {
+    PoliceHeliRandomizer::GetInstance ()->UnloadHelis ();
     PoliceHeliRandomizer::GetInstance ()->RandomizeHelis ();
+}
+
+/*******************************************************/
+void
+PoliceHeliRandomizer::UnloadHelis ()
+{
+    CStreaming::SetIsDeletable (mVCNHeli);
+    CStreaming::SetIsDeletable (mPoliceHeli);
 }
 
 /*******************************************************/

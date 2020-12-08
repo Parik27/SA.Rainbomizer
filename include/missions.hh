@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstring>
 #include <functional>
+#include <cstdint>
 
 struct CRunningScript;
 

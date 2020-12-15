@@ -132,10 +132,9 @@ Patterns = [
 
 #######################################################
 # Pickups Randomizer - Randomizes weapon pickups scattered around the map, as well as the appearance of certain other types of pickups.
-# WARNING: May make missions difficult to progress with
 [PickupsRandomizer]
 
-Enabled = false
+Enabled = true
 ReplaceWithWeaponsOnly = true # Does nothing yet
 
 #######################################################
@@ -220,7 +219,7 @@ Enabled = true
 # Wanted Level Randomizer - Randomizes how you get wanted level during and outside missions
 [WantedLevelRandomizer]
 
-Enabled = false
+Enabled = true
 
 # Randomizes number of wanted stars you get in missions like 2 stars in Drive-by
 RandomizeMissionWantedLevels = true
@@ -228,7 +227,7 @@ RandomizeMissionWantedLevels = true
 # Randomizes how many "chaos points" you get for each crime.
 # You could, for example, get 3 stars for stealing a cop bike, but lose 1 star for killing
 # a cop.
-RandomizeChaosPoints = true
+RandomizeChaosPoints = false
 
 #######################################################
 # Respawn Point Randomizer - Randomizes where you respawn after deatharrest
@@ -319,6 +318,9 @@ Patterns = [
 	{vehicle = 593, coords = [1279, 1361, 9], move = [50, 0, 0, -90], allowed = ["planes"], denied = ["rc"]},
 	{vehicle = 553, allowed = ["planes"], denied = ["rc"]},
 	{coords = [1479, 1758, 12], vehicle = 519, allowed = ["planes"], denied = ["rc"]},
+	{coords = [2322, 73, 26], vehicle = 523, move = [0, 18, 0, 0], allowed = ["cars", "bikes", "helis"]}, # Catalina (STB)
+	{coords = [2323, 70, 26], vehicle = 523, move = [0, 18, 0, 0], allowed = ["cars", "bikes", "helis"]}, # Player (STB)
+	{coords = [-1472, 1563, 1051], vehicle = 468, allowed = ["bikes"]}, #Kickstart
 	
 	# General Patterns
 	{vehicle = "cars", allowed = ["cars", "bikes"]},

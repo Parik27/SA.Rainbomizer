@@ -15,7 +15,8 @@ public:
     /// Returns the static instance for WeaponRandomizer.
     static WeaponRandomizer *GetInstance ();
 
-    int GetRandomWeapon (CPed *ped, int weapon);
+    int GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy);
+    int GetRandomPickup (CPed *ped, int weapon, bool ignoreBuggy);
 
     /// Initialises Hooks/etc.
     void Initialise ();

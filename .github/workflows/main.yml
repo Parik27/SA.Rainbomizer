@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Setup
-      uses: ilammy/msvc-dev-cmd@v1.0.0
+      uses: ilammy/msvc-dev-cmd@v1.5.0
       with:
         arch: x86
         

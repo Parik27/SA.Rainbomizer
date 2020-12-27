@@ -250,6 +250,7 @@ ColourConfig::Read (std::shared_ptr<cpptoml::table> table)
         return;
 
     BaseConfig::Read (table);
+    CONFIG (table, cars, "RandomizeCarCols", bool);
     CONFIG (table, fades, "RandomizeFades", bool);
     CONFIG (table, texts, "RainbowText", bool);
     CONFIG (table, hueCycle, "RainbowHueCycle", bool);

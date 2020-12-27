@@ -194,9 +194,11 @@ ColourRandomizer::Initialise ()
     if (!config.enabled)
         return;
 
-    RegisterHooks ({{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables},
-                    {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}});
-
+    if (config.cars)
+        RegisterHooks ({
+            {HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables},
+            {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}
+        });
     if (config.texts)
         RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
                         {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours},

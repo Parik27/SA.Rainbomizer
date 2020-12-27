@@ -112,6 +112,7 @@ struct ColourConfig : public BaseConfig
 {
 
     std::vector<int64_t> exceptions = {0, 1};
+    bool                 cars       = false;
     bool                 fades      = false;
     bool                 texts      = false;
     bool                 hueCycle   = false;

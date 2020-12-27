@@ -58,7 +58,7 @@ DefaultModel = 0
 
 Enabled = true
 
-# TODO: RandomizeCarCols = true # (Car Colours)
+RandomizeCarCols = true # (Car Colours)
 # TODO: RandomizeMarkers = true # (Mission Markers and Arrows)
 RandomizeFades = false # (In-game fade-in/outs. WARNING: Hard on eyes)
 RainbowText = true # (HUD elements and menu text)

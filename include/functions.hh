@@ -19,6 +19,7 @@
  */
 
 #include <cstdint>
+#include <iterator>
 
 #pragma once
 
@@ -35,6 +36,7 @@ struct CPool;
 struct CEntity;
 struct tHandlingData;
 struct tFlyingHandlingData;
+struct CAnimBlendAssociation;
 
 enum eVehicleClass
 {
@@ -855,12 +857,56 @@ struct CGame
     static int Init3 (void *fileName);
 };
 
-CMatrix *RwFrameGetLTM (void *frame);
+struct CAnimBlock
+{
+    char szName[16];
+    bool bLoaded;
+    bool pad;
+};
+
+struct CAnimBlendAssocGroup
+{
+    CAnimBlock* pAnimBlock;
+    void* ppAssociations;
+    uint32_t iNumAnimations;
+    uint32_t iIDOffset;
+    uint32_t groupId;
+    
+    inline static CAnimBlendAssocGroup *&ms_aAnimAssocGroups
+        = *(CAnimBlendAssocGroup **) 0xB4EA34;
+
+    inline static int &ms_numAnimAssocDefinitions = *(int *) 0xB4EA28;
+
+    CAnimBlendAssociation* CopyAnimation (int Id);
+};
+
+struct CAnimationStyleDescriptor
+{
+    char groupName[16];
+    char blockName[16];
+    uint32_t field_20;
+    uint32_t animsCount;
+    char** animNames;
+    uint32_t animDesc;
+};
+
 
 int    random (int max);
 int    random (int min, int max);
 double randomNormal (double mean, double stddev);
 float  randomFloat (float min, float max);
+
+template<typename T>
+auto&
+GetRandomElement (const T& container)
+{
+    auto it = std::begin(container);
+    std::advance (it, random (std::size(container) - 1));
+
+    return *it;
+}
+
+CMatrix *RwFrameGetLTM (void *frame);
 
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;

@@ -253,6 +253,14 @@ ForcedAudioLineEnabled = false
 ForcedAudioLine = 0
 
 #######################################################
+# Language Randomizer
+[LanguageRandomizer]
+
+Enabled = true
+MinTimeBeforeTextChange = 1 # seconds
+MaxTimeBeforeTextChange = 5 # seconds
+
+#######################################################
 # Script Vehicle Randomizer - Randomizes the vehicles you are given in missions.
 [ScriptVehicleRandomizer]
 
@@ -320,7 +328,7 @@ Patterns = [
 	{coords = [1479, 1758, 12], vehicle = 519, allowed = ["planes"], denied = ["rc"]},
 	{coords = [2322, 73, 26], vehicle = 523, move = [0, 18, 0, 0], allowed = ["cars", "bikes", "helis"]}, # Catalina (STB)
 	{coords = [2323, 70, 26], vehicle = 523, move = [0, 18, 0, 0], allowed = ["cars", "bikes", "helis"]}, # Player (STB)
-	{coords = [-1472, 1563, 1051], vehicle = 468, allowed = ["bikes"]}, #Kickstart
+	{coords = [-1472, 1563, 1051], vehicle = 468, allowed = ["bikes"]}, # Kickstart
 	
 	# General Patterns
 	{vehicle = "cars", allowed = ["cars", "bikes"]},

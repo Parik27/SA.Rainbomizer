@@ -7,6 +7,7 @@
 #include "util/scrpt.hh"
 #include <windows.h>
 #include "config.hh"
+#include "fades.hh"
 
 ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 
@@ -14,29 +15,19 @@ ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 void
 HandleClothesChange ()
 {
-    if(CGame::bMissionPackGame)
-        return HookManager::CallOriginal<injector::cstd<void ()>, 0x53EB9D> ();
-    
-    static int prevFadeValue = -1;
-    int        fadeValue     = injector::ReadMemory<uint8_t> (0xC3EFAB);
+    if (CGame::bMissionPackGame)
+        return;
 
-    if (prevFadeValue != fadeValue && fadeValue == 255)
+    for (int i = 0; i < 17; i++)
         {
-            for (int i = 0; i < 17; i++)
-                {
-                    auto cloth = ClothesRandomizer::GetInstance ()
-                                     ->GetRandomCRCForComponent (i);
+            auto cloth
+                = ClothesRandomizer::GetInstance ()->GetRandomCRCForComponent (
+                    i);
 
-                    Scrpt::CallOpcode (0x784, "set_player_model_tex_crc",
-                                       GlobalVar (2), cloth.second, cloth.first,
-                                       i);
-                    Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
-                }
+            Scrpt::CallOpcode (0x784, "set_player_model_tex_crc", GlobalVar (2),
+                               cloth.second, cloth.first, i);
+            Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
         }
-
-    prevFadeValue = fadeValue;
-
-    HookManager::CallOriginal<injector::cstd<void ()>, 0x53EB9D> ();
 }
 
 /*******************************************************/
@@ -89,8 +80,8 @@ ClothesRandomizer::Initialise ()
 
     mInitialised = false;
 
-    RegisterHooks ({{HOOK_CALL, 0x53EB9D, (void *) HandleClothesChange}});
-
+    FadesManager::AddFadeCallback(HandleClothesChange);
+    
     Logger::GetLogger ()->LogMessage ("Intialised ClothesRandomizer");
 }
 

@@ -19,6 +19,7 @@
  */
 
 #include "base.hh"
+#include "gxt.hh"
 #include "logger.hh"
 #include "traffic.hh"
 #include "colours.hh"
@@ -45,6 +46,7 @@
 #include "wanted.hh"
 #include "respawns.hh"
 #include "dyom.hh"
+#include "animations.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -104,6 +106,8 @@ public:
         WantedLevelRandomizer::GetInstance ()->Initialise ();
         RespawnPointRandomizer::GetInstance ()->Initialise ();
         DyomRandomizer::GetInstance ()->Initialise ();
+        //AnimationRandomizer::GetInstance ()->Initialise ();
+        GxtRandomizer::GetInstance ()->Initialise ();
 
         CreditsExtender::Initialise ();
 

@@ -357,9 +357,7 @@ RandomizeCarPeds (int type, int model, float *pos, bool unk)
 }
 
 /*******************************************************/
-/* Fixes crashes when the game spawns peds that haven't been loaded yet
-   Randomized peds later.
-  */
+/* Fixes crash on spawning a Freight Train in traffic  */
 /*******************************************************/
 void __fastcall FixFreightTrainCrash (CAEVehicleAudioEntity *audio, void *edx,
                                       cVehicleParams *vehicle_params)

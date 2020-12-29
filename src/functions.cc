@@ -805,6 +805,12 @@ randomNormal (double mean, double stddev)
 }
 
 /*******************************************************/
+CAnimBlendAssociation* CAnimBlendAssocGroup::CopyAnimation (int Id)
+{
+    return CallMethodAndReturn<CAnimBlendAssociation*, 0x4CE130>(this, Id);
+}
+
+/*******************************************************/
 float
 randomFloat (float min, float max)
 {

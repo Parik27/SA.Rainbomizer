@@ -174,6 +174,16 @@ struct ParkedCarConfig : public BaseConfig
 };
 
 /*******************************************************/
+struct LanguageConfig : public BaseConfig
+{
+
+    int MinTimeBeforeTextChange  = 1;
+    int MaxTimeBeforeTextChange = 5;
+
+    void Read (std::shared_ptr<cpptoml::table> table);
+};
+
+/*******************************************************/
 struct LicensePlateConfig : public BaseConfig
 {
 };
@@ -305,6 +315,7 @@ struct Configs
     WantedLevelConfig   wanted;
     RespawnPointConfig  respawnPoint;
     DyomConfig          dyom;
+    LanguageConfig      lang;
 };
 
 /*******************************************************/

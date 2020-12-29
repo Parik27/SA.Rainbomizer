@@ -251,6 +251,14 @@ ForcedAudioLineEnabled = false
 ForcedAudioLine = 0
 
 #######################################################
+# Language Randomizer
+[LanguageRandomizer]
+
+Enabled = true
+MinTimeBeforeTextChange = 1 # seconds
+MaxTimeBeforeTextChange = 5 # seconds
+
+#######################################################
 # Script Vehicle Randomizer - Randomizes the vehicles you are given in missions.
 [ScriptVehicleRandomizer]
 

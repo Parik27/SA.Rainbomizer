@@ -139,6 +139,16 @@ WeaponConfig::ReadTable (std::shared_ptr<cpptoml::table> pattern,
         }
 }
 
+void LanguageConfig::Read (std::shared_ptr<cpptoml::table> table)
+{
+    if (!table)
+        return;
+
+    CONFIG (table, enabled, "Enabled", bool);
+    CONFIG (table, MinTimeBeforeTextChange, "MinTimeBeforeTextChange", int);
+    CONFIG (table, MaxTimeBeforeTextChange, "MaxTimeBeforeTextChange", int);
+}
+
 /*******************************************************/
 void
 WeaponStatsConfig::Read (std::shared_ptr<cpptoml::table> table)
@@ -450,7 +460,7 @@ ConfigManager::WriteDefaultConfig (const std::string &file)
     FILE *f = OpenRainbomizerFile (file.c_str (), "wb");
     if (f)
         {
-            fwrite (config_toml, sizeof(config_toml) - 1, 1, f);
+            fwrite (config_toml, sizeof (config_toml) - 1, 1, f);
             fclose (f);
         }
 }
@@ -507,6 +517,7 @@ ConfigManager::Initialise (const std::string &file)
     mConfigs.clothes.Read (config->get_table ("ClothesRandomizer"));
     mConfigs.wanted.Read (config->get_table ("WantedLevelRandomizer"));
     mConfigs.respawnPoint.Read (config->get_table ("RespawnPointRandomizer"));
+    mConfigs.lang.Read (config->get_table ("LanguageRandomizer"));
 }
 
 /*******************************************************/

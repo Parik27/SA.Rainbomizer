@@ -24,7 +24,7 @@ if (MSVC_VERSION GREATER_EQUAL "1900")
   endforeach()
 endif()
 
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 
 # Sources
 include_directories(include)

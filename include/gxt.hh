@@ -10,7 +10,7 @@ struct CText;
 class GxtRandomizer
 {
     static GxtRandomizer *mInstance;
-    
+
     inline static std::unordered_map<uint32_t, std::vector<std::string>>
         m_StringTable;
 

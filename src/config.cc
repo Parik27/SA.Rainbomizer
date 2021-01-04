@@ -139,7 +139,8 @@ WeaponConfig::ReadTable (std::shared_ptr<cpptoml::table> pattern,
         }
 }
 
-void LanguageConfig::Read (std::shared_ptr<cpptoml::table> table)
+void
+LanguageConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
     if (!table)
         return;
@@ -163,7 +164,7 @@ WeaponStatsConfig::Read (std::shared_ptr<cpptoml::table> table)
 void
 RespawnPointConfig::Read (std::shared_ptr<cpptoml::table> table)
 {
-    if(!table)
+    if (!table)
         return;
 
     CONFIG (table, enabled, "Enabled", bool);

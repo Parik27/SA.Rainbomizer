@@ -107,7 +107,7 @@ public:
         WantedLevelRandomizer::GetInstance ()->Initialise ();
         RespawnPointRandomizer::GetInstance ()->Initialise ();
         DyomRandomizer::GetInstance ()->Initialise ();
-        //AnimationRandomizer::GetInstance ()->Initialise ();
+        // AnimationRandomizer::GetInstance ()->Initialise ();
         GxtRandomizer::GetInstance ()->Initialise ();
         PedRandomizer::GetInstance ()->Initialise ();
 

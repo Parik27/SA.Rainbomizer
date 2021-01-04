@@ -53,15 +53,14 @@ PickupsRandomizer::Initialise ()
         return;
 
     for (int address :
-         {0x00445098, 0x00445AFD, 0x00458A58, 0x00477983,
-          0x0047E636, 0x480658, 0x00481744, 0x0048B243, 0x48CEB9, 0x00592103,
-          0x005B49C6, 0x0067B6DE})
+         {0x00445098, 0x00445AFD, 0x00458A58, 0x00477983, 0x0047E636, 0x480658,
+          0x00481744, 0x0048B243, 0x48CEB9, 0x00592103, 0x005B49C6, 0x0067B6DE})
         {
             injector::MakeCALL (address, (void *) &RandomizePickup);
         }
 
-	// Dead peds
-	injector::MakeCALL (0x4573C2, &RandomizePickup);
+    // Dead peds
+    injector::MakeCALL (0x4573C2, &RandomizePickup);
     injector::MakeCALL (0x156DF52, &RandomizePickup);
 
     Logger::GetLogger ()->LogMessage ("Intialised PickupsRandomizer");

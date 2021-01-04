@@ -177,7 +177,7 @@ struct ParkedCarConfig : public BaseConfig
 struct LanguageConfig : public BaseConfig
 {
 
-    int MinTimeBeforeTextChange  = 1;
+    int MinTimeBeforeTextChange = 1;
     int MaxTimeBeforeTextChange = 5;
 
     void Read (std::shared_ptr<cpptoml::table> table);
@@ -266,7 +266,7 @@ struct ClothesConfig : public BaseConfig
 struct WantedLevelConfig : public BaseConfig
 {
     bool enabled = false;
-    
+
     bool missions = true;
     bool chaos    = true;
 
@@ -281,7 +281,9 @@ struct WeaponStatsConfig : public BaseConfig
 };
 
 /*******************************************************/
-struct DyomConfig : public BaseConfig {};
+struct DyomConfig : public BaseConfig
+{
+};
 
 /*******************************************************/
 struct RespawnPointConfig : public BaseConfig

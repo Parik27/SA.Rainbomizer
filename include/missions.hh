@@ -22,7 +22,11 @@ struct MissionStatus
 {
     unsigned char data[102];
 
-    unsigned char &operator[] (int index) { return data[index - 11]; }
+    unsigned char &
+    operator[] (int index)
+    {
+        return data[index - 11];
+    }
 };
 
 struct MissionRandomizerSaveStructure
@@ -79,7 +83,7 @@ class MissionRandomizer
     void HandleEndThreadOpcode (CRunningScript *scr, short opcode);
     void HandleOverrideRestartOpcode (CRunningScript *scr, short opcode);
 
-    bool VerifyMainSCM();
+    bool VerifyMainSCM ();
 
     void InstallCheat (void *func, uint32_t hash);
 
@@ -148,7 +152,7 @@ public:
     {
         mScriptByPass = status;
     }
-    
+
     void Load ();
     void Save ();
 };

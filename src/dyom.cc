@@ -13,11 +13,11 @@ using namespace std::literals;
 DyomRandomizer *DyomRandomizer::mInstance = nullptr;
 
 /*******************************************************/
-CRunningScript*
+CRunningScript *
 StoreRandomizedDYOMScript (uint8_t *startIp)
 {
     auto dyomRandomizer = DyomRandomizer::GetInstance ();
-    
+
     auto out = HookManager::CallOriginalAndReturn<
         injector::cstd<CRunningScript *(uint8_t *)>, 0x46683B> (nullptr,
                                                                 startIp);
@@ -32,11 +32,10 @@ StoreRandomizedDYOMScript (uint8_t *startIp)
 void
 DyomHandleOnScriptOpCodeProcess ()
 {
-    auto dyomRandomizer    = DyomRandomizer::GetInstance ();
+    auto dyomRandomizer = DyomRandomizer::GetInstance ();
 
     if (DyomRandomizer::mEnabled && dyomRandomizer->mDyomScript)
-        dyomRandomizer->HandleDyomScript (
-            dyomRandomizer->mDyomScript);
+        dyomRandomizer->HandleDyomScript (dyomRandomizer->mDyomScript);
 
     HookManager::CallOriginalAndReturn<injector::cstd<void ()>, 0x469FB0> (
         [] { (*((int *) 0xA447F4))++; });
@@ -72,67 +71,71 @@ DyomRandomizer::Initialise ()
     if (!ConfigManager::GetInstance ()->GetConfigs ().missions.enabled)
         {
             RegisterDelayedHooks (
-                {{HOOK_CALL, 0x469FB0, (void *) &DyomHandleOnScriptOpCodeProcess}});
+                {{HOOK_CALL, 0x469FB0,
+                  (void *) &DyomHandleOnScriptOpCodeProcess}});
 
             RegisterDelayedFunction ([] { injector::MakeNOP (0x469fb5, 2); });
         }
 
     RegisterHooks ({{HOOK_CALL, 0x46683B, (void *) &StoreRandomizedDYOMScript},
                     {HOOK_CALL, 0x468E7F, (void *) AdjustCodeForDYOM}});
-    
+
     Logger::GetLogger ()->LogMessage ("Intialised DyomRandomizer");
 }
 
 /*******************************************************/
-bool ReadRequestResponse(HANDLE request, std::vector<uint8_t> &out)
+bool
+ReadRequestResponse (HANDLE request, std::vector<uint8_t> &out)
 {
     DWORD dwSize;
     DWORD dwDownloaded;
-    
-    for(;;)
+
+    for (;;)
         {
-            
-            if(!InternetQueryDataAvailable(request, &dwSize, 0, 0))
+
+            if (!InternetQueryDataAvailable (request, &dwSize, 0, 0))
                 {
                     Logger::GetLogger ()->LogMessage (
                         "InternetQueryDataAvailable failed "
                         + std::to_string (GetLastError ()));
-                    
+
                     return false;
                 }
-            auto lpszData = new TCHAR[dwSize+1];
-            if(!InternetReadFile(request, lpszData, dwSize, &dwDownloaded))
+            auto lpszData = new TCHAR[dwSize + 1];
+            if (!InternetReadFile (request, lpszData, dwSize, &dwDownloaded))
                 {
                     Logger::GetLogger ()->LogMessage (
                         "InternetReadFile failed "
                         + std::to_string (GetLastError ()));
-                    
+
                     delete[] lpszData;
                     break;
                 }
 
-            out.insert(out.end(), lpszData, lpszData + dwSize);
-            
-            if(dwDownloaded == 0)
+            out.insert (out.end (), lpszData, lpszData + dwSize);
+
+            if (dwDownloaded == 0)
                 break;
         }
 
-    InternetCloseHandle(request);
+    InternetCloseHandle (request);
     return true;
 }
 
 /*******************************************************/
-HANDLE MakeRequest(HANDLE session, const std::string &file)
+HANDLE
+MakeRequest (HANDLE session, const std::string &file)
 {
-    HANDLE request = HttpOpenRequest (session, "GET", file.c_str(), NULL,
-                                      NULL, NULL, INTERNET_FLAG_SECURE, 0);
-    HttpSendRequest(request, NULL, 0, NULL, 0);
+    HANDLE request = HttpOpenRequest (session, "GET", file.c_str (), NULL, NULL,
+                                      NULL, INTERNET_FLAG_SECURE, 0);
+    HttpSendRequest (request, NULL, 0, NULL, 0);
 
     return request;
 }
 
 /*******************************************************/
-HANDLE OpenSession(HINTERNET internet)
+HANDLE
+OpenSession (HINTERNET internet)
 {
     return InternetConnect (internet, "dyom.gtagames.nl",
                             INTERNET_DEFAULT_HTTPS_PORT, NULL, NULL,
@@ -140,36 +143,38 @@ HANDLE OpenSession(HINTERNET internet)
 }
 
 /*******************************************************/
-std::string ReadStringFromRequest(HANDLE request)
+std::string
+ReadStringFromRequest (HANDLE request)
 {
     std::vector<uint8_t> output;
-    ReadRequestResponse(request, output);
+    ReadRequestResponse (request, output);
 
-    return std::string(output.begin(), output.end()).c_str();
+    return std::string (output.begin (), output.end ()).c_str ();
 }
 
 /*******************************************************/
 int
-DyomRandomizer::GetTotalNumberOfDYOMMissionPages(HANDLE session, std::string list)
+DyomRandomizer::GetTotalNumberOfDYOMMissionPages (HANDLE      session,
+                                                  std::string list)
 {
-    HANDLE request = MakeRequest(session, list.c_str());
-    std::string lists = ReadStringFromRequest(request);
+    HANDLE      request = MakeRequest (session, list.c_str ());
+    std::string lists   = ReadStringFromRequest (request);
 
-    auto start = lists.find("... <span class=pagelink>");
-    start = lists.find("\' >", start) + 3;
+    auto start = lists.find ("... <span class=pagelink>");
+    start      = lists.find ("\' >", start) + 3;
 
-    auto end = lists.find("</a>", start);
+    auto end = lists.find ("</a>", start);
 
-    return std::stoi(lists.substr(start, end - start));
+    return std::stoi (lists.substr (start, end - start));
 }
 
 /*******************************************************/
 int
-CountOccurrencesInString(const std::string& str, const std::string &substr)
+CountOccurrencesInString (const std::string &str, const std::string &substr)
 {
-    int count = 0;
+    int         count = 0;
     std::size_t found = str.find (substr);
-    while(found != str.npos)
+    while (found != str.npos)
         {
             found = str.find (substr, found + 1);
             count++;
@@ -180,15 +185,16 @@ CountOccurrencesInString(const std::string& str, const std::string &substr)
 
 /*******************************************************/
 const std::size_t
-GetNthOccurrenceOfString(const std::string& str, const std::string &substr, int n)
+GetNthOccurrenceOfString (const std::string &str, const std::string &substr,
+                          int n)
 {
-    int count = 0;
+    int         count = 0;
     std::size_t found = str.find (substr);
-    while(found != str.npos)
+    while (found != str.npos)
         {
-            if(count == n)
+            if (count == n)
                 return found;
-            
+
             count++;
             found = str.find (substr, found + 1);
         }
@@ -200,29 +206,31 @@ GetNthOccurrenceOfString(const std::string& str, const std::string &substr, int 
 std::string
 DyomRandomizer::GetRandomEntryFromPage (HANDLE session, std::string page)
 {
-    std::string entries = ReadStringFromRequest (
-        MakeRequest (session, page.c_str ()));
+    std::string entries
+        = ReadStringFromRequest (MakeRequest (session, page.c_str ()));
 
     int entries_count = CountOccurrencesInString (entries, "<a href='show/");
     std::size_t start = GetNthOccurrenceOfString (entries, "<a href='show/",
-                                                  random (entries_count - 1)) + 9;
-    std::size_t end = entries.find("'>", start + 1);
+                                                  random (entries_count - 1))
+                        + 9;
+    std::size_t end = entries.find ("'>", start + 1);
 
-    return entries.substr(start, end - start);
+    return entries.substr (start, end - start);
 }
 
 /*******************************************************/
-bool DyomRandomizer::ParseMission(HANDLE session, const std::string &url)
+bool
+DyomRandomizer::ParseMission (HANDLE session, const std::string &url)
 {
-    std::string mission = ReadStringFromRequest(MakeRequest(session, url));
-    if(mission.find("<a title='download for slot 1'  href='") == mission.npos)
+    std::string mission = ReadStringFromRequest (MakeRequest (session, url));
+    if (mission.find ("<a title='download for slot 1'  href='") == mission.npos)
         return false;
 
     std::vector<uint8_t> output;
     ReadRequestResponse (MakeRequest (session, "download/" + url.substr (5)),
                          output);
-    FILE* file = fopen((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str(), "wb");
-    fwrite(output.data(), 1, output.size(), file);
+    FILE *file = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "wb");
+    fwrite (output.data (), 1, output.size (), file);
 
     return true;
 }
@@ -231,13 +239,13 @@ bool DyomRandomizer::ParseMission(HANDLE session, const std::string &url)
 void
 DyomRandomizer::DownloadRandomMission ()
 {
-    if(InternetAttemptConnect(0) == ERROR_SUCCESS)
+    if (InternetAttemptConnect (0) == ERROR_SUCCESS)
         {
             HINTERNET handle
                 = InternetOpen ("123robot", INTERNET_OPEN_TYPE_PRECONFIG, NULL,
                                 NULL, 0);
-            
-            HANDLE session = OpenSession(handle);
+
+            HANDLE session = OpenSession (handle);
 
             std::string list = random (100) > 38 ? "list" : "list_d";
 
@@ -249,8 +257,8 @@ DyomRandomizer::DownloadRandomMission ()
                                                          total_pages)))))
                 ;
 
-            CloseHandle(session);
-            CloseHandle(handle);
+            CloseHandle (session);
+            CloseHandle (handle);
         }
 }
 
@@ -276,13 +284,13 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
                 }
             if (currentOffset == 101718 || currentOffset == 101738)
                 {
-                    if(ScriptSpace[11439] == 9)
+                    if (ScriptSpace[11439] == 9)
                         {
-                            //Random Mission
+                            // Random Mission
                             strcpy ((char *) ScriptSpace[9889],
                                     "~n~Random Mission");
 
-                            if(currentOffset == 101738)
+                            if (currentOffset == 101738)
                                 scr->m_pCurrentIP
                                     = (unsigned char *) ScriptSpace + 101718;
                         }

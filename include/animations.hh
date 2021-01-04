@@ -6,8 +6,8 @@ struct CAnimationStyleDescriptor;
 
 class AnimationRandomizer
 {
-    std::vector<CAnimationStyleDescriptor*> mAnimAssocDefs;
-    static AnimationRandomizer *mInstance;
+    std::vector<CAnimationStyleDescriptor *> mAnimAssocDefs;
+    static AnimationRandomizer *             mInstance;
 
     static CAnimationStyleDescriptor *AddAnimAssocDefinition (const char *,
                                                               const char *, int,

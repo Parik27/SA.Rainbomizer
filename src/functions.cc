@@ -200,7 +200,7 @@ CPed::CCopPed__CCopPed (int type)
 void
 CPed::SetModelIndex (int modelIndex)
 {
-    CallMethod<0x5E4880>(this, modelIndex);
+    CallMethod<0x5E4880> (this, modelIndex);
 }
 /*******************************************************/
 int
@@ -530,7 +530,7 @@ void
 CRunningScript::SetCharCoordinates (CPed *ped, CVector pos, bool bWarpGang,
                                     bool bOffset)
 {
-    injector::stdcall<void(CPed *, CVector, bool, bool)>::call<0x464DC0> (
+    injector::stdcall<void (CPed *, CVector, bool, bool)>::call<0x464DC0> (
         ped, pos, bWarpGang, bOffset);
 }
 
@@ -707,7 +707,7 @@ CFont::SetDropShadowPosition (short value)
 void
 CFont::SetBackground (bool enable, bool includeWrap)
 {
-    ((void(__cdecl *) (bool, bool)) 0x7195C0) (enable, includeWrap);
+    ((void (__cdecl *) (bool, bool)) 0x7195C0) (enable, includeWrap);
 }
 
 /*******************************************************/
@@ -728,35 +728,35 @@ CFont::SetColor (CRGBA col)
 void
 CFont::SetJustify (bool on)
 {
-    ((void(__cdecl *) (bool)) 0x719600) (on);
+    ((void (__cdecl *) (bool)) 0x719600) (on);
 }
 
 /*******************************************************/
 void
 CFont::SetOrientation (eFontAlignment alignment)
 {
-    ((void(__cdecl *) (eFontAlignment)) 0x719610) (alignment);
+    ((void (__cdecl *) (eFontAlignment)) 0x719610) (alignment);
 }
 
 /*******************************************************/
 void
 CFont::PrintString (float x, float y, char *text)
 {
-    ((void(__cdecl *) (float, float, char *)) 0x71A700) (x, y, text);
+    ((void (__cdecl *) (float, float, char *)) 0x71A700) (x, y, text);
 }
 
 /*******************************************************/
 void
 CFont::SetScaleForCurrentlanguage (float w, float h)
 {
-    ((void(__cdecl *) (float, float)) 0x7193A0) (w, h);
+    ((void (__cdecl *) (float, float)) 0x7193A0) (w, h);
 }
 
 /*******************************************************/
 void
 CFont::SetAlphaFade (float alpha)
 {
-    ((void(__cdecl *) (float)) 0x719500) (alpha);
+    ((void (__cdecl *) (float)) 0x719500) (alpha);
 }
 
 /*******************************************************/
@@ -822,9 +822,10 @@ randomNormal (double mean, double stddev)
 }
 
 /*******************************************************/
-CAnimBlendAssociation* CAnimBlendAssocGroup::CopyAnimation (int Id)
+CAnimBlendAssociation *
+CAnimBlendAssocGroup::CopyAnimation (int Id)
 {
-    return CallMethodAndReturn<CAnimBlendAssociation*, 0x4CE130>(this, Id);
+    return CallMethodAndReturn<CAnimBlendAssociation *, 0x4CE130> (this, Id);
 }
 
 /*******************************************************/

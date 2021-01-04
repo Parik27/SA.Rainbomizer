@@ -101,7 +101,8 @@ void
 PedRandomizer::Initialise ()
 {
     // If Generic Peds Enabled
-    for (int addr : {0x444E02, 0x445638, 0x461580, 0x4675DA, 0x469CDB, 0x47D8E6, 0x4833BC,
+    for (int addr :
+         {0x444E02, 0x445638, 0x461580, 0x4675DA, 0x469CDB, 0x47D8E6, 0x4833BC,
           0x491D36, 0x61276E, 0x6128E4, 0x6129B2, 0x45CFD8})
         injector::MakeCALL (addr, RandomizeGenericPeds);
 

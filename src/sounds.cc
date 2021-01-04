@@ -17,7 +17,7 @@ SoundRandomizer *SoundRandomizer::mInstance = nullptr;
 void __fastcall RandomizeAudioLoad (CAudioEngine *audio, void *edx,
                                     unsigned char slot, int id)
 {
-    auto soundsR = SoundRandomizer::GetInstance ();    
+    auto soundsR = SoundRandomizer::GetInstance ();
     try
         {
             int  newIndex;
@@ -169,12 +169,12 @@ SoundPair
 SoundRandomizer::GetRandomPair (int &index, int slot, int id)
 {
 
-    if(mSoundTable.size() < 1)
+    if (mSoundTable.size () < 1)
         throw;
-    
+
     if (this->IsSoundLooped (id))
         {
-            auto pair = mLoopedSounds.at(random (mLoopedSounds.size () - 1));
+            auto pair = mLoopedSounds.at (random (mLoopedSounds.size () - 1));
             puts (pair.name.c_str ());
             return pair;
         }

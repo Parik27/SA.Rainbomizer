@@ -51,7 +51,7 @@ AnimationRandomizer::AddAnimAssocDefinition (const char *p1, const char *p2,
 void
 AnimationRandomizer::RandomizeAnimAssocDefs ()
 {
-    auto& defs = GetInstance ()->mAnimAssocDefs;
+    auto &defs = GetInstance ()->mAnimAssocDefs;
     for (auto def : defs)
         {
             for (int i = 0; i < def->animsCount; i++)
@@ -68,7 +68,7 @@ void
 AnimationRandomizer::Initialise ()
 {
 
-    RegisterHooks({{HOOK_CALL, 0x5BC99C, (void *) AddAnimAssocDefinition}});
+    RegisterHooks ({{HOOK_CALL, 0x5BC99C, (void *) AddAnimAssocDefinition}});
     FadesManager::AddFadeCallback (RandomizeAnimAssocDefs);
 
     RegisterHooks ({{HOOK_CALL, 0x4D3AB7, (void *) RandomizeAnimation},

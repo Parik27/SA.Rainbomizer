@@ -1,5 +1,4 @@
-const char config_toml[]
-    = R"(
+const char config_toml[] = R"(
 ########################################################
 
 # Rainbomizer - A (probably fun) Grand Theft Auto San Andreas Mod that

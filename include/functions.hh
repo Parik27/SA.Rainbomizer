@@ -502,7 +502,7 @@ struct CStreaming
     static void SetMissionDoesntRequireModel (int index);
     static void SetIsDeletable (int model);
     static void RemoveLeastUsedModel (int flags);
-    static void RequestSpecialModel(int slot, const char *modelName,
+    static void RequestSpecialModel (int slot, const char *modelName,
                                      int flags);
 };
 
@@ -913,42 +913,41 @@ struct CAnimBlock
 
 struct CAnimBlendAssocGroup
 {
-    CAnimBlock* pAnimBlock;
-    void* ppAssociations;
-    uint32_t iNumAnimations;
-    uint32_t iIDOffset;
-    uint32_t groupId;
-    
+    CAnimBlock *pAnimBlock;
+    void *      ppAssociations;
+    uint32_t    iNumAnimations;
+    uint32_t    iIDOffset;
+    uint32_t    groupId;
+
     inline static CAnimBlendAssocGroup *&ms_aAnimAssocGroups
         = *(CAnimBlendAssocGroup **) 0xB4EA34;
 
     inline static int &ms_numAnimAssocDefinitions = *(int *) 0xB4EA28;
 
-    CAnimBlendAssociation* CopyAnimation (int Id);
+    CAnimBlendAssociation *CopyAnimation (int Id);
 };
 
 struct CAnimationStyleDescriptor
 {
-    char groupName[16];
-    char blockName[16];
+    char     groupName[16];
+    char     blockName[16];
     uint32_t field_20;
     uint32_t animsCount;
-    char** animNames;
+    char **  animNames;
     uint32_t animDesc;
 };
-
 
 int    random (int max);
 int    random (int min, int max);
 double randomNormal (double mean, double stddev);
 float  randomFloat (float min, float max);
 
-template<typename T>
-auto&
-GetRandomElement (const T& container)
+template <typename T>
+auto &
+GetRandomElement (const T &container)
 {
-    auto it = std::begin(container);
-    std::advance (it, random (std::size(container) - 1));
+    auto it = std::begin (container);
+    std::advance (it, random (std::size (container) - 1));
 
     return *it;
 }

@@ -23,7 +23,7 @@ HandleClothesChange ()
         {
             if (random (100) >= 50)
                 {
-					// Special/generic models
+                    // Special/generic models
 
                     int model = 0;
                     while ((model = random (299)),
@@ -34,8 +34,14 @@ HandleClothesChange ()
                         {
                             model = 298;
 
-                            CStreaming::RequestSpecialModel (model, 
-								PedRandomizer::special_models[random(PedRandomizer::special_models.size() - 1)].c_str(), 1);
+                            CStreaming::RequestSpecialModel (
+                                model,
+                                PedRandomizer::special_models
+                                    [random (
+                                         PedRandomizer::special_models.size ()
+                                         - 1)]
+                                        .c_str (),
+                                1);
                         }
                     else
                         {
@@ -55,7 +61,7 @@ HandleClothesChange ()
                 }
             else
                 {
-					// CJ Clothes
+                    // CJ Clothes
 
                     Scrpt::CallOpcode (0x09C7, "set_player_model",
                                        GlobalVar (2), 0);
@@ -139,10 +145,10 @@ ClothesRandomizer::Initialise ()
 
     mInitialised = false;
 
-    FadesManager::AddFadeCallback(HandleClothesChange);
+    FadesManager::AddFadeCallback (HandleClothesChange);
     injector::MakeCALL (0x5A834D, FixChangingClothes);
     injector::MakeCALL (0x5A82AF, FixChangingClothes);
-    
+
     Logger::GetLogger ()->LogMessage ("Intialised ClothesRandomizer");
 }
 

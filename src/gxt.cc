@@ -23,7 +23,7 @@ GxtRandomizer::Initialise ()
 {
     if (!ConfigManager::GetInstance ()->GetConfigs ().lang.enabled)
         return;
-    
+
     Logger::GetLogger ()->LogMessage ("Intialised GxtRandomizer");
 
     RegisterHooks ({{HOOK_JUMP, 0x6A0050, (void *) GetTextHook}});

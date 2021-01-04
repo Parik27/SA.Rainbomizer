@@ -427,8 +427,8 @@ void __fastcall FixMaddDogg (CRunningScript *scr, void *edx, short count)
     // HIghjack - Adjust truck requirements
     else if (scr->CheckName ("toreno2"))
         {
-            if(fabs(((float*)ScriptParams)[2] - 4.0) < 0.01)
-                ((float*)ScriptParams)[2] = 104.0;
+            if (fabs (((float *) ScriptParams)[2] - 4.0) < 0.01)
+                ((float *) ScriptParams)[2] = 104.0;
         }
 }
 

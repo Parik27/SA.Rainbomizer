@@ -702,24 +702,24 @@ void __fastcall OverrideHospitalEndPosition (CRunningScript *scr)
 
 /*******************************************************/
 bool
-MissionRandomizer::VerifyMainSCM()
+MissionRandomizer::VerifyMainSCM ()
 {
     const size_t MAIN_SIZE = 3079599;
-    bool valid = false;
-    
+    bool         valid     = false;
+
     FILE *mainScm
         = fopen (GetGameDirRelativePathA ("data/script/main.scm"), "rb");
 
-    if(!mainScm)
+    if (!mainScm)
         return true; // Can't be certain if it's valid or not so continue anyway
                      // for convenience
-    
-    fseek(mainScm, SEEK_SET, SEEK_END);
 
-    valid = ftell(mainScm) == MAIN_SIZE;
-    fclose(mainScm);
-    
-    if(!valid)
+    fseek (mainScm, SEEK_SET, SEEK_END);
+
+    valid = ftell (mainScm) == MAIN_SIZE;
+    fclose (mainScm);
+
+    if (!valid)
         Logger::GetLogger ()->LogMessage (
             "main.scm is invalid size: expected: 3079599");
 
@@ -733,7 +733,7 @@ MissionRandomizer::Initialise ()
 
     auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
 
-    if (!config.enabled || (!config.disableMainScmCheck && !VerifyMainSCM()))
+    if (!config.enabled || (!config.disableMainScmCheck && !VerifyMainSCM ()))
         return;
 
     if (!mTempMissionData)

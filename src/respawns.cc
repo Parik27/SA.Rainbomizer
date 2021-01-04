@@ -11,16 +11,16 @@ RespawnPointRandomizer *RespawnPointRandomizer::mInstance = nullptr;
 void
 RandomizeRespawnPoint (float x, float y, float z, RwV3d *a4, float *a5)
 {
-    a4->x = randomFloat(-3000.0, 3000.0);
-    a4->y = randomFloat(-3000.0, 3000.0);
+    a4->x = randomFloat (-3000.0, 3000.0);
+    a4->y = randomFloat (-3000.0, 3000.0);
 
     Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", a4->x, a4->y);
     Scrpt::CallOpcode (0x3CB, "set_render_origin", a4->x, a4->y, 20);
     Scrpt::CallOpcode (0x15f, "set_pos", a4->x, a4->y, 20, 0, 0, 0);
 
     a4->z = CWorld::FindGroundZedForCoord (a4->x, a4->y);
-    
-    *a5 = randomFloat(0, 360);
+
+    *a5 = randomFloat (0, 360);
 }
 
 /*******************************************************/
@@ -29,9 +29,9 @@ RespawnPointRandomizer::Initialise ()
 {
 
     auto config = ConfigManager::GetInstance ()->GetConfigs ().respawnPoint;
-    if(!config.enabled)
+    if (!config.enabled)
         return;
-    
+
     RegisterHooks ({{HOOK_CALL, 0x44331B, (void *) &RandomizeRespawnPoint},
                     {HOOK_CALL, 0x4435C6, (void *) &RandomizeRespawnPoint},
                     {HOOK_CALL, 0x442F70, (void *) &RandomizeRespawnPoint}});

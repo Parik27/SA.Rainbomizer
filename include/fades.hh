@@ -6,11 +6,12 @@
 class FadesManager
 {
 
-  static auto& GetFadeCallbacks ()
-  {
-    static std::vector<std::function<void ()>> mFadeCallbacks;
-    return mFadeCallbacks;
-  }
+    static auto &
+    GetFadeCallbacks ()
+    {
+        static std::vector<std::function<void ()>> mFadeCallbacks;
+        return mFadeCallbacks;
+    }
 
 public:
     static void HandleFades ();
@@ -19,6 +20,6 @@ public:
     AddFadeCallback (std::function<void ()> function)
     {
         Initialise ();
-        GetFadeCallbacks().push_back (function);
+        GetFadeCallbacks ().push_back (function);
     };
 };

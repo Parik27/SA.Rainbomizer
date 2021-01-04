@@ -45,6 +45,7 @@
 #include "wanted.hh"
 #include "respawns.hh"
 #include "dyom.hh"
+#include "ped.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -104,6 +105,7 @@ public:
         WantedLevelRandomizer::GetInstance ()->Initialise ();
         RespawnPointRandomizer::GetInstance ()->Initialise ();
         DyomRandomizer::GetInstance ()->Initialise ();
+        PedRandomizer::GetInstance ()->Initialise ();
 
         CreditsExtender::Initialise ();
 

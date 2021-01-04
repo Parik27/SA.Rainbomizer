@@ -54,6 +54,45 @@ enum eVehicleClass
     VEHICLE_TRAILER,
 };
 
+enum ePedType
+{
+    PED_TYPE_PLAYER1,
+    PED_TYPE_PLAYER2,
+    PED_TYPE_PLAYER_NETWORK,
+    PED_TYPE_PLAYER_UNUSED,
+    PED_TYPE_CIVMALE,
+    PED_TYPE_CIVFEMALE,
+    PED_TYPE_COP,
+    PED_TYPE_GANG1,
+    PED_TYPE_GANG2,
+    PED_TYPE_GANG3,
+    PED_TYPE_GANG4,
+    PED_TYPE_GANG5,
+    PED_TYPE_GANG6,
+    PED_TYPE_GANG7,
+    PED_TYPE_GANG8,
+    PED_TYPE_GANG9,
+    PED_TYPE_GANG10,
+    PED_TYPE_DEALER,
+    PED_TYPE_MEDIC,
+    PED_TYPE_FIREMAN,
+    PED_TYPE_CRIMINAL,
+    PED_TYPE_BUM,
+    PED_TYPE_PROSTITUTE,
+    PED_TYPE_SPECIAL,
+    PED_TYPE_MISSION1,
+    PED_TYPE_MISSION2,
+    PED_TYPE_MISSION3,
+    PED_TYPE_MISSION4,
+    PED_TYPE_MISSION5,
+    PED_TYPE_MISSION6,
+    PED_TYPE_MISSION7,
+    PED_TYPE_MISSION8
+};
+
+inline static int *ms_numPedsLoaded = reinterpret_cast<int *> (0x8E4BB0);
+inline static int *ms_pedsLoaded    = reinterpret_cast<int *> (0x8E4C00);
+
 struct cVehicleParams
 {
 public:
@@ -120,6 +159,11 @@ struct CCarCtrl
     static void *CreateCarForScript (int modelId, float X, float Y, float Z,
                                      char a5);
     static int   ChooseModel (int *type);
+};
+
+struct CCivilianPed
+{
+    void CivilianPed (ePedType type, unsigned int modelIndex);
 };
 
 struct CRunningScript
@@ -408,6 +452,7 @@ struct CPed
     int   GiveWeapon (int weapon, int ammo, int slot);
     void  SetCurrentWeapon (int slot);
     void *CCopPed__CCopPed (int type);
+    void  SetModelIndex (int modelIndex);
 };
 
 struct CPickups
@@ -457,6 +502,8 @@ struct CStreaming
     static void SetMissionDoesntRequireModel (int index);
     static void SetIsDeletable (int model);
     static void RemoveLeastUsedModel (int flags);
+    static void RequestSpecialModel(int slot, const char *modelName,
+                                     int flags);
 };
 
 struct CStreamingInfo
@@ -723,7 +770,7 @@ struct CFont
 
 struct CFileMgr
 {
-    static char* ms_dirName;
+    static char *ms_dirName;
 };
 
 struct CRect
@@ -853,8 +900,8 @@ struct C3dMarker
 
 struct CGame
 {
-    static unsigned char& bMissionPackGame;
-    static int Init3 (void *fileName);
+    static unsigned char &bMissionPackGame;
+    static int            Init3 (void *fileName);
 };
 
 struct CAnimBlock

@@ -47,6 +47,7 @@
 #include "respawns.hh"
 #include "dyom.hh"
 #include "animations.hh"
+#include "ped.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -108,6 +109,7 @@ public:
         DyomRandomizer::GetInstance ()->Initialise ();
         //AnimationRandomizer::GetInstance ()->Initialise ();
         GxtRandomizer::GetInstance ()->Initialise ();
+        PedRandomizer::GetInstance ()->Initialise ();
 
         CreditsExtender::Initialise ();
 

@@ -8,6 +8,7 @@
 #include <windows.h>
 #include "config.hh"
 #include "fades.hh"
+#include "ped.hh"
 
 ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 
@@ -20,20 +21,65 @@ HandleClothesChange ()
 
     for (int i = 0; i < 17; i++)
         {
-            auto cloth
-                = ClothesRandomizer::GetInstance ()->GetRandomCRCForComponent (
-                    i);
+            if (random (100) >= 50)
+                {
+					// Special/generic models
 
-            Scrpt::CallOpcode (0x784, "set_player_model_tex_crc", GlobalVar (2),
-                               cloth.second, cloth.first, i);
-            Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
+                    int model = 0;
+                    while ((model = random (299)),
+                           PedRandomizer::IsModelBlacklisted (model))
+                        ;
+
+                    if (PedRandomizer::IsSpecialModel (model))
+                        {
+                            model = 298;
+
+                            CStreaming::RequestSpecialModel (model, 
+								PedRandomizer::special_models[random(PedRandomizer::special_models.size() - 1)].c_str(), 1);
+                        }
+                    else
+                        {
+                            CStreaming::RequestModel (model, 1);
+                        }
+
+                    CStreaming::LoadAllRequestedModels (false);
+
+                    if (ms_aInfoForModel[model].m_nLoadState != 1)
+                        model = 0;
+
+                    Logger::GetLogger ()->LogMessage ("Player Model: "
+                                                      + std::to_string (model));
+
+                    Scrpt::CallOpcode (0x09C7, "set_player_model",
+                                       GlobalVar (2), model);
+                }
+            else
+                {
+					// CJ Clothes
+
+                    Scrpt::CallOpcode (0x09C7, "set_player_model",
+                                       GlobalVar (2), 0);
+
+                    for (int i = 0; i < 17; i++)
+                        {
+                            auto cloth = ClothesRandomizer::GetInstance ()
+                                             ->GetRandomCRCForComponent (i);
+
+                            Scrpt::CallOpcode (0x784,
+                                               "set_player_model_tex_crc",
+                                               GlobalVar (2), cloth.second,
+                                               cloth.first, i);
+                            Scrpt::CallOpcode (0x070D, "rebuild_player",
+                                               GlobalVar (2));
+                        }
+                }
         }
 }
 
 /*******************************************************/
 void
 ClothesRandomizer::InitialiseClothes ()
-{    
+{
     std::vector<std::string> shops
         = {"CSchp", "CSsprt",  "LACS1",   "clothgp", "Csdesgn",
            "Csexl", "barbers", "barber2", "barber3"};
@@ -56,6 +102,19 @@ ClothesRandomizer::InitialiseClothes ()
     mInitialised = true;
 }
 
+/*******************************************************/
+void
+ClothesRandomizer::FixChangingClothes (int modelId, uint32_t *newClothes,
+                                       uint32_t *oldClothes,
+                                       bool      CutscenePlayer)
+
+{
+    int model = 0;
+    if (CutscenePlayer)
+        model = 1;
+
+    Call<0x5A81E0> (model, newClothes, oldClothes, CutscenePlayer);
+}
 /*******************************************************/
 std::pair<int, int>
 ClothesRandomizer::GetRandomCRCForComponent (int componentId)
@@ -81,6 +140,8 @@ ClothesRandomizer::Initialise ()
     mInitialised = false;
 
     FadesManager::AddFadeCallback(HandleClothesChange);
+    injector::MakeCALL (0x5A834D, FixChangingClothes);
+    injector::MakeCALL (0x5A82AF, FixChangingClothes);
     
     Logger::GetLogger ()->LogMessage ("Intialised ClothesRandomizer");
 }

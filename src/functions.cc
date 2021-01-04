@@ -42,6 +42,13 @@ CStreaming::RequestModel (int model, int flags)
 }
 
 /*******************************************************/
+void
+CStreaming::RequestSpecialModel (int slot, const char *modelName, int flags)
+{
+    Call<0x409D10> (slot, modelName, flags);
+}
+
+/*******************************************************/
 void *
 CPopulation::AddPed (int type, int model, float *posn, bool unk)
 {
@@ -189,7 +196,12 @@ CPed::CCopPed__CCopPed (int type)
 {
     return CallMethodAndReturn<void *, 0x5DDC60> (this, type);
 }
-
+/*******************************************************/
+void
+CPed::SetModelIndex (int modelIndex)
+{
+    CallMethod<0x5E4880>(this, modelIndex);
+}
 /*******************************************************/
 int
 CModelInfo::LoadVehicleColours ()
@@ -404,7 +416,12 @@ CRunningScript::GetPointerToScriptVariable (int a2)
 {
     return CallMethodAndReturn<char *, 0x464790> (this, a2);
 }
-
+/*******************************************************/
+void
+CCivilianPed::CivilianPed (ePedType type, unsigned int modelIndex)
+{
+    CallMethod<0x5DDB70> (this, type, modelIndex);
+}
 /*******************************************************/
 int
 CPickups::GenerateNewOne (float x, float y, float z, unsigned int modelId,
@@ -513,7 +530,7 @@ void
 CRunningScript::SetCharCoordinates (CPed *ped, CVector pos, bool bWarpGang,
                                     bool bOffset)
 {
-    injector::stdcall<void (CPed *, CVector, bool, bool)>::call<0x464DC0> (
+    injector::stdcall<void(CPed *, CVector, bool, bool)>::call<0x464DC0> (
         ped, pos, bWarpGang, bOffset);
 }
 
@@ -690,7 +707,7 @@ CFont::SetDropShadowPosition (short value)
 void
 CFont::SetBackground (bool enable, bool includeWrap)
 {
-    ((void (__cdecl *) (bool, bool)) 0x7195C0) (enable, includeWrap);
+    ((void(__cdecl *) (bool, bool)) 0x7195C0) (enable, includeWrap);
 }
 
 /*******************************************************/
@@ -711,35 +728,35 @@ CFont::SetColor (CRGBA col)
 void
 CFont::SetJustify (bool on)
 {
-    ((void (__cdecl *) (bool)) 0x719600) (on);
+    ((void(__cdecl *) (bool)) 0x719600) (on);
 }
 
 /*******************************************************/
 void
 CFont::SetOrientation (eFontAlignment alignment)
 {
-    ((void (__cdecl *) (eFontAlignment)) 0x719610) (alignment);
+    ((void(__cdecl *) (eFontAlignment)) 0x719610) (alignment);
 }
 
 /*******************************************************/
 void
 CFont::PrintString (float x, float y, char *text)
 {
-    ((void (__cdecl *) (float, float, char *)) 0x71A700) (x, y, text);
+    ((void(__cdecl *) (float, float, char *)) 0x71A700) (x, y, text);
 }
 
 /*******************************************************/
 void
 CFont::SetScaleForCurrentlanguage (float w, float h)
 {
-    ((void (__cdecl *) (float, float)) 0x7193A0) (w, h);
+    ((void(__cdecl *) (float, float)) 0x7193A0) (w, h);
 }
 
 /*******************************************************/
 void
 CFont::SetAlphaFade (float alpha)
 {
-    ((void (__cdecl *) (float)) 0x719500) (alpha);
+    ((void(__cdecl *) (float)) 0x719500) (alpha);
 }
 
 /*******************************************************/

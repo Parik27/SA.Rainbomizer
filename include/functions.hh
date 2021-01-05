@@ -448,6 +448,9 @@ struct CPed
     int      flags[4];
     char     __pad47C[272];
     CEntity *m_pVehicle;
+    int      field_590;
+    int      field_594;
+    int      m_nPedType;
 
     int   GiveWeapon (int weapon, int ammo, int slot);
     void  SetCurrentWeapon (int slot);

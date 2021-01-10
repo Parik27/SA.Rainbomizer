@@ -31,6 +31,7 @@ struct CClumpModelInfo;
 struct CVector;
 struct CBox;
 struct CColModel;
+struct CPhysical;
 struct CPed;
 struct CPool;
 struct CEntity;
@@ -211,6 +212,7 @@ private:
 
 public:
     char *GetPointerToScriptVariable (int a2);
+    char  ReadTextLabelFromScript (char *text, char length);
     void  CollectParameters (short num);
     bool  CheckName (const char *name);
     void  ProcessCommands1526to1537 (int opcode);
@@ -448,6 +450,9 @@ struct CPed
     int      flags[4];
     char     __pad47C[272];
     CEntity *m_pVehicle;
+    int      field_590;
+    int      field_594;
+    int      m_nPedType;
 
     int   GiveWeapon (int weapon, int ammo, int slot);
     void  SetCurrentWeapon (int slot);
@@ -786,6 +791,13 @@ struct CMatrixLink
     CMatrix matrix;
 };
 
+struct CPhysical
+{
+    char    field_0x00[0x44];
+    CVector m_vecMoveSpeed;
+    CVector m_vecTurnSpeed;
+};
+
 struct CEntity
 {
     int              vtable;
@@ -918,7 +930,7 @@ struct CAnimBlendAssocGroup
     uint32_t iNumAnimations;
     uint32_t iIDOffset;
     uint32_t groupId;
-    
+
     inline static CAnimBlendAssocGroup *&ms_aAnimAssocGroups
         = *(CAnimBlendAssocGroup **) 0xB4EA34;
 
@@ -935,8 +947,11 @@ struct CAnimationStyleDescriptor
     uint32_t animsCount;
     char** animNames;
     uint32_t animDesc;
+    static unsigned char& bMissionPackGame;
+    static int Init3 (void *fileName);
 };
 
+CMatrix *RwFrameGetLTM (void *frame);
 
 int    random (int max);
 int    random (int min, int max);
@@ -965,3 +980,9 @@ extern CPool *&         ms_pVehiclePool;
 extern CWeaponInfo *    aWeaponInfos;
 extern RsGlobalType *   RsGlobal;
 extern float *          ms_fTimeStep;
+
+#define REGISTER_HOOK(offset, function, ret, ...)                     \
+    {                                                                 \
+        static ret (*F) (__VA_ARGS__);                                \
+        RegisterHook (offset, F, function<F>);                        \
+    }

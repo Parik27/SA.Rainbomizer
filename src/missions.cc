@@ -23,6 +23,7 @@ MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 const int START_MISSIONS     = 11;
 const int END_MISSIONS       = 112;
 const int UNLOCKED_CITY_STAT = 181;
+int       missionNumberOfLastMissionStarted = -1;
 
 int exceptions[] = {
     40, // First Date
@@ -33,8 +34,19 @@ int exceptions[] = {
 
 /*******************************************************/
 void
-Teleport (Position pos, bool refresh = true)
+Teleport (Position pos, bool endMission, bool refresh = true)
 {
+    CVector moveSpeed;
+    CVector turnSpeed;
+
+    CPhysical *player = (CPhysical *) FindPlayerEntity (-1);
+
+    if (endMission)
+        {
+            moveSpeed = player->m_vecMoveSpeed;
+            turnSpeed = player->m_vecTurnSpeed;
+        }
+
     if (refresh)
         {
             Scrpt::CallOpcode (0x4BB, "select_interior", 0);
@@ -46,9 +58,17 @@ Teleport (Position pos, bool refresh = true)
             Scrpt::CallOpcode (0xA0B, "set_rendering_origin", pos.x, pos.y,
                                pos.z, pos.heading);
         }
+
     CRunningScript::SetCharCoordinates (FindPlayerPed (), {pos.x, pos.y, pos.z},
                                         1, 1);
-    FindPlayerEntity ()->SetHeading (pos.heading * 3.1415926 / 180.0);
+    //Don't set heading if preserving momentum - will add config option for old teleport system
+    //FindPlayerEntity ()->SetHeading (pos.heading * 3.1415926 / 180.0);
+
+    if (endMission)
+        {
+            player->m_vecMoveSpeed = moveSpeed;
+            player->m_vecTurnSpeed = turnSpeed;
+        }
 }
 
 /*******************************************************/
@@ -102,7 +122,7 @@ void
 MissionRandomizer::TeleportPlayerBeforeMission ()
 {
     if (missionStartPos.count (mRandomizedMissionNumber))
-        Teleport (missionStartPos[mRandomizedMissionNumber]);
+        Teleport (missionStartPos[mRandomizedMissionNumber], false);
 }
 
 /*******************************************************/
@@ -115,7 +135,7 @@ MissionRandomizer::TeleportPlayerAfterMission ()
             Position pos = missionEndPos.at (mOriginalMissionNumber)[status];
             pos.z        = (mRandomizedMissionNumber == 80) ? 1500 : pos.z;
 
-            Teleport (pos);
+            Teleport (pos, true);
         }
     catch (const std::out_of_range &e)
         {
@@ -379,6 +399,7 @@ MissionRandomizer::MoveScriptToOriginalOffset (CRunningScript *scr)
     mSaveInfo.missionStatus[GetCorrectedMissionStatusIndex (
         mRandomizedMissionNumber)]--;
     SetCorrectedMissionStatusIndex (-1, -1);
+    missionNumberOfLastMissionStarted = -1;
 
     memcpy (this->mLocalVariables, (int *) 0xA48960, 0x400 * sizeof (uint32_t));
     // needn't reset local variables if we're jumping to the same mission
@@ -512,6 +533,8 @@ StoreRandomizedScript (uint8_t *startIp)
     auto out = HookManager::CallOriginalAndReturn<
         injector::cstd<CRunningScript *(uint8_t *)>, 0x489A7A> (nullptr,
                                                                 startIp);
+    missionNumberOfLastMissionStarted
+        = missionRandomizer->mOriginalMissionNumber;
 
     if (missionRandomizer->mStoreNextMission)
         {
@@ -591,6 +614,7 @@ MissionRandomizer::ResetSaveData ()
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
     this->mRandomizedScript = nullptr;
+    missionNumberOfLastMissionStarted = -1;
 
     mSaveInfo.randomSeed = config.shufflingSeed;
     if (config.shufflingEnabled && config.shufflingSeed == -1)
@@ -682,22 +706,31 @@ MissionRandomizer::InstallCheat (void *func, uint32_t hash)
 }
 
 /*******************************************************/
-void __fastcall OverrideHospitalEndPosition (CRunningScript *scr)
+template <int address>
+void
+OverrideHospitalEndPosition(float x, float y, float z, RwV3d *a4, float *a5)
 {
-    HookManager::CallOriginal<injector::thiscall<void (CRunningScript *)>,
-                              0x469F5B> (scr);
-
-    auto missionRandomizer = MissionRandomizer::GetInstance ();
-    if (scr->m_bWastedOrBusted && scr == missionRandomizer->mRandomizedScript)
-        {
-            int i = missionRandomizer->mOriginalMissionNumber;
-            if (missionStartPos.count (i))
-                {
-                    auto pos = missionStartPos[i];
-                    Scrpt::CallOpcode (0x9FF, "set_restart_closest_to", pos.x,
-                                       pos.y, pos.z);
-                }
-        }
+    if (missionNumberOfLastMissionStarted != -1)
+    {
+            if (missionStartPos.count(missionNumberOfLastMissionStarted))
+            {
+                    Position thisMissionStartPos = missionStartPos.at (
+                        missionNumberOfLastMissionStarted);
+                    a4->x = thisMissionStartPos.x;
+                    a4->y = thisMissionStartPos.y;
+                    a4->z = thisMissionStartPos.z;
+                    missionNumberOfLastMissionStarted = -1;
+            }
+            HookManager::CallOriginal<
+                injector::cstd<void (float, float, float, RwV3d *, float *)>,
+                address> (a4->x, a4->y, a4->z, a4, a5);
+    }
+    else
+    {
+            HookManager::CallOriginal<
+                injector::cstd<void (float, float, float, RwV3d *, float *)>,
+                address> (x, y, z, a4, a5);
+    }
 }
 
 /*******************************************************/
@@ -750,12 +783,15 @@ MissionRandomizer::Initialise ()
          {HOOK_CALL, 0x60C95D, (void *) &UnlockCities},
          {HOOK_CALL, 0x5D15A6, (void *) &SaveMissionData},
          {HOOK_CALL, 0x5D19CE, (void *) &LoadMissionData},
-         {HOOK_CALL, 0x60C925, (void *) &CorrectMaxNumberOfGroupMembers}});
+         {HOOK_CALL, 0x60C925, (void *) &CorrectMaxNumberOfGroupMembers},
+         {HOOK_CALL, 0x44331B, (void *) &OverrideHospitalEndPosition<0x44331B>},
+         {HOOK_CALL, 0x4435C6, (void *) &OverrideHospitalEndPosition<0x4435C6>},
+         {HOOK_CALL, 0x442F70, (void *) &OverrideHospitalEndPosition<0x442F70>}});
 
     RegisterDelayedHooks (
         {{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
          {HOOK_CALL, 0x53BE76, (void *) &InitAtNewGame},
-         {HOOK_CALL, 0x469F5B, (void *) &OverrideHospitalEndPosition}});
+        });
 
     RegisterDelayedFunction ([] { injector::MakeNOP (0x469fb5, 2); });
 

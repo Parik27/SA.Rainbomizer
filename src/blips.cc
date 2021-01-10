@@ -7,6 +7,7 @@
 #include "config.hh"
 
 BlipRandomizer *BlipRandomizer::mInstance = nullptr;
+int             northIcon                 = -1;
 
 /*******************************************************/
 void
@@ -29,6 +30,7 @@ RandomizeBlipsOnStart ()
                 injector::WriteMemory<uint8_t> (radarTrace, random (2, 63));
             radarTrace += 40;
         }
+    northIcon = random (2, 63);
 }
 
 /*******************************************************/
@@ -44,6 +46,21 @@ FixLegendCrash (float x, float y, char *text)
 
 /*******************************************************/
 void
+RandomizeNorthIcon (int iconID, float x, float y, uint8_t alpha)
+{
+    iconID = northIcon;
+    injector::cstd<void (int, float, float, uint8_t)>::call (0x585FF0, iconID, x, y, alpha);
+}
+
+/*******************************************************/
+int
+DisplayBlipsInInteriors (int a1, char a2)
+{
+    return 1;
+}
+
+/*******************************************************/
+void
 BlipRandomizer::Initialise ()
 {
     auto config = ConfigManager::GetInstance ()->GetConfigs ().blips;
@@ -52,7 +69,10 @@ BlipRandomizer::Initialise ()
 
     Logger::GetLogger ()->LogMessage ("Intialised BlipRandomizer");
     RegisterHooks ({{HOOK_CALL, 0x5D1948, (void *) RandomizeBlipsOnStart},
-                    {HOOK_CALL, 0x582DEE, (void *) FixLegendCrash}});
+                    {HOOK_CALL, 0x582DEE, (void *) FixLegendCrash},
+                    {HOOK_CALL, 0x588188, (void *) RandomizeNorthIcon}, 
+                    {HOOK_JUMP, 0x583B40, (void *) DisplayBlipsInInteriors}, 
+        });
     for (auto i : {0x444403, 0x47F7FE, 0x48BCA8, 0x48DBE1, 0x5775DD})
         injector::MakeCALL (i, (void *) RandomizeBlipSprite);
 }

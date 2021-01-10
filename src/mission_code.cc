@@ -277,6 +277,7 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         case 112:
             Scrpt::CallOpcode (0x555, "remove_weapon", GlobalVar (3), 28);
             Scrpt::CallOpcode (0x1B2, "give_weapon", GlobalVar (3), 28, 120);
+            Scrpt::CallOpcode (0x16A, "do_fade", 500, 1);
             break;
 
         // Tagging up Turf - Infinite ammo

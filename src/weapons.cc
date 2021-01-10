@@ -202,7 +202,11 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy)
                     else
                         {
                             buggy_weapons = {19, 20, 21, 14, 40, 39};
-                        }
+                            if (ped->m_nPedType == ePedType::PED_TYPE_DEALER)
+                            {
+                                    buggy_weapons.push_back (22);
+                            }
+                    }
 
                     while ((weapon = random (1, 46),
 

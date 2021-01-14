@@ -21,6 +21,10 @@ class ClothesRandomizer
 	static int __fastcall FixAnimCrash (uint32_t *anim, void *edx, int arg0,
                                         int animGroup);
 
+    static void RandomizePlayerClothes ();
+    static void RandomizePlayerModel ();
+    static void HandleClothesChange ();
+
 public:
     /// Returns the static instance for ClothesRandomizer.
     static ClothesRandomizer *GetInstance ();

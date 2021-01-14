@@ -32,14 +32,15 @@ ParkedCarRandomizer *ParkedCarRandomizer::mInstance = nullptr;
 void
 ParkedCarRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().parkedCar;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("ParkedCarRandomizer", 
+            std::pair ("RandomizeFixedSpawns", &m_Config.RandomizeFixedSpawns),
+            std::pair ("RandomizeRandomSpawns", &m_Config.RandomizeRandomSpawns)))
         return;
 
-    if (config.randomizeRandomSpawns)
+    if (m_Config.RandomizeRandomSpawns)
         RegisterHooks ({{HOOK_CALL, 0x6F3583, (void *) &RandomizeRandomSpawn}});
 
-    if (config.randomizeFixedSpawns)
+    if (m_Config.RandomizeFixedSpawns)
         RegisterHooks ({{HOOK_CALL, 0x6F3EC1, (void *) &RandomizeFixedSpawn}});
 
     Logger::GetLogger ()->LogMessage ("Intialised ParkedCarRandomizer");

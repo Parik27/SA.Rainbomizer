@@ -125,10 +125,10 @@ ApplyFixesBasedOnModel (int model, int newModel)
 void *
 RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
 {
-    int newModel
-        = ScriptVehicleRandomizer::GetInstance ()->ProcessVehicleChange (model,
+    int newModel = 500; /*ScriptVehicleRandomizer::GetInstance
+                           ()->ProcessVehicleChange (model,
                                                                          x, y,
-                                                                         z);
+                                                                         z);*/
 
     ApplyFixesBasedOnModel (model, newModel);
 
@@ -169,104 +169,103 @@ int16_t __fastcall UpdateLastThread (CRunningScript *script, void *edx,
 }
 
 /*******************************************************/
-int
-ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
-                                               float &z)
-{
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().scriptVehicle;
-    for (auto pattern : mPatternCache)
-        {
-            if (DoesVehicleMatchPattern (id, pattern.pattern)
-                && CompareCoordinates (x, y, z, pattern.coords[0],
-                                       pattern.coords[1], pattern.coords[2])
-                && (pattern.thread == "" || pattern.thread == mLastThread))
-                {
-                    // Update x,y,z coordinates
-                    x += pattern.move[0];
-                    y += pattern.move[1];
-                    z += pattern.move[2];
-
-                    std::vector<uint16_t> vehicles;
-                    if (pattern.seat_check)
-                        {
-                            for (auto vehicle : pattern.cars)
-                                {
-                                    if (mSeatsCache[id - 400]
-                                        <= mSeatsCache[vehicle - 400])
-                                        vehicles.push_back (vehicle);
-                                }
-                        }
-                    else
-                        vehicles = pattern.cars;
-
-                    if (vehicles.size () > 0)
-                        return vehicles[random (vehicles.size () - 1)];
-
-                    Logger::GetLogger ()->LogMessage (
-                        "Pattern yielded no valid vehicles");
-                }
-        }
-    return id;
-}
+//int
+//ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
+//                                               float &z)
+//{
+//    for (auto pattern : mPatternCache)
+//        {
+//            if (DoesVehicleMatchPattern (id, pattern.pattern)
+//                && CompareCoordinates (x, y, z, pattern.coords[0],
+//                                       pattern.coords[1], pattern.coords[2])
+//                && (pattern.thread == "" || pattern.thread == mLastThread))
+//                {
+//                    // Update x,y,z coordinates
+//                    x += pattern.move[0];
+//                    y += pattern.move[1];
+//                    z += pattern.move[2];
+//
+//                    std::vector<uint16_t> vehicles;
+//                    if (pattern.seat_check)
+//                        {
+//                            for (auto vehicle : pattern.cars)
+//                                {
+//                                    if (mSeatsCache[id - 400]
+//                                        <= mSeatsCache[vehicle - 400])
+//                                        vehicles.push_back (vehicle);
+//                                }
+//                        }
+//                    else
+//                        vehicles = pattern.cars;
+//
+//                    if (vehicles.size () > 0)
+//                        return vehicles[random (vehicles.size () - 1)];
+//
+//                    Logger::GetLogger ()->LogMessage (
+//                        "Pattern yielded no valid vehicles");
+//                }
+//        }
+//    return id;
+//}
 
 /*******************************************************/
-bool
-ScriptVehicleRandomizer::DoesVehicleMatchPattern (int vehicle, int pattern)
-{
-    uint8_t *modelInfo = (uint8_t *) ms_modelInfoPtrs[vehicle];
-    uint32_t type      = *(uint32_t *) (modelInfo + 0x3C);
-
-    if (pattern == VEHICLE_ALL)
-        return true;
-
-    if (pattern < 12)
-        {
-            if (type == pattern)
-                return true;
-        }
-    else if (pattern < 18)
-        {
-            switch (pattern)
-                {
-                case VEHICLE_APPEARANCE_PLANE:
-                    if (type == VEHICLE_PLANE || type == VEHICLE_FPLANE)
-                        return true;
-                    break;
-
-                case VEHICLE_APPEARANCE_BOAT:
-                    if (type == VEHICLE_BOAT)
-                        return true;
-                    break;
-
-                case VEHICLE_APPEARANCE_HELI:
-                    if (type == VEHICLE_HELI || type == VEHICLE_FHELI)
-                        return true;
-                    break;
-
-                case VEHICLE_APPEARANCE_BIKE:
-                    if (type == VEHICLE_BMX || type == VEHICLE_BIKE)
-                        return true;
-                    break;
-
-                case VEHICLE_APPEARANCE_RC:
-                    if (CModelInfo::IsRCModel (vehicle))
-                        return true;
-                    break;
-
-                default:
-                    if (type != VEHICLE_BMX && type != VEHICLE_BIKE
-                        && type != VEHICLE_FPLANE && type != VEHICLE_HELI
-                        && type != VEHICLE_BOAT && type != VEHICLE_FPLANE
-                        && type != VEHICLE_PLANE && type != VEHICLE_TRAIN
-                        && type != VEHICLE_TRAILER)
-                        return true;
-                }
-        }
-    else
-        return pattern == vehicle;
-
-    return false;
-}
+//bool
+//ScriptVehicleRandomizer::DoesVehicleMatchPattern (int vehicle, int pattern)
+//{
+//    uint8_t *modelInfo = (uint8_t *) ms_modelInfoPtrs[vehicle];
+//    uint32_t type      = *(uint32_t *) (modelInfo + 0x3C);
+//
+//    if (pattern == VEHICLE_ALL)
+//        return true;
+//
+//    if (pattern < 12)
+//        {
+//            if (type == pattern)
+//                return true;
+//        }
+//    else if (pattern < 18)
+//        {
+//            switch (pattern)
+//                {
+//                case VEHICLE_APPEARANCE_PLANE:
+//                    if (type == VEHICLE_PLANE || type == VEHICLE_FPLANE)
+//                        return true;
+//                    break;
+//
+//                case VEHICLE_APPEARANCE_BOAT:
+//                    if (type == VEHICLE_BOAT)
+//                        return true;
+//                    break;
+//
+//                case VEHICLE_APPEARANCE_HELI:
+//                    if (type == VEHICLE_HELI || type == VEHICLE_FHELI)
+//                        return true;
+//                    break;
+//
+//                case VEHICLE_APPEARANCE_BIKE:
+//                    if (type == VEHICLE_BMX || type == VEHICLE_BIKE)
+//                        return true;
+//                    break;
+//
+//                case VEHICLE_APPEARANCE_RC:
+//                    if (CModelInfo::IsRCModel (vehicle))
+//                        return true;
+//                    break;
+//
+//                default:
+//                    if (type != VEHICLE_BMX && type != VEHICLE_BIKE
+//                        && type != VEHICLE_FPLANE && type != VEHICLE_HELI
+//                        && type != VEHICLE_BOAT && type != VEHICLE_FPLANE
+//                        && type != VEHICLE_PLANE && type != VEHICLE_TRAIN
+//                        && type != VEHICLE_TRAILER)
+//                        return true;
+//                }
+//        }
+//    else
+//        return pattern == vehicle;
+//
+//    return false;
+//}
 
 /*******************************************************/
 bool
@@ -448,9 +447,7 @@ void __fastcall FixMaddDoggBoxes (CRunningScript *scr, void *edx, short count)
 void
 ScriptVehicleRandomizer::Initialise ()
 {
-
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().scriptVehicle;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("ScriptVehicleRandomizer"))
         return;
 
     RegisterHooks (
@@ -480,7 +477,7 @@ void
 ScriptVehicleRandomizer::InitialiseCache ()
 {
     this->CacheSeats ();
-    this->CachePatterns ();
+    /*this->CachePatterns ();*/
 
     Logger::GetLogger ()->LogMessage ("Initialised Script Vehicles cache");
 }
@@ -509,60 +506,59 @@ ScriptVehicleRandomizer::CacheSeats ()
 }
 
 /*******************************************************/
-void
-ScriptVehicleRandomizer::CachePatterns ()
-{
-    auto &config = ConfigManager::GetInstance ()->GetConfigs ().scriptVehicle;
-    for (auto &pattern : config.patterns)
-        {
-            CachedPattern cache;
-            memcpy (cache.coords, pattern.coords, sizeof (cache.coords));
-            memcpy (cache.move, pattern.move, sizeof (cache.move));
-            cache.thread     = pattern.thread;
-            cache.pattern    = pattern.vehicle;
-            cache.seat_check = pattern.seat_check;
-
-            bool vehicleMask[212] = {0};
-            auto updateMask = [&] (const std::vector<int16_t> &v, bool val) {
-                for (auto i : v)
-                    {
-                        if (i >= 400)
-                            vehicleMask[i - 400] = val;
-                        else
-                            {
-                                for (int j = 0; j < 212; j++)
-                                    {
-                                        if (DoesVehicleMatchPattern (j + 400,
-                                                                     i))
-                                            vehicleMask[j] = val;
-                                    }
-                            }
-                    }
-            };
-            updateMask (pattern.allowed, true);
-            updateMask (pattern.denied, false);
-
-            // If the vehicle matched is a static vehicle, cache the seats
-            if (cache.pattern >= 400 && cache.seat_check)
-                {
-                    for (int i = 0; i < 212; i++)
-                        {
-                            if (mSeatsCache[cache.pattern - 400]
-                                > mSeatsCache[i])
-                                vehicleMask[i] = false;
-                        }
-                    cache.seat_check = false;
-                }
-
-            for (int i = 0; i < 212; i++)
-                {
-                    if (vehicleMask[i])
-                        cache.cars.push_back (i + 400);
-                }
-
-            this->mPatternCache.push_back (cache);
-        }
-}
+//void
+//ScriptVehicleRandomizer::CachePatterns ()
+//{
+//    for (auto &pattern : config.patterns)
+//        {
+//            CachedPattern cache;
+//            memcpy (cache.coords, pattern.coords, sizeof (cache.coords));
+//            memcpy (cache.move, pattern.move, sizeof (cache.move));
+//            cache.thread     = pattern.thread;
+//            cache.pattern    = pattern.vehicle;
+//            cache.seat_check = pattern.seat_check;
+//
+//            bool vehicleMask[212] = {0};
+//            auto updateMask = [&] (const std::vector<int16_t> &v, bool val) {
+//                for (auto i : v)
+//                    {
+//                        if (i >= 400)
+//                            vehicleMask[i - 400] = val;
+//                        else
+//                            {
+//                                for (int j = 0; j < 212; j++)
+//                                    {
+//                                        if (DoesVehicleMatchPattern (j + 400,
+//                                                                     i))
+//                                            vehicleMask[j] = val;
+//                                    }
+//                            }
+//                    }
+//            };
+//            updateMask (pattern.allowed, true);
+//            updateMask (pattern.denied, false);
+//
+//            // If the vehicle matched is a static vehicle, cache the seats
+//            if (cache.pattern >= 400 && cache.seat_check)
+//                {
+//                    for (int i = 0; i < 212; i++)
+//                        {
+//                            if (mSeatsCache[cache.pattern - 400]
+//                                > mSeatsCache[i])
+//                                vehicleMask[i] = false;
+//                        }
+//                    cache.seat_check = false;
+//                }
+//
+//            for (int i = 0; i < 212; i++)
+//                {
+//                    if (vehicleMask[i])
+//                        cache.cars.push_back (i + 400);
+//                }
+//
+//            this->mPatternCache.push_back (cache);
+//        }
+//}
 
 /*******************************************************/
 void

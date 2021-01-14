@@ -48,6 +48,7 @@
 #include "dyom.hh"
 #include "animations.hh"
 #include "ped.hh"
+#include "generalsettings.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -64,16 +65,19 @@ public:
     /*******************************************************/
     Rainbomizer ()
     {
-        CreateRainbomizerFolder ();
+        //auto config = ConfigManager::GetInstance ();
+        //config->Initialise ("config.toml");
 
-        auto config = ConfigManager::GetInstance ();
-        config->Initialise ("config.toml");
+        //if (!config->GetConfigs ().general.enabled)
+        //    return;
 
-        if (!config->GetConfigs ().general.enabled)
+        if (!ConfigManager::ReadConfig ("EnableRainbomizer"))
             return;
 
+        GeneralSettings::GetInstance ()->Initialise ();
+
         // Unprotect if required
-        if (!config->GetConfigs ().general.unprotect)
+        if (GeneralSettings::m_Config.Unprotect)
             UnProtectInstance ();
 
         auto logger = Logger::GetLogger ();

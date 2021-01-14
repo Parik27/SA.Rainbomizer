@@ -53,9 +53,8 @@ char *__fastcall RemoveSubtitlesHook (CText *TheText, void *edx, char *key)
 char *__fastcall CorrectSubtitles (CText *text, void *edx, char *key)
 {
     auto soundsR = SoundRandomizer::GetInstance ();
-    auto config  = ConfigManager::GetInstance ()->GetConfigs ().sounds;
 
-    if (!config.matchSubtitles)
+    if (!SoundRandomizer::m_Config.MatchSubtitles)
         return text->Get (key);
 
     try
@@ -245,8 +244,9 @@ SoundRandomizer::InitaliseSoundTable ()
 void
 SoundRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().sounds;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("VoiceLineRandomizer", 
+            std::pair("MatchSubtitles", &m_Config.MatchSubtitles),
+            std::pair("ForcedAudioLine", &m_Config.ForcedAudioLine)))
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised SoundRandomizer");

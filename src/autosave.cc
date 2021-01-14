@@ -10,6 +10,7 @@
 #include "colours.hh"
 #include <cmath>
 #include <ctime>
+#include "generalsettings.hh"
 
 AutoSave *AutoSave::mInstance = nullptr;
 
@@ -38,8 +39,6 @@ int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
         {
             scr->m_bIsActive = false;
 
-            auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
-
             // Save in a vehicle
             int *playerFlags   = FindPlayerPed (0)->flags;
             auto vehicleCoords = FindPlayerEntity ()->GetPosition ();
@@ -52,7 +51,7 @@ int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
             playerFlags[0] &= ~0x100;
 
             // Save
-            CGenericGameStorage::MakeValidSaveFileName (config.save_slot - 1);
+            CGenericGameStorage::MakeValidSaveFileName (GeneralSettings::m_Config.AutoSaveSlot - 1);
             CGenericGameStorage::GenericSave ();
 
             AutoSave::GetInstance ()->SetShouldSave (false);
@@ -209,8 +208,8 @@ void __stdcall HookDrawVitals (CRect *rect, char *title, char fadeState,
 void
 AutoSave::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
-    if (config.save_slot < 1 || config.save_slot > 8)
+    if (GeneralSettings::m_Config.AutoSaveSlot < 1
+        || GeneralSettings::m_Config.AutoSaveSlot > 8)
         return;
 
     this->InstallHooks ();

@@ -26,6 +26,7 @@
 #include "config.hh"
 #include <ctime>
 #include "injector/calling.hpp"
+#include "generalsettings.hh"
 
 /*******************************************************/
 int
@@ -791,9 +792,9 @@ CIplStore::FindIplSlot (char *name)
 std::mt19937 &
 rand_engine ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
-    thread_local static std::mt19937 engine{
-        config.seed != -1 ? config.seed : (unsigned int) time (NULL)};
+    thread_local static std::mt19937 engine{GeneralSettings::m_Config.Seed != -1
+                                                ? GeneralSettings::m_Config.Seed
+                                                : (unsigned int) time (NULL)};
 
     return engine;
 }

@@ -132,9 +132,8 @@ HashColour (const CRGBA &colour)
 CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
                                     uint8_t g, uint8_t b, uint8_t a)
 {
-    static auto config   = ConfigManager::GetInstance ()->GetConfigs ().colours;
-    static bool hueCycle = config.hueCycle;
-    static bool crazyMode = config.crazyMode;
+    static bool hueCycle  = ColourRandomizer::m_Config.RainbowHueCycle;
+    static bool crazyMode = ColourRandomizer::m_Config.CrazyMode;
 
     static int offset = random (0, 10000);
     float      time = (!hueCycle) ? offset : 1000.0 * clock () / CLOCKS_PER_SEC;
@@ -189,21 +188,25 @@ void __fastcall RandomizeMarkers (C3dMarker *marker)
 void
 ColourRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().colours;
-
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("ColourRandomizer", 
+            std::pair ("RandomizeCarCols", &m_Config.RandomizeCarCols),
+            std::pair ("RandomizeFades", &m_Config.RandomizeFades),
+            std::pair ("RainbowText", &m_Config.RandomizeText),
+            std::pair ("RainbowHueCycle", &m_Config.RainbowHueCycle),
+            //std::pair ("Exceptions", &m_Config.Exceptions),
+            std::pair ("Crazy Mode", &m_Config.CrazyMode)))
         return;
 
-    if (config.cars)
+    if (m_Config.RandomizeCarCols)
         RegisterHooks (
             {{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables},
              {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}});
-    if (config.texts)
+    if (m_Config.RandomizeText)
         RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
                         {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours},
                         {HOOK_CALL, 0x7250B1, (void *) &RandomizeMarkers}});
 
-    if (config.fades)
+    if (m_Config.RandomizeFades)
         {
             RegisterHooks (
                 {{HOOK_CALL, 0x50BF22, (void *) &RandomizeFadeColour}});
@@ -230,15 +233,13 @@ RandomizeColourTables ()
 {
     int ret = CModelInfo::LoadVehicleColours ();
 
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().colours;
-
     for (int i = 0; i < 128; i++)
         {
             // Check for exceptions
-            if (std::find (std::begin (config.exceptions),
-                           std::end (config.exceptions), i)
-                != std::end (config.exceptions))
-                continue;
+            //if (std::find (std::begin (ColourRandomizer::m_Config.Exceptions),
+            //               std::end (ColourRandomizer::m_Config.Exceptions), i)
+            //    != std::end (ColourRandomizer::m_Config.Exceptions))
+            //    continue;
 
             int colour[] = {0, 0, 0};
             HSVtoRGB ((int) (i * 2.8125), random (50, 100) / 100.0,

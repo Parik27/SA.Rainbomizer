@@ -75,15 +75,19 @@ void __fastcall PlaceOnRoadFix (CVehicle *vehicle, void *edx)
 void
 TrafficRandomizer::Initialise ()
 {
-
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
-
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("TrafficRandomizer",
+            std::pair("ForcedVehicleID", &m_Config.ForcedVehicleID),
+            std::pair("EnableTrains", &m_Config.Trains),
+            std::pair("EnableBoats", &m_Config.Boats),
+            std::pair("EnableAircrafts", &m_Config.Aircraft),
+            std::pair("EnableCars", &m_Config.Cars),
+            std::pair("EnableBikes", &m_Config.Bikes),
+            std::pair("EnableTrailers", &m_Config.Trailers),
+            std::pair("DefaultModel", &m_Config.DefaultModel)))
         return;
 
-    if (config.forcedVehicleEnabled && config.forcedVehicleID >= 400
-        && config.forcedVehicleID <= 611)
-        this->SetForcedRandomCar (config.forcedVehicleID);
+    if (m_Config.ForcedVehicleID >= 400 && m_Config.ForcedVehicleID <= 611)
+        this->SetForcedRandomCar (m_Config.ForcedVehicleID);
 
     // TODO: Add Config option
     this->MakeRCsEnterable ();
@@ -256,34 +260,33 @@ RandomizeTrafficCars (int *type)
 bool
 TrafficRandomizer::IsVehicleAllowed (int model)
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
 
     // Aircrafts
     if ((CModelInfo::IsHeliModel (model) || CModelInfo::IsPlaneModel (model))
-        && !config.enableAircrafts)
+        && !m_Config.Aircraft)
         return false;
 
     // Boats
-    if (CModelInfo::IsBoatModel (model) && !config.enableBoats)
+    if (CModelInfo::IsBoatModel (model) && !m_Config.Boats)
         return false;
 
     // Bikes
     if ((CModelInfo::IsBikeModel (model) || CModelInfo::IsBmxModel (model))
-        && !config.enableBikes)
+        && !m_Config.Bikes)
         return false;
 
     // Trains
-    if (CModelInfo::IsTrainModel (model) && !config.enableTrains)
+    if (CModelInfo::IsTrainModel (model) && !m_Config.Trains)
         return false;
 
     // Cars
     if ((CModelInfo::IsCarModel (model) || CModelInfo::IsQuadBikeModel (model)
          || CModelInfo::IsMonsterTruckModel (model))
-        && !config.enableCars)
+        && !m_Config.Cars)
         return false;
 
     // Trailers
-    if (CModelInfo::IsTrailerModel (model) && !config.enableTrailers)
+    if (CModelInfo::IsTrailerModel (model) && !m_Config.Trailers)
         return false;
 
     return true;
@@ -350,10 +353,8 @@ RandomizeCarPeds (int type, int model, float *pos, bool unk)
     if (ms_aInfoForModel[model].m_nLoadState == 1)
         return CPopulation::AddPed (type, model, pos, unk);
 
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
-
     // spawn CJ because why not :P
-    return CPopulation::AddPed (type, config.defaultModel, pos, unk);
+    return CPopulation::AddPed (type, TrafficRandomizer::m_Config.DefaultModel, pos, unk);
 }
 
 /*******************************************************/

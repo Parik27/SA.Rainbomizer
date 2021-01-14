@@ -170,11 +170,10 @@ MissionRandomizer::GetRandomMission (int originalMission)
             return originalMission;
 
     // Forced Mission
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
-    if (config.forcedMissionEnabled)
-        return config.forcedMissionID;
+    if (m_Config.ForcedMissionID >= 2 && m_Config.ForcedMissionID <= 134)
+        return m_Config.ForcedMissionID;
 
-    if (config.shufflingEnabled)
+    if (m_Config.RandomizeOnce)
         {
             if (mShuffledOrder.count (originalMission))
                 {
@@ -612,12 +611,11 @@ InitAtNewGame ()
 void
 MissionRandomizer::ResetSaveData ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
     this->mRandomizedScript = nullptr;
     missionNumberOfLastMissionStarted = -1;
 
-    mSaveInfo.randomSeed = config.shufflingSeed;
-    if (config.shufflingEnabled && config.shufflingSeed == -1)
+    mSaveInfo.randomSeed = m_Config.MissionSeedHash;
+    if (m_Config.RandomizeOnce && m_Config.MissionSeedHash == -1)
         mSaveInfo.randomSeed = random (UINT_MAX);
 
     memset (mSaveInfo.missionStatus.data, 1,
@@ -644,7 +642,6 @@ MissionRandomizer::Save ()
 void
 MissionRandomizer::Load ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
     MissionRandomizerSaveStructure saveInfo;
     CGenericGameStorage::LoadDataFromWorkBuffer (&saveInfo, sizeof (saveInfo));
 
@@ -656,8 +653,8 @@ MissionRandomizer::Load ()
     Logger::GetLogger ()->LogMessage ("Setting seed "
                                       + std::to_string (mSaveInfo.randomSeed)
                                       + " from save file");
-    if (config.forceShufflingSeed && config.shufflingSeed != -1)
-        mSaveInfo.randomSeed = config.shufflingSeed;
+    if (m_Config.ForcedRandomizeOnceSeed && m_Config.MissionSeedHash != -1)
+        mSaveInfo.randomSeed = m_Config.MissionSeedHash;
 
     InitShuffledMissionOrder ();
 
@@ -763,10 +760,18 @@ MissionRandomizer::VerifyMainSCM ()
 void
 MissionRandomizer::Initialise ()
 {
+    if (!ConfigManager::ReadConfig (
+            "MissionRandomizer", std::pair ("ForcedMissionID", &m_Config.ForcedMissionID),
+            std::pair ("RandomizeOnce", &m_Config.RandomizeOnce),
+            std::pair ("RandomizeOnceSeed", &m_Config.RandomizeOnceSeed),
+            std::pair ("ForcedRandomizeOnceSeed", &m_Config.ForcedRandomizeOnceSeed),
+            std::pair ("DisableMainScmCheck", &m_Config.DisableMainSCMCheck)))
+        return;
 
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
+    m_Config.MissionSeedHash
+        = std::hash<std::string>{}(m_Config.RandomizeOnceSeed);
 
-    if (!config.enabled || (!config.disableMainScmCheck && !VerifyMainSCM ()))
+    if (!m_Config.DisableMainSCMCheck && !VerifyMainSCM ())
         return;
 
     if (!mTempMissionData)
@@ -808,9 +813,8 @@ MissionRandomizer::Initialise ()
 void
 MissionRandomizer::InitShuffledMissionOrder ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
     mShuffledOrder.clear ();
-    if (!config.shufflingEnabled)
+    if (!m_Config.RandomizeOnce)
         return;
 
     std::mt19937 engine{mSaveInfo.randomSeed};

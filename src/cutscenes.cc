@@ -126,12 +126,13 @@ RestoreCutsceneInterior ()
 void
 CutsceneRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().cutscenes;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("CutsceneRandomizer",
+            std::pair ("RandomizeModels", &m_Config.RandomizeModels),
+            std::pair ("RandomizeLocations", &m_Config.RandomizeLocation)))
         return;
 
-    FILE *modelFile = OpenRainbomizerFile (config.cutsceneFile, "r");
-    if (modelFile && config.randomizeModels)
+    FILE *modelFile = OpenRainbomizerFile ("Cutscene_Models.txt", "r", "data/");
+    if (modelFile && m_Config.RandomizeModels)
         {
             char line[512] = {0};
             mModels.push_back (std::vector<std::string> ());
@@ -152,12 +153,12 @@ CutsceneRandomizer::Initialise ()
         {
             // Log a message if file wasn't found
             Logger::GetLogger ()->LogMessage (
-                "Failed to read file: rainbomizer/" + config.cutsceneFile);
+                "Failed to read file: rainbomizer/data/Cutscene_Models.txt");
             Logger::GetLogger ()->LogMessage (
                 "Cutscene models will not be randomized");
         }
 
-    if (config.randomizeLocations)
+    if (m_Config.RandomizeLocation)
         {
             RegisterHooks (
                 {{HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},

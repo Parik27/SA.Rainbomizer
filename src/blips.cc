@@ -7,7 +7,7 @@
 #include "config.hh"
 
 BlipRandomizer *BlipRandomizer::mInstance = nullptr;
-int             northIcon                 = -1;
+int             northIcon                 = random (2, 63);
 
 /*******************************************************/
 void
@@ -63,8 +63,7 @@ DisplayBlipsInInteriors (int a1, char a2)
 void
 BlipRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().blips;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("BlipRandomizer")) 
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised BlipRandomizer");

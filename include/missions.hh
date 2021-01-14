@@ -51,6 +51,18 @@ class MissionRandomizer
 {
     static MissionRandomizer *mInstance;
 
+    static inline struct Config
+    {
+        int ForcedMissionID;
+
+        bool        RandomizeOnce = true;
+        std::string RandomizeOnceSeed;
+        int         MissionSeedHash         = -1;
+        bool        ForcedRandomizeOnceSeed = false;
+
+        bool DisableMainSCMCheck = false;
+    } m_Config;
+
     MissionRandomizer (){};
     static void DestroyInstance ();
 

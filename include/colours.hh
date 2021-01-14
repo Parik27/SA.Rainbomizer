@@ -21,6 +21,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 // Hooks
 // - Select car colour
@@ -45,6 +46,19 @@ class ColourRandomizer
     static void DestroyInstance ();
 
 public:
+
+    static inline struct Config
+    {
+        bool RandomizeCarCols;
+        bool RandomizeFades;
+        bool RandomizeText;
+
+        bool RainbowHueCycle;
+
+        //std::vector<int64_t> Exceptions;
+        bool                 CrazyMode;
+    } m_Config;
+
     /// Returns the static instance for CarColRandomizer.
     static ColourRandomizer *GetInstance ();
 

@@ -90,7 +90,7 @@ class ScriptVehicleRandomizer
     eDoorCheckError DoesVehicleHaveEnoughDoors (int modelA, int modelB);
 
     void CacheSeats ();
-    void CachePatterns ();
+    //void CachePatterns ();
 
 public:
     void ApplyEOTLFixes (int newFiretruck);
@@ -105,7 +105,7 @@ public:
     static ScriptVehicleRandomizer *GetInstance ();
 
     /// Returns a random id with which the given vehicle can be replaced
-    int ProcessVehicleChange (int id, float &x, float &y, float &z);
+    //int ProcessVehicleChange (int id, float &x, float &y, float &z);
 
     /// Returns if the EOTL pos fixed is enabled
     bool
@@ -122,7 +122,7 @@ public:
     }
 
     /// Returns if a vehicle matches a certain pattern
-    bool DoesVehicleMatchPattern (int vehicle, int pattern);
+    //bool DoesVehicleMatchPattern (int vehicle, int pattern);
 
     /// Initialises Hooks/etc.
     void Initialise ();

@@ -21,7 +21,9 @@ GxtRandomizer *GxtRandomizer::mInstance = nullptr;
 void
 GxtRandomizer::Initialise ()
 {
-    if (!ConfigManager::GetInstance ()->GetConfigs ().lang.enabled)
+    if (!ConfigManager::ReadConfig ("LanguageRandomizer", 
+            std::pair("MinTimeBeforeTextChange", &m_Config.MinTime),
+            std::pair("MaxTimeBeforeTextChange", &m_Config.MaxTime)))
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised GxtRandomizer");
@@ -160,7 +162,6 @@ GxtRandomizer::ReadDatEntry (std::istream &in, uint32_t crc32)
 /*******************************************************/
 char *__fastcall GxtRandomizer::GetTextHook (CText *text, void *edx, char *key)
 {
-    auto &   config  = ConfigManager::GetInstance ()->GetConfigs ().lang;
     uint32_t crcHash = CKeyGen::GetUppercaseKey (key);
 
     if (!m_StringTable.count (crcHash))
@@ -168,8 +169,8 @@ char *__fastcall GxtRandomizer::GetTextHook (CText *text, void *edx, char *key)
 
     auto &table = m_StringTable[crcHash];
 
-    if (config.MaxTimeBeforeTextChange == 0
-        || config.MinTimeBeforeTextChange == 0)
+    if (GxtRandomizer::m_Config.MaxTime == 0
+        || GxtRandomizer::m_Config.MinTime == 0)
         {
             return (char *) GetRandomElement (table).data ();
         }
@@ -178,10 +179,10 @@ char *__fastcall GxtRandomizer::GetTextHook (CText *text, void *edx, char *key)
                       + time (NULL)
                             / ((crcHash
                                 % (std::max (
-                                    config.MaxTimeBeforeTextChange
-                                        - config.MinTimeBeforeTextChange,
+                                    GxtRandomizer::m_Config.MaxTime
+                                        - GxtRandomizer::m_Config.MinTime,
                                     1)))
-                               + std::max (config.MinTimeBeforeTextChange, 1)))
+                               + std::max (GxtRandomizer::m_Config.MinTime, 1)))
                  % table.size ()]
         .data ();
 }

@@ -65,11 +65,10 @@ GetWeaponInfo (int weaponId, char skill)
 int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
                                     int ammo, int slot)
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
 
     int original_slot = -1;
     if (weapon != 0
-        && !(FindPlayerPed () == thisPed && !config.playerRandomization))
+        && !(FindPlayerPed () == thisPed && !WeaponRandomizer::m_Config.RandomizePlayerWeapons))
         {
             int target_slot = GetWeaponInfo (weapon, 1)[5];
 
@@ -122,9 +121,8 @@ void __fastcall Opcode1B9Fix (CRunningScript *scr, void *edx, short count)
 void
 WeaponRandomizer::Initialise ()
 {
-
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("WeaponRandomizer",
+            std::pair("RandomizePlayerWeapons", &m_Config.RandomizePlayerWeapons)))
         return;
 
     // CPed::GiveWeapon
@@ -167,10 +165,9 @@ WeaponRandomizer::DestroyInstance ()
 int
 WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy)
 {
-    auto &config = ConfigManager::GetInstance ()->GetConfigs ().weapon;
 
     int slot = GetWeaponInfo (weapon, 1)[5];
-    for (auto pattern : config.patterns)
+    /*for (auto pattern : config.patterns)
         {
             if ((pattern.weapon == -1 || pattern.weapon == weapon)
                 && (pattern.ped == -1
@@ -192,8 +189,8 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy)
                                 }
 
                             return weapon;
-                        }
-                    int              weapon;
+                        }*/
+                    //int              weapon;
                     std::vector<int> buggy_weapons;
                     if (ignoreBuggy)
                         {
@@ -214,24 +211,16 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy)
                                        buggy_weapons.end (), weapon)
                                     != buggy_weapons.end ()
 
-                                || std::find (pattern.denied.begin (),
+/*                                || std::find (pattern.denied.begin (),
                                               pattern.denied.end (), weapon)
-                                       != pattern.denied.end ()))
+                                       != pattern.denied.end ()*/))
                         ;
 
                     return weapon;
                 }
-        }
-    return weapon;
-}
-
-/*******************************************************/
-// Currently irrelevant pls ignore
-int
-WeaponRandomizer::GetRandomPickup (CPed *ped, int weapon, bool ignoreBuggy)
-{
-    return weapon;
-}
+        //}
+    //return weapon;
+//}
 
 /*******************************************************/
 WeaponRandomizer *

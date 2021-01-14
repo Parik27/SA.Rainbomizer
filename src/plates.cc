@@ -39,8 +39,7 @@ GetNewPlateText (char *buf, int len)
 void
 LicensePlateRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().licensePlate;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("LicensePlateRandomizer"))
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised LicensePlateRandomizer");

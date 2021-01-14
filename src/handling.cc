@@ -27,6 +27,7 @@
 
 HandlingRandomizer *HandlingRandomizer::mInstance = nullptr;
 
+// This does literally nothing lul
 /*******************************************************/
 void __fastcall RandomizeHandling (CVehicle *vehicle, void *edx, CPed *ped) {}
 
@@ -34,8 +35,7 @@ void __fastcall RandomizeHandling (CVehicle *vehicle, void *edx, CPed *ped) {}
 void
 HandlingRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().handling;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("HandlingRandomizer"))
         return;
 
     RegisterHooks ({{HOOK_CALL, 0x64BB57, (void *) &RandomizeHandling}});

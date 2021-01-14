@@ -18,7 +18,6 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
                  char pickupType, int ammo, unsigned int moneyPerDay,
                  char isEmpty, char *message)
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().pickups;
 
     if (modelId != 1212 && modelId != 367 && modelId != 344 && modelId != 366
         && modelId != 371 && modelId != 363 && modelId != 953 && modelId != 954
@@ -47,9 +46,7 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
 void
 PickupsRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().pickups;
-
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("PickupsRandomizer"))
         return;
 
     for (int address :
@@ -61,7 +58,7 @@ PickupsRandomizer::Initialise ()
 
     // Dead peds
     injector::MakeCALL (0x4573C2, &RandomizePickup);
-    injector::MakeCALL (0x156DF52, &RandomizePickup);
+    //injector::MakeCALL (0x156DF52, &RandomizePickup);
 
     Logger::GetLogger ()->LogMessage ("Intialised PickupsRandomizer");
 }

@@ -4,20 +4,10 @@
 #include "logger.hh"
 #include "injector/injector.hpp"
 #include "util/loader.hh"
+#include "injector/calling.hpp"
+#include "config.hh"
 
 PedRandomizer *PedRandomizer::mInstance = nullptr;
-
-std::vector<std::string> PedRandomizer::special_models
-    = {"TRUTH",  "MACCER", "TENPEN",  "PULASKI", "HERN",    "DWAYNE",
-       "SMOKE",  "SWEET",  "RYDER",   "FORELLI", "ROSE",    "PAUL",
-       "CESAR",  "OGLOC",  "WUZIMU",  "TORINO",  "JIZZY",   "MADDOGG",
-       "CAT",    "CLAUDE", "RYDER2",  "RYDER3",  "EMMET",   "ANDRE",
-       "KENDL",  "JETHRO", "ZERO",    "TBONE",   "SINDACO", "JANITOR",
-       "BBTHIN", "SMOKEV", "GUNGRL2", "COPGRL2", "NURGRL2", "CROGRL2",
-       "BB",     "SUZIE",  "PSYCHO"};
-
-std::string nsfw_models[8] = {"GANGRL1", "MECGRL1", "GUNGRL1", "COPGRL1",
-                              "NURGRL1", "CROGRL1", "GANGRL2", "COPGRL2"};
 
 /*******************************************************/
 int
@@ -44,6 +34,9 @@ void __fastcall PedRandomizer::RandomizeGenericPeds (CCivilianPed *ped,
     if (ms_aInfoForModel[newModel].m_nLoadState != 1 || IsSpecialModel (model))
         newModel = model;
 
+    Logger::GetLogger ()->LogMessage ("Ped: " + std::to_string (model) + ", "
+                                      + std::to_string (newModel));
+
     ped->CivilianPed (type, newModel);
 }
 /*******************************************************/
@@ -58,6 +51,9 @@ void __fastcall PedRandomizer::RandomizeCopPeds (CPed *ped, void *edx,
     // Final checks before spawning
     if (ms_aInfoForModel[newModel].m_nLoadState != 1)
         newModel = modelIndex;
+
+    Logger::GetLogger ()->LogMessage ("Cop: " + std::to_string (modelIndex)
+                                      + ", " + std::to_string (newModel));
 
     ped->SetModelIndex (newModel);
 }
@@ -97,9 +93,22 @@ PedRandomizer::IsSpecialModel (int model)
     return false;
 }
 /*******************************************************/
+void __stdcall ForceCopType (int pedType, int *modelIndex)
+{
+    if (pedType == 6 && *modelIndex == 283)
+        *modelIndex = 280;
+    
+    HookManager::CallOriginal<injector::stdcall<int (int, int *)>,
+        0x464F50> (pedType, modelIndex);
+}
+
+/*******************************************************/
 void
 PedRandomizer::Initialise ()
 {
+    if (!ConfigManager::ReadConfig ("PedRandomizer"))
+        return;
+
     // If Generic Peds Enabled
     for (int addr :
          {0x444E02, 0x445638, 0x461580, 0x4675DA, 0x469CDB, 0x47D8E6, 0x4833BC,
@@ -108,10 +117,6 @@ PedRandomizer::Initialise ()
 
     injector::MakeJMP (0x60FFD0, ChooseRandomPedToLoad);
 
-    // If NSFW enabled
-    for (std::string &model : nsfw_models)
-        special_models.push_back (model);
-
     // If Special Models Enabled
     injector::MakeJMP (0x40B45E, RandomizeSpecialModels);
 
@@ -119,6 +124,12 @@ PedRandomizer::Initialise ()
     for (int addr :
          {0x5DDD8A, 0x5DDD96, 0x5DDDD6, 0x5DDE16, 0x5DDE54, 0x5DDCB0})
         injector::MakeCALL (addr, RandomizeCopPeds);
+
+    // If NSFW enabled
+    for (std::string &model : nsfw_models)
+        special_models.push_back (model);
+
+    RegisterHooks ({{HOOK_CALL, 0x469C64, (void *) &ForceCopType}});
 
     Logger::GetLogger ()->LogMessage ("Intialised PedRandomizer");
 }

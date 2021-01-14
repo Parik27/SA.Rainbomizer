@@ -30,6 +30,12 @@ class ParkedCarRandomizer
 {
     static ParkedCarRandomizer *mInstance;
 
+    static inline struct Config
+    {
+        bool RandomizeFixedSpawns;
+        bool RandomizeRandomSpawns;
+    } m_Config;
+
     ParkedCarRandomizer (){};
     static void DestroyInstance ();
 

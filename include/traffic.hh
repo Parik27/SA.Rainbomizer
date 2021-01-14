@@ -62,6 +62,21 @@ class TrafficRandomizer
     void FixTrainSpawns ();
 
 public:
+
+    static inline struct Config
+    {
+        int ForcedVehicleID;
+
+        bool Trains;
+        bool Boats;
+        bool Aircraft;
+        bool Cars;
+        bool Bikes;
+        bool Trailers;
+
+        int DefaultModel;
+    } m_Config;
+
     /// Initialises Hooks/etc.
     void Initialise ();
 

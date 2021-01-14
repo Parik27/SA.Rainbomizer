@@ -27,9 +27,7 @@ RandomizeRespawnPoint (float x, float y, float z, RwV3d *a4, float *a5)
 void
 RespawnPointRandomizer::Initialise ()
 {
-
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().respawnPoint;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("RespawnPointRandomizer"))
         return;
 
     RegisterHooks ({{HOOK_CALL, 0x44331B, (void *) &RandomizeRespawnPoint},

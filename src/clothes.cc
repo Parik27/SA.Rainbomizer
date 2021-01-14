@@ -16,70 +16,61 @@ ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 void
 HandleClothesChange ()
 {
-    if (CGame::bMissionPackGame)
+    if (CGame::bMissionPackGame || FindPlayerVehicle())
         return;
 
-    for (int i = 0; i < 17; i++)
+	if (random (100) >= 0)
         {
-            if (random (100) >= 50)
+            // Special/generic models
+
+            int model = 0;
+            while ((model = random (299)),
+                   PedRandomizer::IsModelBlacklisted (model))
+                ;
+
+            if (PedRandomizer::IsSpecialModel (model))
                 {
-                    // Special/generic models
+                    model = 298;
 
-                    int model = 0;
-                    while ((model = random (299)),
-                           PedRandomizer::IsModelBlacklisted (model))
-                        ;
-
-                    if (PedRandomizer::IsSpecialModel (model))
-                        {
-                            model = 298;
-
-                            CStreaming::RequestSpecialModel (
-                                model,
-                                PedRandomizer::special_models
-                                    [random (
-                                         PedRandomizer::special_models.size ()
-                                         - 1)]
-                                        .c_str (),
-                                1);
-                        }
-                    else
-                        {
-                            CStreaming::RequestModel (model, 1);
-                        }
-
-                    CStreaming::LoadAllRequestedModels (false);
-
-                    if (ms_aInfoForModel[model].m_nLoadState != 1)
-                        model = 0;
-
-                    Logger::GetLogger ()->LogMessage ("Player Model: "
-                                                      + std::to_string (model));
-
-                    Scrpt::CallOpcode (0x09C7, "set_player_model",
-                                       GlobalVar (2), model);
+                    CStreaming::RequestSpecialModel (
+                        model,
+                        PedRandomizer::special_models
+                            [random (PedRandomizer::special_models.size () - 1)]
+                                .c_str (),
+                        1);
                 }
             else
                 {
-                    // CJ Clothes
+                    CStreaming::RequestModel (model, 1);
+                }
 
-                    Scrpt::CallOpcode (0x09C7, "set_player_model",
-                                       GlobalVar (2), 0);
+            CStreaming::LoadAllRequestedModels (false);
 
-                    for (int i = 0; i < 17; i++)
-                        {
-                            auto cloth = ClothesRandomizer::GetInstance ()
-                                             ->GetRandomCRCForComponent (i);
+            if (ms_aInfoForModel[model].m_nLoadState != 1)
+                model = 0;
 
-                            Scrpt::CallOpcode (0x784,
-                                               "set_player_model_tex_crc",
-                                               GlobalVar (2), cloth.second,
-                                               cloth.first, i);
-                            Scrpt::CallOpcode (0x070D, "rebuild_player",
-                                               GlobalVar (2));
-                        }
+            Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2),
+                               model);
+        }
+    else
+        {
+            // CJ Clothes
+
+            Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2), 0);
+
+            for (int i = 0; i < 17; i++)
+                {
+                    auto cloth = ClothesRandomizer::GetInstance ()
+                                     ->GetRandomCRCForComponent (i);
+
+                    Scrpt::CallOpcode (0x784, "set_player_model_tex_crc",
+                                       GlobalVar (2), cloth.second, cloth.first,
+                                       i);
                 }
         }
+
+    Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
+    CStreaming::LoadAllRequestedModels (false);
 }
 
 /*******************************************************/
@@ -122,6 +113,17 @@ ClothesRandomizer::FixChangingClothes (int modelId, uint32_t *newClothes,
     Call<0x5A81E0> (model, newClothes, oldClothes, CutscenePlayer);
 }
 /*******************************************************/
+int __fastcall ClothesRandomizer::FixAnimCrash (uint32_t *anim, void *edx,
+                                                int arg0, int animGroup)
+{
+    Logger::GetLogger ()->LogMessage (std::to_string (animGroup));
+
+    if (animGroup > 0)
+        animGroup = 0;
+
+    return CallMethodAndReturn<int, 0x6E3D10> (anim, arg0, animGroup);
+}
+/*******************************************************/
 std::pair<int, int>
 ClothesRandomizer::GetRandomCRCForComponent (int componentId)
 {
@@ -139,8 +141,7 @@ ClothesRandomizer::GetRandomCRCForComponent (int componentId)
 void
 ClothesRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().clothes;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("PlayerRandomizer"))
         return;
 
     mInitialised = false;
@@ -148,6 +149,11 @@ ClothesRandomizer::Initialise ()
     FadesManager::AddFadeCallback (HandleClothesChange);
     injector::MakeCALL (0x5A834D, FixChangingClothes);
     injector::MakeCALL (0x5A82AF, FixChangingClothes);
+
+
+    for (int addr : {0x64561B, 0x64C3FE, 0x64E7EE, 0x64EA43, 0x64EB0F, 0x64FD1E,
+                     0x64FD57, 0x64FE54})
+        injector::MakeCALL (addr, FixAnimCrash);
 
     Logger::GetLogger ()->LogMessage ("Intialised ClothesRandomizer");
 }

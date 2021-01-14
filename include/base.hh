@@ -50,9 +50,9 @@ struct GamePathA
 };
 
 char *      GetGameDirRelativePathA (const char *subpath);
-std::string GetRainbomizerFileName (std::string name);
-FILE *      OpenRainbomizerFile (std::string name, std::string mode);
-void        CreateRainbomizerFolder ();
+std::string GetRainbomizerFileName (std::string name, std::string subdirs = "");
+FILE *      OpenRainbomizerFile (std::string name, std::string mode, std::string subdirs = "");
+FILE *GetRainbomizerDataFile (const std::string &name, const std::string &mode = "r");
 
 bool VerifyGameVersion ();
 

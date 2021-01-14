@@ -15,6 +15,11 @@ public:
     /// Returns the static instance for WeaponRandomizer.
     static WeaponRandomizer *GetInstance ();
 
+    static inline struct Config
+    {
+        bool RandomizePlayerWeapons;
+    } m_Config;
+
     int GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy);
     int GetRandomPickup (CPed *ped, int weapon, bool ignoreBuggy);
 

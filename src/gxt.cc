@@ -26,8 +26,8 @@ GxtRandomizer::Initialise ()
 
     Logger::GetLogger ()->LogMessage ("Intialised GxtRandomizer");
 
-    RegisterHooks ({{HOOK_JUMP, 0x6A0050, (void *) GetTextHook}});
-    InitialiseStringTable ();
+    if (InitialiseStringTable ())
+        RegisterHooks ({{HOOK_JUMP, 0x6A0050, (void *) GetTextHook}});
 }
 
 /*******************************************************/
@@ -51,18 +51,24 @@ GxtRandomizer::GetInstance ()
 }
 
 /*******************************************************/
-void
+bool
 GxtRandomizer::InitialiseStringTable ()
 {
-    for (auto &p : std::filesystem::recursive_directory_iterator ("text/"))
+    bool initialised = false;
+    for (auto &p : std::filesystem::recursive_directory_iterator (
+             GetGameDirRelativePathA ("text/")))
         {
             if (p.is_regular_file () && p.path ().has_extension ()
                 && p.path ().extension () == ".gxt")
                 {
                     std::ifstream file (p.path ().string (), std::ios::binary);
                     AddGxtFile (file);
+
+                    initialised = true;
                 }
         }
+
+    return initialised;
 }
 
 /*******************************************************/

@@ -19,7 +19,7 @@ class GxtRandomizer
     void ReadDatEntry (std::istream &i, uint32_t crc32);
     void ReadKeyTable (std::istream &i);
     void ReadStringTable (std::istream &i, uint32_t);
-    void InitialiseStringTable ();
+    bool InitialiseStringTable ();
     void AddGxtFile (std::istream &i);
 
     GxtRandomizer (){};

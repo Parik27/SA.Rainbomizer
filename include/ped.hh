@@ -1,6 +1,7 @@
 
 #pragma once
 #include "functions.hh"
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -11,10 +12,11 @@ class PedRandomizer
     PedRandomizer (){};
     static void DestroyInstance ();
 
-    static void __fastcall RandomizeGenericPeds (CCivilianPed *ped, void *edx,
-                                                 ePedType type, int model);
-    static void __fastcall RandomizeCopPeds (CPed *ped, void *edx,
-                                             int modelIndex);
+    static uint32_t GetRandomModelIndex (uint32_t originalIdx);
+
+    static void __fastcall RandomizePedModelIndex (CEntity *entity, void *,
+                                                   uint32_t index);
+
     static int  ChooseRandomPedToLoad ();
     static void RandomizeSpecialModels (int slot, const char *modelName,
                                         int flags);
@@ -26,7 +28,7 @@ public:
     /// Initialises Hooks/etc.
     void Initialise ();
 
-    static std::vector<std::string> special_models;
+    static std::vector<std::string> specialModels;
     static bool                     IsSpecialModel (int model);
-    static bool                     IsModelBlacklisted (int model);
+    static bool                     IsModelValidPedModel (int model);
 };

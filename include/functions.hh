@@ -475,6 +475,12 @@ public:
     CColModel *      m_pColModel;
     float            m_fDrawDistance;
     struct RwObject *m_pRwObject;
+
+    virtual void Destructor ();
+    virtual void AsAtomicModelInfoPtr ();
+    virtual void AsDamageAtomicModelInfoPtr ();
+    virtual void AsLodAtomicModelInfoPtr ();
+    virtual uint8_t  GetModelType ();
 };
 
 struct CClumpModelInfo : public CBaseModelInfo
@@ -960,12 +966,19 @@ float  randomFloat (float min, float max);
 
 template <typename T>
 auto &
-GetRandomElement (const T &container)
+GetRandomElement (T &container)
 {
     auto it = std::begin (container);
     std::advance (it, random (std::size (container) - 1));
 
     return *it;
+}
+
+template <typename T>
+auto &
+GetRandomElement (T* container, uint32_t size)
+{
+    return container[random (size - 1)];
 }
 
 CMatrix *RwFrameGetLTM (void *frame);

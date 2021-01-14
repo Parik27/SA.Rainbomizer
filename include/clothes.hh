@@ -18,6 +18,10 @@ class ClothesRandomizer
     static void FixChangingClothes (int modelId, uint32_t *newClothes,
                                     uint32_t *oldClothes, bool CutscenePlayer);
 
+    static void RandomizePlayerClothes ();
+    static void RandomizePlayerModel ();
+    static void HandleClothesChange ();
+
 public:
     /// Returns the static instance for ClothesRandomizer.
     static ClothesRandomizer *GetInstance ();

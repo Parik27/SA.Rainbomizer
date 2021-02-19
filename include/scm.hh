@@ -32,6 +32,7 @@ struct CRunningScript;
 
 void *RandomizeCarForScript (int model, float x, float y, float z,
                              bool createdBy);
+void  SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed);
 void *FixCarDoorCrash (uint8_t *vehicle, int index, int door);
 void  RevertVehFixes (int vehicle);
 short FixCWPacker (void *script, void *edx, short count);
@@ -75,7 +76,6 @@ class ScriptVehicleRandomizer
 
     bool        mPosFixEnabled          = false;
     int         mSanchezDrivingOverride = -1;
-    std::string mLastThread;
 
     eDoorCheckError DoesVehicleHaveEnoughDoors (int modelA, int modelB);
 
@@ -84,8 +84,8 @@ class ScriptVehicleRandomizer
 public:
 
     uint8_t mSeatsCache[212];
+    std::string mLastThread;
 
-    void SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed);
     void ApplyEOTLFixes (int newFiretruck);
 
     void

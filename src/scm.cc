@@ -37,12 +37,12 @@ const int MODEL_SANCHZ = 468;
 
 /*******************************************************/
 void
-ScriptVehicleRandomizer::SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
+SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
 {
     //uint16_t modelIndex = *reinterpret_cast<uint16_t *> (vehicle + 0x22);
 
     if (speed < 1.1 && speed > 0.9
-        && mLastThread == "desert9")
+        && ScriptVehicleRandomizer::GetInstance()->mLastThread == "desert9")
         speed = 0.7;
 
     CVehicleRecording::SetPlaybackSpeed (vehicle, speed);

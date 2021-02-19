@@ -24,13 +24,14 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <unordered_map>
+#include "scm_patterns.hh"
 
 struct CMatrix;
 struct CRunningScript;
 
 void *RandomizeCarForScript (int model, float x, float y, float z,
                              bool createdBy);
-void  SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed);
 void *FixCarDoorCrash (uint8_t *vehicle, int index, int door);
 void  RevertVehFixes (int vehicle);
 short FixCWPacker (void *script, void *edx, short count);
@@ -57,16 +58,6 @@ enum eVehicleApperance
     VEHICLE_APPEARANCE_RC
 };
 
-struct CachedPattern
-{
-    int                   pattern;
-    std::string           thread;
-    int                   coords[3];
-    int                   move[4];
-    std::vector<uint16_t> cars;
-    bool                  seat_check;
-};
-
 enum eDoorCheckError
 {
     ERR_FALSE,
@@ -77,8 +68,7 @@ enum eDoorCheckError
 class ScriptVehicleRandomizer
 {
     static ScriptVehicleRandomizer *mInstance;
-    std::vector<CachedPattern>      mPatternCache;
-    uint8_t                         mSeatsCache[212];
+    static inline std::vector<ScriptVehiclePattern> mPatterns;
 
     ScriptVehicleRandomizer (){};
     static void DestroyInstance ();
@@ -89,10 +79,13 @@ class ScriptVehicleRandomizer
 
     eDoorCheckError DoesVehicleHaveEnoughDoors (int modelA, int modelB);
 
-    void CacheSeats ();
-    //void CachePatterns ();
+    void CachePatterns ();
 
 public:
+
+    uint8_t mSeatsCache[212];
+
+    void SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed);
     void ApplyEOTLFixes (int newFiretruck);
 
     void
@@ -105,7 +98,7 @@ public:
     static ScriptVehicleRandomizer *GetInstance ();
 
     /// Returns a random id with which the given vehicle can be replaced
-    //int ProcessVehicleChange (int id, float &x, float &y, float &z);
+    int ProcessVehicleChange (int id, float &x, float &y, float &z);
 
     /// Returns if the EOTL pos fixed is enabled
     bool
@@ -120,9 +113,6 @@ public:
     {
         mLastThread = thread;
     }
-
-    /// Returns if a vehicle matches a certain pattern
-    //bool DoesVehicleMatchPattern (int vehicle, int pattern);
 
     /// Initialises Hooks/etc.
     void Initialise ();

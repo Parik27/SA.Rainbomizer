@@ -28,6 +28,7 @@
 #include "config.hh"
 #include <cmath>
 #include <unordered_map>
+#include "scm_patterns.hh"
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
@@ -36,13 +37,12 @@ const int MODEL_SANCHZ = 468;
 
 /*******************************************************/
 void
-SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
+ScriptVehicleRandomizer::SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
 {
-    uint16_t modelIndex = *reinterpret_cast<uint16_t *> (vehicle + 0x22);
+    //uint16_t modelIndex = *reinterpret_cast<uint16_t *> (vehicle + 0x22);
 
     if (speed < 1.1 && speed > 0.9
-        && (CModelInfo::IsHeliModel (modelIndex)
-            || CModelInfo::IsPlaneModel (modelIndex)))
+        && mLastThread == "desert9")
         speed = 0.7;
 
     CVehicleRecording::SetPlaybackSpeed (vehicle, speed);
@@ -125,10 +125,11 @@ ApplyFixesBasedOnModel (int model, int newModel)
 void *
 RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
 {
-    int newModel = 500; /*ScriptVehicleRandomizer::GetInstance
+    /*int newModel = 500;*/ 
+    int newModel = ScriptVehicleRandomizer::GetInstance
                            ()->ProcessVehicleChange (model,
                                                                          x, y,
-                                                                         z);*/
+                                                                         z);
 
     ApplyFixesBasedOnModel (model, newModel);
 
@@ -169,103 +170,20 @@ int16_t __fastcall UpdateLastThread (CRunningScript *script, void *edx,
 }
 
 /*******************************************************/
-//int
-//ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
-//                                               float &z)
-//{
-//    for (auto pattern : mPatternCache)
-//        {
-//            if (DoesVehicleMatchPattern (id, pattern.pattern)
-//                && CompareCoordinates (x, y, z, pattern.coords[0],
-//                                       pattern.coords[1], pattern.coords[2])
-//                && (pattern.thread == "" || pattern.thread == mLastThread))
-//                {
-//                    // Update x,y,z coordinates
-//                    x += pattern.move[0];
-//                    y += pattern.move[1];
-//                    z += pattern.move[2];
-//
-//                    std::vector<uint16_t> vehicles;
-//                    if (pattern.seat_check)
-//                        {
-//                            for (auto vehicle : pattern.cars)
-//                                {
-//                                    if (mSeatsCache[id - 400]
-//                                        <= mSeatsCache[vehicle - 400])
-//                                        vehicles.push_back (vehicle);
-//                                }
-//                        }
-//                    else
-//                        vehicles = pattern.cars;
-//
-//                    if (vehicles.size () > 0)
-//                        return vehicles[random (vehicles.size () - 1)];
-//
-//                    Logger::GetLogger ()->LogMessage (
-//                        "Pattern yielded no valid vehicles");
-//                }
-//        }
-//    return id;
-//}
-
-/*******************************************************/
-//bool
-//ScriptVehicleRandomizer::DoesVehicleMatchPattern (int vehicle, int pattern)
-//{
-//    uint8_t *modelInfo = (uint8_t *) ms_modelInfoPtrs[vehicle];
-//    uint32_t type      = *(uint32_t *) (modelInfo + 0x3C);
-//
-//    if (pattern == VEHICLE_ALL)
-//        return true;
-//
-//    if (pattern < 12)
-//        {
-//            if (type == pattern)
-//                return true;
-//        }
-//    else if (pattern < 18)
-//        {
-//            switch (pattern)
-//                {
-//                case VEHICLE_APPEARANCE_PLANE:
-//                    if (type == VEHICLE_PLANE || type == VEHICLE_FPLANE)
-//                        return true;
-//                    break;
-//
-//                case VEHICLE_APPEARANCE_BOAT:
-//                    if (type == VEHICLE_BOAT)
-//                        return true;
-//                    break;
-//
-//                case VEHICLE_APPEARANCE_HELI:
-//                    if (type == VEHICLE_HELI || type == VEHICLE_FHELI)
-//                        return true;
-//                    break;
-//
-//                case VEHICLE_APPEARANCE_BIKE:
-//                    if (type == VEHICLE_BMX || type == VEHICLE_BIKE)
-//                        return true;
-//                    break;
-//
-//                case VEHICLE_APPEARANCE_RC:
-//                    if (CModelInfo::IsRCModel (vehicle))
-//                        return true;
-//                    break;
-//
-//                default:
-//                    if (type != VEHICLE_BMX && type != VEHICLE_BIKE
-//                        && type != VEHICLE_FPLANE && type != VEHICLE_HELI
-//                        && type != VEHICLE_BOAT && type != VEHICLE_FPLANE
-//                        && type != VEHICLE_PLANE && type != VEHICLE_TRAIN
-//                        && type != VEHICLE_TRAILER)
-//                        return true;
-//                }
-//        }
-//    else
-//        return pattern == vehicle;
-//
-//    return false;
-//}
+int
+ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
+                                               float &z)
+{
+    Vector3 pos = {x, y, z};
+    for (auto pattern : mPatterns)
+        {
+            if (pattern.MatchVehicle(id, mLastThread, pos))
+                {
+                    return pattern.GetRandom (pos);
+                }
+        }
+    return random(400, 611);
+}
 
 /*******************************************************/
 bool
@@ -476,89 +394,89 @@ ScriptVehicleRandomizer::Initialise ()
 void
 ScriptVehicleRandomizer::InitialiseCache ()
 {
-    this->CacheSeats ();
-    /*this->CachePatterns ();*/
+    CacheSeats ();
+    this->CachePatterns ();
 
     Logger::GetLogger ()->LogMessage ("Initialised Script Vehicles cache");
 }
 
 /*******************************************************/
 void
-ScriptVehicleRandomizer::CacheSeats ()
+ScriptVehicleRandomizer::CachePatterns ()
 {
-    for (int i = 0; i < 212; i++)
+    FILE *vehPatternsFile = OpenRainbomizerFile ("Vehicle_Patterns.txt", "r", "data/");
+    if (vehPatternsFile)
         {
-            auto err = StreamingManager::AttemptToLoadVehicle (i + 400);
-            if (err != ERR_FAILED)
+            char line[2048] = {0};
+            while (fgets (line, 2048, vehPatternsFile))
                 {
-                    mSeatsCache[i] = CModelInfo::
-                        GetMaximumNumberOfPassengersFromNumberOfDoors (i + 400);
+                    if (line[0] == '#' || strlen (line) < 10)
+                        continue;
 
-                    if (err != ERR_ALREADY_LOADED)
-                        CStreaming::RemoveModel (i + 400);
-                    continue;
+                    char threadName[64]  = {0};
+                    char vehicleName[64] = {0};
+                    char flags[256]      = {0};
+                    int  seats           = 0;
+                    char cars            = 'N';
+                    char bikes           = 'N';
+                    char bicycles        = 'N';
+                    char quadbikes       = 'N';
+                    char planes          = 'N';
+                    char helicopters     = 'N';
+                    char boats           = 'N';
+                    char trains          = 'N';
+                    char trailers        = 'N';
+
+                    Vector3 altCoords = {0.0, 0.0, 0.0};
+
+                    sscanf (line,
+                            "%s %s %d %c %c %c %c %c %c %c %c %c %s "
+                            "%f %f %f",
+                            threadName, vehicleName, &seats, &cars, &bikes,
+                            &bicycles, &quadbikes, &planes, &helicopters, &boats,
+                            &trains, &trailers, flags, &altCoords.x, &altCoords.y, &altCoords.z);
+
+                    for (int i = 0; i < 64; i++)
+                    {
+                        threadName[i] = NormaliseChar (threadName[i]);
+                        vehicleName[i] = NormaliseChar (vehicleName[i]);
+                    }
+
+                    ScriptVehiclePattern pattern;
+                    pattern.SetOriginalVehicle (vehicleName);
+                    pattern.SetSeatsCheck (seats);
+                    pattern.SetThreadName (threadName);
+
+                    pattern.SetAllowedTypes (
+                        {cars == 'Y', bikes == 'Y', bicycles == 'Y',
+                         quadbikes == 'Y', planes == 'Y', helicopters == 'Y', 
+                         boats == 'Y', trains == 'Y', trailers == 'Y'});
+
+                    pattern.SetMovedTypes (
+                        {cars == 'C', bikes == 'C', bicycles == 'C',
+                         quadbikes == 'C', planes == 'C', helicopters == 'C', 
+                         boats == 'C',  trains == 'C', trailers == 'C'});
+
+                    pattern.SetMovedCoordinates (altCoords);
+                    pattern.ParseFlags (flags);
+
+                    pattern.Cache ();
+
+                    mPatterns.push_back(pattern);
+
+                    //mModels.push_back (std::vector<std::string> ());
+                    //line[strcspn (line, "\n")] = 0;
+                    //mModels.back ().push_back (line);
                 }
-
-            mSeatsCache[i] = 3; // fallback (safest)
-            Logger::GetLogger ()->LogMessage ("Unable to cache seats for model "
-                                              + std::to_string (i));
+        }
+    else if (!vehPatternsFile)
+        {
+            // Log a message if file wasn't found
+            Logger::GetLogger ()->LogMessage (
+                "Failed to read file: rainbomizer/data/Vehicle_Patterns.txt");
+            return;
         }
 }
-
-/*******************************************************/
-//void
-//ScriptVehicleRandomizer::CachePatterns ()
-//{
-//    for (auto &pattern : config.patterns)
-//        {
-//            CachedPattern cache;
-//            memcpy (cache.coords, pattern.coords, sizeof (cache.coords));
-//            memcpy (cache.move, pattern.move, sizeof (cache.move));
-//            cache.thread     = pattern.thread;
-//            cache.pattern    = pattern.vehicle;
-//            cache.seat_check = pattern.seat_check;
-//
-//            bool vehicleMask[212] = {0};
-//            auto updateMask = [&] (const std::vector<int16_t> &v, bool val) {
-//                for (auto i : v)
-//                    {
-//                        if (i >= 400)
-//                            vehicleMask[i - 400] = val;
-//                        else
-//                            {
-//                                for (int j = 0; j < 212; j++)
-//                                    {
-//                                        if (DoesVehicleMatchPattern (j + 400,
-//                                                                     i))
-//                                            vehicleMask[j] = val;
-//                                    }
-//                            }
-//                    }
-//            };
-//            updateMask (pattern.allowed, true);
-//            updateMask (pattern.denied, false);
-//
-//            // If the vehicle matched is a static vehicle, cache the seats
-//            if (cache.pattern >= 400 && cache.seat_check)
-//                {
-//                    for (int i = 0; i < 212; i++)
-//                        {
-//                            if (mSeatsCache[cache.pattern - 400]
-//                                > mSeatsCache[i])
-//                                vehicleMask[i] = false;
-//                        }
-//                    cache.seat_check = false;
-//                }
-//
-//            for (int i = 0; i < 212; i++)
-//                {
-//                    if (vehicleMask[i])
-//                        cache.cars.push_back (i + 400);
-//                }
-//
-//            this->mPatternCache.push_back (cache);
-//        }
-//}
 
 /*******************************************************/
 void

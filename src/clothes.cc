@@ -118,7 +118,7 @@ ClothesRandomizer::FixChangingClothes (int modelId, uint32_t *newClothes,
 int __fastcall ClothesRandomizer::FixAnimCrash (uint32_t *anim, void *edx,
                                                 int arg0, int animGroup)
 {
-    Logger::GetLogger ()->LogMessage (std::to_string (animGroup));
+    //Logger::GetLogger ()->LogMessage (std::to_string (animGroup));
 
     if (animGroup > 0)
         animGroup = 0;

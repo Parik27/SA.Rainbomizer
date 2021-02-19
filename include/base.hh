@@ -148,6 +148,19 @@ public:
 };
 
 /*******************************************************/
+constexpr char
+NormaliseChar (const char c)
+{
+    if (c >= 'A' && c <= 'Z')
+        return c + ('a' - 'A');
+
+    else if (c == '\\')
+        return '/';
+
+    return c;
+}
+
+/*******************************************************/
 template <unsigned int address, typename... Args>
 void
 Call (Args... args)

@@ -213,7 +213,7 @@ ColourRandomizer::Initialise ()
             injector::MakeRangedNOP (0x50BF22 + 5, 0x50BF33);
         }
 
-    Logger::GetLogger ()->LogMessage ("Initialised ColourRandomizzer");
+    Logger::GetLogger ()->LogMessage ("Initialised ColourRandomizer");
 }
 
 /*******************************************************/

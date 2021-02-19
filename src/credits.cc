@@ -6,12 +6,12 @@
 #include "config.hh"
 #include "generalsettings.hh"
 
-std::vector<std::string> lead_devs = {"Parik", "GTAMadman"};
+std::vector<std::string> lead_devs = {"Parik", "GTA_Madman", "123robot"};
 
 std::vector<std::string> concept = {"NABN00B", "MrMateczko", "Veigar"};
 
 std::vector<std::string> contribs
-    = {"123robot", "iguana", "SpeedyFolf", "SRewo"};
+    = {"iguana", "opain-replika", "SpeedyFolf", "sisco0", "SRewo"};
 
 std::vector<std::string> beta_testers
     = {"Fryterp23", "Hugo_One", "Lordmau5", "Waris"};

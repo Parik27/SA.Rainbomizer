@@ -90,7 +90,11 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
     if (numSeats < m_nSeatCheck)
         return false;
 
-    if (mFlags.RC && !CModelInfo::IsRCModel(vehID))
+    if (mFlags.Guns && vehID != 425 && vehID != 430 && vehID != 432
+        && vehID != 447 && vehID != 464 && vehID != 476 && vehID != 520)
+        return false;
+
+    if (mFlags.RC && !CModelInfo::IsRCModel(vehID) && (CModelInfo::IsCarModel(vehID) || CModelInfo::IsHeliModel(vehID) || CModelInfo::IsPlaneModel(vehID)))
         return false;
     else if (mFlags.NoRC && CModelInfo::IsRCModel (vehID)) 
         return false;

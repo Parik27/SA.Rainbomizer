@@ -179,7 +179,11 @@ ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
         {
             if (pattern.MatchVehicle(id, mLastThread, pos))
                 {
-                    return pattern.GetRandom (pos);
+                    int newVehID = pattern.GetRandom (pos);
+                    x            = pos.x;
+                    y            = pos.y;
+                    z            = pos.z;
+                    return newVehID;
                 }
         }
     return random(400, 611);
@@ -468,6 +472,8 @@ ScriptVehicleRandomizer::CachePatterns ()
                     //line[strcspn (line, "\n")] = 0;
                     //mModels.back ().push_back (line);
                 }
+            Logger::GetLogger ()->LogMessage (
+                "Cached Script Vehicle Patterns.");
         }
     else if (!vehPatternsFile)
         {

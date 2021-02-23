@@ -144,6 +144,26 @@ struct Message
     char    _pad2[3];
 };
 
+struct cheattable
+{
+    char field_0x00[0x22];
+    bool CarsOnWater;
+    bool BoatsFly;
+    bool FatPlayer;
+    bool MaxMuscle;
+    bool SkinnyPlayer;
+    bool ElvisIsEverywhere;
+    bool PedsAttackYouWithRockets;
+    bool BeachParty;
+    bool GangMembersEverywhere;
+    bool GangsControlTheStreets;
+    bool NinjaTheme;
+    bool SlutMagnet;
+    bool CheapTraffic;
+    bool FastTraffic;
+    bool CarsFly;
+};
+
 struct CHud
 {
     static void SetMessage (char *str);

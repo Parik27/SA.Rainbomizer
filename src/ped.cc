@@ -18,7 +18,7 @@ std::vector<std::string> PedRandomizer::specialModels
        "CESAR",  "OGLOC",  "WUZIMU",  "TORINO",  "JIZZY",   "MADDOGG",
        "CAT",    "CLAUDE", "RYDER2",  "RYDER3",  "EMMET",   "ANDRE",
        "KENDL",  "JETHRO", "ZERO",    "TBONE",   "SINDACO", "JANITOR",
-       "BBTHIN", "SMOKEV", "GUNGRL2", "COPGRL2", "NURGRL2", "CROGRL2",
+       "BBTHIN", "SMOKEV", "GUNGRL2", "NURGRL2", "CROGRL2",
        "BB",     "SUZIE",  "PSYCHO"};
 
 /*******************************************************/

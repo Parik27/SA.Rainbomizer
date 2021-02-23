@@ -164,6 +164,12 @@ MaxTimeBeforeTextChange = 5 # seconds
 #######################################################
 [ScriptVehicleRandomizer]
 
+EnableExtraTimeForSchools = true
+
+# Allow certain vehicle checks for sub-missions or markers to be skipped so they can be activated with any vehicle
+
+LowriderMissions = true # (Lowrider Minigame, High Stakes Low-Rider)
+
 # Gives you any vehicle for every mission (You might not be able to proceed with missions with this enabled)
 SkipChecks = false
 )";

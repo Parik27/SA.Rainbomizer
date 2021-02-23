@@ -36,7 +36,7 @@ void  SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed);
 void *FixCarDoorCrash (uint8_t *vehicle, int index, int door);
 void  RevertVehFixes (int vehicle);
 short FixCWPacker (void *script, void *edx, short count);
-void __fastcall FixKSTCarCheck (CRunningScript *scr, void *edx, short count);
+void __fastcall FixCarChecks (CRunningScript *scr, void *edx, short count);
 void __fastcall FixJBCarHealth (CRunningScript *scr, void *edx, short vehicle);
 void __fastcall FixEOTLPosition (CMatrix *matrix, void *edx, CMatrix *attach,
                                  char link);
@@ -75,7 +75,8 @@ class ScriptVehicleRandomizer
     static void DestroyInstance ();
 
     bool        mPosFixEnabled          = false;
-    int         mSanchezDrivingOverride = -1;
+    int         mVehicleDrivingOverride = -1;
+    int         mOriginalTestTime       = 0;
 
     eDoorCheckError DoesVehicleHaveEnoughDoors (int modelA, int modelB);
 
@@ -83,15 +84,27 @@ class ScriptVehicleRandomizer
 
 public:
 
+    static inline struct Config
+    {
+        bool MoreSchoolTestTime = true;
+        bool SkipLowriderCheck = true;
+    } m_Config;
+
     uint8_t mSeatsCache[212];
     std::string mLastThread;
 
     void ApplyEOTLFixes (int newFiretruck);
 
     void
-    ApplyKSTFix (int newSanchez)
+    SaveTestTime (int time)
     {
-        mSanchezDrivingOverride = newSanchez;
+        mOriginalTestTime = time;
+    }
+
+    void
+    ApplyCarCheckFix (int newVehicle)
+    {
+        mVehicleDrivingOverride = newVehicle;
     };
 
     /// Returns the static instance for ScriptVehicleRandomizer.
@@ -118,10 +131,15 @@ public:
     void Initialise ();
     void InitialiseCache ();
 
-    /// Initialises Hooks/etc.
     int
-    GetKSTBike ()
+    GetNewCarForCheck ()
     {
-        return mSanchezDrivingOverride;
+        return mVehicleDrivingOverride;
+    }
+
+    int
+    GetOriginalTestTime ()
+    {
+        return mOriginalTestTime;
     }
 };

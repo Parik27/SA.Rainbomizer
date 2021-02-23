@@ -1,0 +1,253 @@
+#Thread	Original Vehicle	Seats	Cars	Bikes	Bicycles	Quadbikes	Planes	Helicopters	Boats	Trains	Trailers	Flags	Alternate Coordinates			Alt Coord Notes
+#													X	Y	Z	
+intro	Copcarla	4	Y	N	N	N	Y	Y	N	Y	N					
+lowr	Savanna	2	Y	Y	Y	Y	Y	Y	Y	Y	N					
+zero5	Rcbaron	1	Y	N	N	N	Y	Y	N	N	N	guns				
+intro1	Peren	2	Y	Y	Y	Y	Y	Y	Y	Y	N					
+intro1	Voodoo	2	Y	Y	Y	Y	Y	Y	N	N	N					
+intro1	Bmx	1	C	Y	Y	Y	C	C	N	N	N	x=971+y=-1115+z=23+smallplanes	-9	0	0	Player bike and Smoke bike are unimportant so only patterns for Sweet and Ryder
+intro1	Bmx	1	Y	Y	Y	Y	Y	Y	N	N	N	x=971+y=-1113+z=23+smallplanes				Player bike and Smoke bike are unimportant so only patterns for Sweet and Ryder
+intro2	Picador	2	Y	Y	N	Y	C	C	N	N	N	smallplanes	0	27	0	
+sweet1	Greenwoo	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+sweet3	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
+sweet3	Voodoo	2	Y	Y	N	Y	Y	Y	N	N	N					
+sweet2	Glendale	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+sweet4	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
+hoods5	Sentinel	1	Y	Y	Y	Y	Y	Y	N	N	N					
+sweet6	Savanna	2	Y	Y	Y	Y	Y	Y	N	N	N	x=2644+y=-2028+z=12+smallplanes				Added code to cancel entering mod shop
+sweet6	Savanna	2	Y	Y	Y	Y	Y	Y	Y	Y	N					
+sweet6	Remingtn	1	Y	Y	Y	Y	Y	Y	Y	Y	N					
+sweet7	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
+sweet7	Admiral	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+crash1	Voodoo	2	Y	Y	N	Y	Y	Y	N	N	N					
+drugs3	Banshee	1	Y	Y	Y	Y	Y	Y	N	N	N					
+guns1	Boxburg	2	Y	Y	N	Y	Y	Y	N	N	N	x=2476+y=-1679+z=12+smallplanes				
+guns1	Copcarla	2	Y	Y	N	Y	Y	Y	N	N	N					
+ryder3	Picador	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+ryder3	Greenwoo	4	Y	N	N	N	N	N	N	N	N					
+ryder2	Mule	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+ryder2	Forklift	1	N	N	N	N	N	N	N	N	N					
+ryder2	Mesa	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+ryder2	Patriot	2	Y	Y	N	Y	N	Y	N	N	N					
+twar7	Glendale	4	Y	N	N	N	N	Y	N	N	N					
+twar7	Pcj600	2	Y	Y	N	Y	N	C	N	N	N	x=2471+y=-1285+z=28	39	0	7	
+smoke2	Glendale	2	Y	N	N	N	C	C	N	N	N	smallplanes	22	0	0	
+smoke2	Sentinel	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+smoke3	Glendale	2	Y	Y	N	Y	C	C	N	N	N	x=2058+y=-1694+z=12+smallplanes	22	0	0	
+drugs1	Glendale	2	Y	Y	N	Y	C	C	N	N	N	x=2058+y=-1694+z=12+smallplanes	22	0	0	
+drugs1	Bf400	2	Y	Y	N	Y	N	N	N	N	N	rc				
+drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1374+y=-1394+z=13				
+drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1374+y=-1665+z=12				
+drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1373+y=-1633+z=12				
+drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1496+y=-1731+z=6				
+drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=2002+y=-1890+z=8				
+drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=2008+y=-1897+z=8				
+drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=2529+y=-1892+z=13				
+music1	Pony	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+music1	Voodoo	1	Y	Y	Y	Y	Y	Y	N	N	N					
+music1	Oceanic	1	Y	Y	Y	Y	Y	Y	N	N	N					
+music1	Esperant	1	Y	Y	Y	Y	Y	Y	N	N	N					
+music3	Elegant	4	Y	N	N	N	N	N	N	N	N					
+music5	Greenwoo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+music5	Voodoo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+music5	Tahoma	4	Y	N	N	N	N	N	N	N	N	x=2224+y=-1677+z=13				
+music5	Tahoma	4	Y	N	N	N	N	N	N	N	N	x=2227+y=-1667+z=13				
+cprace	Blade	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Savanna	2	Y	Y	N	Y	N	N	N	N	N					
+cprace	Majestic	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Remingtn	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Nrg500	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Pcj600	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Bf400	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Fcr900	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Sunrise	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Blistac	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Windsor	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Uranus	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Sentinel	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Supergt	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Bullet	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Buffalo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Banshee	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Cheetah	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Turismo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Infernus	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Elegy	2	Y	Y	N	Y	N	N	N	N	N					
+cprace	Stunt	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
+cprace	Rustler	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
+cprace	Hydra	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
+cprace	Maverick	1	N	N	N	N	C	Y	N	N	N	smallplanes	46	-39	0	
+cprace	Vcnmav	1	N	N	N	N	Y	Y	N	N	N	smallplanes				
+cprace	Hunter	1	N	N	N	N	Y	Y	N	N	N	vtol				
+cprace	Bandito	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Kart	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Alpha	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Phoenix	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Flash	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Club	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Jester	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Zr350	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Sultan	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Sanchez	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Sabre	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Stallion	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Hotring	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Hotrina	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Hotrinb	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cesar1	Savanna	2	Y	Y	N	Y	Y	Y	N	N	N	x=1793+y=-2138+z=12				
+cesar1	Savanna	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+drugs4	Greenwoo	4	Y	N	N	N	N	Y	N	N	N	INCREASE HEIGHT AT SHOOTING				
+drugs4	Enforcer	2	Y	Y	N	Y	Y	Y	Y	Y	N					
+drugs4	Copcarla	2	Y	Y	N	Y	Y	Y	Y	Y	N					
+la1fin2	Bravura	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
+la1fin2	Pony	4	Y	N	N	N	N	Y	N	N	N					
+la1fin2	Sentinel	4	Y	N	N	N	N	Y	N	N	N	x=1582+y=-1043+z=22				
+bcrash1	Washing	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cat1	Quad	2	Y	Y	N	Y	Y	Y	N	N	N	x=235+y=-100+z=0+smallplanes				
+cat1	Quad	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cat2	Copcarru	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+cat2	Copbike	1	C	Y	Y	Y	C	C	N	N	N	x=2322+y=73+z=26+smallplanes	-1	18	0	Catalina's STB Bike
+cat2	Copbike	1	C	Y	Y	Y	C	C	N	N	N	x=2323+y=70+z=26+smallplanes	-30	0	0	CJ's STB Bike
+cat3	Petro	2	Y	N	N	N	N	N	N	N	N	canattach				
+cat3	Petrotr	1	N	N	N	N	N	N	N	N	Y	canattach				
+cat3	Sabre	2	Y	Y	N	Y	Y	Y	N	N	N					
+truth1	Combine	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-1023+y=-933+z=129+smallplanes				
+truth1	Walton	1	Y	Y	Y	Y	Y	N	N	N	Y	x=-1154+y=-1339+z=126+hovercraft				
+truth2	Camper	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+cprace	Fortune	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+bcesar4	Stallion	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+bcesar4	Sabre	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+bcesar4	Fortune	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+garag1	Emperor	4	Y	N	N	N	N	Y	N	N	N					
+garag1	Hotdog	1	Y	Y	Y	Y	Y	Y	N	N	N					
+scrash3	Zr350	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+scrash3	Buffalo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+scrash3	Merit	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+scrash2	Taxi	2	Y	Y	N	Y	N	N	N	N	N					
+wuzi1	Sentinel	4	Y	N	N	N	N	N	N	N	N	x=-2177+y=642+z=48				
+wuzi1	Sentinel	2	Y	Y	N	Y	N	N	N	N	N	x=-2245+y=715+z=48				
+wuzi1	Sentinel	2	Y	Y	N	Y	N	N	N	N	N	x=-2251+y=612+z=48				
+wuzi1	Sanchez	2	Y	Y	N	Y	Y	N	N	N	N					
+wuzi1	Sentinel	2	Y	Y	N	Y	Y	Y	N	N	N	x=-2267+y=659+z=48				
+farlie4	Manana	1	Y	Y	Y	Y	Y	N	N	N	N	x=-1425+y=-21+z=5+hovercraft				
+farlie4	Mule	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+farlie4	Mule	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	x=-1478+y=-470+z=10				
+farlie4	Mule	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	x=-1586+y=-359+z=10				
+farlie4	Fcr900	2	Y	Y	N	Y	N	N	N	N	N					
+farlie4	Manana	2	Y	Y	N	Y	N	N	N	N	N					
+farlie4	Sabre	2	Y	Y	N	Y	N	N	N	N	N					
+farlie4	Sadler	2	Y	Y	N	Y	N	N	N	N	N					
+driv6	Rancher	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+driv6	Sanchez	2	Y	Y	N	Y	Y	N	N	N	N					
+wuzi2	Tropic	1	N	N	N	N	Y	Y	Y	N	N	float				
+wuzi5	Dinghy	1	N	N	N	N	C	C	C	N	N	float	0	10	0	
+syn1	Savanna	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+syn1	Mtbike	1	N	N	N	N	N	N	N	N	N					
+syn1	Picador	2	Y	Y	N	Y	Y	Y	N	N	N					
+syn1	Zr350	1	Y	Y	Y	Y	Y	Y	N	N	Y					
+syn1	Broadway	2	Y	Y	N	Y	Y	Y	N	N	N					
+syn1	Washing	1	Y	Y	Y	Y	Y	Y	N	N	Y					
+syn2	Broadway	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+syn2	Hustler	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+syn2	Stretch	4	Y	N	N	N	N	N	N	N	N					
+syn2	Huntley	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
+syn3	Sanchez	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
+syn3	Rumpo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+syn3	Washing	4	Y	N	N	N	N	N	N	N	N					
+synd4	Broadway	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+synd4	Pizzaboy	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+syn7	Tampa	1	Y	Y	Y	Y	Y	N	N	N	N	smallcar+hovercraft				
+syn7	Voodoo	2	Y	Y	N	Y	N	N	N	N	N					
+syn5	Picador	2	Y	Y	N	Y	Y	N	N	N	N					
+syn5	Tahoma	2	Y	Y	N	Y	Y	N	N	N	N					
+syn5	Speeder	1	N	N	N	N	Y	Y	Y	N	N	float				
+driv3	Premier	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+driv3	Burrito	4	Y	N	N	N	N	N	N	N	N					
+driv3	Freeway	1	Y	Y	Y	Y	N	N	N	N	N					
+driv3	Stretch	4	Y	N	N	N	Y	Y	N	N	N					
+steal1	Uranus	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+steal1	Alpha	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+steal2	Sultan	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+steal4	Savanna	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+steal4	Jester	2	Y	Y	N	Y	Y	N	N	N	N	hovercraft				
+steal4	Sentinel	4	Y	N	N	N	N	Y	N	N	N					
+steal5	Tampa	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+steal5	Stratum	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+dskool	Infernus	1	Y	Y	Y	Y	N	Y	N	N	N	x=-2050+y=-130				
+dskool	Blistac	1	Y	Y	Y	Y	Y	Y	N	N	N	hovercraft				
+dskool	Copcarsf	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-2050+y=-130+hovercraft				
+dskool	Copcarsf	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+dskool	Taxi	1	Y	Y	Y	Y	Y	Y	N	N	N	hovercraft				
+dskool	Supergt	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+dskool	Banshee	1	Y	N	N	N	N	N	N	N	N	x=-2050+y=-130+smallcar				
+dskool	Banshee	1	Y	N	N	N	N	N	N	N	N	x=-2050+y=-110+smallcar				
+zero1	Rcbaron	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
+zero2	Rcbaron	1	Y	N	N	N	Y	Y	N	N	N	guns				
+zero2	Sanchez	2	Y	Y	N	Y	Y	Y	N	N	N					
+zero4	Bmx	1	N	N	N	N	N	N	N	N	N					
+zero4	Rcgoblin	1	N	N	N	N	N	Y	N	N	N	rc				
+toreno1	Monster	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+toreno2	Pcj600	2	Y	Y	N	Y	N	N	N	N	N					
+toreno2	Petro	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
+des3	Journey	2	Y	Y	N	Y	Y	Y	N	N	N					
+desert6	Rustler	1	N	N	N	N	C	C	N	N	N	nohovercraft+norc	0	-35	0	
+desert6	Hydra	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
+desert9	Pcj600	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
+maf4	Camper	2	Y	Y	N	Y	Y	Y	Y	Y	N					
+desert5	Rustler	1	Y	N	N	N	Y	N	N	N	N	norc+nohovercraft				
+desert5	Hunter	1	N	N	N	N	Y	Y	N	N	N	guns				
+desert5	Landstal	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+desert5	Stunt	1	Y	N	N	N	Y	N	N	N	N	nohovercraft				
+casino1	Feltzer	1	Y	N	N	N	N	N	N	N	N					
+casino2	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+casino2	Manana	1	Y	Y	Y	Y	Y	Y	Y	N	Y	smallplanes				
+casino2	Securica	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
+casino3	Admiral	2	Y	Y	N	N	Y	N	N	N	N	smallplanes				
+casino3	Washing	2	Y	Y	N	Y	N	N	N	N	N					
+casino4	Walton	2	Y	Y	N	Y	N	N	N	N	N					
+casino5	Ambulan	4	Y	N	N	N	Y	Y	N	N	N	smallplanes				
+casino9	Dodo	1	N	N	N	N	C	N	N	N	N	norc+nohovercraft	50	0	0	
+casino9	Shamal	1	N	N	N	N	Y	N	N	N	N	x=1465+y=5200+z=200				
+casin10	Sentinel	4	Y	N	N	N	N	Y	N	N	N	x=2160+y=1682+z=9				
+casin10	Shamal	1	N	N	N	N	Y	Y	N	N	N	x=1479+y=1758+z=12+norc				
+casin10	Shamal	1	N	N	N	N	Y	N	N	N	N					
+casin10	Taxi	2	Y	Y	N	Y	Y	Y	Y	N	N					
+vcrash1	Buffalo	1	Y	Y	Y	Y	Y	Y	Y	N	N	x=2077+y=2420+z=48				
+vcr2	Buffalo	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-371+y=2209+z=41+smallplanes				
+vcr2	Bandito	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+doc2	Walton	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
+heist1	Washing	2	Y	Y	N	Y	N	N	N	N	N					
+heist3	Club	1	Y	Y	Y	Y	N	N	N	N	N					
+heist2	Nevada	1	N	N	N	N	Y	Y	N	N	N	norc+nohovercraft				
+heist4	Copbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+heist4	Freeway	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
+heist5	Leviathn	1	N	N	N	N	Y	Y	N	N	N	vtol+norc				
+heist5	Securica	1	Y	Y	Y	Y	Y	Y	Y	N	Y	smallcar+smallplanes				
+heist5	Patriot	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
+heist5	Hunter	1	N	N	N	N	N	Y	N	N	N					
+heist9	Forklift	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+heist9	Securica	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	x=345+y=2546+z=15				
+heist9	Securica	4	Y	N	N	N	N	N	N	N	N					
+heist9	Copbike	1	Y	Y	Y	Y	N	N	N	N	N					
+heist9	Polmav	1	Y	Y	Y	Y	Y	Y	N	N	N	x=2295+y=1839+z=38+smallplanes				
+mansio1	Phoenix	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+mansio1	Windsor	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+mansio2	Washing	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+mansio2	Squalo	1	N	N	N	N	Y	Y	Y	N	N	float				
+mansio2	Hydra	1	N	N	N	N	Y	Y	N	N	N	guns+norc				
+mansio2	Tropic	1	N	N	N	N	Y	Y	Y	N	N	float				
+manson5	Vortex	1	Y	Y	Y	Y	Y	Y	C	N	N	x=-7+y=-1116+z=7+smallplanes	40	0	-6	
+manson5	Marquis	1	N	N	N	N	Y	Y	Y	N	N	float				
+manson5	Reefer	1	N	N	N	N	Y	Y	Y	N	N	float				
+manson5	Kart	1	Y	Y	Y	Y	Y	Y	N	N	N	x=832+y=-2046+z=11+smallplanes				
+grove1	Infernus	1	Y	Y	Y	Y	Y	Y	N	N	N	x=2003+y=-1132+z=24+smallplanes				
+riot1	Greenwoo	2	Y	Y	N	Y	N	N	N	N	N					
+finalea	Greenwoo	2	Y	Y	N	Y	Y	Y	N	N	N	x=2507+y=-1671+z=12+smallplanes				
+finalea	Swatvan	1	Y	Y	Y	Y	N	N	N	N	N	x=2374+y=-1323+z=22				
+finalea	Swatvan	2	Y	Y	N	Y	Y	Y	N	N	N	x=2561+y=-1275+z=1031				
+finalec	Firela	1	Y	Y	Y	Y	Y	Y	N	N	N					
+finalec	Feltzer	2	Y	Y	N	Y	N	Y	N	N	N					
+finalec	Copcarla	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
+finalec	Sanchez	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
+finalec	Tornado	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
+kicksta	Sanchez	1	N	Y	Y	N	N	N	N	N	N					

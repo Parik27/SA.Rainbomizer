@@ -38,7 +38,11 @@ ClothesRandomizer::RandomizePlayerModel ()
     Logger::GetLogger ()->LogMessage ("Player Model: "
                                       + std::to_string (model));
 
+    auto ped = FindPlayerPed ();
+    //auto associations = RpAnimBlendClumpExtractAssociations (ped->m_pRwClump);
     Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2), model);
+    //RpAnimBlendClumpGiveAssociations (ped->physical.entity.object.m_pRwClump,
+    //                                  associations);
 }
 
 /*******************************************************/

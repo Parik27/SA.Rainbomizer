@@ -615,7 +615,7 @@ MissionRandomizer::ResetSaveData ()
     missionNumberOfLastMissionStarted = -1;
 
     mSaveInfo.randomSeed = m_Config.MissionSeedHash;
-    if (m_Config.RandomizeOnce && m_Config.MissionSeedHash == -1)
+    if (m_Config.RandomizeOnce && m_Config.MissionSeedHash == 0)
         mSaveInfo.randomSeed = random (UINT_MAX);
 
     memset (mSaveInfo.missionStatus.data, 1,
@@ -768,8 +768,9 @@ MissionRandomizer::Initialise ()
             std::pair ("DisableMainScmCheck", &m_Config.DisableMainSCMCheck)))
         return;
 
-    m_Config.MissionSeedHash
-        = std::hash<std::string>{}(m_Config.RandomizeOnceSeed);
+    if (m_Config.RandomizeOnceSeed != "")
+        m_Config.MissionSeedHash
+            = std::hash<std::string>{}(m_Config.RandomizeOnceSeed);
 
     if (!m_Config.DisableMainSCMCheck && !VerifyMainSCM ())
         return;

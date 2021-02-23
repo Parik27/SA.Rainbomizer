@@ -110,12 +110,23 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
          && vehID != 460 && vehID != 447)
         return false;
 
-    if (mFlags.NoHovercraft && vehID == 539)
+    if (mFlags.Hovercraft && CModelInfo::IsPlaneModel (vehID) && vehID != 539)
+        return false;
+    else if (mFlags.NoHovercraft && vehID == 539)
         return false;
 
     if (mFlags.CanAttach
         && (!CModelInfo::IsTrailerModel (vehID) || vehID != 403 || vehID != 514
             || vehID != 515))
+        return false;
+
+    if (mFlags.SmallCar && CModelInfo::IsCarModel (vehID)
+        && (vehID == 403 || vehID == 406 || vehID == 408 || vehID == 414
+            || vehID == 431 || vehID == 432 || vehID == 433 || vehID == 437
+            || vehID == 443 || vehID == 444 || vehID == 455 || vehID == 456
+            || vehID == 486 || vehID == 514 || vehID == 515 || vehID == 524
+            || vehID == 532 || vehID == 544 || vehID == 556 || vehID == 557
+            || vehID == 578 || vehID == 588))
         return false;
 
     // Type check (it has to be both not moved and allowed)
@@ -194,8 +205,12 @@ ScriptVehiclePattern::ReadFlag (const std::string &flag)
         mFlags.CanAttach = true;
     else if (flag == "float")
         mFlags.Float = true;
+    else if (flag == "hovercraft")
+        mFlags.Hovercraft = true;
     else if (flag == "nohovercraft")
         mFlags.NoHovercraft = true;
+    else if (flag == "smallcar")
+        mFlags.SmallCar = true;
 
     // Coordinates
     else if (flag.find ("x=") == 0)

@@ -57,7 +57,7 @@ class MissionRandomizer
 
         bool        RandomizeOnce = true;
         std::string RandomizeOnceSeed;
-        int         MissionSeedHash         = -1;
+        int         MissionSeedHash         = 0;
         bool        ForcedRandomizeOnceSeed = false;
 
         bool DisableMainSCMCheck = false;

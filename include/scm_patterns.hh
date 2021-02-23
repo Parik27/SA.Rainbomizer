@@ -40,7 +40,9 @@ class ScriptVehiclePattern
         bool VTOL : 1;
         bool CanAttach : 1;
         bool Float : 1;
+        bool Hovercraft : 1;
         bool NoHovercraft : 1;
+        bool SmallCar : 1;
     } mFlags;
 
     Vector3        m_vecMovedCoords = {0.0, 0.0, 0.0};

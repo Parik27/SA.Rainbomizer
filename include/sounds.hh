@@ -46,7 +46,7 @@ public:
 
     static inline struct Config
     {
-        int MatchSubtitles;
+        bool MatchSubtitles;
         int ForcedAudioLine = -1;
     } m_Config;
 

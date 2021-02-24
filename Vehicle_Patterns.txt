@@ -3,10 +3,12 @@
 intro	Copcarla	4	Y	N	N	N	Y	Y	N	Y	N					
 lowr	Savanna	2	Y	Y	Y	Y	Y	Y	Y	Y	N					
 zero5	Rcbaron	1	Y	N	N	N	Y	Y	N	N	N	guns				
-intro1	Peren	2	Y	Y	Y	Y	Y	Y	Y	Y	N					
+intro1	Peren	2	Y	Y	Y	Y	Y	Y	N	N	N					
 intro1	Voodoo	2	Y	Y	Y	Y	Y	Y	N	N	N					
-intro1	Bmx	1	C	Y	Y	Y	C	C	N	N	N	x=971+y=-1115+z=23+smallplanes	-9	0	0	Player bike and Smoke bike are unimportant so only patterns for Sweet and Ryder
-intro1	Bmx	1	Y	Y	Y	Y	Y	Y	N	N	N	x=971+y=-1113+z=23+smallplanes				Player bike and Smoke bike are unimportant so only patterns for Sweet and Ryder
+intro1	Bmx	1	C	Y	Y	Y	C	N	N	N	N	x=971+y=-1115+z=23+smallplanes	-20	-37	0	Ryder bike
+intro1	Bmx	1	C	Y	Y	Y	C	N	N	N	N	x=971+y=-1113+z=23+smallplanes	-9	0	0	Sweet bike
+intro1	Bmx	1	C	Y	Y	Y	C	C	Y	Y	Y	x=971+y=-1110+z=23+smallplanes	-20	-30	0	Smoke bike
+intro1	Bmx	1	C	Y	Y	Y	C	C	Y	Y	Y	x=971+y=-1108+z=23	5	4	0	Player bike
 intro2	Picador	2	Y	Y	N	Y	C	C	N	N	N	smallplanes	0	27	0	
 sweet1	Greenwoo	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 sweet3	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
@@ -186,7 +188,7 @@ zero2	Rcbaron	1	Y	N	N	N	Y	Y	N	N	N	guns
 zero2	Sanchez	2	Y	Y	N	Y	Y	Y	N	N	N					
 zero4	Bmx	1	N	N	N	N	N	N	N	N	N					
 zero4	Rcgoblin	1	N	N	N	N	N	Y	N	N	N	rc				
-toreno1	Monster	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+toreno1	Monster	1	Y	Y	Y	Y	C	C	N	N	N	smallplanes	-10	0	0	
 toreno2	Pcj600	2	Y	Y	N	Y	N	N	N	N	N					
 toreno2	Petro	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
 des3	Journey	2	Y	Y	N	Y	Y	Y	N	N	N					

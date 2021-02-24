@@ -151,19 +151,20 @@ ApplyFixesBasedOnMission ()
     if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "dskool" && 
         ScriptVehicleRandomizer::m_Config.MoreSchoolTestTime)
     {
-            if (ScriptSpace[247] == 1)
-                ScriptSpace[253] = 16000;
-            else if (ScriptSpace[247] == 2)
-                ScriptSpace[253] = 26000;
-            else if (ScriptSpace[247] == 3 || ScriptSpace[247] == 4)
-                ScriptSpace[253] = 14000;
-            else if (ScriptSpace[247] == 5)
+        int currentTest = ScriptSpace[247];
+        if (currentTest == 1)
+                ScriptSpace[253] = 16000; // Timer value
+        else if (currentTest == 2)
+            ScriptSpace[253] = 26000;
+        else if (currentTest == 3 || currentTest == 4)
+            ScriptSpace[253] = 14000;
+        else if (currentTest == 5)
                 ScriptSpace[253] = 15000;
-            else if (ScriptSpace[247] == 8 || ScriptSpace[247] == 9)
+        else if (currentTest == 8 || currentTest == 9)
                 ScriptSpace[253] = 31000;
-            else if (ScriptSpace[247] == 10)
+        else if (currentTest == 10)
                 ScriptSpace[253] = 12000;
-            else if (ScriptSpace[247] == 12 || ScriptSpace[247] == 13)
+        else if (currentTest == 12 || currentTest == 13)
                 ScriptSpace[253] = 14000;
     }   
 
@@ -182,6 +183,8 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                            ()->ProcessVehicleChange (model,
                                                                          x, y,
                                                                          z);
+    //Logger::GetLogger ()->LogMessage ("Vehicle Spawned: "
+    //                                  + std::to_string (newModel));
 
     ApplyFixesBasedOnModel (model, newModel);
     ApplyFixesBasedOnMission ();

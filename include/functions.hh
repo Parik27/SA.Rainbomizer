@@ -491,7 +491,7 @@ struct CPickups
 struct CBaseModelInfo
 {
 public:
-    char             pad[0x14];
+    char             pad[0x10];
     CColModel *      m_pColModel;
     float            m_fDrawDistance;
     struct RwObject *m_pRwObject;

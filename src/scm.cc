@@ -30,6 +30,7 @@
 #include <unordered_map>
 #include "scm_patterns.hh"
 #include "util/scrpt.hh"
+#include "injector/calling.hpp"
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
@@ -40,6 +41,8 @@ const int MODEL_HYDRA    = 520;
 const int MODEL_CEMENT   = 524;
 const int MODEL_FORKLIFT = 530;
 int       ignoreNextHook = false;
+
+bool     wasFlyingCarsOn = 0;
 
 /*******************************************************/
 void
@@ -84,9 +87,9 @@ void __fastcall FixCarChecks (CRunningScript *scr, void *edx, short count)
         ScriptParams[1] = FindPlayerVehicle ()->m_nModelIndex;
     else if (ScriptParams[1] == MODEL_HYDRA && FindPlayerVehicle ())
     {
-            int playerVeh = FindPlayerVehicle ()->m_nModelIndex;
-        if ((CModelInfo::IsPlaneModel (playerVeh) && playerVeh != 539)
-            || CModelInfo::IsHeliModel (playerVeh))
+        int playerVeh = FindPlayerVehicle ()->m_nModelIndex;
+        if (CModelInfo::IsPlaneModel (playerVeh) || CModelInfo::IsHeliModel (playerVeh) 
+            || CModelInfo::IsCarModel(playerVeh) || CModelInfo::IsQuadBikeModel(playerVeh))
             ScriptParams[1] = playerVeh;
     }
 }
@@ -138,7 +141,8 @@ ApplyFixesBasedOnModel (int model, int newModel)
     else if ((model == MODEL_SANCHZ && ScriptVehicleRandomizer::GetInstance()->mLastThread == "kicksta") 
         || (model == MODEL_FORKLIFT && ScriptVehicleRandomizer::GetInstance()->mLastThread == "heist9")
         || (model == MODEL_DUMPER && ScriptVehicleRandomizer::GetInstance()->mLastThread == "casino2"))
-        ScriptVehicleRandomizer::GetInstance ()->ApplyCarCheckFix (newModel);
+            ScriptVehicleRandomizer::GetInstance ()->ApplyCarCheckFix (newModel);
+        
 }
 
 /*******************************************************/
@@ -170,7 +174,7 @@ ApplyFixesBasedOnMission ()
 
     if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "desert5")
     {
-            injector::WriteMemory (0x969130 + 48, 1); // Enable Flying Cars
+            ignoreNextHook = false;
     }
 }
 
@@ -178,7 +182,6 @@ ApplyFixesBasedOnMission ()
 void *
 RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
 {
-    /*int newModel = 500;*/ 
     int newModel = ScriptVehicleRandomizer::GetInstance
                            ()->ProcessVehicleChange (model,
                                                                          x, y,
@@ -204,6 +207,50 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
         }
 
     return vehicle;
+}
+
+///*******************************************************/
+void
+EnableFlyingCars ()
+{
+    if (!ScriptVehicleRandomizer::GetInstance ()->GetIfPlayerInFlyingCar ())
+        {
+            ScriptVehicleRandomizer::GetInstance ()->SetPlayerAsInFlyingCar (
+                true);
+            wasFlyingCarsOn = injector::ReadMemory<bool> (0x969130 + 48);
+        }
+}
+
+///*******************************************************/
+void
+DisableFlyingCars ()
+{
+    if (ScriptVehicleRandomizer::GetInstance ()->GetIfPlayerInFlyingCar ())
+    {
+        ScriptVehicleRandomizer::GetInstance ()->SetPlayerAsInFlyingCar (false);
+        injector::WriteMemory (0x969130 + 48, wasFlyingCarsOn);
+    }
+}
+
+///*******************************************************/
+void __fastcall SetFlyingCar (CRunningScript *scr, void *edx, char flag)
+{
+    EnableFlyingCars ();
+    if (flag && (scr->CheckName ("desert6") || scr->CheckName("desert5") 
+        || scr->CheckName("casino9") || scr->CheckName("casin10") 
+        || scr->CheckName("heist2") || scr->CheckName("mansio2")))
+        injector::WriteMemory (0x969130 + 48, 1);
+    else
+        DisableFlyingCars ();
+
+    scr->UpdateCompareFlag (flag);
+}
+
+/*******************************************************/
+void __fastcall ResetFlyingCar (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    DisableFlyingCars ();
 }
 
 /*******************************************************/
@@ -395,6 +442,7 @@ void __fastcall ProcessModifiedSchoolTimesFlying (CRunningScript *scr, void *edx
         {
                 ScriptVehicleRandomizer::GetInstance ()->SaveTestTime (
                     ScriptSpace[253]);
+                Scrpt::CallOpcode (0x14F, "stop_timer", GlobalVar (253));
                 Scrpt::CallOpcode (0x396, "pause_timer", 1);
                 //Logger::GetLogger ()->LogMessage ("Saving flight school time: "
                 //                                  + std::to_string(ScriptSpace[253]));
@@ -404,16 +452,6 @@ void __fastcall ProcessModifiedSchoolTimesFlying (CRunningScript *scr, void *edx
                 ignoreNextHook = true;
         }
     }
-}
-
-/*******************************************************/
-void __fastcall CheckFlightSchoolTestStart (CRunningScript *scr, void *edx,
-                                            short count)
-{
-    scr->CollectParameters (count);
-    if (scr->CheckName ("desert5"))
-        if (ScriptParams[1] == 16)
-                ignoreNextHook = false;
 }
 
 /*******************************************************/
@@ -431,23 +469,21 @@ void __fastcall DisplayCorrectSchoolTime (CRunningScript *scr, void *edx,
         miliseconds /= 10;
         ScriptSpace[301] = seconds;
         ScriptSpace[302] = miliseconds;
-        //ScriptParams[3]  = seconds;
-        //ScriptParams[4]  = miliseconds;
     }
 }
 
 /*******************************************************/
-char __fastcall DisplayCorrectFlyingSchoolTime (CRunningScript *scr, void *edx, char* textptr, char length)
+void __fastcall DisplayCorrectFlyingSchoolTime (CRunningScript *scr, void *edx,
+                                                short count)
 {
+    scr->CollectParameters (count);
     if (scr->CheckName ("desert5"))
     {
         int actualTime = ScriptVehicleRandomizer::GetInstance ()
             ->GetOriginalTestTime ();
         int seconds = actualTime / 1000;
         ScriptSpace[301] = seconds;
-        //Logger::GetLogger ()->LogMessage ("Set flight school time");
     }
-    return CallMethodAndReturn<char, 0x463D50> (scr, textptr, length);
 }
 
 /*******************************************************/
@@ -474,15 +510,6 @@ SetMaddDoggOffset (CVehicle *vehicle, float *out, float offset)
     *out = ms_modelInfoPtrs[vehicle->m_nModelIndex]
                ->m_pColModel->m_boundBox.m_vecMax.z
            + offset;
-}
-
-/*******************************************************/
-void __fastcall CheckFlightSchoolEnd (CRunningScript *scr, void *edx,
-                                      short count)
-{
-    scr->CollectParameters (count);
-    if (scr->CheckName ("desert5"))
-        injector::WriteMemory (0x969130 + 48, 0); // Disable Flying Cars
 }
 
 /*******************************************************/
@@ -525,7 +552,7 @@ MoveFlyingSchoolCorona (float x, float y, float z, float dirX, float dirY, float
     if (ScriptVehicleRandomizer::GetInstance()->mLastThread == "desert5")
     {
             if (int (x) == 377 && int (z) == 80)
-                x += 250.0f;
+                x += 300.0f;
     }
     return CallAndReturn<int, 0x4935A0> (x, y, z, dirX, dirY, dirZ, radius,
                                          type);
@@ -538,7 +565,7 @@ MoveFlyingSchoolBlip (int blipType, float x, float y, float z, int a5, int displ
     if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "desert5")
     {
             if (int (x) == 377 && int (z) == 80)
-                x += 250.0f;
+                x += 300.0f;
     }
     return CallAndReturn<int, 0x583820> (blipType, x, y, z, a5, display);
 }
@@ -552,7 +579,7 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx, short c
         float coordCompareX = ((float *) ScriptParams)[1];
         float coordCompareZ = ((float *) ScriptParams)[3];
         if (int (coordCompareX) == 377 && int (coordCompareZ) == 80)
-            ((float *) ScriptParams)[1] += 250.0f;
+            ((float *) ScriptParams)[1] += 300.0f;
     }
 }
 
@@ -574,6 +601,44 @@ void __fastcall IgnoreLowriderCheck (CRunningScript *scr, void *edx, char result
 }
 
 /*******************************************************/
+int __fastcall ActivateSAMForFlyingCars(CVehicle* veh, void* edx) 
+{
+    if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "desert6"
+        && ScriptVehicleRandomizer::GetInstance ()->GetIfPlayerInFlyingCar ())
+        return 5;
+    else
+        return CallMethodAndReturn<int, 0x6D1080> (veh); // Gets vehicle type as normal
+}
+
+/*******************************************************/
+void __fastcall FixRaiseDoorHeist9 (CRunningScript *scr, void *edx,
+                                         short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("heist9")
+        && (ScriptParams[1] == 1165 || ScriptParams[1] == 1166) 
+        && ScriptVehicleRandomizer::GetInstance()->GetNewCarForCheck() != MODEL_FORKLIFT)
+    {
+        ((float *) ScriptSpace)[7937] = 1003.0f;
+    }
+}
+
+/*******************************************************/
+void __fastcall FixRaiseDoorHeist9PosCheck (CRunningScript *scr, void *edx,
+                                            short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("heist9") && FindPlayerVehicle())
+    {
+        CVector playerPos = FindPlayerCoors ();
+        if (playerPos.z >= 950.0f && playerPos.y >= 1572.7f && playerPos.y <= 1577.0f)
+        {
+            ((float *) ScriptSpace)[74] = 1573.0f;
+        }
+    }
+}
+
+/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -588,6 +653,7 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x47F070, (void *) &RevertVehFixes},
          {HOOK_CALL, 0x5DFE79, (void *) &FixEOTLPosition},
          {HOOK_CALL, 0x469612, (void *) &FixCarChecks},
+         {HOOK_CALL, 0x47C12B, (void *) &FixCarChecks},
          {HOOK_CALL, 0x4958C6, (void *) &PopDoorFix},
          {HOOK_CALL, 0x495B38, (void *) &PopPanelFix},
          {HOOK_CALL, 0x48C1FA, (void *) &PopBootFix},
@@ -601,6 +667,14 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x495429, (void *) &FixMaddDoggBoxes},
          {HOOK_CALL, 0x48ABB0, (void *) &AlwaysPickUpPackagesTBone},
          {HOOK_CALL, 0x476BCB, (void *) &IgnoreLandingGearCheck},
+         {HOOK_CALL, 0x469602, (void *) &SetFlyingCar},
+         {HOOK_CALL, 0x48A0F6, (void *) &SetFlyingCar},
+         {HOOK_CALL, 0x47D75E, (void *) &ResetFlyingCar},
+         {HOOK_CALL, 0x48B33B, (void *) &ActivateSAMForFlyingCars},
+         {HOOK_CALL, 0x5A0846, (void *) &ActivateSAMForFlyingCars},
+         {HOOK_CALL, 0x5A085E, (void *) &ActivateSAMForFlyingCars},
+         {HOOK_CALL, 0x47884F, (void *) &FixRaiseDoorHeist9},
+         {HOOK_CALL, 0x47CAAD, (void *) &FixRaiseDoorHeist9PosCheck},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     if (m_Config.MoreSchoolTestTime)
@@ -608,12 +682,10 @@ ScriptVehicleRandomizer::Initialise ()
                 {{HOOK_CALL, 0x48CFA9, (void *) &ProcessModifiedSchoolTimes},
             {HOOK_CALL, 0x48A664, (void *) &DisplayCorrectSchoolTime},
             {HOOK_CALL, 0x47D3CC, (void *) &ProcessModifiedSchoolTimesFlying},
-            {HOOK_CALL, 0x4696BC, (void *) &CheckFlightSchoolTestStart},
-            {HOOK_CALL, 0x48F7CC, (void *) &DisplayCorrectFlyingSchoolTime},
+            {HOOK_CALL, 0x475DE8, (void *) &DisplayCorrectFlyingSchoolTime},
             {HOOK_CALL, 0x497ED7, (void *) &MoveFlyingSchoolCorona},
             {HOOK_CALL, 0x47CFE0, (void *) &MoveFlyingSchoolBlip},
-            {HOOK_CALL, 0x486DB1, (void *) &MoveFlyingSchoolTrigger},
-            {HOOK_CALL, 0x46C1AB, (void *) &CheckFlightSchoolEnd}});
+            {HOOK_CALL, 0x486DB1, (void *) &MoveFlyingSchoolTrigger}});
 
     if (m_Config.SkipLowriderCheck)
         RegisterHooks ({{HOOK_CALL, 0x478528, (void *) &IgnoreLowriderCheck}});

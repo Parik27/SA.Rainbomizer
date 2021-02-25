@@ -77,6 +77,7 @@ class ScriptVehicleRandomizer
     bool        mPosFixEnabled          = false;
     int         mVehicleDrivingOverride = -1;
     int         mOriginalTestTime       = 0;
+    bool        mInFlyingCar            = false;
 
     eDoorCheckError DoesVehicleHaveEnoughDoors (int modelA, int modelB);
 
@@ -94,6 +95,12 @@ public:
     std::string mLastThread;
 
     void ApplyEOTLFixes (int newFiretruck);
+
+    void
+    SetPlayerAsInFlyingCar (bool setting)
+    {
+        mInFlyingCar = setting;
+    }
 
     void
     SaveTestTime (int time)
@@ -141,5 +148,11 @@ public:
     GetOriginalTestTime ()
     {
         return mOriginalTestTime;
+    }
+
+    bool
+    GetIfPlayerInFlyingCar ()
+    {
+        return mInFlyingCar;
     }
 };

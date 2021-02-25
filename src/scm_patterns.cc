@@ -116,8 +116,8 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
         return false;
 
     if (mFlags.CanAttach
-        && (!CModelInfo::IsTrailerModel (vehID) || vehID != 403 || vehID != 514
-            || vehID != 515))
+        && vehID != 435 && vehID != 450 && vehID != 584 && vehID != 591 
+        && vehID != 403 && vehID != 514 && vehID != 515)
         return false;
 
     if (mFlags.SmallCar && CModelInfo::IsCarModel (vehID)

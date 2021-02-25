@@ -8,7 +8,7 @@ intro1	Voodoo	2	Y	Y	Y	Y	Y	Y	N	N	N
 intro1	Bmx	1	C	Y	Y	Y	C	N	N	N	N	x=971+y=-1115+z=23+smallplanes	-20	-37	0	Ryder bike
 intro1	Bmx	1	C	Y	Y	Y	C	N	N	N	N	x=971+y=-1113+z=23+smallplanes	-9	0	0	Sweet bike
 intro1	Bmx	1	C	Y	Y	Y	C	C	Y	Y	Y	x=971+y=-1110+z=23+smallplanes	-20	-30	0	Smoke bike
-intro1	Bmx	1	C	Y	Y	Y	C	C	Y	Y	Y	x=971+y=-1108+z=23	5	4	0	Player bike
+intro1	Bmx	1	C	Y	Y	Y	C	C	N	Y	Y	x=971+y=-1108+z=23	5	4	0	Player bike
 intro2	Picador	2	Y	Y	N	Y	C	C	N	N	N	smallplanes	0	27	0	
 sweet1	Greenwoo	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 sweet3	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
@@ -192,14 +192,16 @@ toreno1	Monster	1	Y	Y	Y	Y	C	C	N	N	N	smallplanes	-10	0	0
 toreno2	Pcj600	2	Y	Y	N	Y	N	N	N	N	N					
 toreno2	Petro	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
 des3	Journey	2	Y	Y	N	Y	Y	Y	N	N	N					
-desert6	Rustler	1	N	N	N	N	C	C	N	N	N	nohovercraft+norc	0	-35	0	
+desert6	Rustler	1	Y	N	N	Y	C	C	N	N	N	nohovercraft+norc	0	-35	0	
 desert6	Hydra	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
 desert9	Pcj600	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 maf4	Camper	2	Y	Y	N	Y	Y	Y	Y	Y	N					
-desert5	Rustler	1	Y	N	N	N	Y	N	N	N	N	norc+nohovercraft				
+desert5	Rustler	1	Y	N	N	Y	Y	N	N	N	N	norc+nohovercraft				
+desert5	Hunter		Y	N	N	Y	Y	Y	N	N	N	z=15				
 desert5	Hunter	1	N	N	N	N	Y	Y	N	N	N	guns				
-desert5	Landstal	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
-desert5	Stunt	1	Y	N	N	N	Y	N	N	N	N	nohovercraft				
+desert5	Landstal	1	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+desert5	Petro	1	Y	Y	N	Y	Y	Y	Y	Y	Y					
+desert5	Stunt	1	Y	N	N	Y	Y	N	N	N	N	nohovercraft				
 casino1	Feltzer	1	Y	N	N	N	N	N	N	N	N					
 casino2	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 casino2	Manana	1	Y	Y	Y	Y	Y	Y	Y	N	Y	smallplanes				
@@ -208,11 +210,11 @@ casino3	Admiral	2	Y	Y	N	N	Y	N	N	N	N	smallplanes
 casino3	Washing	2	Y	Y	N	Y	N	N	N	N	N					
 casino4	Walton	2	Y	Y	N	Y	N	N	N	N	N					
 casino5	Ambulan	4	Y	N	N	N	Y	Y	N	N	N	smallplanes				
-casino9	Dodo	1	N	N	N	N	C	N	N	N	N	norc+nohovercraft	50	0	0	
-casino9	Shamal	1	N	N	N	N	Y	N	N	N	N	x=1465+y=5200+z=200				
+casino9	Dodo	1	Y	N	N	Y	C	N	N	N	N	norc+nohovercraft	50	0	0	
+casino9	Shamal	1	Y	N	N	Y	Y	N	N	N	N	x=1465+y=5200+z=200				
 casin10	Sentinel	4	Y	N	N	N	N	Y	N	N	N	x=2160+y=1682+z=9				
-casin10	Shamal	1	N	N	N	N	Y	Y	N	N	N	x=1479+y=1758+z=12+norc				
-casin10	Shamal	1	N	N	N	N	Y	N	N	N	N					
+casin10	Shamal	1	Y	N	N	Y	Y	Y	N	N	N	x=1479+y=1758+z=12+norc				
+casin10	Shamal	1	Y	N	N	Y	Y	N	N	N	N					
 casin10	Taxi	2	Y	Y	N	Y	Y	Y	Y	N	N					
 vcrash1	Buffalo	1	Y	Y	Y	Y	Y	Y	Y	N	N	x=2077+y=2420+z=48				
 vcr2	Buffalo	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-371+y=2209+z=41+smallplanes				
@@ -220,14 +222,14 @@ vcr2	Bandito	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes
 doc2	Walton	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 heist1	Washing	2	Y	Y	N	Y	N	N	N	N	N					
 heist3	Club	1	Y	Y	Y	Y	N	N	N	N	N					
-heist2	Nevada	1	N	N	N	N	Y	Y	N	N	N	norc+nohovercraft				
+heist2	Nevada	1	Y	N	N	Y	Y	Y	N	N	N	norc+nohovercraft				
 heist4	Copbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 heist4	Freeway	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
 heist5	Leviathn	1	N	N	N	N	Y	Y	N	N	N	vtol+norc				
 heist5	Securica	1	Y	Y	Y	Y	Y	Y	Y	N	Y	smallcar+smallplanes				
 heist5	Patriot	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 heist5	Hunter	1	N	N	N	N	N	Y	N	N	N					
-heist9	Forklift	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+heist9	Forklift	1	C	Y	Y	Y	N	N	N	N	N	x=2173+y=1585+z=998	6	0	0	
 heist9	Securica	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	x=345+y=2546+z=15				
 heist9	Securica	4	Y	N	N	N	N	N	N	N	N					
 heist9	Copbike	1	Y	Y	Y	Y	N	N	N	N	N					
@@ -236,7 +238,7 @@ mansio1	Phoenix	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes
 mansio1	Windsor	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 mansio2	Washing	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 mansio2	Squalo	1	N	N	N	N	Y	Y	Y	N	N	float				
-mansio2	Hydra	1	N	N	N	N	Y	Y	N	N	N	guns+norc				
+mansio2	Hydra	1	Y	N	N	Y	Y	Y	N	N	N	smallplanes+norc				
 mansio2	Tropic	1	N	N	N	N	Y	Y	Y	N	N	float				
 manson5	Vortex	1	Y	Y	Y	Y	Y	Y	C	N	N	x=-7+y=-1116+z=7+smallplanes	40	0	-6	
 manson5	Marquis	1	N	N	N	N	Y	Y	Y	N	N	float				

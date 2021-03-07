@@ -58,50 +58,78 @@ class ScriptVehiclePattern
 
 public:
 
-        std::unordered_map<int, std::string> vehIDs = {
-        {400, "landstal"},  {401, "bravura"},   {402, "buffalo"},   {403, "linerun"},   {404, "peren"},
-        {405, "sentinel"},  {406, "dumper"},    {407, "firetruk"},  {408, "trash"},     {409, "stretch"}, 
-        {410, "manana"},    {411, "infernus"},  {412, "voodoo"},    {413, "pony"},      {414, "mule"}, 
-        {415, "cheetah"},   {416, "ambulan"},   {417, "leviathn"},  {418, "moonbeam"},  {419, "esperant"}, 
-        {420, "taxi"},      {421, "washing"},   {422, "bobcat"},    {423, "mrwhoop"},   {424, "bfinject"}, 
-        {425, "hunter"},    {426, "premier"},   {427, "enforcer"},  {428, "securica"},  {429, "banshee"}, 
-        {430, "predator"},  {431, "bus"},       {432, "rhino"},     {433, "barracks"},  {434, "hotknife"}, 
-        {435, "artict1"},   {436, "previon"},   {437, "coach"},     {438, "cabbie"},    {439, "stallion"}, 
-        {440, "rumpo"},     {441, "rcbandit"},  {442, "romero"},    {443, "packer"},    {444, "monster"}, 
-        {445, "admiral"},   {446, "squalo"},    {447, "seaspar"},   {448, "pizzaboy"},  {449, "tram"}, 
-        {450, "artict2"},   {451, "turismo"},   {452, "speeder"},   {453, "reefer"},    {454, "tropic"}, 
-        {455, "flatbed"},   {456, "yankee"},    {457, "caddy"},     {458, "solair"},    {459, "topfun"}, 
-        {460, "skimmer"},   {461, "pcj600"},    {462, "faggio"},    {463, "freeway"},   {464, "rcbaron"}, 
-        {465, "rcraider"},  {466, "glendale"},  {467, "oceanic"},   {468, "sanchez"},   {469, "sparrow"}, 
-        {470, "patriot"},   {471, "quad"},      {472, "coastg"},    {473, "dinghy"},    {474, "hermes"}, 
-        {475, "sabre"},     {476, "rustler"},   {477, "zr350"},     {478, "walton"},    {479, "regina"}, 
-        {480, "comet"},     {481, "bmx"},       {482, "burrito"},   {483, "camper"},    {484, "marquis"}, 
-        {485, "baggage"},   {486, "dozer"},     {487, "maverick"},  {488, "vcnmav"},    {489, "rancher"}, 
-        {490, "fbiranch"},  {491, "virgo"},     {492, "greenwoo"},  {493, "jetmax"},    {494, "hotring"},
-        {495, "sandking"},  {496, "blistac"},   {497, "polmav"},    {498, "boxville"},  {499, "benson"}, 
-        {500, "mesa"},      {501, "rcgoblin"},  {502, "hotrina"},   {503, "hotrinb"},   {504, "bloodra"}, 
-        {505, "rnchlure"},  {506, "supergt"},   {507, "elegant"},   {508, "journey"},   {509, "bike"}, 
-        {510, "mtbike"},    {511, "beagle"},    {512, "cropdust"},  {513, "stunt"},     {514, "petro"}, 
-        {515, "rdtrain"},   {516, "nebula"},    {517, "majestic"},  {518, "buccanee"},  {519, "shamal"}, 
-        {520, "hydra"},     {521, "fcr900"},    {522, "nrg500"},    {523, "copbike"},   {524, "cement"}, 
-        {525, "towtruck"},  {526, "fortune"},   {527, "cadrona"},   {528, "fbitruck"},  {529, "willard"}, 
-        {530, "forklift"},  {531, "tractor"},   {532, "combine"},   {533, "feltzer"},   {534, "remingtn"}, 
-        {535, "slamvan"},   {536, "blade"},     {537, "freight"},   {538, "streak"},    {539, "vortex"}, 
-        {540, "vincent"},   {541, "bullet"},    {542, "clover"},    {543, "sadler"},    {544, "firela"}, 
-        {545, "hustler"},   {546, "intruder"},  {547, "primo"},     {548, "cargobob"},  {549, "tampa"}, 
-        {550, "sunrise"},   {551, "merit"},     {552, "utility"},   {553, "nevada"},    {554, "yosemite"}, 
-        {555, "windsor"},   {556, "monstera"},  {557, "monsterb"},  {558, "uranus"},    {559, "jester"}, 
-        {560, "sultan"},    {561, "stratum"},   {562, "elegy"},     {563, "raindanc"},  {564, "rctiger"}, 
-        {565, "flash"},     {566, "tahoma"},    {567, "savanna"},   {568, "bandito"},   {569, "freiflat"}, 
-        {570, "streakc"},   {571, "kart"},      {572, "mower"},     {573, "duneride"},  {574, "sweeper"}, 
-        {575, "broadway"},  {576, "tornado"},   {577, "at400"},     {578, "dft30"},     {579, "huntley"}, 
-        {580, "stafford"},  {581, "bf400"},     {582, "newsvan"},   {583, "tug"},       {584, "petrotr"}, 
-        {585, "emperor"},   {586, "wayfarer"},  {587, "euros"},     {588, "hotdog"},    {589, "club"}, 
-        {590, "freibox"},   {591, "artict3"},   {592, "androm"},    {593, "dodo"},      {594, "rccam"}, 
-        {595, "launch"},    {596, "copcarla"},  {597, "copcarsf"},  {598, "copcarvg"},  {599, "copcarru"}, 
-        {600, "picador"},   {601, "swatvan"},   {602, "alpha"},     {603, "phoenix"},   {604, "glenshit"}, 
-        {605, "sadlshit"},  {606, "bagboxa"},   {607, "bagboxb"},   {608, "tugstair"},  {609, "boxburg"}, 
-        {610, "farmtr1"},  {611, "utiltr1"}
+        std::unordered_map<std::string, int> vehIDs = {{"landstal", 400}, {"bravura", 401},  {"buffalo", 402},
+           {"linerun", 403},  {"peren", 404},    {"sentinel", 405},
+           {"dumper", 406},   {"firetruk", 407}, {"trash", 408},
+           {"stretch", 409},  {"manana", 410},   {"infernus", 411},
+           {"voodoo", 412},   {"pony", 413},     {"mule", 414},
+           {"cheetah", 415},  {"ambulan", 416},  {"leviathn", 417},
+           {"moonbeam", 418}, {"esperant", 419}, {"taxi", 420},
+           {"washing", 421},  {"bobcat", 422},   {"mrwhoop", 423},
+           {"bfinject", 424}, {"hunter", 425},   {"premier", 426},
+           {"enforcer", 427}, {"securica", 428}, {"banshee", 429},
+           {"predator", 430}, {"bus", 431},      {"rhino", 432},
+           {"barracks", 433}, {"hotknife", 434}, {"artict1", 435},
+           {"previon", 436},  {"coach", 437},    {"cabbie", 438},
+           {"stallion", 439}, {"rumpo", 440},    {"rcbandit", 441},
+           {"romero", 442},   {"packer", 443},   {"monster", 444},
+           {"admiral", 445},  {"squalo", 446},   {"seaspar", 447},
+           {"pizzaboy", 448}, {"tram", 449},     {"artict2", 450},
+           {"turismo", 451},  {"speeder", 452},  {"reefer", 453},
+           {"tropic", 454},   {"flatbed", 455},  {"yankee", 456},
+           {"caddy", 457},    {"solair", 458},   {"topfun", 459},
+           {"skimmer", 460},  {"pcj600", 461},   {"faggio", 462},
+           {"freeway", 463},  {"rcbaron", 464},  {"rcraider", 465},
+           {"glendale", 466}, {"oceanic", 467},  {"sanchez", 468},
+           {"sparrow", 469},  {"patriot", 470},  {"quad", 471},
+           {"coastg", 472},   {"dinghy", 473},   {"hermes", 474},
+           {"sabre", 475},    {"rustler", 476},  {"zr350", 477},
+           {"walton", 478},   {"regina", 479},   {"comet", 480},
+           {"bmx", 481},      {"burrito", 482},  {"camper", 483},
+           {"marquis", 484},  {"baggage", 485},  {"dozer", 486},
+           {"maverick", 487}, {"vcnmav", 488},   {"rancher", 489},
+           {"fbiranch", 490}, {"virgo", 491},    {"greenwoo", 492},
+           {"jetmax", 493},   {"hotring", 494},  {"sandking", 495},
+           {"blistac", 496},  {"polmav", 497},   {"boxville", 498},
+           {"benson", 499},   {"mesa", 500},     {"rcgoblin", 501},
+           {"hotrina", 502},  {"hotrinb", 503},  {"bloodra", 504},
+           {"rnchlure", 505}, {"supergt", 506},  {"elegant", 507},
+           {"journey", 508},  {"bike", 509},     {"mtbike", 510},
+           {"beagle", 511},   {"cropdust", 512}, {"stunt", 513},
+           {"petro", 514},    {"rdtrain", 515},  {"nebula", 516},
+           {"majestic", 517}, {"buccanee", 518}, {"shamal", 519},
+           {"hydra", 520},    {"fcr900", 521},   {"nrg500", 522},
+           {"copbike", 523},  {"cement", 524},   {"towtruck", 525},
+           {"fortune", 526},  {"cadrona", 527},  {"fbitruck", 528},
+           {"willard", 529},  {"forklift", 530}, {"tractor", 531},
+           {"combine", 532},  {"feltzer", 533},  {"remingtn", 534},
+           {"slamvan", 535},  {"blade", 536},    {"freight", 537},
+           {"streak", 538},   {"vortex", 539},   {"vincent", 540},
+           {"bullet", 541},   {"clover", 542},   {"sadler", 543},
+           {"firela", 544},   {"hustler", 545},  {"intruder", 546},
+           {"primo", 547},    {"cargobob", 548}, {"tampa", 549},
+           {"sunrise", 550},  {"merit", 551},    {"utility", 552},
+           {"nevada", 553},   {"yosemite", 554}, {"windsor", 555},
+           {"monstera", 556}, {"monsterb", 557}, {"uranus", 558},
+           {"jester", 559},   {"sultan", 560},   {"stratum", 561},
+           {"elegy", 562},    {"raindanc", 563}, {"rctiger", 564},
+           {"flash", 565},    {"tahoma", 566},   {"savanna", 567},
+           {"bandito", 568},  {"freiflat", 569}, {"streakc", 570},
+           {"kart", 571},     {"mower", 572},    {"duneride", 573},
+           {"sweeper", 574},  {"broadway", 575}, {"tornado", 576},
+           {"at400", 577},    {"dft30", 578},    {"huntley", 579},
+           {"stafford", 580}, {"bf400", 581},    {"newsvan", 582},
+           {"tug", 583},      {"petrotr", 584},  {"emperor", 585},
+           {"wayfarer", 586}, {"euros", 587},    {"hotdog", 588},
+           {"club", 589},     {"freibox", 590},  {"artict3", 591},
+           {"androm", 592},   {"dodo", 593},     {"rccam", 594},
+           {"launch", 595},   {"copcarla", 596}, {"copcarsf", 597},
+           {"copcarvg", 598}, {"copcarru", 599}, {"picador", 600},
+           {"swatvan", 601},  {"alpha", 602},    {"phoenix", 603},
+           {"glenshit", 604}, {"sadlshit", 605}, {"bagboxa", 606},
+           {"bagboxb", 607},  {"tugstair", 608}, {"boxburg", 609},
+           {"farmtr1", 610},  {"utiltr1", 611}
+
     };
     
     /*******************************************************/
@@ -125,16 +153,10 @@ public:
     }
 
     void
-    SetOriginalVehicle (char veh[64])
+    SetOriginalVehicle (char* veh)
     {
         m_bCached          = false;
-        for (auto& it : vehIDs)
-        {
-                if (it.second == veh)
-                {
-                    m_nOriginalVehicle = it.first;
-                }
-        }
+        m_nOriginalVehicle = vehIDs[veh]; // steamhappy
     }
 
     void

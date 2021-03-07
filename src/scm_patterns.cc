@@ -94,7 +94,8 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
         && vehID != 447 && vehID != 464 && vehID != 476 && vehID != 520)
         return false;
 
-    if (mFlags.RC && !CModelInfo::IsRCModel(vehID) && (CModelInfo::IsCarModel(vehID) || CModelInfo::IsHeliModel(vehID) || CModelInfo::IsPlaneModel(vehID)))
+    if (mFlags.RC && !CModelInfo::IsRCModel(vehID) && (CModelInfo::IsCarModel(vehID) 
+        || CModelInfo::IsHeliModel(vehID) || CModelInfo::IsPlaneModel(vehID)))
         return false;
     else if (mFlags.NoRC && CModelInfo::IsRCModel (vehID)) 
         return false;
@@ -106,8 +107,9 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
     if ((mFlags.VTOL && CModelInfo::IsPlaneModel (vehID)) && vehID != 520)
         return false;
 
-    if (mFlags.Float && !CModelInfo::IsBoatModel (vehID) && vehID != 539
-         && vehID != 460 && vehID != 447)
+    if (mFlags.Float && (vehID == 406 || vehID == 444 || vehID == 556 || vehID == 557 
+        || vehID == 573 || (CModelInfo::IsPlaneModel(vehID) && vehID != 539 && vehID != 460) 
+        || (CModelInfo::IsHeliModel(vehID) && vehID != 447 && vehID != 417)))
         return false;
 
     if (mFlags.Hovercraft && CModelInfo::IsPlaneModel (vehID) && vehID != 539)

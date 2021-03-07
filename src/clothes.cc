@@ -14,6 +14,16 @@ ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 
 /*******************************************************/
 void
+SetModel (int modelIndex)
+{
+    auto ped          = FindPlayerPed ();
+    auto associations = RpAnimBlendClumpExtractAssociations (ped->m_pRwClump);
+    Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2), modelIndex);
+    RpAnimBlendClumpGiveAssociations (ped->m_pRwClump, associations);
+}
+
+/*******************************************************/
+void
 ClothesRandomizer::RandomizePlayerModel ()
 {
     int model = 0;
@@ -35,21 +45,14 @@ ClothesRandomizer::RandomizePlayerModel ()
     if (ms_aInfoForModel[model].m_nLoadState != 1)
         model = 0;
 
-    Logger::GetLogger ()->LogMessage ("Player Model: "
-                                      + std::to_string (model));
-
-    auto ped = FindPlayerPed ();
-    //auto associations = RpAnimBlendClumpExtractAssociations (ped->m_pRwClump);
-    Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2), model);
-    //RpAnimBlendClumpGiveAssociations (ped->physical.entity.object.m_pRwClump,
-    //                                  associations);
+    SetModel (model);
 }
 
 /*******************************************************/
 void
 ClothesRandomizer::RandomizePlayerClothes ()
 {
-    Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2), 0);
+    SetModel (0);
 
     for (int i = 0; i < 17; i++)
         {
@@ -73,7 +76,7 @@ ClothesRandomizer::HandleClothesChange ()
     if (CGame::bMissionPackGame)
         return;
 
-    if (random (100) >= 50)
+    if (random (100) >= 90)
         RandomizePlayerClothes ();
     else
         RandomizePlayerModel ();
@@ -122,8 +125,6 @@ ClothesRandomizer::FixChangingClothes (int modelId, uint32_t *newClothes,
 int __fastcall ClothesRandomizer::FixAnimCrash (uint32_t *anim, void *edx,
                                                 int arg0, int animGroup)
 {
-    //Logger::GetLogger ()->LogMessage (std::to_string (animGroup));
-
     if (animGroup > 0)
         animGroup = 0;
 

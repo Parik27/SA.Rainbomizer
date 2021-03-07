@@ -10,13 +10,13 @@
 #include <algorithm>
 #include "injector/calling.hpp"
 #include "autosave.hh"
-#include "missions_data.hh"
 #include <stdexcept>
 #include <array>
 #include <random>
 #include <memory>
 #include "util/loader.hh"
 #include "dyom.hh"
+#include "missions_data.hh"
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 

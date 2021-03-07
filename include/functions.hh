@@ -38,6 +38,7 @@ struct CEntity;
 struct tHandlingData;
 struct tFlyingHandlingData;
 struct CAnimBlendAssociation;
+struct RpClump;
 
 enum eVehicleClass
 {
@@ -142,26 +143,6 @@ struct Message
     char *  m_pString;
     char    m_bPreviousBrief;
     char    _pad2[3];
-};
-
-struct cheattable
-{
-    char field_0x00[0x22];
-    bool CarsOnWater;
-    bool BoatsFly;
-    bool FatPlayer;
-    bool MaxMuscle;
-    bool SkinnyPlayer;
-    bool ElvisIsEverywhere;
-    bool PedsAttackYouWithRockets;
-    bool BeachParty;
-    bool GangMembersEverywhere;
-    bool GangsControlTheStreets;
-    bool NinjaTheme;
-    bool SlutMagnet;
-    bool CheapTraffic;
-    bool FastTraffic;
-    bool CarsFly;
 };
 
 struct CHud
@@ -462,22 +443,6 @@ struct CVehicle
     void                 AutomobilePlaceOnRoadProperly ();
     void                 BikePlaceOnRoadProperly ();
     char                 SetGearUp ();
-};
-
-struct CPed
-{
-    char     __pad00[0x46C];
-    int      flags[4];
-    char     __pad47C[272];
-    CEntity *m_pVehicle;
-    int      field_590;
-    int      field_594;
-    int      m_nPedType;
-
-    int   GiveWeapon (int weapon, int ammo, int slot);
-    void  SetCurrentWeapon (int slot);
-    void *CCopPed__CCopPed (int type);
-    void  SetModelIndex (int modelIndex);
 };
 
 struct CPickups
@@ -817,6 +782,32 @@ struct CMatrixLink
     CMatrix matrix;
 };
 
+struct CPed
+{
+    int              vtable;
+    cSimpleTransform m_SimpleTransform;
+    CMatrixLink *    m_pMatrix;
+    union
+    {
+        struct RwObject *m_pRwObject;
+        struct RpClump * m_pRwClump;
+        struct RpAtomic *m_pRwAtomic;
+    };
+
+    char     __pad1C[1104];
+    int      flags[4];
+    char     __pad47C[272];
+    CEntity *m_pVehicle;
+    int      field_590;
+    int      field_594;
+    int      m_nPedType;
+
+    int   GiveWeapon (int weapon, int ammo, int slot);
+    void  SetCurrentWeapon (int slot);
+    void *CCopPed__CCopPed (int type);
+    void  SetModelIndex (int modelIndex);
+};
+
 struct CPhysical
 {
     char    field_0x00[0x44];
@@ -978,6 +969,8 @@ struct CAnimationStyleDescriptor
 };
 
 CMatrix *RwFrameGetLTM (void *frame);
+CAnimBlendAssociation *RpAnimBlendClumpExtractAssociations (RpClump *clump);
+void     RpAnimBlendClumpGiveAssociations (RpClump *clump, CAnimBlendAssociation *association);
 
 int    random (int max);
 int    random (int min, int max);

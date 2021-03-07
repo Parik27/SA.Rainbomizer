@@ -469,6 +469,20 @@ CPad::DoCheats ()
 }
 
 /*******************************************************/
+CAnimBlendAssociation *
+RpAnimBlendClumpExtractAssociations (RpClump* clump)
+{
+    return CallAndReturn<CAnimBlendAssociation *, 0x4D6BE0> (clump);
+}
+
+/*******************************************************/
+void
+RpAnimBlendClumpGiveAssociations (RpClump* clump, CAnimBlendAssociation* association)
+{
+    Call<0x4D6C30> (clump, association);
+}
+
+/*******************************************************/
 void
 CAudioEngine::PreloadMissionAudio (unsigned char slot, int id)
 {

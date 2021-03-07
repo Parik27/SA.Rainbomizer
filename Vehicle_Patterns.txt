@@ -28,7 +28,7 @@ guns1	Copcarla	2	Y	Y	N	Y	Y	Y	N	N	N
 ryder3	Picador	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 ryder3	Greenwoo	4	Y	N	N	N	N	N	N	N	N					
 ryder2	Mule	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
-ryder2	Forklift	1	N	N	N	N	N	N	N	N	N					
+ryder2	Forklift	1	N	N	N	N	N	Y	N	N	N	rc				
 ryder2	Mesa	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 ryder2	Patriot	2	Y	Y	N	Y	N	Y	N	N	N					
 twar7	Glendale	4	Y	N	N	N	N	Y	N	N	N					
@@ -75,12 +75,12 @@ cprace	Cheetah	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft
 cprace	Turismo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Infernus	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Elegy	2	Y	Y	N	Y	N	N	N	N	N					
-cprace	Stunt	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
-cprace	Rustler	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
-cprace	Hydra	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
-cprace	Maverick	1	N	N	N	N	C	Y	N	N	N	smallplanes	46	-39	0	
-cprace	Vcnmav	1	N	N	N	N	Y	Y	N	N	N	smallplanes				
-cprace	Hunter	1	N	N	N	N	Y	Y	N	N	N	vtol				
+cprace	Stunt	1	Y	N	N	Y	Y	N	N	N	N	nohovercraft				
+cprace	Rustler	1	Y	N	N	Y	Y	N	N	N	N	nohovercraft				
+cprace	Hydra	1	Y	N	N	Y	Y	N	N	N	N	nohovercraft				
+cprace	Maverick	1	C	N	N	C	C	Y	N	N	N	smallplanes	46	-39	0	
+cprace	Vcnmav	1	Y	N	N	Y	Y	Y	N	N	N	smallplanes				
+cprace	Hunter	1	Y	N	N	Y	Y	Y	N	N	N	vtol				
 cprace	Bandito	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Kart	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Alpha	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
@@ -110,8 +110,8 @@ cat1	Quad	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft
 cat2	Copcarru	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 cat2	Copbike	1	C	Y	Y	Y	C	C	N	N	N	x=2322+y=73+z=26+smallplanes	-1	18	0	Catalina's STB Bike
 cat2	Copbike	1	C	Y	Y	Y	C	C	N	N	N	x=2323+y=70+z=26+smallplanes	-30	0	0	CJ's STB Bike
-cat3	Petro	2	Y	N	N	N	N	N	N	N	N	canattach				
-cat3	Petrotr	1	N	N	N	N	N	N	N	N	Y	canattach				
+cat3	Petro	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
+cat3	Petrotr	1	Y	N	N	Y	Y	Y	N	N	Y	smallplanes+norc				
 cat3	Sabre	2	Y	Y	N	Y	Y	Y	N	N	N					
 truth1	Combine	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-1023+y=-933+z=129+smallplanes				
 truth1	Walton	1	Y	Y	Y	Y	Y	N	N	N	Y	x=-1154+y=-1339+z=126+hovercraft				
@@ -125,7 +125,7 @@ garag1	Hotdog	1	Y	Y	Y	Y	Y	Y	N	N	N
 scrash3	Zr350	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 scrash3	Buffalo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 scrash3	Merit	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-scrash2	Taxi	2	Y	Y	N	Y	N	N	N	N	N					
+scrash2	Taxi	4	Y	N	N	N	N	N	N	N	N					
 wuzi1	Sentinel	4	Y	N	N	N	N	N	N	N	N	x=-2177+y=642+z=48				
 wuzi1	Sentinel	2	Y	Y	N	Y	N	N	N	N	N	x=-2245+y=715+z=48				
 wuzi1	Sentinel	2	Y	Y	N	Y	N	N	N	N	N	x=-2251+y=612+z=48				
@@ -184,20 +184,21 @@ dskool	Supergt	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes
 dskool	Banshee	1	Y	N	N	N	N	N	N	N	N	x=-2050+y=-130+smallcar				
 dskool	Banshee	1	Y	N	N	N	N	N	N	N	N	x=-2050+y=-110+smallcar				
 zero1	Rcbaron	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
-zero2	Rcbaron	1	Y	N	N	N	Y	Y	N	N	N	guns				
+zero2	Rcbaron	1	N	N	N	N	Y	Y	N	N	N	guns				
 zero2	Sanchez	2	Y	Y	N	Y	Y	Y	N	N	N					
 zero4	Bmx	1	N	N	N	N	N	N	N	N	N					
 zero4	Rcgoblin	1	N	N	N	N	N	Y	N	N	N	rc				
 toreno1	Monster	1	Y	Y	Y	Y	C	C	N	N	N	smallplanes	-10	0	0	
 toreno2	Pcj600	2	Y	Y	N	Y	N	N	N	N	N					
 toreno2	Petro	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
+toreno2	Petrotr	1	Y	N	N	Y	Y	Y	N	N	N	smallplanes+norc				
 des3	Journey	2	Y	Y	N	Y	Y	Y	N	N	N					
 desert6	Rustler	1	Y	N	N	Y	C	C	N	N	N	nohovercraft+norc	0	-35	0	
 desert6	Hydra	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
 desert9	Pcj600	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 maf4	Camper	2	Y	Y	N	Y	Y	Y	Y	Y	N					
 desert5	Rustler	1	Y	N	N	Y	Y	N	N	N	N	norc+nohovercraft				
-desert5	Hunter		Y	N	N	Y	Y	Y	N	N	N	z=15				
+desert5	Hunter	1	Y	N	N	Y	Y	Y	N	N	N	z=15				
 desert5	Hunter	1	N	N	N	N	Y	Y	N	N	N	guns				
 desert5	Landstal	1	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 desert5	Petro	1	Y	Y	N	Y	Y	Y	Y	Y	Y					
@@ -206,7 +207,8 @@ casino1	Feltzer	1	Y	N	N	N	N	N	N	N	N
 casino2	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 casino2	Manana	1	Y	Y	Y	Y	Y	Y	Y	N	Y	smallplanes				
 casino2	Securica	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
-casino3	Admiral	2	Y	Y	N	N	Y	N	N	N	N	smallplanes				
+casino3	Admiral	2	Y	Y	N	Y	Y	Y	N	N	N	x=1044+y=2096+z=9+smallplanes				
+casino3	Admiral	4	Y	N	N	N	N	Y	N	N	N					
 casino3	Washing	2	Y	Y	N	Y	N	N	N	N	N					
 casino4	Walton	2	Y	Y	N	Y	N	N	N	N	N					
 casino5	Ambulan	4	Y	N	N	N	Y	Y	N	N	N	smallplanes				
@@ -229,7 +231,7 @@ heist5	Leviathn	1	N	N	N	N	Y	Y	N	N	N	vtol+norc
 heist5	Securica	1	Y	Y	Y	Y	Y	Y	Y	N	Y	smallcar+smallplanes				
 heist5	Patriot	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 heist5	Hunter	1	N	N	N	N	N	Y	N	N	N					
-heist9	Forklift	1	C	Y	Y	Y	N	N	N	N	N	x=2173+y=1585+z=998	6	0	0	
+heist9	Forklift	1	C	Y	Y	Y	N	N	N	N	N	x=2173+y=1585+z=998	6	0	1	
 heist9	Securica	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	x=345+y=2546+z=15				
 heist9	Securica	4	Y	N	N	N	N	N	N	N	N					
 heist9	Copbike	1	Y	Y	Y	Y	N	N	N	N	N					
@@ -237,9 +239,10 @@ heist9	Polmav	1	Y	Y	Y	Y	Y	Y	N	N	N	x=2295+y=1839+z=38+smallplanes
 mansio1	Phoenix	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 mansio1	Windsor	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 mansio2	Washing	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
-mansio2	Squalo	1	N	N	N	N	Y	Y	Y	N	N	float				
+mansio2	Squalo	1	N	N	N	N	C	C	C	N	N	float+nohovercraft	0	0	2	
 mansio2	Hydra	1	Y	N	N	Y	Y	Y	N	N	N	smallplanes+norc				
 mansio2	Tropic	1	N	N	N	N	Y	Y	Y	N	N	float				
+mansio2	Launch	1	N	N	N	N	N	N	N	N	N	float				
 manson5	Vortex	1	Y	Y	Y	Y	Y	Y	C	N	N	x=-7+y=-1116+z=7+smallplanes	40	0	-6	
 manson5	Marquis	1	N	N	N	N	Y	Y	Y	N	N	float				
 manson5	Reefer	1	N	N	N	N	Y	Y	Y	N	N	float				
@@ -255,3 +258,43 @@ finalec	Copcarla	2	Y	Y	Y	Y	Y	Y	Y	Y	Y
 finalec	Sanchez	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
 finalec	Tornado	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
 kicksta	Sanchez	1	N	Y	Y	N	N	N	N	N	N					
+truck	Petro	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
+truck	Petrotr	1	Y	N	N	Y	Y	Y	N	N	Y	smallplanes+norc				
+truck	Linerun	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
+truck	Rdtrain	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
+truck	Artict1	1	Y	N	N	Y	Y	Y	N	N	Y	smallplanes+norc				
+truck	Artict2	1	Y	N	N	Y	Y	Y	N	N	Y	smallplanes+norc				
+truck	Artict3	1	Y	N	N	Y	Y	Y	N	N	Y	smallplanes+norc				
+boat	Coastg	1	C	N	N	C	C	Y	Y	N	N	float+norc	0	0	15	
+boat	Dinghy	1	C	N	N	C	C	Y	Y	N	N	float+norc	0	0	15	
+boat	Vortex	1	Y	N	N	Y	C	C	C	N	N	x=-2014+y=2365+z=6+float	-60	0	0	
+boat	Vortex	1	N	N	N	N	N	N	Y	N	N	float	0	0	15	
+boat	Tropic	1	C	N	N	C	C	Y	Y	N	N	float	0	0	15	
+boat	Marquis	1	C	N	N	C	C	Y	Y	N	N	float	0	0	15	
+bskool	Bf400	1	Y	Y	Y	Y	N	Y	N	N	N					
+bskool	Pcj600	1	Y	Y	Y	Y	Y	Y	N	N	N	hovercraft				
+bskool	Fcr900	1	N	Y	Y	N	N	N	N	N	N					
+bskool	Nrg500	1	N	Y	Y	N	N	N	N	N	N					
+bskool	Sanchez	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
+blood	Bloodra	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
+valet	Cheetah	1	Y	Y	Y	Y	N	N	N	N	N					
+valet	Previon	1	Y	Y	Y	Y	N	N	N	N	N					
+valet	Feltzer	1	Y	Y	Y	Y	N	N	N	N	N					
+valet	Elegant	1	Y	Y	Y	Y	N	N	N	N	N					
+tria	Mtbike	1	Y	Y	Y	Y	Y	Y	N	N	N					
+debt	Vincent	4	Y	N	N	N	N	Y	N	N	N					
+gfdate	Hustler	1	Y	Y	Y	Y	Y	Y	N	N	N					
+gfdate	Monsterb	1	Y	Y	Y	Y	Y	Y	N	N	N					
+gfdate	Copcarru	1	Y	Y	Y	Y	Y	Y	N	N	N					
+gfdate	Bandito	1	Y	Y	Y	Y	Y	Y	N	N	N					
+gfdate	Romero	1	Y	Y	Y	Y	Y	Y	N	N	N					
+gfdate	Feltzer	1	Y	Y	Y	Y	Y	Y	N	N	N					
+quarry	Copbike	1	Y	Y	Y	Y	Y	N	N	N	N	smallcar+hovercraft				
+quarry	Dumper	1	N	N	N	N	N	N	N	N	N					
+quarry	Dozer	1	N	N	N	N	N	N	N	N	N	x=653+y=879+z=-42				
+quarry	Dozer	1	Y	N	N	N	N	N	N	N	N					
+quarry	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	x=816+y=845+z=9+smallplanes				
+quarry	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	x=812+y=1144+z=27+smallplanes				
+cokec	Sanchez	1	Y	Y	Y	Y	N	N	N	N	N					
+bcesar2	Patriot	4	Y	N	N	N	N	N	N	N	N					
+mtbiker	Mtbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				

@@ -25,7 +25,7 @@ void __fastcall InitialiseText (CText *text, void *edx, char a2)
 
 /*******************************************************/
 void
-GetNewPlateText (char *buf, int len)
+GenerateNewText (char *buf)
 {
     memset (buf, 0, 8);
 
@@ -33,6 +33,13 @@ GetNewPlateText (char *buf, int len)
     int         length = strlen (word);
 
     strncpy (buf, word, std::min (length, 8));
+}
+
+/*******************************************************/
+void
+GetNewPlateText (char *buf, int len)
+{
+    GenerateNewText (buf);
 }
 
 /*******************************************************/

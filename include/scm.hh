@@ -87,8 +87,8 @@ public:
 
     static inline struct Config
     {
-        bool MoreSchoolTestTime = true;
-        bool SkipLowriderCheck = true;
+        bool MoreSchoolTestTime;
+        bool SkipLowriderCheck;
     } m_Config;
 
     uint8_t mSeatsCache[212];

@@ -775,6 +775,13 @@ CFont::SetAlphaFade (float alpha)
 }
 
 /*******************************************************/
+RpLight*
+RpLightSetColor (RpLight *light, RwRGBAReal *colour)
+{
+    return ((RpLight* (__cdecl *) (RpLight *, RwRGBAReal *)) 0x751A90) (light, colour);
+}
+
+/*******************************************************/
 double
 CStats::GetStatValue (short id)
 {
@@ -800,6 +807,115 @@ int
 CIplStore::FindIplSlot (char *name)
 {
     return CallAndReturn<int, 0x404AC0> (name);
+}
+
+/*******************************************************/
+void
+CCoronas::RegisterCorona (int ID, CEntity *attachTo, char red, char green,
+                          char blue, char alpha, CVector const &posn,
+                          float radius, float farClip, int coronaType,
+                          int flareType, bool enableReflection,
+                          bool checkObstacles, int _param_not_used, float angle,
+                          bool longDistance, float nearClip, char fadeState,
+                          float fadeSpeed, bool onlyFromBelow,
+                          bool reflectionDelay)
+{
+    ((void (__cdecl *) (int, CEntity *, char, char, char, char, CVector const &,
+                        float, float, int, int, bool, bool, int, float, bool,
+                        float, char, float, bool, bool)) 0x6FC580) (
+        ID, attachTo, red, green, blue, alpha, posn, radius, farClip,
+        coronaType, flareType, enableReflection, checkObstacles,
+        _param_not_used, angle, longDistance, nearClip, fadeState, fadeSpeed,
+        onlyFromBelow, reflectionDelay);
+}
+
+/*******************************************************/
+void
+CCoronas::RegisterCorona (int ID, CEntity *attachTo, char red, char green,
+                          char blue, char alpha, CVector const &posn,
+                          float radius, float farClip, RwTexture* texture,
+                          int flareType, bool enableReflection,
+                          bool checkObstacles, int _param_not_used, float angle,
+                          bool longDistance, float nearClip, char fadeState,
+                          float fadeSpeed, bool onlyFromBelow,
+                          bool reflectionDelay)
+{
+    ((void (__cdecl *) (int, CEntity *, char, char, char, char, CVector const &,
+                        float, float, RwTexture*, int, bool, bool, int, float, bool, 
+                        float, char, float, bool, bool)) 0x6FC180) (
+        ID, attachTo, red, green, blue, alpha, posn, radius, farClip,
+        texture, flareType, enableReflection, checkObstacles,
+        _param_not_used, angle, longDistance, nearClip, fadeState, fadeSpeed,
+        onlyFromBelow, reflectionDelay);
+}
+
+/*******************************************************/
+void CSprite::RenderOneXLUSprite(float x, float y, float z, float halfw,
+                                float halfh, char r, char g, char b, char a,
+                                float rhw, char intensity, char udir,
+                                char vdir)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
+                        char, float, char, char, char)) 0x70D000) (
+        x, y, z, halfw, halfh, r, g, b, a, rhw, intensity, udir, vdir);
+}
+
+/*******************************************************/
+void CSprite::RenderOneXLUSprite_Triangle (float arg1, float arg2, int arg3,
+                                         int arg4, int arg5, int arg6,
+                                         float arg7, char r, char g, char b,
+                                         char a, float arg12, char arg13)
+{
+    ((void (__cdecl *) (float, float, int, int, int, int, float, char, char, 
+        char, char, float, char)) 0x70D320) (arg1, arg2, arg3, arg4, arg5, arg6,
+                                          arg7, r, g,
+                                          b, a, arg12, arg13);
+}
+
+/*******************************************************/
+void CSprite::RenderOneXLUSprite_Rotate_Aspect (float x, float y, float z,
+                                              float halfw, float halfh, char r,
+                                              char g, char b, char a, float rhw,
+                                              float arg11, char intensity)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char, char, float, float,
+                        char)) 0x70D490) (x, y, z, halfw, halfh, r, 
+                            g, b, a, rhw, arg11, intensity);
+}
+
+/*******************************************************/
+void CSprite::RenderBufferedOneXLUSprite (float x, float y, float z, float w,
+                                        float h, char r, char g, char b, char a,
+                                        float recipNearZ, char arg11)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
+                        char, float, char)) 0x70E4A0) (x, y, z, w, h, r,
+                                                       g, b, a, recipNearZ, arg11);
+}
+
+/*******************************************************/
+void CSprite::RenderBufferedOneXLUSprite_Rotate_Aspect (float x, float y, float z,
+                                                      float w, float h, char r,
+                                                      char g, char b, char a,
+                                                      float recipNearZ,
+                                                      float angle, char arg12)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
+                        char, float, float, char)) 0x70E780) (x, y, z, w, h, r, g, b,
+                                                       a, recipNearZ, angle, arg12);
+}
+
+/*******************************************************/
+void
+CSprite::RenderBufferedOneXLUSprite_Rotate_Dimension (float x, float y, float z,
+                                                   float w, float h, char r,
+                                                   char g, char b, char a,
+                                                   float recipNearZ,
+                                                   float angle, char arg12)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
+                        char, float, float, char)) 0x70EAB0) (x, y, z, w, h, r, g, b, a, recipNearZ,
+                                          angle, arg12);
 }
 
 /*******************************************************/

@@ -29,6 +29,14 @@ public:
     /// Returns the static instance for ClothesRandomizer.
     static ClothesRandomizer *GetInstance ();
 
+    static inline struct Config
+    {
+        bool RandomizePlayerModel;
+        bool RandomizePlayerClothing;
+
+        bool IncludeNSFWModels;
+    } m_Config;
+
     std::pair<int, int> GetRandomCRCForComponent (int componentId);
 
     /// Initialises Hooks/etc.

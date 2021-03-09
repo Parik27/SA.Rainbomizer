@@ -125,6 +125,16 @@ public:
     int            field_48;
 };
 
+struct RwTexture
+{
+    char field_0x00[0x58];
+};
+
+struct RpLight
+{
+    char field_0x00[0x40];
+};
+
 struct CCarGenerator
 {
     int16_t m_nModelId;
@@ -148,6 +158,49 @@ struct Message
 struct CHud
 {
     static void SetMessage (char *str);
+};
+
+struct CCoronas
+{
+    static void RegisterCorona (int ID, CEntity *attachTo, char red, char green,
+                         char blue, char alpha, CVector const &posn,
+                         float radius, float farClip, int coronaType,
+                         int flareType, bool enableReflection,
+                         bool checkObstacles, int _param_not_used, float angle,
+                         bool longDistance, float nearClip, char fadeState,
+                         float fadeSpeed, bool onlyFromBelow,
+                         bool reflectionDelay);
+    static void RegisterCorona (int ID, CEntity *attachTo, char red, char green,
+                                char blue, char alpha, CVector const &posn,
+                                float radius, float farClip, RwTexture* texture,
+                                int flareType, bool enableReflection,
+                                bool checkObstacles, int _param_not_used, float angle,
+                                bool longDistance, float nearClip, char fadeState,
+                                float fadeSpeed, bool onlyFromBelow,
+                                bool reflectionDelay);
+};
+
+struct CSprite
+{
+    static void RenderOneXLUSprite (float x, float y, float z, float halfw,
+                                    float halfh, char r, char g, char b, char a,
+                                    float rhw, char intensity, char udir,
+                                    char vdir);
+    static void RenderOneXLUSprite_Triangle (float arg1, float arg2, int arg3, int arg4, 
+                                            int arg5, int arg6, float arg7, char r, char g, 
+                                            char b, char a, float arg12, char arg13);
+    static void RenderOneXLUSprite_Rotate_Aspect (float x, float y, float z, float halfw, 
+                                                 float halfh, char r, char g, char b, char a, 
+                                                 float rhw, float arg11, char intensity);
+    static void RenderBufferedOneXLUSprite (float x, float y, float z, float w, float h,
+                                            char r, char g, char b, char a, 
+                                            float recipNearZ, char arg11);
+    static void RenderBufferedOneXLUSprite_Rotate_Aspect (float x, float y, float z, float w,
+                                            float h, char r, char g, char b, char a, 
+                                            float recipNearZ, float angle, char arg12);
+    static void RenderBufferedOneXLUSprite_Rotate_Dimension (float x, float y, float z, float w, 
+                                                            float h, char r, char g, char b, char a, 
+                                                            float recipNearZ, float angle, char arg12);
 };
 
 struct CMessages
@@ -213,7 +266,7 @@ private:
 
 public:
     char *GetPointerToScriptVariable (int a2);
-    char  ReadTextLabelFromScript (char *text, char length);
+    void  ReadTextLabelFromScript (char *text, char length);
     void  CollectParameters (short num);
     bool  CheckName (const char *name);
     void  ProcessCommands1526to1537 (int opcode);
@@ -523,6 +576,14 @@ struct RwRGBA
     unsigned char g;
     unsigned char b;
     unsigned char a;
+};
+
+struct RwRGBAReal
+{
+    int r;
+    int g;
+    int b;
+    int a;
 };
 
 struct CMatrix
@@ -971,6 +1032,7 @@ struct CAnimationStyleDescriptor
 CMatrix *RwFrameGetLTM (void *frame);
 CAnimBlendAssociation *RpAnimBlendClumpExtractAssociations (RpClump *clump);
 void     RpAnimBlendClumpGiveAssociations (RpClump *clump, CAnimBlendAssociation *association);
+RpLight* RpLightSetColor (RpLight *light, RwRGBAReal *colour);
 
 int    random (int max);
 int    random (int min, int max);

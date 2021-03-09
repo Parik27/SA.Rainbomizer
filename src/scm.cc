@@ -570,7 +570,7 @@ void __fastcall ProcessModifiedSchoolTimesBoat (CRunningScript *scr,
             else if (currentTest == 5)
             {
                 oldRecord = ScriptSpace[1967];
-                ScriptSpace[8197] -= 180000;
+                ScriptSpace[8197] -= 120000;
             }
     }
 }
@@ -636,7 +636,7 @@ void __fastcall DisplayCorrectBoatTimeOnTV (CRunningScript *scr, void *edx,
                 else if (currentTest == 5 && ScriptSpace[1967] != 200000) 
                 {
                     tempActualTime = ScriptSpace[1967];
-                    ScriptSpace[1967] -= 180000;
+                    ScriptSpace[1967] -= 120000;
                 }
         }
         else if ((((float *) ScriptParams)[0] >= 322.0f
@@ -752,7 +752,7 @@ void __fastcall DisplayCorrectBoatTimePart2 (CRunningScript *scr, void *edx,
                     else if (currentTest == 3)
                         ((float *) ScriptParams)[0] += 2.0f;
                     else if (currentTest == 5)
-                        ((float *) ScriptParams)[0] += 3.0f;
+                        ((float *) ScriptParams)[0] += 2.0f;
             }
             else if (type != -1)
                 {
@@ -1260,14 +1260,7 @@ void __fastcall FixBoatSchoolObjectPlacements (CRunningScript *scr, void *edx,
     if (scr->CheckName ("boat"))
     {
             int currentVehicle = ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ();
-            if (((float *) ScriptParams)[2] >= 99.0f
-                && ((float *) ScriptParams)[2] <= 101.0f
-                && ((float *) ScriptParams)[3] >= 479.0f
-                && ((float *) ScriptParams)[3] <= 481.0f 
-                && (CModelInfo::IsCarModel(currentVehicle) 
-                    || CModelInfo::IsQuadBikeModel(currentVehicle)))
-                ((float *) ScriptParams)[4] += -15.0f;
-            else if (ScriptSpace[8189] == 5
+            if (ScriptSpace[8189] == 5
                      && !CModelInfo::IsCarModel (currentVehicle)
                      && !CModelInfo::IsQuadBikeModel (currentVehicle))
                 ((float *) ScriptParams)[2] += 60.0f;

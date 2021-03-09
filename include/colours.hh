@@ -30,10 +30,13 @@
 // Hooked Functions
 
 struct CRGBA;
+struct CRunningScript;
 
 void __fastcall RandomizeVehicleColour (void *info, void *edx, uint8_t *prim,
                                         uint8_t *secn, uint8_t *tert,
                                         uint8_t *quat, int variation);
+void __fastcall RandomizeScriptVehicleColours (CRunningScript *scr, void *edx,
+                                               short count);
 int RandomizeColourTables ();
 
 CRGBA GetRainbowColour (int offset = 0);
@@ -50,12 +53,15 @@ public:
     static inline struct Config
     {
         bool RandomizeCarCols;
-        bool RandomizeFades;
+        bool RandomizeMarkers;
         bool RandomizeText;
+        bool RandomizeLights;
+        bool RandomizeClouds;
+        bool RandomizeOtherSkyElements;
 
         bool RainbowHueCycle;
 
-        //std::vector<int64_t> Exceptions;
+        bool RandomizeFades;
         bool                 CrazyMode;
     } m_Config;
 
@@ -63,4 +69,10 @@ public:
     static ColourRandomizer *GetInstance ();
 
     void Initialise ();
+
+    struct Pattern
+    {
+        int ID;
+        int colours[3];
+    };
 };

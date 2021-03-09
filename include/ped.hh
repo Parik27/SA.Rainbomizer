@@ -25,6 +25,14 @@ public:
     /// Returns the static instance for PedRandomizer.
     static PedRandomizer *GetInstance ();
 
+    static inline struct Config
+    {
+        bool RandomizeGenericModels;
+        bool RandomizeCops;
+        bool RandomizeSpecialModels;
+        bool IncludeNSFWModels;
+    } m_Config;
+
     /// Initialises Hooks/etc.
     void Initialise ();
 

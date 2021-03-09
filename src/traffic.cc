@@ -99,7 +99,9 @@ TrafficRandomizer::Initialise ()
                     {HOOK_JUMP, 0x421900, (void *) &RandomizeCarToLoad},
                     {HOOK_CALL, 0x42C620, (void *) &FixEmptyPoliceCars},
                     {HOOK_CALL, 0x501F3B, (void *) &FixFreightTrainCrash},
-                    {HOOK_CALL, 0x61282F, (void *) &FixCopCrash}});
+                    {HOOK_CALL, 0x61282F, (void *) &FixCopCrash}, 
+                    {HOOK_CALL, 0x462217, (void *) &RandomizeRoadblocks},
+                    {HOOK_CALL, 0x4998F0, (void *) &RandomizeRoadblocks}});
 
     this->Install6AF420_Hook ();
 
@@ -109,6 +111,59 @@ TrafficRandomizer::Initialise ()
     Logger::GetLogger ()->LogMessage ("Registered Traffic Randomizer");
 
     FixTrainSpawns ();
+}
+
+/*******************************************************/
+void* __fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx,
+                                               int model, char createdBy, char setupSuspensionLines)
+{
+    auto trafficRandomizer = TrafficRandomizer::GetInstance ();
+    int  random_id         = StreamingManager::GetRandomLoadedVehicle ();
+    if (trafficRandomizer->mForcedCar)
+        random_id = trafficRandomizer->mForcedCar;
+    //else if (!trafficRandomizer->IsVehicleAllowed (random_id))
+    //    return;
+
+    //if (ms_aInfoForModel[random_id].m_nLoadState == 1)
+    //    {
+    //        // Add to the recently spawned list
+    //        trafficRandomizer->mMostRecentSpawnedVehicles.push_back (random_id);
+
+    //        if (trafficRandomizer->mMostRecentSpawnedVehicles.size ()
+    //            > LOG_MOST_RECENT_VEHICLES)
+    //            trafficRandomizer->mMostRecentSpawnedVehicles.pop_front ();
+    //    }
+    //else if (trafficRandomizer->mForcedCar)
+    //    return;
+
+    if (CModelInfo::IsBoatModel (random_id) || CModelInfo::IsTrainModel(random_id))
+        CallMethod<0x6F2940> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsPlaneModel (random_id))
+        CallMethod<0x6C8E20> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsHeliModel (random_id))
+        CallMethod<0x6C4190> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsBikeModel (random_id))
+        CallMethod<0x6BF430> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsBmxModel (random_id))
+        CallMethod<0x6BF820> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsTrailerModel (random_id))
+        CallMethod<0x6D03A0> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsQuadBikeModel (random_id))
+        CallMethod<0x6CE370> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsMonsterTruckModel (random_id))
+        CallMethod<0x6C8D60> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsCarModel (random_id))
+        CallMethod<0x6B0A90> (vehicle, random_id, createdBy, setupSuspensionLines);
+
+    return vehicle;
 }
 
 /*******************************************************/
@@ -204,6 +259,8 @@ LoadRandomVehiclesAtStart ()
             for (int i = 0; i < 5; i++)
                 {
                     int model = RandomizeCarToLoad ();
+                    if (trafficRandomizer->mForcedCar)
+                        model = trafficRandomizer->mForcedCar;
                     if (model != -1)
                         CStreaming::RequestModel (model, 8);
                 }

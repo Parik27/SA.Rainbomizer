@@ -45,19 +45,4 @@ template <typename T> struct Vector3_t : public Vector2_t<T>
     }
 };
 
-struct Vector3_native
-{
-    float x;
-    int   _pad08;
-    float y;
-    int   _pad02;
-    float z;
-    int   _pad00;
-};
-
 typedef Vector3_t<float> Vector3;
-
-struct Vector4 : Vector3
-{
-    float __pad;
-};

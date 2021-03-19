@@ -29,11 +29,16 @@
 #include "injector/calling.hpp"
 #include <chrono>
 #include <string>
+#include "fades.hh"
 
 ColourRandomizer *ColourRandomizer::mInstance = nullptr;
-std::vector<ColourRandomizer::Pattern> colourPatterns;
-CRGBA              cloudColourDistant = {-1, -1, -1, -1};
-CRGBA              cloudColourHigh = {-1, -1, -1, -1};
+
+// Store RGB colours and light IDs to ensure each one stays consistent without flickering.
+static std::vector<ColourRandomizer::Pattern> colourPatterns;
+static CRGBA              cloudColourDistant = {-1, -1, -1, -1};
+static CRGBA              cloudColourHigh = {-1, -1, -1, -1};
+static CRGBA              fogType1           = {-1, -1, -1, -1};
+static CRGBA              fogType2           = {-1, -1, -1, -1};
 
 ColourRandomizer::Pattern GetColour (ColourRandomizer::Pattern pattern)
 {
@@ -122,7 +127,7 @@ ColourRandomizer::GetInstance ()
 void
 RandomizeFadeColour ()
 {
-    injector::WriteMemory<CRGBA> (0xC3EFA8, GetRainbowColour ());
+    injector::WriteMemory<CRGBA> (0xC3EFA8, GetRainbowColour());
 }
 
 /*******************************************************/
@@ -131,7 +136,7 @@ GetRainbowColour (int offset)
 {
     static bool hueCycle = ColourRandomizer::m_Config.RainbowHueCycle;
 
-    int    colour[3];
+    int        colour[3];
     static int offsetForStatic = random (0, 10000);
     double     time
         = (!hueCycle) ? offsetForStatic : 1000.0 * clock () / CLOCKS_PER_SEC;
@@ -144,7 +149,10 @@ GetRainbowColour (int offset)
 constexpr int
 HashColour (const CRGBA &colour)
 {
-    return (colour.r * 255 + colour.g) * 255 + colour.b;
+    return (((colour.r + ColourRandomizer::HudRandomizerSeed) % 255) * 255
+            + ((colour.g + ColourRandomizer::HudRandomizerSeed) % 255))
+               * 255
+           + ((colour.b + ColourRandomizer::HudRandomizerSeed) % 255);
 }
 
 /*******************************************************/
@@ -177,6 +185,41 @@ CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
         }
     return thisCol;
 }
+    //CRGBA
+//GenerateRandomColour (uint8_t r, uint8_t g, uint8_t b,
+//                      bool hueCycle)
+//{
+//    HSL h ({r, g, b, 255});
+//
+//    if (!hueCycle)
+//        {
+//
+//            h.h = fmod (h.h + ColourRandomizer::HudRandomizerSeed, 360.0f);
+//            h.s = fmod (h.s + ColourRandomizer::HudRandomizerSeed, 0.5f) + 0.5f;
+//            //h.l = randomFloat (0.0f, 1.0f);
+//        }
+//    else
+//        {
+//            double time = 1000.0 * clock () / CLOCKS_PER_SEC;
+//            h.h += fmod (time / 10 + h.h, 360);
+//            h.s = 0.8f;
+//        }
+//
+//    return h.ToRGBA ();
+//}
+
+///*******************************************************/
+//static CRGBA *__fastcall RandomizeColours (CRGBA *col, void *, uint8_t r,
+//                                           uint8_t g, uint8_t b, uint8_t a)
+//{
+//    auto colour = GenerateRandomColour (r, g, b);
+//    col->r      = colour.r;
+//    col->g      = colour.g;
+//    col->b      = colour.b;
+//    col->a      = a;
+//
+//    return col;
+//}
 
 /*******************************************************/
 CRGBA *__fastcall SkipRandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
@@ -194,7 +237,7 @@ CRGBA *__fastcall SkipRandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
 void __fastcall RandomizeMarkers (C3dMarker *marker)
 {
     auto colour      = marker->colour;
-    marker->colour   = GetRainbowColour (HashColour (colour));
+    marker->colour   = GetRainbowColour (HashColour(colour));
     marker->colour.a = colour.a;
 
     HookManager::CallOriginal<injector::thiscall<void (C3dMarker *)>,
@@ -229,7 +272,7 @@ RandomizeCoronaColours (int ID, CEntity *attachTo, char red, char green,
         colour.g = GetColour (currentID).colours[1];
         colour.b = GetColour (currentID).colours[2];
     }
-    colour               = GetRainbowColour (HashColour (colour));
+    colour = GetRainbowColour (HashColour (colour));
     CCoronas::RegisterCorona (ID, attachTo, colour.r, colour.g, colour.b, alpha, posn, radius,
                     farClip, coronaType, flaretype, enableReflection,
                     checkObstacles, _param_not_used, angle, longDistance,
@@ -263,7 +306,7 @@ RandomizeLightColours (int ID, CEntity *attachTo, char red, char green,
             colour.g = GetColour (currentID).colours[1];
             colour.b = GetColour (currentID).colours[2];
         }
-    colour       = GetRainbowColour (HashColour (colour));
+    colour = GetRainbowColour (HashColour (colour));
     CCoronas::RegisterCorona (ID, attachTo, colour.r, colour.g, colour.b, alpha,
                               posn, radius, farClip, texture, flaretype,
                               enableReflection, checkObstacles, _param_not_used,
@@ -317,22 +360,35 @@ RandomizeWeatherEffectColours (float x, float y, float z, float w, float h,
     if (address == 0x715EDF)
     {
         if (cloudColourHigh.a == -1)
-            cloudColourHigh = {colour.r, colour.g, colour.b, colour.a};
+            cloudColourHigh = {random(255), colour.g, colour.b, colour.a};
         colour = cloudColourHigh;
     }
-    colour       = GetRainbowColour (HashColour (colour));
+    colour = GetRainbowColour (HashColour (colour));
     CSprite::RenderBufferedOneXLUSprite (x, y, z, w, h, colour.r, colour.g,
                                  colour.b, a, recipNearZ, arg11);
 }
 
 /*******************************************************/
+template <int address>
 void
 RandomizeFogColours (float x, float y, float z, float w, float h, char r,
                      char g, char b, char a, float recipNearZ, float angle,
                      char arg12)
 {
     CRGBA colour = {r, g, b, a};
-    colour       = GetRainbowColour (HashColour (colour));
+    if (address == 0x700817)
+        {
+            if (fogType1.a == -1)
+                fogType1 = {random (255), colour.g, colour.b, colour.a};
+            colour = fogType1;
+        }
+    else if (address == 0x700B6B)
+        {
+            if (fogType2.a == -1)
+                fogType2 = {random (255), colour.g, colour.b, colour.a};
+            colour = fogType2;
+    }
+    colour = GetRainbowColour (HashColour (colour));
     CSprite::RenderBufferedOneXLUSprite_Rotate_Aspect (x, y, z, w, h, colour.r, colour.g,
                                  colour.b, a, recipNearZ, angle, arg12);
 }
@@ -347,7 +403,7 @@ RandomizeCloudColours (float x, float y, float z, float w, float h, char r,
     if (cloudColourDistant.a == -1)
         cloudColourDistant = {colour.r, colour.g, colour.b, colour.a};
     colour = cloudColourDistant;
-    colour       = GetRainbowColour (HashColour (colour));
+    colour = GetRainbowColour (HashColour (colour));
     CSprite::RenderBufferedOneXLUSprite_Rotate_Dimension (x, y, z, w, h, colour.r, colour.g,
                                                           colour.b, a, recipNearZ, angle,
                                                           arg12);
@@ -357,11 +413,12 @@ RandomizeCloudColours (float x, float y, float z, float w, float h, char r,
 void
 RandomizeRpLights (RpLight *light, RwRGBAReal *colour)
 {
-    CRGBA colourNew = {colour->r, colour->g, colour->b, colour->a};
+    CRGBA colourNew = {(int)(colour->r * 255.0f), (int)(colour->g * 255.0f), 
+        (int)(colour->b * 255.0f), (int)(colour->a * 255.0f)};
     colourNew       = GetRainbowColour (HashColour (colourNew));
-    colour->r       = colourNew.r;
-    colour->g       = colourNew.g;
-    colour->b       = colourNew.b;
+    colour->r = colourNew.r / 255.0f;
+    colour->g = colourNew.g / 255.0f;
+    colour->b = colourNew.b / 255.0f;
     RpLightSetColor (light, colour);
 }
 
@@ -381,12 +438,16 @@ ColourRandomizer::Initialise ()
             std::pair ("CrazyMode", &m_Config.CrazyMode)))
         return;
 
+    ColourRandomizer::HudRandomizerSeed = random (INT_MAX);
+
     if (m_Config.RandomizeCarCols)
         RegisterHooks (
-            {{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables},
+            {{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables<true>},
              {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}, 
              {HOOK_CALL, 0x47EA9B, (void *) &RandomizeScriptVehicleColours},
              {HOOK_CALL, 0x47B8FE, (void *) &RandomizeScriptVehicleColours}});
+
+            FadesManager::AddFadeCallback ([] { RandomizeColourTables<false>(); });
     if (m_Config.RandomizeText)
     {
         RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
@@ -438,25 +499,27 @@ ColourRandomizer::Initialise ()
 
     if (m_Config.RandomizeOtherSkyElements)
     {
-        for (int address : {0x6FB9A6, 0x713F0F, 0x714371})
-        {
-                injector::MakeCALL (0x6FB9A6, (void *) &RandomizeWeatherEffectColours<0x6FB9A6>); // Wet Roads
-                injector::MakeCALL (0x713F0F, (void *) &RandomizeWeatherEffectColours<0x713F0F>); // Stars
-                injector::MakeCALL (0x714371, (void *) &RandomizeWeatherEffectColours<0x714371>); // Rainbows
-        }
+        injector::MakeCALL (0x6FB9A6, (void *) &RandomizeWeatherEffectColours<0x6FB9A6>); // Wet Roads
+        injector::MakeCALL (0x713F0F, (void *) &RandomizeWeatherEffectColours<0x713F0F>); // Stars
+        injector::MakeCALL (0x714371, (void *) &RandomizeWeatherEffectColours<0x714371>); // Rainbows
     }
 
     if (m_Config.RandomizeClouds)
     {
         injector::MakeCALL (0x715EDF, (void *) &RandomizeWeatherEffectColours<0x715EDF>); // High Clouds
-        injector::MakeCALL (0x700817, (void *) &RandomizeFogColours);
-        injector::MakeCALL (0x700B6B, (void *) &RandomizeFogColours);
+        injector::MakeCALL (0x700817, (void *) &RandomizeFogColours<0x700817>);
+        injector::MakeCALL (0x700B6B, (void *) &RandomizeFogColours <0x700B6B>);
         injector::MakeCALL (0x714216, (void *) &RandomizeCloudColours); // Distant Clouds
     }
 
-    //for (int address : {0x735F9F, 0x735FAF})
+    // Basically the equivalent of discount TimeCycle Randomizer, might add as optional setting
+    //for (int address : {0x5BA566, 0x5BA59E, 0x5BA64D, 0x7064A7, 0x7355D4, 0x735613, 
+    //    0x735803, 0x73582B, 0x735971, 0x735A8B, 0x735A9C, 0x735B05, 0x735B16, 0x735B95,
+    //    0x735BA6, 0x735C17, 0x735C28, 0x735C4B, 0x735C5C, 0x735CF8, 0x735D1B, 0x735D3B, 
+    //    0x735D5C, 0x735D7C, 0x735E21, 0x735E32, 0x735E4B, 0x735E5C, 0x735ED6, 0x735EE6,
+    //    0x735EFB, 0x735F0C, 0x735F4F, 0x735F5F, 0x735F9F, 0x735FAF})
     //{
-    //    injector::MakeCALL (0x751A90, (void *) &RandomizeRpLights);
+    //    injector::MakeCALL (address, (void *) &RandomizeRpLights);
     //}
 
     if (m_Config.RandomizeFades)
@@ -466,10 +529,35 @@ ColourRandomizer::Initialise ()
             injector::MakeRangedNOP (0x50BF22 + 5, 0x50BF33);
         }
 
+    FadesManager::AddFadeCallback (
+        [] { ColourRandomizer::HudRandomizerSeed = random (INT_MAX); });
+
     Logger::GetLogger ()->LogMessage ("Initialised ColourRandomizer");
 }
 
-/*******************************************************/
+///*******************************************************/
+//template <bool callOriginal>
+//static int
+//RandomizeVehicleColours ()
+//{
+//    int ret = 0;
+//    if constexpr (callOriginal)
+//        ret = CModelInfo::LoadVehicleColours ();
+//
+//    const int COLOUR_TABLE_LENGTH = 128;
+//    for (int i = 0; i < COLOUR_TABLE_LENGTH; i++)
+//        {
+//            auto &colour    = ms_vehicleColourTable[i];
+//            auto  newColour = HSL (randomFloat (0.0f, 360.0f),
+//                                               1.0f, randomFloat (0.0f, 1.0f))
+//                                 .ToRGBA ();
+//
+//            colour = {newColour.r, newColour.g, newColour.b, colour.a};
+//        }
+//
+//    return ret;
+//}
+
 void __fastcall RandomizeVehicleColour (void *info, void *edx, uint8_t *prim,
                                         uint8_t *secn, uint8_t *tert,
                                         uint8_t *quat, int variation)
@@ -490,10 +578,13 @@ void __fastcall RandomizeScriptVehicleColours (CRunningScript *scr, void *edx,
 }
 
 /*******************************************************/
+template <bool callOriginal>
 int
 RandomizeColourTables ()
 {
-    int ret = CModelInfo::LoadVehicleColours ();
+    int ret = 0;
+    if constexpr (callOriginal)
+        ret = CModelInfo::LoadVehicleColours ();
 
     for (int i = 0; i < 128; i++)
         {
@@ -505,7 +596,5 @@ RandomizeColourTables ()
             ms_vehicleColourTable[i].g = (uint8_t) colour[1];
             ms_vehicleColourTable[i].b = (uint8_t) colour[2];
         }
-
-    Logger::GetLogger ()->LogMessage ("Randomized Colour Tables");
     return ret;
 }

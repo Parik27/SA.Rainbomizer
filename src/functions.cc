@@ -810,6 +810,15 @@ CIplStore::FindIplSlot (char *name)
 }
 
 /*******************************************************/
+CTimeCycleCurrent *
+CTimeCycleCurrent::GetInfo (CTimeCycleCurrent *timecyc, int weatherID, int timeID)
+{
+    return ((CTimeCycleCurrent
+      * (__fastcall *) (CTimeCycleCurrent *, int,
+                        int) ) 0x55F4B0) (timecyc, weatherID, timeID);
+}
+
+/*******************************************************/
 void
 CCoronas::RegisterCorona (int ID, CEntity *attachTo, char red, char green,
                           char blue, char alpha, CVector const &posn,

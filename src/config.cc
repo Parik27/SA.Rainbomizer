@@ -114,8 +114,8 @@ ConfigManager::GetIsEnabled (const std::string &name)
     ReadValue ("Randomizers", name, enabled);
     ReadValue (name, "Enabled", enabled);
 
-    Logger::GetLogger ()->LogMessage (name + ": "
-                                      + std::to_string (enabled));
+    //Logger::GetLogger ()->LogMessage (name + ": "
+    //                                  + std::to_string (enabled));
 
     return enabled;
 }

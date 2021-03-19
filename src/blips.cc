@@ -7,7 +7,7 @@
 #include "config.hh"
 
 BlipRandomizer *BlipRandomizer::mInstance = nullptr;
-int             northIcon                 = random (2, 63);
+static int             northIcon                 = random (2, 63);
 
 /*******************************************************/
 void

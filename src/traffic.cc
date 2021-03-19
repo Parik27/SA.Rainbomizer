@@ -121,20 +121,16 @@ void* __fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx,
     int  random_id         = StreamingManager::GetRandomLoadedVehicle ();
     if (trafficRandomizer->mForcedCar)
         random_id = trafficRandomizer->mForcedCar;
-    //else if (!trafficRandomizer->IsVehicleAllowed (random_id))
-    //    return;
 
-    //if (ms_aInfoForModel[random_id].m_nLoadState == 1)
-    //    {
-    //        // Add to the recently spawned list
-    //        trafficRandomizer->mMostRecentSpawnedVehicles.push_back (random_id);
+    if (ms_aInfoForModel[random_id].m_nLoadState == 1)
+        {
+            // Add to the recently spawned list
+            trafficRandomizer->mMostRecentSpawnedVehicles.push_back (random_id);
 
-    //        if (trafficRandomizer->mMostRecentSpawnedVehicles.size ()
-    //            > LOG_MOST_RECENT_VEHICLES)
-    //            trafficRandomizer->mMostRecentSpawnedVehicles.pop_front ();
-    //    }
-    //else if (trafficRandomizer->mForcedCar)
-    //    return;
+            if (trafficRandomizer->mMostRecentSpawnedVehicles.size ()
+                > LOG_MOST_RECENT_VEHICLES)
+                trafficRandomizer->mMostRecentSpawnedVehicles.pop_front ();
+        }
 
     if (CModelInfo::IsBoatModel (random_id) || CModelInfo::IsTrainModel(random_id))
         CallMethod<0x6F2940> (vehicle, random_id, createdBy);

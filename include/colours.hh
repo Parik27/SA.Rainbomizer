@@ -37,7 +37,7 @@ void __fastcall RandomizeVehicleColour (void *info, void *edx, uint8_t *prim,
                                         uint8_t *quat, int variation);
 void __fastcall RandomizeScriptVehicleColours (CRunningScript *scr, void *edx,
                                                short count);
-int RandomizeColourTables ();
+template <bool callOriginal> int RandomizeColourTables ();
 
 CRGBA GetRainbowColour (int offset = 0);
 
@@ -65,6 +65,8 @@ public:
         bool                 CrazyMode;
     } m_Config;
 
+    inline static std::uint32_t HudRandomizerSeed = 0;
+
     /// Returns the static instance for CarColRandomizer.
     static ColourRandomizer *GetInstance ();
 
@@ -76,3 +78,6 @@ public:
         int colours[3];
     };
 };
+
+CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
+                                    uint8_t g, uint8_t b, uint8_t a);

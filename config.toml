@@ -29,6 +29,7 @@ EnableRainbomizer = true
 # Brief explanations of each can be found at the end of this file.
 
 ColourRandomizer = true
+TimeCycleRandomizer = true
 TrafficRandomizer = true
 ScriptVehicleRandomizer = true
 ParkedCarRandomizer = true
@@ -41,6 +42,7 @@ CutsceneRandomizer = true
 VoiceLineRandomizer = true
 LanguageRandomizer = true
 LicensePlateRandomizer = true
+RiotRandomizer = true
 PoliceHeliRandomizer = true
 BlipRandomizer = true
 WantedLevelRandomizer = true
@@ -83,6 +85,16 @@ RandomizeFades = false # (In-game fade-in/outs. WARNING: Hard on eyes)
 CrazyMode = false # Changes images and menu background (WARNING: VERY hard on eyes)
 
 #######################################################
+[TimeCycleRandomizer]
+
+# Randomizes timecyc.dat values, which will change appearance and colours of sky and objects.
+# Re-randomizes every fade.
+RandomizeTimeCycle = true
+
+# Randomizes weather cycle at regular intervals.
+RandomizeWeather = true
+
+#######################################################
 [TrafficRandomizer]
 
 # Forces one specific vehicle to spawn in traffic. Set to -1 to not force a vehicle.
@@ -107,6 +119,8 @@ EnableExtraTimeForSchools = true
 # Allow certain vehicle checks for sub-missions or markers to be skipped so they can be activated with any vehicle
 
 LowriderMissions = true # (Lowrider Minigame, High Stakes Low-Rider)
+WuZiMu = true # (Wu Zi Mu start mission marker)
+SweetsGirl = true # (Picking up Sweet in Sweet's Girl)
 
 # Gives you any vehicle for every mission (You might not be able to proceed with missions with this enabled)
 SkipChecks = false
@@ -186,6 +200,16 @@ ForcedAudioLine = -1
 
 MinTimeBeforeTextChange = 1 # seconds
 MaxTimeBeforeTextChange = 5 # seconds
+
+#######################################################
+[RiotRandomizer]
+
+# Adds a small chance of riot mode briefly activating as you enter new areas.
+RandomizeRiots = true
+
+# Randomizes which light is activated next (green, yellow, red) as well as
+# the time between light changes.
+RandomizeTrafficLights = true
 
 #######################################################
 [WantedLevelRandomizer]

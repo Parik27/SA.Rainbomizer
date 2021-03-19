@@ -53,16 +53,6 @@ public:
     /// Returns the static instance for ConfigManager.
     static ConfigManager *GetInstance ();
 
-    //static std::string GetRainbomizerFileName (const std::string &name,
-    //                                           const std::string &subdirs = "");
-
-    //static FILE *GetRainbomizerFile (const std::string &name,
-    //                                 const std::string &mode,
-    //                                 const std::string &subdirs = "");
-
-    //static FILE *GetRainbomizerDataFile (const std::string &name,
-    //                                     const std::string &mode = "r");
-
     /// Initialises
     ConfigManager (const std::string &file = "config.toml");
 

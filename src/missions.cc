@@ -23,7 +23,7 @@ MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 const int START_MISSIONS     = 11;
 const int END_MISSIONS       = 112;
 const int UNLOCKED_CITY_STAT = 181;
-int       missionNumberOfLastMissionStarted = -1;
+static int       missionNumberOfLastMissionStarted = -1;
 
 int exceptions[] = {
     40, // First Date
@@ -616,7 +616,7 @@ MissionRandomizer::ResetSaveData ()
 
     mSaveInfo.randomSeed = m_Config.MissionSeedHash;
     if (m_Config.RandomizeOnce && m_Config.MissionSeedHash == 0)
-        mSaveInfo.randomSeed = random (UINT_MAX);
+        mSaveInfo.randomSeed = random (INT_MAX);
 
     memset (mSaveInfo.missionStatus.data, 1,
             sizeof (mSaveInfo.missionStatus.data));

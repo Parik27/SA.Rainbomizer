@@ -135,6 +135,11 @@ struct RpLight
     char field_0x00[0x40];
 };
 
+struct CCamera
+{
+    char field_0x00[0xd78];
+};
+
 struct CCarGenerator
 {
     int16_t m_nModelId;
@@ -484,6 +489,13 @@ struct CColModel
     CColData *m_pColData;
 };
 
+struct CVehicleModelInfo
+{
+    char field_0x00[0x32];
+    char m_szGameName[8];
+    char _pad[0x2ce];
+};
+
 struct CVehicle
 {
     uint8_t              __pad[0x22];
@@ -580,10 +592,10 @@ struct RwRGBA
 
 struct RwRGBAReal
 {
-    int r;
-    int g;
-    int b;
-    int a;
+    float r;
+    float g;
+    float b;
+    float a;
 };
 
 struct CMatrix
@@ -886,6 +898,19 @@ struct CEntity
     int               SetHeading (float heading);
 };
 
+struct CZone
+{
+    char name[8];
+    char m_szTextKey[8];
+    short x1;
+    short  y1;
+    short  z1;
+    short  x2;
+    short  y2;
+    short  z2;
+    char __pad[4];
+};
+
 struct RsGlobalType
 {
     char *appName;
@@ -992,6 +1017,68 @@ struct CGame
 {
     static unsigned char &bMissionPackGame;
     static int            Init3 (void *fileName);
+};
+
+struct CTimeCycleCurrent
+{
+    float m_fAmbientRed;
+    float m_fAmbientGreen;
+    float m_fAmbientBlue;
+    float m_fAmbientRed_Obj;
+    float m_fAmbientGreen_Obj;
+    float m_fAmbientBlue_Obj;
+    float m_fDirectionalRed;
+    float m_fDirectionalGreen;
+    float m_fDirectionalBlue;
+    short  m_wSkyTopRed;
+    short m_wSkyTopGreen;
+    short  m_wSkyTopBlue;
+    short  m_wSkyBottomRed;
+    short  m_wSkyBottomGreen;
+    short  m_wSkyBottomBlue;
+    short  m_wSunCoreRed;
+    short  m_wSunCoreGreen;
+    short  m_wSunCoreBlue;
+    short  m_wSunCoronaRed;
+    short  m_wSunCoronaGreen;
+    short  m_wSunCoronaBlue;
+    float m_fSunSize;
+    float m_fSpriteSize;
+    float m_fSpriteBrightness;
+    short  m_wShadowStrength;
+    short  m_wLightShadowStrength;
+    short  m_wPoleShadowStrength;
+    char  _padding0[2];
+    float m_fFarClip;
+    float m_fFogSt;
+    float m_fLightOnGround;
+    short  m_wLowCloudsRed;
+    short  m_wLowCloudsGreen;
+    short  m_wLowCloudsBlue;
+    short  m_wBottomCloudsRed;
+    short  m_wBottomCloudsGreen;
+    short  m_wBottomCloudsBlue;
+    float m_fWaterRed;
+    float m_fWaterGreen;
+    float m_fWaterBlue;
+    float m_fWaterAlpha;
+    float m_fRGB1_R;
+    float m_fRGB1_G;
+    float m_fRGB1_B;
+    float m_fAlpha1;
+    float m_fRGB2_R;
+    float m_fRGB2_G;
+    float m_fRGB2_B;
+    float m_fAlpha2;
+    float m_fCloudAlpha1;
+    long m_dwCloudAlpha2;
+    short m_wCloudAlpha3;
+    char  _padding1[2];
+    float m_fIllumination;
+    char  field_A8[4];
+
+    static CTimeCycleCurrent *GetInfo (CTimeCycleCurrent *timecyc,
+                                       int weatherID, int timeID);
 };
 
 struct CAnimBlock

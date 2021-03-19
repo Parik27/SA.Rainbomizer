@@ -45,37 +45,35 @@ const int MODEL_CEMENT   = 524;
 const int MODEL_FORKLIFT = 530;
 const int MODEL_VORTEX   = 539;
 const int MODEL_ANDROM   = 592;
-bool      ignoreNextHook = false;
 
-// Variables for RC heli magnet sections
-int      currentBox           = 0;
-int      ryder2BoxHandles[17];
-int      forkliftID           = 0;
-bool     isPlayerInForklift   = false;
-bool     ryder2CutsceneActive = false;
-int      objectAttached       = -1;
-int      pickUpObjectTimer    = 1000;
-int      fakeColHandle        = 0;
-int      invalidHandle        = 0;
-bool     atForkliftSection    = false;
+static const struct ScriptVehicleRandomizer::RCHeliMagnet emptyTemplate;
+static ScriptVehicleRandomizer::RCHeliMagnet ryder2;
+static ScriptVehicleRandomizer::RCHeliMagnet quarry2;
+static ScriptVehicleRandomizer::RCHeliMagnet quarry6;
 
-bool     currentTrailerAttached = false;
-bool     wasFlyingCarsOn = false;
-int      lastTrainOldType       = -1;
-int      lastTrainNewType          = -1;
+static bool     ignoreNextHook            = false;  // For Flying School times
+static bool     currentTrailerAttached = false;     // For attaching any vehicle in Trucking missions
+static bool     wasFlyingCarsOn = false;            // Stores state of flying cars before starting a mission that forces them
 
-// Boat School Stuff
-float    finishTime             = 0.0f;
-float    damage                 = 0.0f;
-float    overallTime            = 0.0f;
-int      type                   = -1;
-int      tempActualTime         = -1;
-int      oldRecord              = -1;
-bool     newRecordAchieved      = true;
+// Store original train type + randomized train type for random trains
+static int      lastTrainOldType       = -1;
+static int      lastTrainNewType          = -1;
 
+static ScriptVehicleRandomizer::BoatSchoolTimes boatSchool;
+
+// Key is traintype ID, value is number of carriages for that train type
+// Used when randomizing trainType to get number of carriages of new train
+// If new train has less carriages, need to ensure that now nonexistent carriages are ignored
 std::unordered_map<int, int> trainTypes
     = {{0, 5}, {1, 3}, {2, 3},  {3, 4},  {4, 3},  {5, 4},  {6, 3},  {7, 3},
        {8, 2}, {9, 1}, {10, 2}, {11, 3}, {12, 5}, {13, 6}, {14, 1}, {15, 1}}; 
+
+template <typename T>
+T &
+GetGlobalVar(uint32_t index)
+{
+    return *reinterpret_cast<T *> (&ScriptSpace[index]);
+}
 
 /*******************************************************/
 void
@@ -129,7 +127,7 @@ DisableFlyingCars ()
 
 ///*******************************************************/
 void
-SetFlyingCar (char flag)
+SetFlyingCar (bool flag)
 {
     EnableFlyingCars (flag);
     if (flag)
@@ -160,7 +158,7 @@ void __fastcall FlyingCarsForVB (CRunningScript *scr, void *edx,
         if (ScriptParams[0] < 0.5f)
             SetFlyingCar (true);
         else if (ScriptParams[0] > 0.5f)
-            DisableFlyingCars ();
+            SetFlyingCar (false);
     }
 }
 
@@ -173,7 +171,7 @@ void __fastcall FlyingCarsForFlightSchool (CRunningScript *scr, void *edx, short
         if (ScriptParams[0] == 0)
             SetFlyingCar (true);
         else if (ScriptParams[0] == 1)
-            DisableFlyingCars ();
+            SetFlyingCar (false);
     }
 }
 
@@ -317,13 +315,12 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                                                                          z);
     //Logger::GetLogger ()->LogMessage ("Vehicle Spawned: "
     //                                  + std::to_string (newModel));
+    if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry"
+        && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5) && model == 486)
+        newModel = 486;
+
     ApplyFixesBasedOnModel (model, newModel);
     ApplyFixesBasedOnMission ();
-
-    if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry" 
-        && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5)
-        && model == 486)
-        newModel = 486;
 
     // Load the new vehicle. Fallback to the original if needed
     if (StreamingManager::AttemptToLoadVehicle (newModel) == ERR_FAILED)
@@ -367,7 +364,7 @@ ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
                                                float &z)
 {
     Vector3 pos = {x, y, z};
-    for (auto pattern : mPatterns)
+    for (auto &pattern : mPatterns)
         {
             if (pattern.MatchVehicle(id, mLastThread, pos))
                 {
@@ -550,26 +547,26 @@ void __fastcall ProcessModifiedSchoolTimesBoat (CRunningScript *scr,
         ScriptVehicleRandomizer::GetInstance ()->SaveTestTime (ScriptSpace[8197]);
             Scrpt::CallOpcode (0x14F, "stop_timer", GlobalVar (8197));
             Scrpt::CallOpcode (0x396, "pause_timer", 1);
-            oldRecord = -1;
-            newRecordAchieved = true;
+            boatSchool.oldRecord = -1;
+            boatSchool.newRecordAchieved = true;
             if (currentTest == 1)
             {
-                oldRecord = ScriptSpace[1963];
+                boatSchool.oldRecord = ScriptSpace[1963];
                 ScriptSpace[8197] -= 18000;
             }
             else if (currentTest == 2)
             {
-                oldRecord = ScriptSpace[1964];
+                boatSchool.oldRecord = ScriptSpace[1964];
                 ScriptSpace[8197] -= 50000;
             }
             else if (currentTest == 3)
             {
-                oldRecord = ScriptSpace[1965];
+                boatSchool.oldRecord = ScriptSpace[1965];
                 ScriptSpace[8197] -= 120000;
             }
             else if (currentTest == 5)
             {
-                oldRecord = ScriptSpace[1967];
+                boatSchool.oldRecord = ScriptSpace[1967];
                 ScriptSpace[8197] -= 120000;
             }
     }
@@ -620,22 +617,22 @@ void __fastcall DisplayCorrectBoatTimeOnTV (CRunningScript *scr, void *edx,
                 int currentTest = ScriptSpace[8189];
                 if (currentTest == 1 && ScriptSpace[1963] != 60000)
                 {
-                    tempActualTime = ScriptSpace[1963];
+                    boatSchool.tempActualTime = ScriptSpace[1963];
                     ScriptSpace[1963] -= 18000;
                 }
                 else if (currentTest == 2 && ScriptSpace[1964] != 80000)
                 {
-                    tempActualTime = ScriptSpace[1964];
+                    boatSchool.tempActualTime = ScriptSpace[1964];
                     ScriptSpace[1964] -= 50000;
                 }
                 else if (currentTest == 3 && ScriptSpace[1965] != 180000) 
                 {
-                    tempActualTime = ScriptSpace[1965];
+                    boatSchool.tempActualTime = ScriptSpace[1965];
                     ScriptSpace[1965] -= 120000;
                 }
                 else if (currentTest == 5 && ScriptSpace[1967] != 200000) 
                 {
-                    tempActualTime = ScriptSpace[1967];
+                    boatSchool.tempActualTime = ScriptSpace[1967];
                     ScriptSpace[1967] -= 120000;
                 }
         }
@@ -648,7 +645,7 @@ void __fastcall DisplayCorrectBoatTimeOnTV (CRunningScript *scr, void *edx,
                    && ((float *) ScriptParams)[1] >= 64.0f
                    && ((float *) ScriptParams)[1] <= 66.0f))
         {
-                if (!newRecordAchieved)
+                if (!boatSchool.newRecordAchieved)
                     ((float *) ScriptParams)[1] = -100.0f;
         }
     }
@@ -663,32 +660,34 @@ void __fastcall DisplayCorrectBoatTimePart1 (CRunningScript *scr, void *edx,
     {
         int currentTest = ScriptSpace[8189];
             if (((float *) ScriptParams)[1] >= 74.0f 
-                && ((float*) ScriptParams)[1] <= 76.0f && tempActualTime != -1)
+                && ((float *) ScriptParams)[1] <= 76.0f
+            && boatSchool.tempActualTime != -1)
             {
                     if (currentTest == 1)
-                        ScriptSpace[1963] = tempActualTime;
+                    ScriptSpace[1963] = boatSchool.tempActualTime;
                     else if (currentTest == 2)
-                        ScriptSpace[1964] = tempActualTime;
+                        ScriptSpace[1964] = boatSchool.tempActualTime;
                     else if (currentTest == 3)
-                        ScriptSpace[1965] = tempActualTime;
+                        ScriptSpace[1965] = boatSchool.tempActualTime;
                     else if (currentTest == 5)
-                        ScriptSpace[1967] = tempActualTime;
-                tempActualTime = -1;
-                type           = 3;
+                        ScriptSpace[1967] = boatSchool.tempActualTime;
+                boatSchool.tempActualTime = -1;
+                boatSchool.type = 3;
             }
             if ((((float *) ScriptParams)[1] >= 274.0f
              && ((float *) ScriptParams)[1] <= 276.0f) 
                 || (((float *) ScriptParams)[1] >= 54.0f
                 && ((float *) ScriptParams)[1] <= 56.0f))
             {
-                finishTime = (float) ScriptVehicleRandomizer::GetInstance ()
+                boatSchool.finishTime
+                        = (float) ScriptVehicleRandomizer::GetInstance ()
                                            ->GetOriginalTestTime ();
-                finishTime /= 1000.0f;
-                type = 0;
+                boatSchool.finishTime /= 1000.0f;
+                boatSchool.type = 0;
             }
             else if (((float *) ScriptParams)[1] >= 294.0f
                      && ((float *) ScriptParams)[1] <= 296.0f)
-                type   = 1;
+                boatSchool.type = 1;
             else if ((((float *) ScriptParams)[1] >= 314.0f
                       && ((float *) ScriptParams)[1] <= 316.0f)
                      || (((float *) ScriptParams)[1] >= 64.0f
@@ -696,41 +695,41 @@ void __fastcall DisplayCorrectBoatTimePart1 (CRunningScript *scr, void *edx,
             {
                 int actualTime = ScriptVehicleRandomizer::GetInstance ()
                     ->GetOriginalTestTime ();
-                actualTime += damage;
-                if (currentTest == 1 && actualTime < oldRecord)
+                actualTime += boatSchool.damage;
+                if (currentTest == 1 && actualTime < boatSchool.oldRecord)
                         ScriptSpace[1963] = actualTime;
-                else if (currentTest == 1 && actualTime >= oldRecord)
+                else if (currentTest == 1 && actualTime >= boatSchool.oldRecord)
                 {
-                    newRecordAchieved = false;
+                    boatSchool.newRecordAchieved = false;
                     ScriptSpace[8195] = 0;
-                    ScriptSpace[1963] = oldRecord;
+                    ScriptSpace[1963] = boatSchool.oldRecord;
                 }
-                else if (currentTest == 2 && actualTime < oldRecord)
+                else if (currentTest == 2 && actualTime < boatSchool.oldRecord)
                     ScriptSpace[1964] = actualTime;
-                else if (currentTest == 2 && actualTime >= oldRecord)
+                else if (currentTest == 2 && actualTime >= boatSchool.oldRecord)
                 {
-                    newRecordAchieved = false;
+                    boatSchool.newRecordAchieved = false;
                     ScriptSpace[8195] = 0;
-                    ScriptSpace[1964] = oldRecord;
+                    ScriptSpace[1964] = boatSchool.oldRecord;
                 }
-                else if (currentTest == 3 && actualTime < oldRecord)
+                else if (currentTest == 3 && actualTime < boatSchool.oldRecord)
                     ScriptSpace[1965] = actualTime;
-                else if (currentTest == 3 && actualTime >= oldRecord)
+                else if (currentTest == 3 && actualTime >= boatSchool.oldRecord)
                 {
-                    newRecordAchieved = false;
+                    boatSchool.newRecordAchieved = false;
                     ScriptSpace[8195] = 0;
-                    ScriptSpace[1965] = oldRecord;
+                    ScriptSpace[1965] = boatSchool.oldRecord;
                 }
-                else if (currentTest == 5 && actualTime < oldRecord)
+                else if (currentTest == 5 && actualTime < boatSchool.oldRecord)
                     ScriptSpace[1967] = actualTime;
-                else if (currentTest == 5 && actualTime >= oldRecord)
+                else if (currentTest == 5 && actualTime >= boatSchool.oldRecord)
                 {
-                    newRecordAchieved = false;
+                    boatSchool.newRecordAchieved = false;
                     ScriptSpace[8195] = 0;
-                    ScriptSpace[1967] = oldRecord;
+                    ScriptSpace[1967] = boatSchool.oldRecord;
                 }
-                overallTime = (float) actualTime / 1000.0f;
-                type = 2;
+                boatSchool.overallTime = (float) actualTime / 1000.0f;
+                boatSchool.type = 2;
             }
     }
 }
@@ -754,18 +753,20 @@ void __fastcall DisplayCorrectBoatTimePart2 (CRunningScript *scr, void *edx,
                     else if (currentTest == 5)
                         ((float *) ScriptParams)[0] += 2.0f;
             }
-            else if (type != -1)
+            else if (boatSchool.type != -1)
                 {
-                    if (type == 0)
-                        ((float *) ScriptParams)[0] = finishTime;
-                    else if (type == 1)
-                        damage = ((float *) ScriptParams)[0] * 1000.0f;
-                    else if (type == 2)
+                    if (boatSchool.type == 0)
+                        ((float *) ScriptParams)[0] = boatSchool.finishTime;
+                    else if (boatSchool.type == 1)
+                        boatSchool.damage
+                            = ((float *) ScriptParams)[0] * 1000.0f;
+                    else if (boatSchool.type == 2)
                         {
-                            ((float *) ScriptParams)[0] = overallTime;
-                            damage                      = 0;
+                            ((float *) ScriptParams)[0]
+                                = boatSchool.overallTime;
+                            boatSchool.damage           = 0;
                         }
-                    else if (type == 3)
+                    else if (boatSchool.type == 3)
                     {
                             if (currentTest == 1)
                                 ((float *) ScriptParams)[0]
@@ -780,7 +781,7 @@ void __fastcall DisplayCorrectBoatTimePart2 (CRunningScript *scr, void *edx,
                                 ((float *) ScriptParams)[0]
                                     = (float) ScriptSpace[1967] / 1000.0f;
                     }
-                    type = -1;
+                    boatSchool.type = -1;
                 }
     }
 }
@@ -933,8 +934,31 @@ void __fastcall IgnoreLowriderCheck (CRunningScript *scr, void *edx, char result
 {
     if (scr->CheckName ("cesar") || scr->CheckName ("lowr"))
     {
-        result = 1;
-        CallMethod<0x4859D0> (scr, result);
+        ScriptParams[0] = 0;
+    }
+    CallMethod<0x4859D0> (scr, result);
+}
+
+/*******************************************************/
+void __fastcall IgnoreWuZiMuCheck (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName("bcesar"))
+    {
+        GetGlobalVar<int> (49) = 0;
+    }
+}
+
+/*******************************************************/
+void __fastcall IgnoreSweetGirlCarCheck (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("hoods5"))
+    {
+        if (ScriptParams[0] == 596)
+        {
+            ScriptParams[0] = FindPlayerVehicle ()->m_nModelIndex;
+        }
     }
 }
 
@@ -964,15 +988,116 @@ void __fastcall Ryder2AttachMagnet (CRunningScript *scr, void *edx, short count)
             if (ScriptParams[1] == 1 && ScriptParams[2] == 0 && ScriptParams[3] == 0
             && ScriptParams[4] == 0 && ScriptParams[5] == 0)
             {
-                forkliftID = ScriptParams[0];
+                ryder2.vehID = ScriptParams[0];
                 Scrpt::CallOpcode (0x107, "create_object", 3056, 2791.426f,
                                    -2418.577f, 6.66f, GlobalVar (10947));
-                Scrpt::CallOpcode (0x681, "attach_object", GlobalVar (10947), forkliftID,
+                Scrpt::CallOpcode (0x681, "attach_object", GlobalVar (10947), ryder2.vehID,
                                    0.0f, 0.0f, -0.2f, 0.0f, 0.0f, 0.0f);
                 Scrpt::CallOpcode (0x382, "set_object_collision",
                                    GlobalVar (10947), 0);
             }
     }
+}
+
+/*******************************************************/
+void
+RCHeliPlayerJustEntered ()
+{
+    ryder2.isPlayerInVeh = true;
+    CVector playerPos    = FindPlayerCoors ();
+    playerPos.z += 1.0f;
+    CRunningScript::SetCharCoordinates (FindPlayerPed (),
+                                        {playerPos.x, playerPos.y, playerPos.z},
+                                        1, 1);
+    Scrpt::CallOpcode (0x382, "set_object_collision", GlobalVar (10947), 1);
+    Logger::GetLogger ()->LogMessage ("Moved heli, set magnet collision");
+    if (ryder2.objectAttached != -1)
+        {
+            Scrpt::CallOpcode (0x382, "set_object_collision",
+                               ryder2.objHandles[ryder2.objectAttached], 1);
+        }
+    Scrpt::CallOpcode (0x825, "start_rotors_instantly", ryder2.vehID);
+}
+
+/*******************************************************/
+void
+RCHeliCheckForObjects ()
+{
+    if (ryder2.fakeColHandle != ryder2.invalidHandle
+        && ryder2.fakeColHandle != 0)
+        Scrpt::CallOpcode (0x382, "set_object_collision", ryder2.fakeColHandle,
+                           0);
+    Scrpt::CallOpcode (0x407, "get_offset_from_car_in_world", ryder2.vehID,
+                       0.0f, 0.0f, -1.0f, GlobalVar (69), GlobalVar (70),
+                       GlobalVar (71));
+    CVector playerPos    = FindPlayerCoors ();
+    short   isKeyPressed = CallAndReturn<short, 0x485B10> (0, 17);
+    if (isKeyPressed == 255 && ryder2.objectAttached == -1
+        && ryder2.pickUpObjectTimer > 50)
+        {
+            for (int i = 0; i < 17; i++)
+                {
+                    if (ryder2.objHandles[i] != 0)
+                        {
+                            Scrpt::CallOpcode (0x1bb, "get_object_coords",
+                                               ryder2.objHandles[i],
+                                               GlobalVar (8924),
+                                               GlobalVar (8925),
+                                               GlobalVar (8926));
+                            float xCompare = GetGlobalVar<float> (69)
+                                             - GetGlobalVar<float> (8924);
+                            float yCompare = GetGlobalVar<float> (70)
+                                             - GetGlobalVar<float> (8925);
+                            float zCompare = GetGlobalVar<float> (71)
+                                             - GetGlobalVar<float> (8926);
+                            if (xCompare >= -1.0f && xCompare <= 1.0f
+                                && yCompare >= -1.0f && yCompare <= 1.0f
+                                && zCompare >= -1.0f && zCompare <= 1.0f)
+                                {
+                                    Scrpt::CallOpcode (0x681, "attach_object",
+                                                       ryder2.objHandles[i],
+                                                       ryder2.vehID, 0.0f, 0.0f,
+                                                       -1.4f, 0.0f, 0.0f, 0.0f);
+                                    Scrpt::CallOpcode (0x97b,
+                                                       "play_audio_at_object",
+                                                       ryder2.objHandles[i],
+                                                       1009);
+                                    CVector playerPos = FindPlayerCoors ();
+                                    playerPos.z += 0.3f;
+                                    CRunningScript::SetCharCoordinates (
+                                        FindPlayerPed (),
+                                        {playerPos.x, playerPos.y, playerPos.z},
+                                        1, 1);
+                                    ryder2.objectAttached    = i;
+                                    ryder2.pickUpObjectTimer = 0;
+                                    break;
+                                }
+                        }
+                }
+        }
+    else if (isKeyPressed == 255 && ryder2.objectAttached > -1
+             && ryder2.pickUpObjectTimer > 50)
+        {
+            Scrpt::CallOpcode (0x682, "detach_object",
+                               ryder2.objHandles[ryder2.objectAttached], 0.0f,
+                               0.0f, 0.0f, 1);
+            ryder2.objectAttached    = -1;
+            ryder2.pickUpObjectTimer = 0;
+        }
+}
+
+/*******************************************************/
+void
+RCHeliPlayerJustExited ()
+{
+    ryder2.isPlayerInVeh = false;
+    ryder2.invalidHandle = ryder2.fakeColHandle;
+    Scrpt::CallOpcode (0x382, "set_object_collision", GlobalVar (10947), 0);
+    if (ryder2.objectAttached != -1)
+        {
+            Scrpt::CallOpcode (0x382, "set_object_collision",
+                               ryder2.objHandles[ryder2.objectAttached], 0);
+        }
 }
 
 /*******************************************************/
@@ -983,90 +1108,23 @@ void __fastcall IsPlayerInVehicleCheck (CRunningScript *scr, void *edx,
         || scr->CheckName ("casin10") || scr->CheckName ("heist2") 
         || (scr->CheckName ("cprace") && (ScriptSpace[352] >= 19 && ScriptSpace[352] <= 24)))
             SetFlyingCar (flag);
-    else if (scr->CheckName ("ryder2") && ScriptParams[1] == forkliftID
+    else if (scr->CheckName ("ryder2") && ScriptParams[1] == ryder2.vehID
         && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
                != MODEL_FORKLIFT)
     {
-            pickUpObjectTimer++;
+            ryder2.pickUpObjectTimer++;
 
-            if (flag && isPlayerInForklift)
+            if (flag && ryder2.isPlayerInVeh)
             {
-                if (fakeColHandle != invalidHandle && fakeColHandle != 0)
-                    Scrpt::CallOpcode (0x382, "set_object_collision",
-                                           fakeColHandle, 0);
-                Scrpt::CallOpcode (0x407, "get_offset_from_car_in_world",
-                                       forkliftID, 0.0f, 0.0f, -1.0f,
-                                       GlobalVar (69), GlobalVar (70),
-                                       GlobalVar (71));
-                CVector playerPos = FindPlayerCoors ();
-                short isKeyPressed = CallAndReturn<short, 0x485B10> (0, 17);
-                if (isKeyPressed == 255 && objectAttached == -1 && pickUpObjectTimer > 50)
-                {
-                    for (int i = 0; i < 17; i++)
-                    {
-                        if (ryder2BoxHandles[i] != 0)
-                        {
-                                Scrpt::CallOpcode (0x1bb, "get_object_coords",
-                                                   ryder2BoxHandles[i],
-                                                   GlobalVar (8924),
-                                                   GlobalVar (8925),
-                                                   GlobalVar (8926));
-                                float xCompare = ((float *) ScriptSpace)[69] - ((float *) ScriptSpace)[8924];
-                                float yCompare = ((float *) ScriptSpace)[70] - ((float *) ScriptSpace)[8925];
-                                float zCompare = ((float *) ScriptSpace)[71] - ((float *) ScriptSpace)[8926];
-                                if (xCompare >= -1.0f && xCompare <= 1.0f
-                                    && yCompare >= -1.0f && yCompare <= 1.0f
-                                    && zCompare >= -1.0f && zCompare <= 1.0f)
-                                    {
-                                        Scrpt::CallOpcode (0x681, "attach_object", ryder2BoxHandles[i],
-                                                           forkliftID, 0.0f, 0.0f, -1.4f, 0.0f, 0.0f, 0.0f);
-                                        Scrpt::CallOpcode (0x97b, "play_audio_at_object",
-                                            ryder2BoxHandles[i], 1009);
-                                        CVector playerPos = FindPlayerCoors ();
-                                        playerPos.z += 0.2f;
-                                        CRunningScript::SetCharCoordinates (FindPlayerPed (), 
-                                            {playerPos.x, playerPos.y, playerPos.z}, 1, 1);
-                                        objectAttached    = i;
-                                        pickUpObjectTimer = 0;
-                                        break;
-                                    }
-                        }
-                    }
-                }
-                else if (isKeyPressed == 255 && objectAttached > -1 && pickUpObjectTimer > 50)
-                {
-                    Scrpt::CallOpcode(0x682, "detach_object", ryder2BoxHandles[objectAttached], 
-                        0.0f, 0.0f, 0.0f, 1);
-                    objectAttached = -1;
-                    pickUpObjectTimer = 0;
-                }
+                RCHeliCheckForObjects ();
             }
-            else if (flag && !isPlayerInForklift)
+            else if (flag && !ryder2.isPlayerInVeh)
             {
-                isPlayerInForklift = true;
-                CVector playerPos = FindPlayerCoors();
-                playerPos.z += 1.0f;
-                CRunningScript::SetCharCoordinates(FindPlayerPed(), 
-                    { playerPos.x, playerPos.y, playerPos.z }, 1, 1);
-                Scrpt::CallOpcode(0x382, "set_object_collision", GlobalVar(10947), 1);
-                if (objectAttached != -1)
-                    {
-                        Scrpt::CallOpcode (0x382, "set_object_collision",
-                                           ryder2BoxHandles[objectAttached], 1);
-                    }
-                Scrpt::CallOpcode(0x825, "start_rotors_instantly", forkliftID);
+                RCHeliPlayerJustEntered ();
             }
-            else if (!flag && isPlayerInForklift)
+            else if (!flag && ryder2.isPlayerInVeh)
             {
-                isPlayerInForklift = false;
-                invalidHandle      = fakeColHandle;
-                Scrpt::CallOpcode (0x382, "set_object_collision",
-                                   GlobalVar (10947), 0);
-                if (objectAttached != -1)
-                    {
-                        Scrpt::CallOpcode (0x382, "set_object_collision",
-                                           ryder2BoxHandles[objectAttached], 0);
-                    }
+                RCHeliPlayerJustExited ();
         }
     }
     scr->UpdateCompareFlag(flag);
@@ -1078,11 +1136,11 @@ void __fastcall Ryder2IsCutsceneActive(CRunningScript* scr, void* edx, short cou
     scr->CollectParameters(count);
     if (scr->CheckName("ryder2"))
     {
-        ryder2CutsceneActive = ScriptParams[0];
-        if (objectAttached > -1)
+        ryder2.isCutsceneActive = ScriptParams[0];
+        if (ryder2.objectAttached > -1)
         {
-            ryder2BoxHandles[objectAttached] = 0;
-            objectAttached = -1;
+            ryder2.objHandles[ryder2.objectAttached] = 0;
+            ryder2.objectAttached = -1;
         }
     }
 }
@@ -1093,17 +1151,76 @@ void __fastcall Ryder2StoreBoxHandles(CRunningScript* scr, void* edx, short coun
     scr->CollectParameters(count);
     if (scr->CheckName ("ryder2"))
     {
-            if (currentBox == 17)
+            if (ryder2.currentObj == 17)
                 {
-                    fakeColHandle = ScriptParams[0];
-                    currentBox    = 17;
+                    ryder2.fakeColHandle = ScriptParams[0];
+                    ryder2.currentObj    = 17;
                 }
 
-            if (ryder2CutsceneActive)
+            if (ryder2.isCutsceneActive)
                 {
-                    atForkliftSection            = true;
-                    ryder2BoxHandles[currentBox] = ScriptParams[0];
-                    currentBox++;
+                    ryder2.atMagnetSection            = true;
+                    ryder2.objHandles[ryder2.currentObj] = ScriptParams[0];
+                    ryder2.currentObj++;
+                }
+    }
+}
+
+/*******************************************************/
+void __fastcall Ryder2CheckBoxForDamage (CRunningScript *scr, void *edx,
+                                       short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("ryder2")
+        && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+               != MODEL_FORKLIFT)
+        {
+            for (int i = 0; i < 17; i++)
+                {
+                    if (ryder2.objHandles[i] != 0
+                        && ScriptParams[0] == ryder2.objHandles[i])
+                        {
+                            ryder2.checkForObjectExistence = i;
+                        }
+                }
+    }
+}
+
+/*******************************************************/
+void __fastcall Ryder2CheckBoxForDamage2 (CRunningScript *scr, void *edx,
+                                        char flag)
+{
+    if (scr->CheckName ("ryder2")
+        && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+               != MODEL_FORKLIFT)
+        {
+            if (flag && ryder2.checkForObjectExistence != -1)
+                {
+                    ryder2.objHandles[ryder2.checkForObjectExistence] = 0;
+                    if (ryder2.objectAttached == ryder2.checkForObjectExistence)
+                        ryder2.objectAttached = -1;
+                }
+    }
+    ryder2.checkForObjectExistence = -1;
+    scr->UpdateCompareFlag (flag);
+}
+
+/*******************************************************/
+void __fastcall Ryder2WasBoxDestroyedSomehow (CRunningScript *scr, void *edx,
+                                              short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("ryder2")
+            && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                   != MODEL_FORKLIFT)
+        {
+            for (int i = 0; i < 17; i++)
+                {
+                    if (ryder2.objHandles[i] != 0
+                        && ScriptParams[0] == ryder2.objHandles[i])
+                        {
+                            ryder2.objHandles[i] = 0;
+                        }
                 }
     }
 }
@@ -1127,7 +1244,7 @@ void __fastcall Ryder2ForgetMagnet (CRunningScript *scr, void *edx,
 {
     scr->CollectParameters (count);
     if (scr->CheckName ("ryder2") && 
-        ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck () != MODEL_FORKLIFT && atForkliftSection)
+        ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck () != MODEL_FORKLIFT && ryder2.atMagnetSection)
     {
         Scrpt::CallOpcode (0x1c4, "remove_references_to_object",
                            GlobalVar (10947)); // Stops magnet from persisting in save forever
@@ -1141,15 +1258,11 @@ void __fastcall Ryder2ResetVariables (CRunningScript *scr, void *edx, short coun
     scr->CollectParameters (count);
     if (scr->CheckName ("ryder2"))
     {
-            currentBox           = 0;
-            forkliftID           = 0;
-            isPlayerInForklift   = false;
-            ryder2CutsceneActive = false;
-            objectAttached       = -1;
-            pickUpObjectTimer    = 1000;
-            fakeColHandle        = 0;
-            invalidHandle        = 0;
-            atForkliftSection    = false;
+            ryder2 = emptyTemplate;
+        Logger::GetLogger ()->LogMessage (
+            "Test Default Values: " + std::to_string (ryder2.pickUpObjectTimer)
+            + ", " + std::to_string (emptyTemplate.pickUpObjectTimer) + ", Object Attached: "
+        + std::to_string(ryder2.objectAttached) + ", " + std::to_string(emptyTemplate.objectAttached));
     }
 }
 
@@ -1162,7 +1275,7 @@ void __fastcall FixRaiseDoorHeist9 (CRunningScript *scr, void *edx,
         && (ScriptParams[1] == 1165 || ScriptParams[1] == 1166) 
         && ScriptVehicleRandomizer::GetInstance()->GetNewCarForCheck() != MODEL_FORKLIFT)
     {
-        ((float *) ScriptSpace)[7937] = 1003.0f;
+            GetGlobalVar<float>(7937) = 1003.0f;
     }
 }
 
@@ -1176,7 +1289,7 @@ void __fastcall FixRaiseDoorHeist9PosCheck (CRunningScript *scr, void *edx,
         CVector playerPos = FindPlayerCoors ();
         if (playerPos.z >= 950.0f && playerPos.y >= 1572.7f && playerPos.y <= 1577.0f)
         {
-            ((float *) ScriptSpace)[74] = 1573.0f;
+            GetGlobalVar<float>(74) = 1573.0f;
         }
     }
 }
@@ -1208,14 +1321,10 @@ void __fastcall TrailerAttachmentCheck (CRunningScript *scr, void *edx,
                         0.0f, -(ms_modelInfoPtrs[trailerVehicle->m_nModelIndex]
                             ->m_pColModel->m_boundBox.m_vecMax.y), 0.0f, 
                         GlobalVar (8927), GlobalVar (8928), GlobalVar (8929));
-                    float angleCompare = ((float *) ScriptSpace)[69]
-                                         - ((float *) ScriptSpace)[70];
-                    float xCompare = ((float *) ScriptSpace)[8924]
-                                     - ((float *) ScriptSpace)[8927];
-                    float yCompare = ((float *) ScriptSpace)[8925]
-                                     - ((float *) ScriptSpace)[8928];
-                    float zCompare = ((float *) ScriptSpace)[8926]
-                                     - ((float *) ScriptSpace)[8929];
+                    float angleCompare = GetGlobalVar<float> (69) - GetGlobalVar<float>(70);
+                    float xCompare = GetGlobalVar<float>(8924) - GetGlobalVar<float>(8927);
+                    float yCompare = GetGlobalVar<float> (8925) - GetGlobalVar<float>(8928);
+                    float zCompare = GetGlobalVar<float> (8926) - GetGlobalVar<float>(8929);
                     if (angleCompare >= -10.0f && angleCompare <= 10.0f
                         && xCompare >= -1.0f && xCompare <= 1.0f
                         && yCompare >= -1.0f && yCompare <= 1.0f
@@ -1333,7 +1442,9 @@ ScriptVehicleRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig ("ScriptVehicleRandomizer", 
         std::pair ("EnableExtraTimeForSchools", &m_Config.MoreSchoolTestTime),
-        std::pair ("LowriderMissions", &m_Config.SkipLowriderCheck)))
+        std::pair ("LowriderMissions", &m_Config.SkipLowriderCheck),
+        std::pair ("WuZiMu", &m_Config.SkipWuZiMuCheck),
+        std::pair ("SweetsGirl", &m_Config.SkipSweetsGirlCheck)))
     return;
 
     RegisterHooks (
@@ -1379,6 +1490,9 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x47CCF2, (void *) &Ryder2StoreBoxHandles},
          {HOOK_CALL, 0x469773, (void *) &Ryder2IncreaseRadius},
          {HOOK_CALL, 0x46DD99, (void *) &Ryder2ForgetMagnet},
+         {HOOK_CALL, 0x4831FC, (void *) &Ryder2CheckBoxForDamage},
+         {HOOK_CALL, 0x48322F, (void *) &Ryder2CheckBoxForDamage2},
+         {HOOK_CALL, 0x4698C6, (void *) &Ryder2WasBoxDestroyedSomehow},
          {HOOK_CALL, 0x47C233, (void *) &Ryder2ResetVariables},
          {HOOK_CALL, 0x482C6B, (void *) &FixBoatSchoolObjectPlacements},
          {HOOK_CALL, 0x497F89, (void *) &RandomizeTrainForScript},
@@ -1400,7 +1514,19 @@ ScriptVehicleRandomizer::Initialise ()
             {HOOK_CALL, 0x486DB1, (void *) &MoveFlyingSchoolTrigger}});
 
     if (m_Config.SkipLowriderCheck)
-        RegisterHooks ({{HOOK_CALL, 0x478528, (void *) &IgnoreLowriderCheck}});
+    {
+        RegisterHooks ({{HOOK_CALL, 0x478528, (void *) &IgnoreLowriderCheck}}); 
+    }
+
+    if (m_Config.SkipWuZiMuCheck)
+    {
+        RegisterHooks ({{HOOK_CALL, 0x48B0EB, (void *) &IgnoreWuZiMuCheck}});
+    }
+
+    if (m_Config.SkipSweetsGirlCheck)
+    {
+        RegisterHooks ({{HOOK_CALL, 0x48B10F, (void *) &IgnoreSweetGirlCarCheck}});
+    }
 
     Logger::GetLogger ()->LogMessage ("Intialised ScriptVehicleRandomizer");
 }

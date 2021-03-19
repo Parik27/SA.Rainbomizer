@@ -89,10 +89,40 @@ public:
     {
         bool MoreSchoolTestTime;
         bool SkipLowriderCheck;
+        bool SkipWuZiMuCheck;
+        bool SkipSweetsGirlCheck;
     } m_Config;
 
     uint8_t mSeatsCache[212];
     std::string mLastThread;
+
+    // Struct for RC heli magnet sections
+    struct RCHeliMagnet
+    {
+        int  currentObj = 0;
+        int  objHandles[17];
+        int  vehID             = 0;
+        bool isPlayerInVeh     = false;
+        bool isCutsceneActive  = false;
+        int  objectAttached    = -1;
+        int  pickUpObjectTimer = 1000;
+        int  fakeColHandle     = 0;
+        int  invalidHandle     = 0;
+        bool atMagnetSection   = false;
+        int  checkForObjectExistence = -1;
+    };
+
+    // For boat school time changes
+    struct BoatSchoolTimes
+    {
+        float finishTime        = 0.0f;
+        float damage            = 0.0f;
+        float overallTime       = 0.0f;
+        int   type              = -1;
+        int   tempActualTime    = -1;
+        int   oldRecord         = -1;
+        bool  newRecordAchieved = true;
+    };
 
     void ApplyEOTLFixes (int newFiretruck);
 

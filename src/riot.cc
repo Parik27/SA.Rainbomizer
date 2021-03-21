@@ -61,6 +61,8 @@ CZone *CheckNewZone (CVector *point, char checkType)
                         + std::string (currentZone->m_szTextKey));
                     if (ConfigManager::ReadConfig ("RiotRandomizer") && RiotRandomizer::m_Config.RandomizeRiots)
                     {
+                        // Check if riots already enabled separate from randomizer
+                        // Doesn't take effect in these cases
                             if (!injector::ReadMemory<bool> (0xB72958)
                                 && !injector::ReadMemory<bool> (0x969130 + 69))
                                 RiotRandomizer::riotModeRandomized = false;

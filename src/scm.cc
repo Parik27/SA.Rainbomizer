@@ -58,6 +58,7 @@ static bool     wasFlyingCarsOn = false;            // Stores state of flying ca
 // Store original train type + randomized train type for random trains
 static int      lastTrainOldType       = -1;
 static int      lastTrainNewType          = -1;
+static std::vector<int> snailTrailTrain;
 
 static int currentTextBoxForMission = 0;
 
@@ -1452,6 +1453,22 @@ void __fastcall IgnoreTrainCarriages (CRunningScript *scr, void *edx,
                                          short count)
 {
     scr->CollectParameters (count);
+    if (scr->CheckName ("scrash2"))
+    {
+        if (snailTrailTrain.empty() || snailTrailTrain[0] != ScriptParams[0])
+        {
+            snailTrailTrain.clear ();
+            snailTrailTrain.push_back (ScriptParams[0]);
+            snailTrailTrain.push_back (lastTrainNewType);
+            snailTrailTrain.push_back (lastTrainOldType);
+        }
+        else if (snailTrailTrain[0] == ScriptParams[0] && ScriptParams[1] == 2)
+        {
+            lastTrainNewType = snailTrailTrain[1];
+            lastTrainOldType = snailTrailTrain[2];
+            snailTrailTrain.clear ();
+        }
+    }
     int numOfCarriagesNew = trainTypes[lastTrainNewType];
     int numOfCarriagesOld = trainTypes[lastTrainOldType];
     int carriageDifference = numOfCarriagesOld - numOfCarriagesNew;
@@ -1467,6 +1484,20 @@ void __fastcall IgnoreTrainCarriages (CRunningScript *scr, void *edx,
                 ScriptParams[1] = 3;
             else if (numOfCarriagesNew == 5 && ScriptParams[1] > 4)
                 ScriptParams[1] = 4;
+    }
+}
+
+/*******************************************************/
+void __fastcall FixSnailTrailTrain (CRunningScript *scr, void *edx,
+                                      short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("scrash2"))
+    {
+        if (lastTrainNewType != 1 && lastTrainNewType != 2
+                && lastTrainNewType != 4 && lastTrainNewType != 5
+                && lastTrainNewType != 7 && lastTrainNewType != 11)
+        Scrpt::CallOpcode (0x362, "remove_actor_from_car", ScriptParams[0], 843.377f, -1389.283f, -1.269f);
     }
 }
 
@@ -1532,6 +1563,7 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x482C6B, (void *) &FixBoatSchoolObjectPlacements},
          {HOOK_CALL, 0x497F89, (void *) &RandomizeTrainForScript},
          {HOOK_CALL, 0x46BB6C, (void *) &IgnoreTrainCarriages},
+         {HOOK_CALL, 0x490558, (void *) &FixSnailTrailTrain},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     if (m_Config.MoreSchoolTestTime)

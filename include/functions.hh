@@ -92,6 +92,15 @@ enum ePedType
     PED_TYPE_MISSION8
 };
 
+enum eWeatherRegion
+{
+    WEATHER_REGION_DEFAULT,
+    WEATHER_REGION_LA,
+    WEATHER_REGION_SF,
+    WEATHER_REGION_LV,
+    WEATHER_REGION_DESERT
+};
+
 inline static int *ms_numPedsLoaded = reinterpret_cast<int *> (0x8E4BB0);
 inline static int *ms_pedsLoaded    = reinterpret_cast<int *> (0x8E4C00);
 
@@ -1021,15 +1030,15 @@ struct CGame
 
 struct CTimeCycleCurrent
 {
-    float m_fAmbientRed;
-    float m_fAmbientGreen;
-    float m_fAmbientBlue;
-    float m_fAmbientRed_Obj;
-    float m_fAmbientGreen_Obj;
-    float m_fAmbientBlue_Obj;
-    float m_fDirectionalRed;
-    float m_fDirectionalGreen;
-    float m_fDirectionalBlue;
+    float  m_fAmbientRed;
+    float  m_fAmbientGreen;
+    float  m_fAmbientBlue;
+    float  m_fAmbientRed_Obj;
+    float  m_fAmbientGreen_Obj;
+    float  m_fAmbientBlue_Obj;
+    float  m_fDirectionalRed;
+    float  m_fDirectionalGreen;
+    float  m_fDirectionalBlue;
     short  m_wSkyTopRed;
     short m_wSkyTopGreen;
     short  m_wSkyTopBlue;

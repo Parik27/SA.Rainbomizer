@@ -59,6 +59,8 @@ static bool     wasFlyingCarsOn = false;            // Stores state of flying ca
 static int      lastTrainOldType       = -1;
 static int      lastTrainNewType          = -1;
 
+static int currentTextBoxForMission = 0;
+
 static ScriptVehicleRandomizer::BoatSchoolTimes boatSchool;
 
 // Key is traintype ID, value is number of carriages for that train type
@@ -1226,6 +1228,38 @@ void __fastcall Ryder2WasBoxDestroyedSomehow (CRunningScript *scr, void *edx,
 }
 
 /*******************************************************/
+void Ryder2ReplaceHelp (char *str, bool quickMessage, bool permanent, bool addToBrief)
+{
+    if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "ryder2"
+        && ryder2.isPlayerInVeh)
+    {
+        std::string newText;
+        if (currentTextBoxForMission == 0)
+        {
+            newText = "Your helicopter is fitted with a magnet which can pick up objects.";
+        }
+        else if (currentTextBoxForMission == 1)
+        {
+            newText = "Press the Fire Button to pick up and drop the boxes.";
+        }
+        else if (currentTextBoxForMission == 2)
+        {
+            newText = "Once a box is attached, carefully place it in the back "
+                      "of Ryder's vehicle.";
+        }
+        if (currentTextBoxForMission != 2)
+            currentTextBoxForMission++;
+        else
+            currentTextBoxForMission = 0;
+        Call<0x588BE0> (newText.c_str (), quickMessage, permanent, addToBrief);
+    }
+    else
+    {
+        Call<0x588BE0> (str, quickMessage, permanent, addToBrief);
+    }
+}
+
+/*******************************************************/
 void __fastcall Ryder2IncreaseRadius (CRunningScript *scr, void *edx,
                                       short count)
 {
@@ -1493,6 +1527,7 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x4831FC, (void *) &Ryder2CheckBoxForDamage},
          {HOOK_CALL, 0x48322F, (void *) &Ryder2CheckBoxForDamage2},
          {HOOK_CALL, 0x4698C6, (void *) &Ryder2WasBoxDestroyedSomehow},
+         {HOOK_CALL, 0x48563A, (void *) &Ryder2ReplaceHelp},
          {HOOK_CALL, 0x47C233, (void *) &Ryder2ResetVariables},
          {HOOK_CALL, 0x482C6B, (void *) &FixBoatSchoolObjectPlacements},
          {HOOK_CALL, 0x497F89, (void *) &RandomizeTrainForScript},

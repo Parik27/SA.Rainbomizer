@@ -239,14 +239,6 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
             data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
 
-        // Customs Fast Track
-        case 69:
-            // STEAL4_25110
-            data += 25743;
-            data = Scrpt::CreateOpcode (0x2, "jump", data, -30732);
-
-            break;
-
         // New Model Army
         case 74:
             Scrpt::CreateNop (data, 27236, 27254);
@@ -283,6 +275,16 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         // Tagging up Turf - Infinite ammo
         case 13:
             Scrpt::CallOpcode (0x555, "remove_weapon", GlobalVar (3), 41);
+            break;
+        
+        // Customs Fast Track - Fade in
+        case 69: 
+            Scrpt::CallOpcode (0x16A, "do_fade", 500, 1); 
+            break;
+
+        // Zeroing In - Remove player from car
+        case 67: 
+            Scrpt::CallOpcode (0x792, "disembark_actor", GlobalVar (3)); 
             break;
         }
 }

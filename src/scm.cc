@@ -937,7 +937,7 @@ void __fastcall IgnoreLowriderCheck (CRunningScript *scr, void *edx, char result
 {
     if (scr->CheckName ("cesar") || scr->CheckName ("lowr"))
     {
-        ScriptParams[0] = 0;
+        result = 1;
     }
     CallMethod<0x4859D0> (scr, result);
 }

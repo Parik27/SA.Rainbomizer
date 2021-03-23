@@ -573,8 +573,11 @@ void __fastcall RandomizeScriptVehicleColours (CRunningScript *scr, void *edx,
                                                short count)
 {
     scr->CollectParameters (count);
-    ScriptParams[1] = random (127);
-    ScriptParams[2] = random (127);
+    if (!scr->CheckName("scrash3"))
+    {
+        ScriptParams[1] = random (127);
+        ScriptParams[2] = random (127);  
+    }
 }
 
 /*******************************************************/

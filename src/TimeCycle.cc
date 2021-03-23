@@ -15,12 +15,26 @@
 TimeCycleRandomizer *TimeCycleRandomizer::mInstance = nullptr;
 
 static std::vector<int> weatherRegions = {0, 1, 2, 3, 4};
+static int              currentMissionWeather = -1;
+static int              randomCurrentMissionWeather = -1;
 
 /*******************************************************/
 void
 ChangeForceWeather (short weather)
 {
-    weather = random (19);
+    if (weather >= 500 && weather <= 520)
+    {
+        if ((weather - 500) != currentMissionWeather)
+        {
+            currentMissionWeather = weather - 500;
+            randomCurrentMissionWeather = random (19);
+        }
+        weather = randomCurrentMissionWeather;
+    }
+    else
+    {
+        weather = random (19);
+    }
     injector::WriteMemory (0xC81318, weather);
     injector::WriteMemory (0xC81320, weather);
     injector::WriteMemory (0xC8131C, weather);
@@ -61,6 +75,13 @@ ShuffleWeatherRegions (CVector *coors)
     {
         injector::WriteMemory<short> (0xC81314, weatherRegions[3]);
     }
+}
+
+/*******************************************************/
+void __fastcall SaveMissionWeather (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    ScriptParams[0] += 500;
 }
 
 /*******************************************************/
@@ -217,9 +238,9 @@ TimeCycleRandomizer::Initialise ()
 
     if (m_Config.RandomizeWeather)
     {
-        RegisterHooks (
-                {{HOOK_JUMP, 0x72A4F0, (void *) &ChangeForceWeather},
-            {HOOK_JUMP, 0x72A640, (void *) &ShuffleWeatherRegions}});
+        RegisterHooks ({{HOOK_JUMP, 0x72A4F0, (void *) &ChangeForceWeather},
+                        {HOOK_JUMP, 0x72A640, (void *) &ShuffleWeatherRegions},
+                        {HOOK_CALL, 0x47D460, (void *) &SaveMissionWeather}});
         FadesManager::AddFadeCallback (Call<0x72A4F0>);
         
         FadesManager::AddFadeCallback ([] {

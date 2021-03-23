@@ -15,8 +15,7 @@
 TimeCycleRandomizer *TimeCycleRandomizer::mInstance = nullptr;
 
 static std::vector<int> weatherRegions = {0, 1, 2, 3, 4};
-static int              currentMissionWeather = -1;
-static int              randomCurrentMissionWeather = -1;
+static int              lastMissionWeather;
 
 /*******************************************************/
 void
@@ -24,12 +23,7 @@ ChangeForceWeather (short weather)
 {
     if (weather >= 500 && weather <= 520)
     {
-        if ((weather - 500) != currentMissionWeather)
-        {
-            currentMissionWeather = weather - 500;
-            randomCurrentMissionWeather = random (19);
-        }
-        weather = randomCurrentMissionWeather;
+        weather = lastMissionWeather;
     }
     else
     {
@@ -246,6 +240,8 @@ TimeCycleRandomizer::Initialise ()
         FadesManager::AddFadeCallback ([] {
             std::shuffle (weatherRegions.begin (),
                           weatherRegions.end (), std::default_random_engine(time(NULL)));});
+        FadesManager::AddFadeCallback (
+            [] { lastMissionWeather = random (19); });
     }
 
     if (m_Config.RandomizeTimeCycle)

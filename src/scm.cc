@@ -32,6 +32,7 @@
 #include "util/scrpt.hh"
 #include "injector/calling.hpp"
 #include "util/text.hh"
+#include <chrono>
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
@@ -40,6 +41,7 @@ const int MODEL_FIRELA = 0x220;
 const int MODEL_SANCHZ = 468;
 const int MODEL_WALTON   = 478;
 const int MODEL_GREENWOO = 492;
+const int MODEL_BOXVILLE = 498;
 const int MODEL_HYDRA    = 520;
 const int MODEL_CEMENT   = 524;
 const int MODEL_FORKLIFT = 530;
@@ -70,6 +72,9 @@ static ScriptVehicleRandomizer::BoatSchoolTimes boatSchool;
 std::unordered_map<int, int> trainTypes
     = {{0, 5}, {1, 3}, {2, 3},  {3, 4},  {4, 3},  {5, 4},  {6, 3},  {7, 3},
        {8, 2}, {9, 1}, {10, 2}, {11, 3}, {12, 5}, {13, 6}, {14, 1}, {15, 1}}; 
+
+static float timerStartTime = -1.0f;
+static float timerCurrent = -1.0f;
 
 template <typename T>
 T &
@@ -213,7 +218,8 @@ void __fastcall FixCarChecks (CRunningScript *scr, void *edx, short count)
     {
         int playerVeh = FindPlayerVehicle ()->m_nModelIndex;
         if (CModelInfo::IsPlaneModel (playerVeh) || CModelInfo::IsHeliModel (playerVeh) 
-            || CModelInfo::IsCarModel(playerVeh) || CModelInfo::IsQuadBikeModel(playerVeh))
+            || CModelInfo::IsCarModel(playerVeh) || CModelInfo::IsQuadBikeModel(playerVeh) 
+            || CModelInfo::IsMonsterTruckModel(playerVeh))
             {
                 ScriptParams[1] = playerVeh;
             }
@@ -271,7 +277,8 @@ ApplyFixesBasedOnModel (int model, int newModel)
         || (model == MODEL_WALTON && ScriptVehicleRandomizer::GetInstance()->mLastThread == "doc2")
         || (model == MODEL_ANDROM && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "desert9")
         || (model == MODEL_GREENWOO && ScriptVehicleRandomizer::GetInstance()->mLastThread == "drugs4")
-        || (model == MODEL_VORTEX && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "boat"))
+        || (model == MODEL_VORTEX && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "boat")
+        || (model == MODEL_BOXVILLE && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "guns1"))
             ScriptVehicleRandomizer::GetInstance ()->ApplyCarCheckFix (newModel);
         
 }
@@ -281,6 +288,7 @@ void
 ApplyFixesBasedOnMission ()
 {
     currentTrailerAttached = false;
+    timerStartTime         = -1.0f;
     if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "sweet6")
             Scrpt::CallOpcode (0x8, "add_int", GlobalVar (1920), 1);
 
@@ -340,6 +348,24 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
         }
 
     return vehicle;
+}
+
+/*******************************************************/
+void
+RandomizeRCVehicleForScript (float x, float y, float z, float angle, short model)
+{
+    int newModel
+        = ScriptVehicleRandomizer::GetInstance ()->ProcessVehicleChange (model,
+                                                                         x, y,
+                                                                         z);
+
+    ApplyFixesBasedOnModel (model, newModel);
+    ApplyFixesBasedOnMission ();
+
+    if (StreamingManager::AttemptToLoadVehicle (newModel) == ERR_FAILED)
+        newModel = model;
+
+    GivePlayerRemoteControlledCar (x, y, z, angle, newModel);
 }
 
 /*******************************************************/
@@ -923,6 +949,20 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx, short c
         if (int (coordCompareX) == 377 && int (coordCompareZ) == 80)
             ((float *) ScriptParams)[1] += 300.0f;
     }
+    else if (scr->CheckName ("guns1")
+             && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    != 431
+             && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    != 437)
+    {
+        float xRadius = ((float *) ScriptParams)[4];
+        float yRadius = ((float *) ScriptParams)[5];
+        float zRadius = ((float *) ScriptParams)[6];
+        if (int (xRadius) == 2 && int (yRadius) == 3 && int (zRadius) == 5)
+        {
+            ((float *) ScriptParams)[5] += 2.0f;
+        }
+    }
 }
 
 /*******************************************************/
@@ -1502,6 +1542,34 @@ void __fastcall FixSnailTrailTrain (CRunningScript *scr, void *edx,
 }
 
 /*******************************************************/
+void __fastcall FixStuckAtDohertyGarage (CRunningScript *scr, void *edx,
+                                         short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("scrash3"))
+    {
+        if (ScriptParams[0] == GetGlobalVar<int>(3))
+        {
+            if (timerStartTime < 0.0f)
+            {
+                timerStartTime = clock ();
+                Logger::GetLogger ()->LogMessage ("TIMER START!");
+            }
+            timerCurrent = clock () - timerStartTime;
+            Logger::GetLogger ()->LogMessage ("Timer is "
+                                              + std::to_string (timerCurrent));
+            if ((int)timerCurrent >= 6000)
+            {
+                CRunningScript::SetCharCoordinates (
+                        FindPlayerPed (),
+                        {-2047.5f, 178.5f, 27.8f}, 1, 1);
+                timerStartTime = -1.0f;
+            }
+        }
+    }
+}
+
+/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -1514,6 +1582,7 @@ ScriptVehicleRandomizer::Initialise ()
 
     RegisterHooks (
         {{HOOK_CALL, 0x467B01, (void *) &RandomizeCarForScript},
+         {HOOK_CALL, 0x48AAB8, (void *) &RandomizeRCVehicleForScript},
          {HOOK_CALL, 0x498AA8, (void *) &SlowDownAndromedaInStoaway},
          {HOOK_CALL, 0x47F070, (void *) &RevertVehFixes},
          {HOOK_CALL, 0x5DFE79, (void *) &FixEOTLPosition},
@@ -1564,6 +1633,7 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x497F89, (void *) &RandomizeTrainForScript},
          {HOOK_CALL, 0x46BB6C, (void *) &IgnoreTrainCarriages},
          {HOOK_CALL, 0x490558, (void *) &FixSnailTrailTrain},
+         {HOOK_CALL, 0x49220E, (void *) &FixStuckAtDohertyGarage},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     if (m_Config.MoreSchoolTestTime)

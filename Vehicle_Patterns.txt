@@ -2,7 +2,7 @@
 #													X	Y	Z	
 intro	Copcarla	4	Y	N	N	N	Y	Y	N	Y	N					
 lowr	Savanna	2	Y	Y	Y	Y	Y	Y	Y	Y	N					
-zero5	Rcbaron	1	Y	N	N	N	Y	Y	N	N	N	guns				
+zero5	Rcbaron	1	C	N	N	N	C	C	N	N	N	guns	-5	0	0	
 intro1	Peren	2	Y	Y	Y	Y	Y	Y	N	N	N					
 intro1	Voodoo	2	Y	Y	Y	Y	Y	Y	N	N	N					
 intro1	Bmx	1	C	Y	Y	Y	C	N	N	N	N	x=971+y=-1115+z=23+smallplanes	-20	-37	0	Ryder bike
@@ -184,7 +184,7 @@ dskool	Supergt	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes
 dskool	Banshee	1	Y	N	N	N	N	N	N	N	N	x=-2050+y=-130+smallcar				
 dskool	Banshee	1	Y	N	N	N	N	N	N	N	N	x=-2050+y=-110+smallcar				
 zero1	Rcbaron	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
-zero2	Rcbaron	1	N	N	N	N	Y	Y	N	N	N	guns				
+zero2	Rcbaron	1	N	N	N	N	C	C	N	N	N	guns	-5	0	0	
 zero2	Sanchez	2	Y	Y	N	Y	Y	Y	N	N	N					
 zero4	Bmx	1	N	N	N	N	N	N	N	N	N					
 zero4	Rcgoblin	1	N	N	N	N	N	Y	N	N	N	rc				

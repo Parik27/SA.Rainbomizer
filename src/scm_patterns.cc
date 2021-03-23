@@ -95,7 +95,8 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
         return false;
 
     if (mFlags.RC && !CModelInfo::IsRCModel(vehID) && (CModelInfo::IsCarModel(vehID) 
-        || CModelInfo::IsHeliModel(vehID) || CModelInfo::IsPlaneModel(vehID)))
+        || CModelInfo::IsHeliModel(vehID) || CModelInfo::IsPlaneModel(vehID) 
+        || CModelInfo::IsMonsterTruckModel(vehID)))
         return false;
     else if (mFlags.NoRC && CModelInfo::IsRCModel (vehID)) 
         return false;
@@ -122,7 +123,7 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
         && vehID != 403 && vehID != 514 && vehID != 515)
         return false;
 
-    if (mFlags.SmallCar && CModelInfo::IsCarModel (vehID)
+    if (mFlags.SmallCar && (CModelInfo::IsCarModel (vehID) || CModelInfo::IsMonsterTruckModel(vehID))
         && (vehID == 403 || vehID == 406 || vehID == 408 || vehID == 414
             || vehID == 431 || vehID == 432 || vehID == 433 || vehID == 437
             || vehID == 443 || vehID == 444 || vehID == 455 || vehID == 456

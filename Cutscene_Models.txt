@@ -1078,11 +1078,8 @@ csspray
 cswrench
 
 csmop
-csbat
 csbroom
-cscrowbar
 csgiantwrench
-csgolfclub
 csknife
 csspade
 
@@ -1320,6 +1317,7 @@ csammobox
 cscastray
 csgoldrec
 csm16
+csmopbucket
 
 cshandcuff
 

@@ -71,7 +71,7 @@ CZone *CheckNewZone (CVector *point, char checkType)
                                 && !injector::ReadMemory<bool> (0x969130 + 69)
                                 && !RiotRandomizer::riotModeRandomized)
                                 {
-                                    if (random (1000) > 998)
+                                    if (random (1000) > 995)
                                         {
                                             RiotRandomizer::riotModeRandomized
                                                 = true;

@@ -1125,6 +1125,9 @@ struct CAnimationStyleDescriptor
     static int Init3 (void *fileName);
 };
 
+void GivePlayerRemoteControlledCar (float x, float y, float z, float angle,
+                                    short model);
+
 CMatrix *RwFrameGetLTM (void *frame);
 CAnimBlendAssociation *RpAnimBlendClumpExtractAssociations (RpClump *clump);
 void     RpAnimBlendClumpGiveAssociations (RpClump *clump, CAnimBlendAssociation *association);

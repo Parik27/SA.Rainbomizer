@@ -270,6 +270,13 @@ CCarCtrl::CreateCarForScript (int modelId, float X, float Y, float Z, char a5)
 }
 
 /*******************************************************/
+void
+GivePlayerRemoteControlledCar (float x, float y, float z, float angle, short model)
+{
+    Call<0x45AB10> (x, y, z, angle, model);
+}
+
+/*******************************************************/
 CBox *
 CClumpModelInfo::GetBoundingBox ()
 {

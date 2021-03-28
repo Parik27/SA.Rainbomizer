@@ -35,10 +35,6 @@ ColourRandomizer *ColourRandomizer::mInstance = nullptr;
 
 // Store RGB colours and light IDs to ensure each one stays consistent without flickering.
 static std::vector<ColourRandomizer::Pattern> colourPatterns;
-static CRGBA              cloudColourDistant = {-1, -1, -1, -1};
-static CRGBA              cloudColourHigh = {-1, -1, -1, -1};
-static CRGBA              fogType1           = {-1, -1, -1, -1};
-static CRGBA              fogType2           = {-1, -1, -1, -1};
 
 ColourRandomizer::Pattern GetColour (ColourRandomizer::Pattern pattern)
 {
@@ -169,7 +165,7 @@ CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
     int hash = HashColour ({r, g, b, a});
     HSVtoRGB ((int) (time / 10 + hash) % 360, 0.7, 0.7, colour);
 
-    if ((r != g && g != b) || crazyMode)
+    if (((r != 255 && g != 255 && b != 255) && (r != 0 && g != 0 && b != 0)) || crazyMode)
         {
             thisCol->r = colour[0];
             thisCol->g = colour[1];
@@ -359,6 +355,7 @@ RandomizeWeatherEffectColours (float x, float y, float z, float w, float h,
     CRGBA colour = {r, g, b, a};
     if (address == 0x715EDF)
     {
+        static CRGBA cloudColourHigh = {-1, -1, -1, -1};
         if (cloudColourHigh.a == -1)
             cloudColourHigh = {random(255), colour.g, colour.b, colour.a};
         colour = cloudColourHigh;
@@ -375,37 +372,37 @@ RandomizeFogColours (float x, float y, float z, float w, float h, char r,
                      char g, char b, char a, float recipNearZ, float angle,
                      char arg12)
 {
-    CRGBA colour = {r, g, b, a};
-    if (address == 0x700817)
-        {
-            if (fogType1.a == -1)
-                fogType1 = {random (255), colour.g, colour.b, colour.a};
-            colour = fogType1;
-        }
-    else if (address == 0x700B6B)
-        {
-            if (fogType2.a == -1)
-                fogType2 = {random (255), colour.g, colour.b, colour.a};
-            colour = fogType2;
+    CRGBA        colour  = {r, g, b, a};
+    static CRGBA fogType = {r, g, b, -1};
+    if (fogType.a == -1)
+    {
+        fogType = {random (255), g, b, a};
     }
+    colour  = fogType;
     colour = GetRainbowColour (HashColour (colour));
-    CSprite::RenderBufferedOneXLUSprite_Rotate_Aspect (x, y, z, w, h, colour.r, colour.g,
-                                 colour.b, a, recipNearZ, angle, arg12);
+    CSprite::RenderBufferedOneXLUSprite_Rotate_Aspect (x, y, z, w, h, colour.r,
+                                                       colour.g, colour.b, a,
+                                                       recipNearZ, angle,
+                                                       arg12);
 }
 
 /*******************************************************/
+template <int address>
 void
 RandomizeCloudColours (float x, float y, float z, float w, float h, char r,
                        char g, char b, char a, float recipNearZ, float angle,
                        char arg12)
 {
-    CRGBA colour = {r, g, b, a};
+    CRGBA        colour             = {r, g, b, a};
+    static CRGBA cloudColourDistant = {-1, -1, -1, -1};
     if (cloudColourDistant.a == -1)
-        cloudColourDistant = {colour.r, colour.g, colour.b, colour.a};
-    colour = cloudColourDistant;
+        cloudColourDistant = {r, g, b, a};
+    colour             = cloudColourDistant;
     colour = GetRainbowColour (HashColour (colour));
-    CSprite::RenderBufferedOneXLUSprite_Rotate_Dimension (x, y, z, w, h, colour.r, colour.g,
-                                                          colour.b, a, recipNearZ, angle,
+    CSprite::RenderBufferedOneXLUSprite_Rotate_Dimension (x, y, z, w, h,
+                                                          colour.r, colour.g,
+                                                          colour.b, a,
+                                                          recipNearZ, angle,
                                                           arg12);
 }
 
@@ -499,7 +496,7 @@ ColourRandomizer::Initialise ()
 
     if (m_Config.RandomizeOtherSkyElements)
     {
-        injector::MakeCALL (0x6FB9A6, (void *) &RandomizeWeatherEffectColours<0x6FB9A6>); // Wet Roads
+        //injector::MakeCALL (0x6FB9A6, (void *) &RandomizeWeatherEffectColours<0x6FB9A6>); // Wet Roads
         injector::MakeCALL (0x713F0F, (void *) &RandomizeWeatherEffectColours<0x713F0F>); // Stars
         injector::MakeCALL (0x714371, (void *) &RandomizeWeatherEffectColours<0x714371>); // Rainbows
     }
@@ -509,7 +506,7 @@ ColourRandomizer::Initialise ()
         injector::MakeCALL (0x715EDF, (void *) &RandomizeWeatherEffectColours<0x715EDF>); // High Clouds
         injector::MakeCALL (0x700817, (void *) &RandomizeFogColours<0x700817>);
         injector::MakeCALL (0x700B6B, (void *) &RandomizeFogColours <0x700B6B>);
-        injector::MakeCALL (0x714216, (void *) &RandomizeCloudColours); // Distant Clouds
+        injector::MakeCALL (0x714216, (void *) &RandomizeCloudColours<0x714216>); // Distant Clouds
     }
 
     // Basically the equivalent of discount TimeCycle Randomizer, might add as optional setting

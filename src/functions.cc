@@ -285,6 +285,13 @@ CClumpModelInfo::GetBoundingBox ()
 
 /*******************************************************/
 int
+CGame::Init2 (void *file)
+{
+    return CallAndReturn<int, 0x5BA1A0> (file);
+}
+
+/*******************************************************/
+int
 CGame::Init3 (void *file)
 {
     return CallAndReturn<int, 0x5BA400> (file);

@@ -211,3 +211,10 @@ CallVirtualMethodAndReturn (C _this, Args... args)
     return reinterpret_cast<Ret (__thiscall *) (C, Args...)> (
         (*reinterpret_cast<void ***> (_this))[tableIndex]) (_this, args...);
 }
+
+/*******************************************************/
+#define REGISTER_HOOK(address, function, ret, ...)                              \
+    {                                                                          \
+        static ret (*F) (__VA_ARGS__);                                         \
+        RegisterHooks ({{HOOK_CALL, address, function<F>}});                                 \
+    }

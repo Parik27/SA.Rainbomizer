@@ -1,12 +1,17 @@
 #pragma once
 
-struct CPed;
+#include <vector>
+#include <cstdint>
+#include <cstdio>
+#include <string>
+#include "weapon_patterns.hh"
 
 int *GetWeaponInfo (int weaponId, char skill);
 
 class WeaponRandomizer
 {
     static WeaponRandomizer *mInstance;
+    static inline std::vector<WeaponPattern> mWeaponPatterns;
 
     WeaponRandomizer (){};
     static void DestroyInstance ();
@@ -20,9 +25,13 @@ public:
         bool RandomizePlayerWeapons;
     } m_Config;
 
-    int GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy);
-    int GetRandomPickup (CPed *ped, int weapon, bool ignoreBuggy);
+    int GetRandomWeapon (CPed *ped, int weapon, bool isPickup);
+    void CachePatterns ();
+
+    static inline int playerWeaponID = -1;
+    static inline bool isWeaponCheck  = false;
 
     /// Initialises Hooks/etc.
     void Initialise ();
+    void InitialiseCache ();
 };

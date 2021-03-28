@@ -1,0 +1,35 @@
+#Thread	Original Weapon	Ped	Melee	Pistols	Shotguns	SMG	Assault Rifles	Rifles	Heavy Weapons	Projectiles	Sprayables	Gadgets	Pickup?	Flags
+sweet1	spraycan	0	N	N	N	N	N	N	N	N	N	N	N	
+crash1	fire_ex	-1	N	N	N	N	N	N	N	N	N	N	Y	
+crash1	molotov	-1	N	N	N	N	N	N	Y	Y	N	N	Y	flame
+la1fin2	camera	0	N	N	N	N	N	N	N	N	N	N	N	
+bcrash1	camera	-1	N	N	N	N	N	N	N	N	N	N	Y	
+truth2	flame	0	N	N	N	N	N	N	Y	Y	N	N	N	flame
+truth2	flame	-1	N	N	N	N	N	N	Y	Y	N	N	Y	flame
+truth2	rocketla	0	N	N	Y	Y	Y	Y	Y	Y	N	N	N	longrange
+truth2	rocketla	-1	N	N	Y	Y	Y	Y	Y	Y	N	N	Y	longrange
+syn6	rocketla	-1	N	N	Y	Y	Y	Y	Y	Y	N	N	Y	longrange
+des3	rocketla	-1	N	N	Y	Y	Y	Y	Y	Y	N	N	Y	longrange
+desert9	gun_para	-1	N	N	N	N	N	N	N	N	N	N	Y	
+heist1	camera	-1	N	N	N	N	N	N	N	N	N	N	Y	
+heist9	gun_para	-1	N	N	N	N	N	N	N	N	N	N	Y	
+heist9	satchel	-1	N	N	N	N	N	N	Y	Y	N	N	Y	explosive
+heist9	teargas	0	N	N	N	N	N	N	N	Y	N	N	N	
+heist9	nvgoggles	0	N	N	N	N	N	N	N	N	N	Y	N	goggles
+syn5	sniper	0	N	N	Y	Y	Y	Y	Y	Y	N	N	N	longrange
+desert5	gun_para	0	N	N	N	N	N	N	N	N	N	N	N	
+syn1	camera	0	N	N	N	N	N	N	N	N	N	N	N	
+heist2	gun_para	0	N	N	N	N	N	N	N	N	N	N	N	
+mansio1	gun_para	0	N	N	N	N	N	N	N	N	N	N	N	
+cat4	satchel	0	N	N	N	N	N	N	Y	Y	N	N	N	explosive
+drugs4	ak47	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	
+finalec	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
+drugs1	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
+casino9	colt45	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	
+shrange	pistol	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
+shrange	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
+shrange	chromegun	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
+shrange	ak47	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
+zero1	minigun	0	N	N	Y	Y	Y	Y	Y	N	N	N	N	
+heist5	minigun	0	N	N	Y	Y	Y	Y	Y	N	N	N	N	
+wuzi5	minigun	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	

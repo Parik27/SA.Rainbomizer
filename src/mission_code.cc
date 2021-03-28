@@ -4,6 +4,8 @@
 #include "autosave.hh"
 #include "logger.hh"
 
+static int millieProgress = -1;
+
 /*******************************************************/
 void
 InsertRaceJumpAt (unsigned char *data, int index)
@@ -73,6 +75,7 @@ GreenSabreStartFix (unsigned char *data)
 void
 CustomsFastTrackStartFix (unsigned char *data)
 {
+    Scrpt::CreateOpcode (0x51, "return", data + 30732);
     data += 25110;
     data = Scrpt::CreateOpcode (0x6, "set_lvar", data, LocalVar (36), 1);
     data = Scrpt::CreateOpcode (0x51, "return", data);
@@ -143,6 +146,14 @@ LosDesperadosFix (unsigned char *data)
 
 /*******************************************************/
 void
+KeyToHerHeartFix (unsigned char *data)
+{
+    millieProgress = ScriptSpace[364];
+    ScriptSpace[364] = 20;
+}
+
+/*******************************************************/
+void
 MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
 {
     switch (this->mRandomizedMissionNumber)
@@ -165,6 +176,7 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 32: MaddDoggRhymesFix (data); break;
         case 109: LosDesperadosFix (data); break;
         case 112: EOTL3StartFix (data); break;
+        case 97: KeyToHerHeartFix (data); break;
         case 21: DobermanStartFix (data); break;
         }
 }
@@ -192,6 +204,11 @@ MissionRandomizer::ApplyMissionFailFixes ()
         {
         // King in Exile
         case 45: ScriptSpace[719] = 1; break;
+        }
+    switch (this->mRandomizedMissionNumber)
+        {
+            // Key To Her Heart
+            case 97: ScriptSpace[364] = millieProgress; break;
         }
 }
 
@@ -285,6 +302,11 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         // Zeroing In - Remove player from car
         case 67: 
             Scrpt::CallOpcode (0x792, "disembark_actor", GlobalVar (3)); 
+            break;
+
+       // Key To Her Heart - Reset Millie progress
+        case 97: 
+            ScriptSpace[364] = millieProgress; 
             break;
         }
 }

@@ -1665,7 +1665,6 @@ cswrench
 
 cscokelines
 csashtray
-csbarbq
 csbball
 csbcard
 csbeerbottle
@@ -1701,7 +1700,6 @@ csframe
 csgirliecase
 csgolfball
 csgreengoo
-cshatch
 csjar
 cslighterfluid
 csmopbucket

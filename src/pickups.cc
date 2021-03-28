@@ -6,8 +6,20 @@
 #include "config.hh"
 #include "weapons.hh"
 #include <injector/injector.hpp>
+#include <algorithm>
 
 PickupsRandomizer *PickupsRandomizer::mInstance = nullptr;
+
+static std::unordered_map<int, int> weaponToModel = {
+       {331, 1},  {333, 2},  {334, 3},  {335, 4},  {336, 5},  {337, 6},
+       {338, 7},  {339, 8},  {341, 9},  {321, 10}, {322, 11}, {323, 12},
+       {324, 13}, {325, 14}, {326, 15}, {342, 16}, {343, 17}, {344, 18},
+       {346, 22}, {347, 23}, {348, 24}, {349, 25}, {350, 26}, {351, 27},
+       {352, 28}, {353, 29}, {355, 30}, {356, 31}, {372, 32}, {357, 33},
+       {358, 34}, {359, 35}, {360, 36}, {361, 37}, {362, 38}, {363, 39},
+       {364, 40}, {365, 41}, {366, 42}, {367, 43}, {368, 44}, {369, 45},
+       {371, 46}
+};
 
 /*******************************************************/
 std::vector<int> PickupsRandomizer::additional_pickups
@@ -19,29 +31,42 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
                  char isEmpty, char *message)
 {
 
-    if (modelId != 1212 && modelId != 367 && modelId != 344 && modelId != 366
-        && modelId != 371 && modelId != 363 && modelId != 953 && modelId != 954
-        && modelId != 1253 && modelId != 370 && modelId != 1277)
+    if (modelId != 1212 && modelId != 953 && modelId != 954 && modelId != 1253
+        && modelId != 370 && modelId != 1277)
         {
-
-            if (random (100) <= 85)
-                {
-
-                    modelId = WeaponRandomizer::GetInstance ()
-                                  ->GetRandomWeapon (nullptr, 0, true);
-
-                    modelId = GetWeaponInfo (modelId, 1)[3];
-                }
-            else
+            if (weaponToModel.find (modelId) != weaponToModel.end ())
+            {
+                modelId = weaponToModel[modelId];
+            }
+             Logger::GetLogger ()->LogMessage ("Getting random pickup");
+             modelId = WeaponRandomizer::GetInstance ()
+                ->GetRandomWeapon (nullptr, modelId, true);
+             Logger::GetLogger ()->LogMessage ("Random pickup is " + std::to_string(modelId));
+            if (modelId == 47 || modelId == 20 || modelId == 21)
                 {
                     modelId = PickupsRandomizer::additional_pickups[random (
                         PickupsRandomizer::additional_pickups.size () - 1)];
                 }
+            else if (find (PickupsRandomizer::additional_pickups.begin (),
+                           PickupsRandomizer::additional_pickups.end (),
+                           modelId)
+                     == PickupsRandomizer::additional_pickups.end ())
+                modelId = GetWeaponInfo (modelId, 1)[3];
         }
 
     return CPickups::GenerateNewOne (x, y, z, modelId, pickupType, ammo,
                                      moneyPerDay, isEmpty, message);
 }
+
+/*******************************************************/
+int
+InitialiseCacheForPickupRandomization (void *fileName)
+{
+    Logger::GetLogger ()->LogMessage ("Pickup Cache Hook");
+     WeaponRandomizer::GetInstance()->CachePatterns ();
+    return CGame::Init2 (fileName);
+}
+
 /*******************************************************/
 void
 PickupsRandomizer::Initialise ()
@@ -59,6 +84,8 @@ PickupsRandomizer::Initialise ()
     // Dead peds
     injector::MakeCALL (0x4573C2, &RandomizePickup);
     //injector::MakeCALL (0x156DF52, &RandomizePickup);
+
+    injector::MakeCALL (0x53BCA6, (void *) &InitialiseCacheForPickupRandomization);
 
     Logger::GetLogger ()->LogMessage ("Intialised PickupsRandomizer");
 }

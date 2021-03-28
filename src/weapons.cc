@@ -27,23 +27,11 @@
 #include "util/loader.hh"
 #include "config.hh"
 #include <algorithm>
+#include "weapon_patterns.hh"
 
 WeaponRandomizer *WeaponRandomizer::mInstance = nullptr;
 
 const int WEAPON_MELEE = 100;
-
-std::vector<std::vector<int>> weapon_slots = {{0, 1},
-                                              {2, 3, 4, 5, 6, 7, 8, 9},
-                                              {22, 23, 24},
-                                              {25, 26, 27},
-                                              {28, 29, 32},
-                                              {30, 31},
-                                              {33, 34},
-                                              {35, 36, 37, 38},
-                                              {16, 17, 18, 39},
-                                              {41, 42, 43},
-                                              {10, 11, 12, 14, 15},
-                                              {44, 45, 46}};
 
 /*******************************************************/
 int *
@@ -118,9 +106,125 @@ void __fastcall Opcode1B9Fix (CRunningScript *scr, void *edx, short count)
 }
 
 /*******************************************************/
+int
+InitialiseCacheForWeaponRandomization (void *fileName)
+{
+    Logger::GetLogger ()->LogMessage ("Weapon Cache Hook");
+    WeaponRandomizer::GetInstance ()->InitialiseCache ();
+    return CGame::Init2 (fileName);
+}
+
+/*******************************************************/
+void
+WeaponRandomizer::InitialiseCache ()
+{
+    this->CachePatterns ();
+}
+
+/*******************************************************/
+void __fastcall ChangeLockedPlayerWeaponForTurrets (CRunningScript *scr, void *edx,
+                                          short count)
+{
+    scr->CollectParameters (count);
+    if (ScriptParams[0] == ScriptSpace[3] && WeaponRandomizer::playerWeaponID != -1)
+    {
+        ScriptParams[7] = WeaponRandomizer::playerWeaponID;
+    }
+}
+
+/*******************************************************/
+void __fastcall IsThisAWeaponCheck (CRunningScript *scr, void *edx,
+                                           short count)
+{
+    scr->CollectParameters (count);
+    if (ScriptParams[0] == ScriptSpace[3] && ScriptParams[1] >= 0
+        && ScriptParams[1] <= 46)
+        WeaponRandomizer::isWeaponCheck = true;
+}
+
+/*******************************************************/
+void __fastcall OverridePlayerWeaponCheck (CRunningScript *scr, void *edx,
+                                        char flag)
+{
+    // For now I will force all HasWeapon checks for player to return true
+    // Will probably need to be refined later
+    if (WeaponRandomizer::isWeaponCheck)
+        flag = true;
+    
+    scr->UpdateCompareFlag (flag);
+}
+
+/*******************************************************/
+void __fastcall IgnoreWeaponAmmoCheck (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    if (ScriptParams[0] == ScriptSpace[3]
+        && WeaponRandomizer::playerWeaponID != -1)
+    {
+        ScriptParams[1] = WeaponRandomizer::playerWeaponID;
+    }
+}
+
+/*******************************************************/
+void __fastcall AllowMoreExplosionTypes (CRunningScript *scr, void *edx,
+                                       short count)
+{
+    scr->CollectParameters (count);
+    ScriptParams[0] = -1;
+}
+
+/*******************************************************/
+void __fastcall ChangeLockedPlayerWeapon (CRunningScript *scr, void *edx,
+                                         short count)
+{
+    scr->CollectParameters (count);
+    if (ScriptParams[0] == ScriptSpace[3] && ScriptParams[1] != 0)
+        ScriptParams[1] = WeaponRandomizer::playerWeaponID;
+}
+
+/*******************************************************/
+void __fastcall ChangeGiveAmmoWeapon (CRunningScript *scr, void *edx,
+                                          short count)
+{
+    scr->CollectParameters (count);
+    if (ScriptParams[0] == ScriptSpace[3])
+        ScriptParams[1] = WeaponRandomizer::playerWeaponID;
+}
+
+///*******************************************************/
+//char
+//AllowMoreExplosionTypes (int type, float x1, float y1, float z1, float x2, float y2, float z2)
+//{
+//    char explosion = 0;
+//    for (int i = 0; i < 4; i++)
+//    {
+//        explosion = CallAndReturn<char, 0x736950> (i, x1, y1, z1, x2, y2, z2);
+//        if (explosion)
+//            break;
+//    }
+//}
+
+///*******************************************************/
+//void __fastcall IgnoreWeaponAmmoCheck (CRunningScript *scr, void *edx, int toStore,
+//                                        short count)
+//{
+//    ScriptParams[1] = 10;
+//    CallMethod<0x464370> (scr, toStore, count);
+//}
+
+/*******************************************************/
 void
 WeaponRandomizer::Initialise ()
 {
+    if (ConfigManager::ReadConfig ("WeaponRandomizer") 
+        || ConfigManager::ReadConfig ("PickupsRandomizer"))
+    {
+        injector::MakeCALL (0x48AE9E, (void *) &IsThisAWeaponCheck);
+        injector::MakeCALL (0x48A495, (void *) &OverridePlayerWeaponCheck);
+        injector::MakeCALL (0x489AFA, (void *) &IgnoreWeaponAmmoCheck),
+        injector::MakeCALL (0x482B8D, (void *) &AllowMoreExplosionTypes);
+    }
+
     if (!ConfigManager::ReadConfig ("WeaponRandomizer",
             std::pair("RandomizePlayerWeapons", &m_Config.RandomizePlayerWeapons)))
         return;
@@ -150,6 +254,11 @@ WeaponRandomizer::Initialise ()
     injector::MakeCALL (0x47D4AC, (void *) &Opcode1B9Fix);
     injector::MakeNOP (0x5E62D8, 4);
 
+    injector::MakeCALL (0x53BCA6, (void *) &InitialiseCacheForWeaponRandomization);
+    injector::MakeCALL (0x48C4A1, (void *) &ChangeLockedPlayerWeaponForTurrets);
+    injector::MakeCALL (0x47D4AC, (void *) &ChangeLockedPlayerWeapon);
+    injector::MakeCALL (0x469AAC, (void *) &ChangeGiveAmmoWeapon);
+
     Logger::GetLogger ()->LogMessage ("Intialised WeaponRandomizer");
 }
 
@@ -163,64 +272,120 @@ WeaponRandomizer::DestroyInstance ()
 
 /*******************************************************/
 int
-WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool ignoreBuggy)
+WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool isPickup)
 {
-
-    int slot = GetWeaponInfo (weapon, 1)[5];
-    /*for (auto pattern : config.patterns)
+    std::vector<int> buggy_weapons;
+    if (isPickup)
+    {
+        buggy_weapons = {19};
+    }
+    else
+    {
+        if (ped->m_nPedType == ePedType::PED_TYPE_PLAYER1)
         {
-            if ((pattern.weapon == -1 || pattern.weapon == weapon)
-                && (pattern.ped == -1
-                    || (pattern.ped == 0 && ped == FindPlayerPed ()))
-                && (pattern.thread == ""
-                    || CRunningScripts::CheckForRunningScript (
-                        pattern.thread.c_str ())))
+            buggy_weapons = {19, 20, 21, 40, 47};
+        }
+        else
+        {
+            buggy_weapons = {19, 20, 21, 14, 40, 39, 47};
+            if (ped->m_nPedType == ePedType::PED_TYPE_DEALER)
+            {
+                buggy_weapons.push_back (22);
+            }
+        }
+    }
+
+    for (auto &pattern : mWeaponPatterns)
+    {
+        int pedType = -1;
+        if (!isPickup && ped != nullptr)
+            pedType = ped->m_nPedType;
+        if (pattern.MatchWeapon (weapon, pedType, isPickup))
+        {
+            int newWeaponID = pattern.GetRandom ();
+            if (pedType == 0)
+                playerWeaponID = newWeaponID;
+            return newWeaponID;
+        }
+    }
+
+    while ((weapon = random (1, 47),
+        std::find (buggy_weapons.begin (),
+            buggy_weapons.end (), weapon)
+        != buggy_weapons.end ()));
+
+    return weapon;
+}
+
+/*******************************************************/
+void
+WeaponRandomizer::CachePatterns ()
+{
+    FILE *weaponPatternsFile
+        = OpenRainbomizerFile ("Weapon_Patterns.txt", "r", "data/");
+    if (weaponPatternsFile)
+        {
+            char line[2048] = {0};
+            while (fgets (line, 2048, weaponPatternsFile))
                 {
-                    if (pattern.allowed.size () != 0)
-                        {
-                            int weapon = pattern.allowed[random (
-                                pattern.allowed.size () - 1)];
+                    if (line[0] == '#' || strlen (line) < 10)
+                        continue;
 
-                            if (weapon == WEAPON_SLOT)
-                                {
-                                    auto slot_weapons = weapon_slots[slot];
-                                    weapon            = slot_weapons[random (
-                                        slot_weapons.size () - 1)];
-                                }
+                    char threadName[64] = {0};
+                    char weaponName[64] = {0};
+                    char flags[256]     = {0};
+                    int  ped            = 0;
+                    char melee          = 'N';
+                    char pistol         = 'N';
+                    char shotgun        = 'N';
+                    char smg            = 'N';
+                    char assault        = 'N';
+                    char rifle          = 'N';
+                    char heavy          = 'N';
+                    char projectile     = 'N';
+                    char spray          = 'N';
+                    char gadget         = 'N';
+                    char pickup         = 'N';
 
-                            return weapon;
-                        }*/
-                    //int              weapon;
-                    std::vector<int> buggy_weapons;
-                    if (ignoreBuggy)
+                    sscanf (line,
+                            "%s %s %d %c %c %c %c %c %c %c %c %c %c %c %s",
+                            threadName, weaponName, &ped, &melee, &pistol,
+                            &shotgun, &smg, &assault, &rifle, &heavy,
+                            &projectile, &spray, &gadget, &pickup, flags);
+
+                    for (int i = 0; i < 64; i++)
                         {
-                            buggy_weapons = {19, 20, 21};
+                            threadName[i] = NormaliseChar (threadName[i]);
+                            weaponName[i] = NormaliseChar (weaponName[i]);
                         }
-                    else
-                        {
-                            buggy_weapons = {19, 20, 21, 14, 40, 39};
-                            if (ped->m_nPedType == ePedType::PED_TYPE_DEALER)
-                            {
-                                    buggy_weapons.push_back (22);
-                            }
-                    }
 
-                    while ((weapon = random (1, 46),
+                    WeaponPattern pattern;
+                    pattern.SetOriginalWeapon (weaponName);
+                    pattern.SetThreadName (threadName);
 
-                            std::find (buggy_weapons.begin (),
-                                       buggy_weapons.end (), weapon)
-                                    != buggy_weapons.end ()
+                    pattern.SetAllowedTypes (
+                        {melee == 'Y', pistol == 'Y', shotgun == 'Y',
+                         smg == 'Y', assault == 'Y', rifle == 'Y', heavy == 'Y',
+                         projectile == 'Y', spray == 'Y', gadget == 'Y'});
 
-/*                                || std::find (pattern.denied.begin (),
-                                              pattern.denied.end (), weapon)
-                                       != pattern.denied.end ()*/))
-                        ;
+                    pattern.SetPedType (ped);
+                    pattern.SetPickup (pickup);
+                    pattern.ParseFlags (flags);
 
-                    return weapon;
+                    pattern.Cache ();
+
+                    mWeaponPatterns.push_back (pattern);
                 }
-        //}
-    //return weapon;
-//}
+            Logger::GetLogger ()->LogMessage ("Cached Weapon Patterns.");
+        }
+    else if (!weaponPatternsFile)
+        {
+            // Log a message if file wasn't found
+            Logger::GetLogger ()->LogMessage (
+                "Failed to read file: rainbomizer/data/Weapon_Patterns.txt");
+            return;
+        }
+}
 
 /*******************************************************/
 WeaponRandomizer *

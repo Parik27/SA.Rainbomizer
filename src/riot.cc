@@ -49,62 +49,58 @@ CZone *CheckNewZone (CVector *point, char checkType)
 {
     CZone *currentZone = CallAndReturn<CZone *, 0x572360> (point, checkType);
     CVector playerPos = FindPlayerCoors ();
-    if ((int)playerPos.x == (int)point->x 
-        && (int) playerPos.y == (int) point->y
-        && (int) playerPos.z == (int)point->z)
-    {
-            if (std::string (currentZone->m_szTextKey)
-            != std::string (RiotRandomizer::previousZone))
-                {
-                    Logger::GetLogger ()->LogMessage (
-                        "Zone changed to "
-                        + std::string (currentZone->m_szTextKey));
-                    if (ConfigManager::ReadConfig ("RiotRandomizer") && RiotRandomizer::m_Config.RandomizeRiots)
-                    {
-                        // Check if riots already enabled separate from randomizer
-                        // Doesn't take effect in these cases
-                            if (!injector::ReadMemory<bool> (0xB72958)
-                                && !injector::ReadMemory<bool> (0x969130 + 69))
-                                RiotRandomizer::riotModeRandomized = false;
+    if ((int) playerPos.x != (int) point->x
+        && (int) playerPos.y != (int) point->y
+        && (int) playerPos.z != (int) point->z)
+        return currentZone;
 
-                            if (!injector::ReadMemory<bool> (0xB72958)
-                                && !injector::ReadMemory<bool> (0x969130 + 69)
-                                && !RiotRandomizer::riotModeRandomized)
-                                {
-                                    if (random (1000) > 995)
-                                        {
-                                            RiotRandomizer::riotModeRandomized
-                                                = true;
-                                            injector::WriteMemory (0x969130
-                                                                       + 69,
-                                                                   1);
-                                            Logger::GetLogger ()->LogMessage (
-                                                "Randomized riot mode for "
-                                                "zone");
-                                        }
-                                }
-                            else if (!injector::ReadMemory<bool> (0xB72958)
-                                     && RiotRandomizer::riotModeRandomized)
-                                {
-                                    if (random (1000) > 500)
-                                        {
-                                            RiotRandomizer::riotModeRandomized
-                                                = false;
-                                            injector::WriteMemory (0x969130
-                                                                       + 69,
-                                                                   0);
-                                            Logger::GetLogger ()->LogMessage (
-                                                "Randomized no riot mode for "
-                                                "new zone");
-                                        }
-                                }
-                    }
-                }
-            for (int i = 0; i < 8; i++)
-                {
-                    RiotRandomizer::previousZone[i]
-                        = currentZone->m_szTextKey[i];
-                }
+    if (std::string (currentZone->m_szTextKey)
+        != std::string (RiotRandomizer::previousZone))
+    {
+        if (ConfigManager::ReadConfig ("RiotRandomizer") && RiotRandomizer::m_Config.RandomizeRiots)
+        {
+            // Memory address storing if end-game riots are enabled
+            int gbLARiots = 0xB72958;
+
+            // Memory address storing if riot cheat is enabled
+            // Checked before randomizing riot and written to in order to enable it
+            int riotCheatActive = 0x969130 + 69;
+
+            Logger::GetLogger ()->LogMessage ("Zone changed to "
+                    + std::string (currentZone->m_szTextKey));
+            
+            // Check if riots already enabled separate from randomizer
+            // Doesn't take effect in these cases for simplicity
+            if (!injector::ReadMemory<bool> (gbLARiots)
+                && !injector::ReadMemory<bool> (riotCheatActive))
+                RiotRandomizer::riotModeRandomized = false;
+            
+            if (!injector::ReadMemory<bool> (gbLARiots)
+                && !injector::ReadMemory<bool> (riotCheatActive)
+                && !RiotRandomizer::riotModeRandomized 
+                && random(1000) > 980)
+            {
+                RiotRandomizer::riotModeRandomized = true;
+                injector::WriteMemory (riotCheatActive, 1);
+                Logger::GetLogger ()->LogMessage (
+                        "Randomized riot mode for zone");
+            }
+            else if (!injector::ReadMemory<bool> (gbLARiots)
+                && RiotRandomizer::riotModeRandomized 
+                && random(1000) > 600)
+            {
+                RiotRandomizer::riotModeRandomized = false;
+                injector::WriteMemory (riotCheatActive, 0);
+                Logger::GetLogger ()->LogMessage (
+                    "Randomized no riot mode for new zone");
+            }
+        }
+    }
+    
+    for (int i = 0; i < 8; i++)
+    {
+        RiotRandomizer::previousZone[i]
+            = currentZone->m_szTextKey[i];
     }
     return currentZone;
 }

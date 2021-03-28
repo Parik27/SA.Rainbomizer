@@ -12,6 +12,8 @@ void __fastcall RandomizeObjectIndices (CRunningScript *script, void *edx,
                                         short count)
 {
     script->CollectParameters (count);
+    //if (ScriptParams[0] == -154)
+    //    ScriptParams[0] = -46;
     if (ScriptParams[0] < 0)
         ScriptParams[0] = -random (*((int *) 0xA44B6C));
 }

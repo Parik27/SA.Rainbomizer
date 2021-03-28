@@ -149,6 +149,14 @@ struct CCamera
     char field_0x00[0xd78];
 };
 
+struct CTrain
+{
+    char field_0x00[0x5d0];
+    CTrain  *m_pPrevCarriage;
+    CTrain *m_pNextCarriage;
+    char __pad1[0xd4];
+};
+
 struct CCarGenerator
 {
     int16_t m_nModelId;
@@ -1025,6 +1033,7 @@ struct C3dMarker
 struct CGame
 {
     static unsigned char &bMissionPackGame;
+    static int            Init2 (void *fileName);
     static int            Init3 (void *fileName);
 };
 
@@ -1167,9 +1176,3 @@ extern CPool *&         ms_pVehiclePool;
 extern CWeaponInfo *    aWeaponInfos;
 extern RsGlobalType *   RsGlobal;
 extern float *          ms_fTimeStep;
-
-#define REGISTER_HOOK(offset, function, ret, ...)                     \
-    {                                                                 \
-        static ret (*F) (__VA_ARGS__);                                \
-        RegisterHook (offset, F, function<F>);                        \
-    }

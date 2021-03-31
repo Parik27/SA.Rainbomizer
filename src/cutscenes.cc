@@ -124,16 +124,20 @@ SelectCutsceneOffset (char *name)
 {
     auto    cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
     COffset offset;
+    offset.z = -100.0f;
+    while (offset.z < -70.0f)
+    {
+        offset.x = randomFloat (-3000, 3000);
+        offset.y = randomFloat (-3000, 3000);
 
-    offset.x = randomFloat (-3000, 3000);
-    offset.y = randomFloat (-3000, 3000);
+        Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", offset.x, offset.y);
+        Scrpt::CallOpcode (0x3CB, "set_render_origin", offset.x, offset.y, 20);
+        Scrpt::CallOpcode (0x15f, "set_pos", offset.x, offset.y, 20, 0, 0, 0);
+        Scrpt::CallOpcode (0x4D7, "freeze_player", GlobalVar (3), 1);
 
-    Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", offset.x, offset.y);
-    Scrpt::CallOpcode (0x3CB, "set_render_origin", offset.x, offset.y, 20);
-    Scrpt::CallOpcode (0x15f, "set_pos", offset.x, offset.y, 20, 0, 0, 0);
-    Scrpt::CallOpcode (0x4D7, "freeze_player", GlobalVar (3), 1);
+        offset.z = CWorld::FindGroundZedForCoord (offset.x, offset.y);
+    }
 
-    offset.z = CWorld::FindGroundZedForCoord (offset.x, offset.y);
     Logger::GetLogger ()->LogMessage ("Cutscene Z: " + std::to_string(offset.z));
 
     offset.z -= cutsceneOffsetCorrections[name];

@@ -38,10 +38,8 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
             {
                 modelId = weaponToModel[modelId];
             }
-             Logger::GetLogger ()->LogMessage ("Getting random pickup");
              modelId = WeaponRandomizer::GetInstance ()
                 ->GetRandomWeapon (nullptr, modelId, true);
-             Logger::GetLogger ()->LogMessage ("Random pickup is " + std::to_string(modelId));
             if (modelId == 47 || modelId == 20 || modelId == 21)
                 {
                     modelId = PickupsRandomizer::additional_pickups[random (

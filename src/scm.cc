@@ -39,11 +39,16 @@ ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 const int MODEL_DUMPER   = 406;
 const int MODEL_FIRELA = 0x220;
 const int MODEL_PCJ      = 461;
+const int MODEL_FAGGIO   = 462;
+const int MODEL_FREEWAY  = 463;
 const int MODEL_SANCHZ = 468;
 const int MODEL_WALTON   = 478;
+const int MODEL_BMX      = 481;
 const int MODEL_GREENWOO = 492;
 const int MODEL_BOXVILLE = 498;
+const int MODEL_MTBIKE   = 510;
 const int MODEL_HYDRA    = 520;
+const int MODEL_NRG      = 522;
 const int MODEL_CEMENT   = 524;
 const int MODEL_FORKLIFT = 530;
 const int MODEL_VORTEX   = 539;
@@ -228,6 +233,13 @@ void __fastcall FixCarChecks (CRunningScript *scr, void *edx, short count)
                 ScriptParams[1] = playerVeh;
             }
     }
+    else if (scr->CheckName ("oddveh") && (ScriptParams[1] == MODEL_BMX 
+        || ScriptParams[1] == MODEL_FREEWAY || ScriptParams[1] == MODEL_FAGGIO))
+        ScriptParams[1] = FindPlayerVehicle ()->m_nModelIndex;
+    else if (scr->CheckName ("oddveh") && ScriptParams[1] == MODEL_MTBIKE)
+        ScriptParams[1] = FindPlayerVehicle ()->m_nModelIndex;
+    else if (scr->CheckName ("oddveh") && ScriptParams[1] == MODEL_NRG)
+        ScriptParams[1] = FindPlayerVehicle ()->m_nModelIndex;
 }
 
 /*******************************************************/
@@ -1622,14 +1634,6 @@ void __fastcall FixStuckAtDohertyGarage (CRunningScript *scr, void *edx,
 }
 
 /*******************************************************/
-int
-TestThing (CTrain * train)
-{
-    int returned = CallAndReturn<int, 0x6F5E70> (train);
-    return returned;
-}
-
-/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -1637,7 +1641,10 @@ ScriptVehicleRandomizer::Initialise ()
         std::pair ("EnableExtraTimeForSchools", &m_Config.MoreSchoolTestTime),
         std::pair ("LowriderMissions", &m_Config.SkipLowriderCheck),
         std::pair ("WuZiMu", &m_Config.SkipWuZiMuCheck),
-        std::pair ("SweetsGirl", &m_Config.SkipSweetsGirlCheck)))
+        std::pair ("SweetsGirl", &m_Config.SkipSweetsGirlCheck),
+        std::pair ("CourierMissions", &m_Config.SkipCourierCheck),
+        std::pair("NRG500Challenge", &m_Config.SkipNRGChallengeCheck),
+        std::pair("ChiliadChallenge", &m_Config.SkipChiliadCheck)))
     return;
 
     RegisterHooks (
@@ -1695,7 +1702,6 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x490558, (void *) &FixSnailTrailTrain},
          {HOOK_CALL, 0x49220E, (void *) &FixStuckAtDohertyGarage},
          {HOOK_JUMP, 0x6F5E70, (void *) &ChangeLastTrainCarriage},
-         //{HOOK_CALL, 0x4980B0, (void *) &TestThing},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     if (m_Config.MoreSchoolTestTime)

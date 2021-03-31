@@ -29,7 +29,7 @@ public:
     void CachePatterns ();
 
     static inline int playerWeaponID = -1;
-    static inline bool isWeaponCheck  = false;
+    static inline bool forceWeapon    = false;
 
     /// Initialises Hooks/etc.
     void Initialise ();

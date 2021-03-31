@@ -54,6 +54,9 @@ class WeaponPattern
         bool Flame : 1;
         bool LongRange : 1;
         bool Goggles : 1;
+        bool DualWield : 1;
+        bool CanDriveby : 1;
+        bool ProjectileCheck : 1;
     } mFlags;
 
     uint32_t m_nPedType        = 0;
@@ -110,12 +113,10 @@ public:
     SetPickup (char pickup)
     {
         m_bCached = false;
-        Logger::GetLogger ()->LogMessage (std::to_string(pickup));
         if (pickup == 'Y')
             m_bPickup = true;
         else
             m_bPickup = false;
-        Logger::GetLogger ()->LogMessage (std::to_string (m_bPickup));
     }
 
     bool

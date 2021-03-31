@@ -33,10 +33,10 @@ ryder2	Mesa	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft
 ryder2	Patriot	2	Y	Y	N	Y	N	Y	N	N	N					
 twar7	Glendale	4	Y	N	N	N	N	Y	N	N	N					
 twar7	Pcj600	2	Y	Y	N	Y	N	C	N	N	N	x=2471+y=-1285+z=28	39	0	7	
-smoke2	Glendale	2	Y	N	N	N	C	C	N	N	N	smallplanes	22	0	0	
+smoke2	Glendale	2	Y	N	N	N	C	C	N	N	N	smallplanes	20	0	0	
 smoke2	Sentinel	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
-smoke3	Glendale	2	Y	Y	N	Y	C	C	N	N	N	x=2058+y=-1694+z=12+smallplanes	22	0	0	
-drugs1	Glendale	2	Y	Y	N	Y	C	C	N	N	N	x=2058+y=-1694+z=12+smallplanes	22	0	0	
+smoke3	Glendale	2	Y	Y	N	Y	C	C	N	N	N	x=2058+y=-1694+z=12+smallplanes	20	0	0	
+drugs1	Glendale	2	Y	Y	N	Y	C	C	N	N	N	x=2058+y=-1694+z=12+smallplanes	20	0	0	
 drugs1	Bf400	2	Y	Y	N	Y	N	N	N	N	N	rc				
 drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1374+y=-1394+z=13				
 drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1374+y=-1665+z=12				
@@ -116,6 +116,7 @@ cat3	Sabre	2	Y	Y	N	Y	Y	Y	N	N	N
 truth1	Combine	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-1023+y=-933+z=129+smallplanes				
 truth1	Walton	1	Y	Y	Y	Y	Y	N	N	N	Y	x=-1154+y=-1339+z=126+hovercraft				
 truth2	Camper	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+truth2	Polmav	1	N	N	N	N	N	Y	N	N	N					
 cprace	Fortune	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 bcesar4	Stallion	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 bcesar4	Sabre	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
@@ -199,7 +200,7 @@ desert9	Pcj600	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes
 maf4	Camper	2	Y	Y	N	Y	Y	Y	Y	Y	N					
 desert5	Rustler	1	Y	N	N	Y	Y	N	N	N	N	norc+nohovercraft				
 desert5	Hunter	1	Y	N	N	Y	Y	Y	N	N	N	z=15				
-desert5	Hunter	1	N	N	N	N	Y	Y	N	N	N	guns				
+desert5	Hunter	1	Y	N	N	N	Y	Y	N	N	N	guns				
 desert5	Landstal	1	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 desert5	Petro	1	Y	Y	N	Y	Y	Y	Y	Y	Y					
 desert5	Stunt	1	Y	N	N	Y	Y	N	N	N	N	nohovercraft				

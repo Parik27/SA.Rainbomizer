@@ -102,7 +102,8 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
         return false;
 
     if ((mFlags.Smallplanes && CModelInfo::IsPlaneModel(vehID)) && 
-        (vehID == 464 || vehID == 519 || vehID == 553 || vehID == 577 || vehID == 592))
+        (vehID == 460 || vehID == 464 || vehID == 519 || vehID == 553 
+            || vehID == 577 || vehID == 592))
         return false;
 
     if ((mFlags.VTOL && CModelInfo::IsPlaneModel (vehID)) && vehID != 520)

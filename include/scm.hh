@@ -91,6 +91,9 @@ public:
         bool SkipLowriderCheck;
         bool SkipWuZiMuCheck;
         bool SkipSweetsGirlCheck;
+        bool SkipCourierCheck;
+        bool SkipNRGChallengeCheck;
+        bool SkipChiliadCheck;
     } m_Config;
 
     uint8_t mSeatsCache[212];

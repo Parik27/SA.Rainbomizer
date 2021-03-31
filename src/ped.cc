@@ -9,17 +9,11 @@
 #include "util/loader.hh"
 #include "injector/calling.hpp"
 #include "config.hh"
+#include <vector>
 
 PedRandomizer *PedRandomizer::mInstance = nullptr;
 
-std::vector<std::string> PedRandomizer::specialModels
-    = {"TRUTH",  "MACCER", "TENPEN",  "PULASKI", "HERN",    "DWAYNE",
-       "SMOKE",  "SWEET",  "RYDER",   "FORELLI", "ROSE",    "PAUL",
-       "CESAR",  "OGLOC",  "WUZIMU",  "TORINO",  "JIZZY",   "MADDOGG",
-       "CAT",    "CLAUDE", "RYDER2",  "RYDER3",  "EMMET",   "ANDRE",
-       "KENDL",  "JETHRO", "ZERO",    "TBONE",   "SINDACO", "JANITOR",
-       "BBTHIN", "SMOKEV", "GUNGRL2", "NURGRL2", "CROGRL2",
-       "BB",     "SUZIE",  "PSYCHO"};
+std::vector<std::string> PedRandomizer::specialModels;
 
 /*******************************************************/
 int
@@ -94,13 +88,28 @@ PedRandomizer::IsSpecialModel (int model)
 void
 PedRandomizer::Initialise ()
 {
+    if (ConfigManager::ReadConfig ("PedRandomizer")
+        || ConfigManager::ReadConfig ("PlayerRandomizer"))
+    {
+        for (auto &model :
+                 {"TRUTH",   "MACCER", "TENPEN",  "PULASKI", "HERN",
+                  "DWAYNE",  "SMOKE",  "SWEET",   "RYDER",   "FORELLI",
+                  "ROSE",    "PAUL",   "CESAR",   "OGLOC",   "WUZIMU",
+                  "TORINO",  "JIZZY",  "MADDOGG", "CAT",     "CLAUDE",
+                  "RYDER2",  "RYDER3", "EMMET",   "ANDRE",   "KENDL",
+                  "JETHRO",  "ZERO",   "TBONE",   "SINDACO", "JANITOR",
+                  "BBTHIN",  "SMOKEV", "GUNGRL2", "COPGRL2", "NURGRL2",
+                  "CROGRL2", "BB",     "SUZIE",   "PSYCHO"})
+                specialModels.push_back (model);
+
+        // If NSFW enabled
+        for (auto &model : {"GANGRL1", "MECGRL1", "GUNGRL1", "COPGRL1",
+            "NURGRL1", "CROGRL1", "GANGRL2", "COPGRL2"})
+            specialModels.push_back (std::string (model));
+    }
+
     if (!ConfigManager::ReadConfig ("PedRandomizer"))
         return;
-
-    // If NSFW enabled
-    for (auto &model : {"GANGRL1", "MECGRL1", "GUNGRL1", "COPGRL1", "NURGRL1",
-                        "CROGRL1", "GANGRL2", "COPGRL2"})
-        specialModels.push_back (model);
 
     // If Special Models Enabled
     injector::MakeJMP (0x40B45E, RandomizeSpecialModels);

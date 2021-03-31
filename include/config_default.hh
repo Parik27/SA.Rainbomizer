@@ -121,6 +121,9 @@ EnableExtraTimeForSchools = true
 LowriderMissions = true # (Lowrider Minigame, High Stakes Low-Rider)
 WuZiMu = true # (Wu Zi Mu start mission marker)
 SweetsGirl = true # (Picking up Sweet in Sweet's Girl)
+CourierMissions = true # (Courier Missions in LS / SF / LV + BMX Challenge)
+NRG500Challenge = true # (NRG-500 Challenge in SF)
+ChiliadChallenge = true # (All 3 Chiliad Challenge routes)
 
 # Gives you any vehicle for every mission (You might not be able to proceed with missions with this enabled)
 SkipChecks = false

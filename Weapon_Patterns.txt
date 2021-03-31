@@ -14,17 +14,19 @@ desert9	gun_para	-1	N	N	N	N	N	N	N	N	N	N	Y
 heist1	camera	-1	N	N	N	N	N	N	N	N	N	N	Y	
 heist9	gun_para	-1	N	N	N	N	N	N	N	N	N	N	Y	
 heist9	satchel	-1	N	N	N	N	N	N	Y	Y	N	N	Y	explosive
-heist9	teargas	0	N	N	N	N	N	N	N	Y	N	N	N	
+heist9	teargas	0	N	N	N	N	N	N	N	Y	N	N	N	projectilecheck
 heist9	nvgoggles	0	N	N	N	N	N	N	N	N	N	Y	N	goggles
+heist9	knifecur	0	Y	Y	Y	Y	Y	Y	Y	N	Y	N	N	
+heist9	mp5lng	0	Y	Y	Y	Y	Y	Y	Y	N	Y	N	N	
 syn5	sniper	0	N	N	Y	Y	Y	Y	Y	Y	N	N	N	longrange
 desert5	gun_para	0	N	N	N	N	N	N	N	N	N	N	N	
 syn1	camera	0	N	N	N	N	N	N	N	N	N	N	N	
 heist2	gun_para	0	N	N	N	N	N	N	N	N	N	N	N	
-mansio1	gun_para	0	N	N	N	N	N	N	N	N	N	N	N	
+mansio1	gun_para	-1	N	N	N	N	N	N	N	N	N	N	N	
 cat4	satchel	0	N	N	N	N	N	N	Y	Y	N	N	N	explosive
 drugs4	ak47	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	
-finalec	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
-drugs1	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
+finalec	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	candriveby
+drugs1	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	candriveby
 casino9	colt45	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	
 shrange	pistol	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
 shrange	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
@@ -33,3 +35,6 @@ shrange	ak47	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N
 zero1	minigun	0	N	N	Y	Y	Y	Y	Y	N	N	N	N	
 heist5	minigun	0	N	N	Y	Y	Y	Y	Y	N	N	N	N	
 wuzi5	minigun	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	
+sweet2	colt45	0	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	N	
+maf4	micro_uzi	0	N	Y	Y	Y	N	N	N	N	N	N	N	dualwield
+des10	micro_uzi	0	N	Y	Y	Y	N	N	N	N	N	N	N	dualwield

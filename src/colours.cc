@@ -311,11 +311,16 @@ RandomizeLightColours (int ID, CEntity *attachTo, char red, char green,
 }
 
 /*******************************************************/
+template <int address>
 void RandomizeWeaponSpriteColours (float x, float y, float z, float halfw,
                              float halfh, char r, char g, char b, char a,
                              float rhw, char intensity, char udir, char vdir)
 {
     CRGBA colour = {r, g, b, a};
+    static CRGBA weaponColour = {-1, -1, -1, -1};
+    if (weaponColour.a == -1)
+            weaponColour = {r, random (255), b, a};
+    colour = weaponColour;
     colour       = GetRainbowColour (HashColour (colour));
     CSprite::RenderOneXLUSprite (x, y, z, halfw, halfh, colour.r, colour.g,
                                  colour.b, a, rhw, intensity, udir, vdir);
@@ -450,15 +455,18 @@ ColourRandomizer::Initialise ()
         RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
                         {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours}});
 
-        for (int address : {0x58D8FD, 0x58E95B, 0x58E9CA, 0x58EA39, 0x58EAA8,
-                            0x714011, 0x725D70})
-            {
-                injector::MakeCALL (address, (void *) &RandomizeWeaponSpriteColours);
-            }
+        injector::MakeCALL (0x58D8FD, (void *) &RandomizeWeaponSpriteColours <0x58D8FD>); // Weapon Icon
+        injector::MakeCALL (0x58E95B, (void *) &RandomizeWeaponSpriteColours<0x58E95B>); // FPS Crosshair 1
+        injector::MakeCALL (0x58E9CA, (void *) &RandomizeWeaponSpriteColours<0x58E9CA>); // FPS Crosshair 2
+        injector::MakeCALL (0x58EA39, (void *) &RandomizeWeaponSpriteColours<0x58EA39>); // FPS Crosshair 3
+        injector::MakeCALL (0x58EAA8, (void *) &RandomizeWeaponSpriteColours<0x58EAA8>); // FPS Crosshair 4
     }
 
     if (m_Config.RandomizeMarkers)
-        RegisterHooks ({{HOOK_CALL, 0x7250B1, (void *) &RandomizeMarkers}});
+    {
+        RegisterHooks ({{HOOK_CALL, 0x7250B1, (void *) &RandomizeMarkers},
+                        {HOOK_CALL, 0x725D70, (void *) &RandomizeWeaponSpriteColours<0x725D70>}}); // Checkpoint Arrow
+    }
 
     if (m_Config.RandomizeLights)
     {
@@ -507,6 +515,7 @@ ColourRandomizer::Initialise ()
         injector::MakeCALL (0x700817, (void *) &RandomizeFogColours<0x700817>);
         injector::MakeCALL (0x700B6B, (void *) &RandomizeFogColours <0x700B6B>);
         injector::MakeCALL (0x714216, (void *) &RandomizeCloudColours<0x714216>); // Distant Clouds
+        injector::MakeCALL (0x714011, (void *) &RandomizeWeaponSpriteColours<0x714011>); // Cloud-related
     }
 
     // Basically the equivalent of discount TimeCycle Randomizer, might add as optional setting

@@ -241,6 +241,28 @@ SoundRandomizer::InitaliseSoundTable ()
 }
 
 /*******************************************************/
+void __fastcall RandomizeAudioEvents (CRunningScript *scr, void *edx,
+                                         short count)
+{
+    scr->CollectParameters (count);
+    ScriptParams[3] = random (1000, 1190);
+}
+
+/*******************************************************/
+signed short __fastcall 
+RandomizeSayEvent (CPed *ped, void *edx, int phraseID, int a3, float a4, int a5, char a6, char a7)
+{
+    signed short result;
+    if (phraseID)
+        result = CallMethodAndReturn<signed short, 0x4E6550> (&ped->m_pedSpeech, 52,
+                                                              random (358), a3,
+                                                              a4, a5, a6, a7);
+    else
+        result = -1;
+    return result;
+}
+
+/*******************************************************/
 void
 SoundRandomizer::Initialise ()
 {
@@ -258,7 +280,10 @@ SoundRandomizer::Initialise ()
          {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
          {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
          {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList}});
+         {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList},
+         {HOOK_JUMP, 0x5EFFE0, (void *) &RandomizeSayEvent}
+/*         {HOOK_CALL, 0x4EE953, (void *) &RandomizeAudioEvents},
+         {HOOK_CALL, 0x4EE994, (void *) &RandomizeAudioEvents}*/});
 
     injector::WriteMemory<uint8_t> (0x4EC302 + 2, 3);
     InitaliseSoundTable ();

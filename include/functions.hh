@@ -872,6 +872,16 @@ struct CMatrixLink
     CMatrix matrix;
 };
 
+struct CAEPedAudioEntity
+{
+    char field_0x00[0x15c];
+};
+
+struct CAEPedSpeechAudioEntity
+{
+    char field_0x00[0x100];
+};
+
 struct CPed
 {
     int              vtable;
@@ -884,7 +894,10 @@ struct CPed
         struct RpAtomic *m_pRwAtomic;
     };
 
-    char     __pad1C[1104];
+    char     __pad1C[284];
+    CAEPedAudioEntity m_pedAudio;
+    CAEPedSpeechAudioEntity m_pedSpeech;
+    char                    __pad394[216];
     int      flags[4];
     char     __pad47C[272];
     CEntity *m_pVehicle;

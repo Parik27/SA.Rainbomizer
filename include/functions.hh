@@ -928,6 +928,25 @@ struct CEntity
     int               SetHeading (float heading);
 };
 
+struct CObject : public CEntity
+{
+};
+
+struct CPickup
+{
+    float m_fRevenueValue;
+    CObject * m_pObject;
+    int   m_dwAmmo;
+    int   m_dwRegenerationTime;
+    char  m_vPos[6];
+    short m_nMoneyPerDay;
+    short m_wModelId;
+    short m_wReferenceIndex;
+    char  m_PickupType;
+    char  m_nFlags;
+    char  _pad[2];
+};
+
 struct CZone
 {
     char name[8];
@@ -1179,6 +1198,7 @@ GetRandomElement (T* container, uint32_t size)
 
 CMatrix *RwFrameGetLTM (void *frame);
 
+extern CPickup *        aPickups;
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
 extern RwRGBA *         ms_vehicleColourTable;

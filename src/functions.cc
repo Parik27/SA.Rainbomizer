@@ -990,6 +990,7 @@ randomFloat (float min, float max)
     return dist (rand_engine ());
 }
 
+CPickup *        aPickups                       = (CPickup *) 0x9788C0;
 CStreamingInfo * ms_aInfoForModel               = (CStreamingInfo *) 0x8E4CC0;
 RwRGBA *         ms_vehicleColourTable          = (RwRGBA *) 0xB4E480;
 CBaseModelInfo **ms_modelInfoPtrs               = (CBaseModelInfo **) 0xA9B0C8;

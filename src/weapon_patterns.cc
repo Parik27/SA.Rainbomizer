@@ -83,8 +83,7 @@ WeaponPattern::DoesWeaponMatchPattern (int weaponID)
     if (mFlags.Goggles && weaponID != 44 && weaponID != 45)
         return false;
 
-    if (mFlags.DualWield && weaponID != 22 && weaponID != 32 && weaponID != 28
-        && weaponID != 26)
+    if (mFlags.DualWield && weaponID != 22 && weaponID != 32 && weaponID != 28)
         return false;
 
     if (mFlags.CanDriveby && (weaponID < 22 || weaponID > 38 || weaponID == 34

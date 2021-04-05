@@ -33,6 +33,7 @@
 #include "injector/calling.hpp"
 #include "util/text.hh"
 #include <chrono>
+#include "traffic.hh"
 
 ScriptVehicleRandomizer *ScriptVehicleRandomizer::mInstance = nullptr;
 
@@ -341,8 +342,8 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                            ()->ProcessVehicleChange (model,
                                                                          x, y,
                                                                          z);
-    //Logger::GetLogger ()->LogMessage ("Vehicle Spawned: "
-    //                                  + std::to_string (newModel));
+    Logger::GetLogger ()->LogMessage ("Vehicle Spawned: "
+                                      + std::to_string (newModel));
     if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry"
         && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5) && model == 486)
         newModel = 486;
@@ -1407,10 +1408,12 @@ void __fastcall FixRaiseDoorHeist9PosCheck (CRunningScript *scr, void *edx,
                                             short count)
 {
     scr->CollectParameters (count);
-    if (scr->CheckName ("heist9") && FindPlayerVehicle())
+    if (scr->CheckName ("heist9") && FindPlayerVehicle ()
+        && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+               != MODEL_FORKLIFT)
     {
         CVector playerPos = FindPlayerCoors ();
-        if (playerPos.z >= 950.0f && playerPos.y >= 1572.7f && playerPos.y <= 1577.0f)
+        if (playerPos.z >= 950.0f && playerPos.y >= 1570.7f && playerPos.y <= 1577.0f)
         {
             GetGlobalVar<float>(74) = 1573.0f;
         }
@@ -1505,17 +1508,23 @@ void __fastcall RandomizeTrainForScript (CRunningScript *scr, void *edx,
 {
     scr->CollectParameters (count);
     lastTrainOldType = ScriptParams[0];
-    ScriptParams[0] = random (0, 15);
+    lastTrainNewType = random (0, 15);
     if (scr->CheckName ("ryder3"))
     {
-        while (ScriptParams[0] == 1 || ScriptParams[0] == 2 || ScriptParams[0] == 4 || 
-            ScriptParams[0] == 5 || ScriptParams[0] == 7 || ScriptParams[0] == 11)
+            while (lastTrainNewType == 1 || lastTrainNewType == 2
+               || lastTrainNewType == 4 || lastTrainNewType == 5
+               || lastTrainNewType == 7 || lastTrainNewType == 11)
         {
-            ScriptParams[0] = random (0, 15);
+                lastTrainNewType = random (0, 15);
         }
     }
     eLoadError loadState1, loadState2 = ERR_LOADED;
-    lastTrainNewType = ScriptParams[0];
+    ScriptParams[0] = lastTrainNewType;
+    Logger::GetLogger ()
+        ->LogMessage ("Last Train Old Type: "
+                          + std::to_string (lastTrainOldType));
+    Logger::GetLogger ()->LogMessage ("Last Train New Type: "
+                                      + std::to_string (lastTrainNewType));
 
     if (lastTrainNewType == 0 || lastTrainNewType == 3 || lastTrainNewType == 6 
         || lastTrainNewType == 10 || lastTrainNewType == 12
@@ -1646,6 +1655,8 @@ ScriptVehicleRandomizer::Initialise ()
         std::pair("NRG500Challenge", &m_Config.SkipNRGChallengeCheck),
         std::pair("ChiliadChallenge", &m_Config.SkipChiliadCheck)))
     return;
+
+    TrafficRandomizer::GetInstance ()->MakeRCsEnterable ();
 
     RegisterHooks (
         {{HOOK_CALL, 0x467B01, (void *) &RandomizeCarForScript},

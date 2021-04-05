@@ -53,8 +53,6 @@ class TrafficRandomizer
     TrafficRandomizer (){};
     static void DestroyInstance ();
 
-    void MakeRCsEnterable ();
-
     void FixTrainSpawns ();
 
 public:
@@ -83,6 +81,8 @@ public:
     void Revert6AF420_Hook ();
 
     bool IsVehicleAllowed (int model);
+
+    void MakeRCsEnterable ();
 
     /// Exception Handling
     static void ExceptionHandlerCallback (_EXCEPTION_POINTERS *ep);

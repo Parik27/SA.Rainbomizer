@@ -98,9 +98,10 @@ cprace	Hotrina	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft
 cprace	Hotrinb	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cesar1	Savanna	2	Y	Y	N	Y	Y	Y	N	N	N	x=1793+y=-2138+z=12				
 cesar1	Savanna	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
-drugs4	Greenwoo	4	Y	N	N	N	N	Y	N	N	N	INCREASE HEIGHT AT SHOOTING				
+drugs4	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
 drugs4	Enforcer	2	Y	Y	N	Y	Y	Y	Y	Y	N					
 drugs4	Copcarla	2	Y	Y	N	Y	Y	Y	Y	Y	N					
+drugs4	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y					
 la1fin2	Bravura	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
 la1fin2	Pony	4	Y	N	N	N	N	Y	N	N	N					
 la1fin2	Sentinel	4	Y	N	N	N	N	Y	N	N	N	x=1582+y=-1043+z=22				
@@ -164,6 +165,8 @@ syn7	Voodoo	2	Y	Y	N	Y	N	N	N	N	N
 syn5	Picador	2	Y	Y	N	Y	Y	N	N	N	N					
 syn5	Tahoma	2	Y	Y	N	Y	Y	N	N	N	N					
 syn5	Speeder	1	N	N	N	N	Y	Y	Y	N	N	float				
+syn5	Maverick	1	Y	N	N	N	Y	Y	Y	Y	Y					
+syn6	Maverick	1	Y	N	N	N	Y	Y	Y	Y	Y					
 driv3	Premier	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 driv3	Burrito	4	Y	N	N	N	N	N	N	N	N					
 driv3	Freeway	1	Y	Y	Y	Y	N	N	N	N	N					
@@ -194,6 +197,7 @@ toreno2	Pcj600	2	Y	Y	N	Y	N	N	N	N	N
 toreno2	Petro	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
 toreno2	Petrotr	1	Y	N	N	Y	Y	Y	N	N	N	smallplanes+norc				
 des3	Journey	2	Y	Y	N	Y	Y	Y	N	N	N					
+des3	Maverick	1	Y	N	N	N	Y	Y	Y	Y	Y					
 desert6	Rustler	1	Y	N	N	Y	C	C	N	N	N	nohovercraft+norc	0	-35	0	
 desert6	Hydra	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
 desert9	Pcj600	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
@@ -226,17 +230,19 @@ doc2	Walton	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes
 heist1	Washing	2	Y	Y	N	Y	N	N	N	N	N					
 heist3	Club	1	Y	Y	Y	Y	N	N	N	N	N					
 heist2	Nevada	1	Y	N	N	Y	Y	Y	N	N	N	norc+nohovercraft				
+heist4	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y					
 heist4	Copbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 heist4	Freeway	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
 heist5	Leviathn	1	N	N	N	N	Y	Y	N	N	N	vtol+norc				
 heist5	Securica	1	Y	Y	Y	Y	Y	Y	Y	N	Y	smallcar+smallplanes				
 heist5	Patriot	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 heist5	Hunter	1	N	N	N	N	N	Y	N	N	N					
-heist9	Forklift	1	C	Y	Y	Y	N	N	N	N	N	x=2173+y=1585+z=998	6	0	1	
+heist9	Forklift	1	C	Y	Y	Y	N	N	N	N	N	x=2173+y=1585+z=998+smallcar	6	0	1	
 heist9	Securica	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	x=345+y=2546+z=15				
 heist9	Securica	4	Y	N	N	N	N	N	N	N	N					
 heist9	Copbike	1	Y	Y	Y	Y	N	N	N	N	N					
 heist9	Polmav	1	Y	Y	Y	Y	Y	Y	N	N	N	x=2295+y=1839+z=38+smallplanes				
+heist9	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y	x=2253+y=1626+z=87				
 mansio1	Phoenix	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 mansio1	Windsor	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 mansio2	Washing	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
@@ -272,6 +278,7 @@ boat	Vortex	1	Y	N	N	Y	C	C	C	N	N	x=-2014+y=2365+z=6+float	-60	0	0
 boat	Vortex	1	N	N	N	N	N	N	N	N	N					
 boat	Tropic	1	C	N	N	C	C	Y	Y	N	N	float	0	0	15	
 boat	Marquis	1	C	N	N	C	C	Y	Y	N	N	float	0	0	15	
+boat	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y					
 bskool	Bf400	1	Y	Y	Y	Y	N	Y	N	N	N					
 bskool	Pcj600	1	Y	Y	Y	Y	Y	Y	N	N	N	hovercraft				
 bskool	Fcr900	1	N	Y	Y	N	N	N	N	N	N					

@@ -386,7 +386,11 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool isPickup)
             {
                     if (!CRunningScripts::CheckForRunningScript ("heist9")
                         || (weapon != 29 && weapon != 4))
-                            playerWeaponID = newWeaponID;
+                    {
+                        playerWeaponID = newWeaponID;
+                        Logger::GetLogger ()->LogMessage (
+                            "New Weapon: " + std::to_string (playerWeaponID));
+                    }
             }
             return newWeaponID;
         }

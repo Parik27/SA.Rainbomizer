@@ -7,6 +7,9 @@
 #include "weapons.hh"
 #include <injector/injector.hpp>
 #include <algorithm>
+#include <vector>
+
+// MODIFY PICKUPS TO SHUFFLE USING CPickups:aPickups ARRAY. COORDS CAN ONLY BE COMPARED / CHANGED THROUGH THE COBJECT POINTERS
 
 PickupsRandomizer *PickupsRandomizer::mInstance = nullptr;
 
@@ -18,7 +21,12 @@ static std::unordered_map<int, int> weaponToModel = {
        {352, 28}, {353, 29}, {355, 30}, {356, 31}, {372, 32}, {357, 33},
        {358, 34}, {359, 35}, {360, 36}, {361, 37}, {362, 38}, {363, 39},
        {364, 40}, {365, 41}, {366, 42}, {367, 43}, {368, 44}, {369, 45},
-       {371, 46}
+       {371, 46}};
+
+struct Pickup
+{
+    int ID;
+    CPickup pickup;
 };
 
 /*******************************************************/
@@ -30,6 +38,28 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
                  char pickupType, int ammo, unsigned int moneyPerDay,
                  char isEmpty, char *message)
 {
+    //std::vector<Pickup> pickups;
+
+    //for (int i = 0; i < 620; i++)
+    //{
+    //    CPickup *pickup = aPickups + (i * 32);
+    //    if (!pickup->m_PickupType || pickup->m_PickupType == 4
+    //        || pickup->m_PickupType == 5 || pickup->m_PickupType == 8)
+    //        continue;
+    //    pickups.push_back ({i, *pickup});
+    //}
+
+    //if (!pickups.empty())
+    //{
+    //        Pickup  otherPickup = GetRandomElement (pickups);
+    //        CVector pos1
+    //            = otherPickup.pickup.m_pObject->m_SimpleTransform.m_vPosn;
+    //        CVector pos2                                            = {x, y, z};
+    //        otherPickup.pickup.m_pObject->m_SimpleTransform.m_vPosn = pos2;
+    //        x                                                       = pos1.x;
+    //        y                                                       = pos1.y;
+    //        z                                                       = pos1.z;
+    //}
 
     if (modelId != 1212 && modelId != 953 && modelId != 954 && modelId != 1253
         && modelId != 370 && modelId != 1277)

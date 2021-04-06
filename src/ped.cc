@@ -105,7 +105,7 @@ PedRandomizer::Initialise ()
         // If NSFW enabled
         for (auto &model : {"GANGRL1", "MECGRL1", "GUNGRL1", "COPGRL1",
             "NURGRL1", "CROGRL1", "GANGRL2", "COPGRL2"})
-            specialModels.push_back (std::string (model));
+            specialModels.push_back (model);
     }
 
     if (!ConfigManager::ReadConfig ("PedRandomizer"))

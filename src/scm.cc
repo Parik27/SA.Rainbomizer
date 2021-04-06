@@ -45,6 +45,7 @@ const int MODEL_FREEWAY  = 463;
 const int MODEL_SANCHZ = 468;
 const int MODEL_WALTON   = 478;
 const int MODEL_BMX      = 481;
+const int MODEL_DOZER    = 486;
 const int MODEL_GREENWOO = 492;
 const int MODEL_BOXVILLE = 498;
 const int MODEL_MTBIKE   = 510;
@@ -60,8 +61,7 @@ const int flyingCarsCheatActive = 0x969130 + 48;
 
 static const struct ScriptVehicleRandomizer::RCHeliMagnet emptyTemplate;
 static ScriptVehicleRandomizer::RCHeliMagnet ryder2;
-static ScriptVehicleRandomizer::RCHeliMagnet quarry2;
-static ScriptVehicleRandomizer::RCHeliMagnet quarry6;
+static ScriptVehicleRandomizer::RCHeliMagnet quarry;
 
 static bool     ignoreNextHook            = false;  // For Flying School times
 static bool     currentTrailerAttached = false;     // For attaching any vehicle in Trucking missions
@@ -71,8 +71,6 @@ static bool     wasFlyingCarsOn = false;            // Stores state of flying ca
 static int      lastTrainOldType       = -1;
 static int      lastTrainNewType          = -1;
 static std::vector<int> snailTrailTrain;
-
-static int currentTextBoxForMission = 0;
 
 static ScriptVehicleRandomizer::BoatSchoolTimes boatSchool;
 
@@ -296,9 +294,27 @@ ApplyFixesBasedOnModel (int model, int newModel)
         || (model == MODEL_GREENWOO && ScriptVehicleRandomizer::GetInstance()->mLastThread == "drugs4")
         || (model == MODEL_VORTEX && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "boat")
         || (model == MODEL_BOXVILLE && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "guns1")
-        || (model == MODEL_PCJ && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "toreno2"))
+        || (model == MODEL_PCJ && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "toreno2")
+        || (model == MODEL_DOZER && ScriptVehicleRandomizer::GetInstance()->mLastThread == "quarry"))
             ScriptVehicleRandomizer::GetInstance ()->ApplyCarCheckFix (newModel);
-        
+}
+
+/*******************************************************/
+void
+GetModelExceptions (int model, int &newModel)
+{
+        if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry"
+        && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5)
+        && model == MODEL_DOZER)
+    {
+        newModel = random (0, 2);
+        if (newModel == 0)
+            newModel = MODEL_DOZER;
+        else if (newModel == 1)
+            newModel = 501;
+        else
+            newModel = 465;
+    }
 }
 
 /*******************************************************/
@@ -344,11 +360,9 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                                                                          z);
     Logger::GetLogger ()->LogMessage ("Vehicle Spawned: "
                                       + std::to_string (newModel));
-    if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry"
-        && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5) && model == 486)
-        newModel = 486;
 
     ApplyFixesBasedOnModel (model, newModel);
+    GetModelExceptions (model, newModel);
     ApplyFixesBasedOnMission ();
 
     // Load the new vehicle. Fallback to the original if needed
@@ -916,16 +930,6 @@ void __fastcall FixMaddDoggBoxes (CRunningScript *scr, void *edx, short count)
                 && lastTrainNewType != 10 && lastTrainNewType != 12 && lastTrainNewType != 13)
                 SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0);
         }
-    //else if (scr->CheckName("ryder3"))
-    //{
-    //        if (((float *) ScriptParams)[2] < 1.0f
-    //            && ((float *) ScriptParams)[3] < 1.0f
-    //            && ((float *) ScriptParams)[4] < 1.0f
-    //            && ((float *) ScriptParams)[5] < 1.0f
-    //            && ((float *) ScriptParams)[6] < 1.0f
-    //            && ((float *) ScriptParams)[7] < 1.0f)
-    //            ((float *) ScriptParams)[4] -= 50.0f;
-    //}
 }
 
 /*******************************************************/
@@ -991,7 +995,7 @@ MoveFlyingSchoolBlip (int blipType, float x, float y, float z, int a5, int displ
 void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx, short count)
 {
     scr->CollectParameters (count);
-    if (scr->CheckName ("desert5"))
+    if (scr->CheckName ("desert5") && ScriptVehicleRandomizer::m_Config.MoreSchoolTestTime)
     {
         float coordCompareX = ((float *) ScriptParams)[1];
         float coordCompareZ = ((float *) ScriptParams)[3];
@@ -1070,6 +1074,8 @@ void __fastcall InitialiseExtraText (CText *text, void *edx, char a2)
     GxtManager::Initialise (text);
 }
 
+// Hooks 02AC (give vehicle immunities)
+// Attaches magnet object to RC heli
 /*******************************************************/
 void __fastcall Ryder2AttachMagnet (CRunningScript *scr, void *edx, short count)
 {
@@ -1091,48 +1097,74 @@ void __fastcall Ryder2AttachMagnet (CRunningScript *scr, void *edx, short count)
     }
 }
 
+// Hooks 0175 (set car Z angle)
+/*******************************************************/
+void __fastcall QuarryAttachMagnet (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName("quarry") && ScriptVehicleRandomizer::GetInstance()->GetNewCarForCheck() 
+        != MODEL_DOZER && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5))
+    {
+        quarry.vehID = ScriptParams[0];
+        Scrpt::CallOpcode (0x107, "create_object", 3056, 816.4382f, 845.8509f,
+                           7.49f, GlobalVar (10947));
+        Scrpt::CallOpcode (0x681, "attach_object", GlobalVar (10947),
+                           quarry.vehID, 0.0f, 0.0f, -0.2f, 0.0f, 0.0f, 0.0f);
+        Scrpt::CallOpcode (0x382, "set_object_collision", GlobalVar (10947), 0);
+        quarry.atMagnetSection = true;
+    }
+}
+
 /*******************************************************/
 void
-RCHeliPlayerJustEntered ()
+RCHeliPlayerJustEntered (ScriptVehicleRandomizer::RCHeliMagnet *RCCurrent,
+                         int                                    currentMission)
 {
-    ryder2.isPlayerInVeh = true;
+    RCCurrent->isPlayerInVeh = true;
     CVector playerPos    = FindPlayerCoors ();
     playerPos.z += 1.0f;
     CRunningScript::SetCharCoordinates (FindPlayerPed (),
                                         {playerPos.x, playerPos.y, playerPos.z},
                                         1, 1);
     Scrpt::CallOpcode (0x382, "set_object_collision", GlobalVar (10947), 1);
-    Logger::GetLogger ()->LogMessage ("Moved heli, set magnet collision");
-    if (ryder2.objectAttached != -1)
+    if (RCCurrent->objectAttached != -1)
         {
             Scrpt::CallOpcode (0x382, "set_object_collision",
-                               ryder2.objHandles[ryder2.objectAttached], 1);
+                               RCCurrent->objHandles[RCCurrent->objectAttached],
+                               1);
         }
-    Scrpt::CallOpcode (0x825, "start_rotors_instantly", ryder2.vehID);
+    Scrpt::CallOpcode (0x825, "start_rotors_instantly", RCCurrent->vehID);
+    if (currentMission == 118)
+    {
+        std::string tempLabel = "QUAR_H2";
+        Scrpt::CallOpcode (0x3e5, "print_help", tempLabel.c_str ());
+    }
 }
 
 /*******************************************************/
 void
-RCHeliCheckForObjects ()
+RCHeliCheckForObjects (ScriptVehicleRandomizer::RCHeliMagnet *RCCurrent,
+                       int                                    currentMission)
 {
-    if (ryder2.fakeColHandle != ryder2.invalidHandle
-        && ryder2.fakeColHandle != 0)
-        Scrpt::CallOpcode (0x382, "set_object_collision", ryder2.fakeColHandle,
+    if (currentMission = 26 && RCCurrent->fakeColHandle 
+        != RCCurrent->invalidHandle && RCCurrent->fakeColHandle != 0)
+        Scrpt::CallOpcode (0x382, "set_object_collision",
+                           RCCurrent->fakeColHandle,
                            0);
-    Scrpt::CallOpcode (0x407, "get_offset_from_car_in_world", ryder2.vehID,
+    Scrpt::CallOpcode (0x407, "get_offset_from_car_in_world", RCCurrent->vehID,
                        0.0f, 0.0f, -1.0f, GlobalVar (69), GlobalVar (70),
                        GlobalVar (71));
     CVector playerPos    = FindPlayerCoors ();
     short   isKeyPressed = CallAndReturn<short, 0x485B10> (0, 17);
-    if (isKeyPressed == 255 && ryder2.objectAttached == -1
-        && ryder2.pickUpObjectTimer > 50)
+    if (isKeyPressed == 255 && RCCurrent->objectAttached == -1
+        && RCCurrent->pickUpObjectTimer > 50)
         {
             for (int i = 0; i < 17; i++)
                 {
-                    if (ryder2.objHandles[i] != 0)
+                    if (RCCurrent->objHandles[i] != 0)
                         {
                             Scrpt::CallOpcode (0x1bb, "get_object_coords",
-                                               ryder2.objHandles[i],
+                                               RCCurrent->objHandles[i],
                                                GlobalVar (8924),
                                                GlobalVar (8925),
                                                GlobalVar (8926));
@@ -1146,13 +1178,19 @@ RCHeliCheckForObjects ()
                                 && yCompare >= -1.0f && yCompare <= 1.0f
                                 && zCompare >= -1.0f && zCompare <= 1.0f)
                                 {
+                                    float offsetZ = 0;
+                                    if (currentMission == 26)
+                                        offsetZ = -1.4f;
+                                    else
+                                        offsetZ = -1.2f;
                                     Scrpt::CallOpcode (0x681, "attach_object",
-                                                       ryder2.objHandles[i],
-                                                       ryder2.vehID, 0.0f, 0.0f,
-                                                       -1.4f, 0.0f, 0.0f, 0.0f);
+                                                       RCCurrent->objHandles[i],
+                                                       RCCurrent->vehID, 0.0f,
+                                                       0.0f,
+                                                       offsetZ, 0.0f, 0.0f, 0.0f);
                                     Scrpt::CallOpcode (0x97b,
                                                        "play_audio_at_object",
-                                                       ryder2.objHandles[i],
+                                                       RCCurrent->objHandles[i],
                                                        1009);
                                     CVector playerPos = FindPlayerCoors ();
                                     playerPos.z += 0.3f;
@@ -1160,42 +1198,49 @@ RCHeliCheckForObjects ()
                                         FindPlayerPed (),
                                         {playerPos.x, playerPos.y, playerPos.z},
                                         1, 1);
-                                    ryder2.objectAttached    = i;
-                                    ryder2.pickUpObjectTimer = 0;
+                                    RCCurrent->objectAttached = i;
+                                    RCCurrent->pickUpObjectTimer = 0;
                                     break;
                                 }
                         }
                 }
         }
-    else if (isKeyPressed == 255 && ryder2.objectAttached > -1
-             && ryder2.pickUpObjectTimer > 50)
+    else if (isKeyPressed == 255 && RCCurrent->objectAttached > -1
+             && RCCurrent->pickUpObjectTimer > 50)
         {
             Scrpt::CallOpcode (0x682, "detach_object",
-                               ryder2.objHandles[ryder2.objectAttached], 0.0f,
+                               RCCurrent->objHandles[RCCurrent->objectAttached],
+                               0.0f,
                                0.0f, 0.0f, 1);
-            ryder2.objectAttached    = -1;
-            ryder2.pickUpObjectTimer = 0;
+            RCCurrent->objectAttached = -1;
+            RCCurrent->pickUpObjectTimer = 0;
         }
 }
 
 /*******************************************************/
 void
-RCHeliPlayerJustExited ()
+RCHeliPlayerJustExited (ScriptVehicleRandomizer::RCHeliMagnet *RCCurrent, int currentMission)
 {
-    ryder2.isPlayerInVeh = false;
-    ryder2.invalidHandle = ryder2.fakeColHandle;
+    RCCurrent->isPlayerInVeh = false;
+    if (currentMission == 26)
+        RCCurrent->invalidHandle = RCCurrent->fakeColHandle;
+    
     Scrpt::CallOpcode (0x382, "set_object_collision", GlobalVar (10947), 0);
-    if (ryder2.objectAttached != -1)
+    if (RCCurrent->objectAttached != -1)
         {
             Scrpt::CallOpcode (0x382, "set_object_collision",
-                               ryder2.objHandles[ryder2.objectAttached], 0);
+                               RCCurrent->objHandles[RCCurrent->objectAttached],
+                               0);
         }
+    Logger::GetLogger ()->LogMessage ("Player has exited heli, reset collision");
 }
 
 /*******************************************************/
 void __fastcall IsPlayerInVehicleCheck (CRunningScript *scr, void *edx,
                                         char flag)
 {
+    int currentMission = -1;
+    ScriptVehicleRandomizer::RCHeliMagnet *RCCurrent;
     if (scr->CheckName ("desert6") || scr->CheckName ("casino9") 
         || scr->CheckName ("casin10") || scr->CheckName ("heist2") 
         || (scr->CheckName ("cprace") && (ScriptSpace[352] >= 19 && ScriptSpace[352] <= 24)))
@@ -1204,21 +1249,35 @@ void __fastcall IsPlayerInVehicleCheck (CRunningScript *scr, void *edx,
         && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
                != MODEL_FORKLIFT)
     {
-            ryder2.pickUpObjectTimer++;
-
-            if (flag && ryder2.isPlayerInVeh)
-            {
-                RCHeliCheckForObjects ();
-            }
-            else if (flag && !ryder2.isPlayerInVeh)
-            {
-                RCHeliPlayerJustEntered ();
-            }
-            else if (!flag && ryder2.isPlayerInVeh)
-            {
-                RCHeliPlayerJustExited ();
-        }
+            RCCurrent = &ryder2;
+            currentMission = 26;
     }
+    else if (scr->CheckName ("quarry")
+             && ((ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5) && ScriptParams[1] == quarry.vehID 
+                 && ScriptVehicleRandomizer::GetInstance()->GetNewCarForCheck() != MODEL_DOZER))
+    {
+        RCCurrent = &quarry;
+        currentMission = 118;
+    }
+
+    if (currentMission != -1)
+    {
+        RCCurrent->pickUpObjectTimer++;
+
+        if (flag && RCCurrent->isPlayerInVeh)
+            {
+                RCHeliCheckForObjects (RCCurrent, currentMission);
+            }
+        else if (flag && !RCCurrent->isPlayerInVeh)
+            {
+                RCHeliPlayerJustEntered (RCCurrent, currentMission);
+            }
+        else if (!flag && RCCurrent->isPlayerInVeh)
+            {
+                RCHeliPlayerJustExited (RCCurrent, currentMission);
+            }
+    }
+
     scr->UpdateCompareFlag(flag);
 }
 
@@ -1237,6 +1296,8 @@ void __fastcall Ryder2IsCutsceneActive(CRunningScript* scr, void* edx, short cou
     }
 }
 
+// Hooks 0177 (set object Z angle)
+// Saves handles for all relevant objects for future reference
 /*******************************************************/
 void __fastcall Ryder2StoreBoxHandles(CRunningScript* scr, void* edx, short count)
 {
@@ -1258,6 +1319,72 @@ void __fastcall Ryder2StoreBoxHandles(CRunningScript* scr, void* edx, short coun
     }
 }
 
+// Hooks 04e6 (is object near point)
+/*******************************************************/
+void __fastcall Quarry2StoreBarrelHandles (CRunningScript *scr, void *edx,
+                                       short count)
+{
+    scr->CollectParameters (count);
+    bool alreadyStored = false;
+    if (scr->CheckName ("quarry") && ScriptSpace[8171] == 1 
+        && ScriptVehicleRandomizer::GetInstance () ->GetNewCarForCheck ()
+        != MODEL_DOZER)
+    {
+        for (int i = 0; i < 17; i++)
+        {
+                if (i < 4)
+                    {
+                        if (quarry.objHandles[i] == ScriptParams[0])
+                            {
+                                alreadyStored = true;
+                                break;
+                            }
+                    }
+                else if (i >= 4)
+                    quarry.objHandles[i] = 0;
+        }
+        if (!alreadyStored)
+        {
+            quarry.objHandles[quarry.currentObj] = ScriptParams[0];
+            quarry.currentObj++;
+        }
+    }
+}
+
+// Hooks 03ca (object exists)
+/*******************************************************/
+void __fastcall Quarry6StoreBarrelHandles (CRunningScript *scr, void *edx,
+                                           short count)
+{
+    scr->CollectParameters (count);
+    bool alreadyStored = false;
+    if (scr->CheckName ("quarry") && ScriptSpace[8171] == 5
+        && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+               != MODEL_DOZER)
+    {
+
+        for (int i = 0; i < 17; i++)
+            {
+                if (i < 10)
+                    {
+                        if (quarry.objHandles[i] == ScriptParams[0])
+                            {
+                                alreadyStored = true;
+                                break;
+                            }
+                    }
+                else if (i >= 10)
+                    quarry.objHandles[i] = 0;
+            }
+        if (!alreadyStored)
+            {
+                quarry.objHandles[quarry.currentObj] = ScriptParams[0];
+                quarry.currentObj++;
+            }
+    }
+}
+
+// Hooks 0366 (has object been damaged)
 /*******************************************************/
 void __fastcall Ryder2CheckBoxForDamage (CRunningScript *scr, void *edx,
                                        short count)
@@ -1297,6 +1424,7 @@ void __fastcall Ryder2CheckBoxForDamage2 (CRunningScript *scr, void *edx,
     scr->UpdateCompareFlag (flag);
 }
 
+// Hooks 0108 (delete object)
 /*******************************************************/
 void __fastcall Ryder2WasBoxDestroyedSomehow (CRunningScript *scr, void *edx,
                                               short count)
@@ -1317,12 +1445,43 @@ void __fastcall Ryder2WasBoxDestroyedSomehow (CRunningScript *scr, void *edx,
     }
 }
 
+// Hooks 0382 (set object collision)
+/*******************************************************/
+void __fastcall Quarry2RemoveSafeBarrel (CRunningScript *scr, void *edx,
+                                              short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("quarry") && ScriptSpace[8171] == 1
+        && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+               != MODEL_DOZER)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (quarry.objHandles[i] != 0
+                && ScriptParams[0] ==  quarry.objHandles[i])
+            {
+                if (quarry.objectAttached != -1 && 
+                    quarry.objectAttached == i)
+                {
+                    Scrpt::CallOpcode (0x682, "detach_object",
+                                quarry.objHandles[quarry.objectAttached], 0.0f,
+                                0.0f, 0.0f, 1);
+                            quarry.objectAttached = -1;
+                }
+                quarry.objHandles[i] = 0;
+            }
+        }
+    }
+}
+
+// Hooks 03E5 (displays black text box in corner with help info)
 /*******************************************************/
 void Ryder2ReplaceHelp (char *str, bool quickMessage, bool permanent, bool addToBrief)
 {
     if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "ryder2"
         && ryder2.isPlayerInVeh)
     {
+        static int  currentTextBoxForMission = 0;
         std::string newText;
         if (currentTextBoxForMission == 0)
         {
@@ -1341,6 +1500,13 @@ void Ryder2ReplaceHelp (char *str, bool quickMessage, bool permanent, bool addTo
             currentTextBoxForMission++;
         else
             currentTextBoxForMission = 0;
+        Call<0x588BE0> (newText.c_str (), quickMessage, permanent, addToBrief);
+    }
+    else if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry" 
+        && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5) && quarry.isPlayerInVeh)
+    {
+            std::string newText = "Press the Fire Button to pick up and drop "
+                                  "the barrels with your helicopter's magnet.";
         Call<0x588BE0> (newText.c_str (), quickMessage, permanent, addToBrief);
     }
     else
@@ -1362,32 +1528,34 @@ void __fastcall Ryder2IncreaseRadius (CRunningScript *scr, void *edx,
     }
 }
 
+// Mission Cleanup hook
 /*******************************************************/
-void __fastcall Ryder2ForgetMagnet (CRunningScript *scr, void *edx,
-                                        short count)
+char
+Ryder2ForgetMagnet (char enable)
 {
-    scr->CollectParameters (count);
-    if (scr->CheckName ("ryder2") && 
-        ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck () != MODEL_FORKLIFT && ryder2.atMagnetSection)
+    if (ScriptVehicleRandomizer::GetInstance()->mLastThread == "ryder2" || 
+        ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry")
     {
-        Scrpt::CallOpcode (0x1c4, "remove_references_to_object",
+        if ((ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    != MODEL_FORKLIFT && ryder2.atMagnetSection) || 
+            (ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    != MODEL_DOZER && quarry.atMagnetSection))
+                Scrpt::CallOpcode (0x1c4, "remove_references_to_object",
                            GlobalVar (10947)); // Stops magnet from persisting in save forever
     }
+    return CallAndReturn<char, 0x6F5DB0> (enable);
 }
 
+// Start Mission hook
 // Reset variables for RC box magnet section at start of Robbing Uncle Sam
 /*******************************************************/
-void __fastcall Ryder2ResetVariables (CRunningScript *scr, void *edx, short count)
+char
+Ryder2ResetVariables ()
 {
-    scr->CollectParameters (count);
-    if (scr->CheckName ("ryder2"))
-    {
-            ryder2 = emptyTemplate;
-        Logger::GetLogger ()->LogMessage (
-            "Test Default Values: " + std::to_string (ryder2.pickUpObjectTimer)
-            + ", " + std::to_string (emptyTemplate.pickUpObjectTimer) + ", Object Attached: "
-        + std::to_string(ryder2.objectAttached) + ", " + std::to_string(emptyTemplate.objectAttached));
-    }
+    Logger::GetLogger ()->LogMessage ("Clearing variables for mission start");
+    ryder2 = emptyTemplate;
+    quarry = emptyTemplate;
+    return CallAndReturn<char, 0x5619D0> ();
 }
 
 /*******************************************************/
@@ -1424,9 +1592,7 @@ void __fastcall FixRaiseDoorHeist9PosCheck (CRunningScript *scr, void *edx,
 void __fastcall TrailerAttachmentCheck (CRunningScript *scr, void *edx,
                                         char flag)
 {
-    if (scr->CheckName ("cat3") || scr->CheckName("toreno2") || scr->CheckName("truck"))
-    {
-            if (!flag && !currentTrailerAttached && FindPlayerVehicle ())
+    if (!flag && !currentTrailerAttached && FindPlayerVehicle ())
                 {
                     CVehicle *mainVehicle
                         = (CVehicle *) (ms_pVehiclePool->m_pObjects
@@ -1447,6 +1613,7 @@ void __fastcall TrailerAttachmentCheck (CRunningScript *scr, void *edx,
                         0.0f, -(ms_modelInfoPtrs[trailerVehicle->m_nModelIndex]
                             ->m_pColModel->m_boundBox.m_vecMax.y), 0.0f, 
                         GlobalVar (8927), GlobalVar (8928), GlobalVar (8929));
+
                     float angleCompare = GetGlobalVar<float> (69) - GetGlobalVar<float>(70);
                     float xCompare = GetGlobalVar<float>(8924) - GetGlobalVar<float>(8927);
                     float yCompare = GetGlobalVar<float> (8925) - GetGlobalVar<float>(8928);
@@ -1465,7 +1632,6 @@ void __fastcall TrailerAttachmentCheck (CRunningScript *scr, void *edx,
                 }
             else if (!flag && currentTrailerAttached)
                 currentTrailerAttached = false;
-    }
     scr->UpdateCompareFlag (flag);
 }
 
@@ -1697,22 +1863,27 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x46C2A3, (void *) &TrailerAttachmentCheck},
          {HOOK_CALL, 0x4720BF, (void *) &HasTrailerForceAttached},
          {HOOK_CALL, 0x49557F, (void *) &FixToreno2},
+         {HOOK_CALL, 0x47CC68, (void *) &QuarryAttachMagnet},
+         {HOOK_CALL, 0x487D29, (void *) &Quarry2StoreBarrelHandles},
+         {HOOK_CALL, 0x485067, (void *) &Quarry6StoreBarrelHandles},
          {HOOK_CALL, 0x47F90C, (void *) &Ryder2AttachMagnet},
          {HOOK_CALL, 0x47F688, (void *) &Ryder2IsCutsceneActive},
          {HOOK_CALL, 0x47CCF2, (void *) &Ryder2StoreBoxHandles},
          {HOOK_CALL, 0x469773, (void *) &Ryder2IncreaseRadius},
-         {HOOK_CALL, 0x46DD99, (void *) &Ryder2ForgetMagnet},
+         {HOOK_CALL, 0x4685A8, (void *) &Ryder2ForgetMagnet},
          {HOOK_CALL, 0x4831FC, (void *) &Ryder2CheckBoxForDamage},
          {HOOK_CALL, 0x48322F, (void *) &Ryder2CheckBoxForDamage2},
          {HOOK_CALL, 0x4698C6, (void *) &Ryder2WasBoxDestroyedSomehow},
+         {HOOK_CALL, 0x483584, (void *) &Quarry2RemoveSafeBarrel},
          {HOOK_CALL, 0x48563A, (void *) &Ryder2ReplaceHelp},
-         {HOOK_CALL, 0x47C233, (void *) &Ryder2ResetVariables},
+         {HOOK_CALL, 0x489955, (void *) &Ryder2ResetVariables},
          {HOOK_CALL, 0x482C6B, (void *) &FixBoatSchoolObjectPlacements},
          {HOOK_CALL, 0x497F89, (void *) &RandomizeTrainForScript},
          {HOOK_CALL, 0x46BB6C, (void *) &IgnoreTrainCarriages},
          {HOOK_CALL, 0x490558, (void *) &FixSnailTrailTrain},
          {HOOK_CALL, 0x49220E, (void *) &FixStuckAtDohertyGarage},
          {HOOK_JUMP, 0x6F5E70, (void *) &ChangeLastTrainCarriage},
+         {HOOK_CALL, 0x486DB1, (void *) &MoveFlyingSchoolTrigger},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     if (m_Config.MoreSchoolTestTime)
@@ -1726,8 +1897,7 @@ ScriptVehicleRandomizer::Initialise ()
             {HOOK_CALL, 0x473140, (void *) &DisplayCorrectBoatTimePart2},
             {HOOK_CALL, 0x481A0C, (void *) &DisplayCorrectBoatTimeOnTV},
             {HOOK_CALL, 0x497ED7, (void *) &MoveFlyingSchoolCorona},
-            {HOOK_CALL, 0x47CFE0, (void *) &MoveFlyingSchoolBlip},
-            {HOOK_CALL, 0x486DB1, (void *) &MoveFlyingSchoolTrigger}});
+            {HOOK_CALL, 0x47CFE0, (void *) &MoveFlyingSchoolBlip}});
 
     if (m_Config.SkipLowriderCheck)
     {

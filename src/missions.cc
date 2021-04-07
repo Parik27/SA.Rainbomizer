@@ -761,23 +761,23 @@ MissionRandomizer::VerifyMainSCM ()
 void __fastcall RandomizeMissionRewardDisplay (CRunningScript *scr, void *edx, short count)
 {
     scr->CollectParameters (count);
-    if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
-            != MissionRandomizer::GetInstance ()->mRandomizedMissionNumber
-        && ScriptParams[0] == 0)
-    {
-            if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber == 19)
-                newMissionReward = random (1000);
-            else if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
-                     == 43)
-                newMissionReward = 5000;
-            else if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
-                     == 69)
-                newMissionReward = 9000;
-            else if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
-                     == 75)
-                newMissionReward = random (5000);   
+    int origMissionId
+        = MissionRandomizer::GetInstance ()->mOriginalMissionNumber;
+    int randomMissionId
+        = MissionRandomizer::GetInstance ()->mRandomizedMissionNumber;
 
-            ScriptParams[0] = newMissionReward;
+    if (origMissionId != randomMissionId && ScriptParams[0] == 0)
+    {
+            switch (origMissionId)
+                {
+                case 19: newMissionReward = random (1000); break;
+                case 43: newMissionReward = 5000; break;
+                case 69: newMissionReward = random (9000); break;
+                case 75: newMissionReward = random (5000); break;
+                }  
+
+            if (newMissionReward != -1)
+                ScriptParams[0] = newMissionReward;
     }
 }
 

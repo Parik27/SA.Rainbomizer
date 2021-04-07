@@ -133,6 +133,9 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
             || vehID == 578 || vehID == 588))
         return false;
 
+    if (mFlags.CarryObjects && vehID != 406 && vehID != 443 && vehID != 530)
+        return false;
+
     // Type check (it has to be both not moved and allowed)
     if (!mAllowedTypes.GetValue (GetVehicleType(vehID))
         && !mMovedTypes.GetValue (GetVehicleType(vehID)))
@@ -215,6 +218,8 @@ ScriptVehiclePattern::ReadFlag (const std::string &flag)
         mFlags.NoHovercraft = true;
     else if (flag == "smallcar")
         mFlags.SmallCar = true;
+    else if (flag == "carryobjects")
+        mFlags.CarryObjects = true;
 
     // Coordinates
     else if (flag.find ("x=") == 0)

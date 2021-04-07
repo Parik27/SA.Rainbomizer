@@ -303,6 +303,7 @@ quarry	Dozer	1	Y	N	N	N	N	N	N	N	N
 quarry	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	x=816+y=845+z=9+smallplanes				
 quarry	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	x=812+y=1144+z=27+smallplanes				
 quarry	Dumper	1	N	N	N	N	N	N	N	N	N					
+quarry	Copbike	1	Y	Y	Y	Y	N	Y	N	N	N	smallcar				
 cokec	Sanchez	1	Y	Y	Y	Y	N	N	N	N	N					
 bcesar2	Patriot	4	Y	N	N	N	N	N	N	N	N					
 mtbiker	Mtbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				

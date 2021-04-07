@@ -24,6 +24,7 @@ const int START_MISSIONS     = 11;
 const int END_MISSIONS       = 112;
 const int UNLOCKED_CITY_STAT = 181;
 static int       missionNumberOfLastMissionStarted = -1;
+static int newMissionReward                  = -1;
 
 int exceptions[] = {
     40, // First Date
@@ -757,6 +758,44 @@ MissionRandomizer::VerifyMainSCM ()
 }
 
 /*******************************************************/
+void __fastcall RandomizeMissionRewardDisplay (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
+            != MissionRandomizer::GetInstance ()->mRandomizedMissionNumber
+        && ScriptParams[0] == 0)
+    {
+            if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber == 19)
+                newMissionReward = random (1000);
+            else if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
+                     == 43)
+                newMissionReward = 5000;
+            else if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
+                     == 69)
+                newMissionReward = 9000;
+            else if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
+                     == 75)
+                newMissionReward = random (5000);   
+
+            ScriptParams[0] = newMissionReward;
+    }
+}
+
+/*******************************************************/
+void __fastcall RandomizeMissionReward (CRunningScript *scr, void *edx,
+                                               short count)
+{
+    scr->CollectParameters (count);
+    if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
+            != MissionRandomizer::GetInstance ()->mRandomizedMissionNumber
+        && ScriptParams[0] == 0 && newMissionReward != -1)
+    {
+        ScriptParams[1] = newMissionReward;
+        newMissionReward = -1;
+    }
+}
+
+/*******************************************************/
 void
 MissionRandomizer::Initialise ()
 {
@@ -795,7 +834,9 @@ MissionRandomizer::Initialise ()
          {HOOK_CALL, 0x60C925, (void *) &CorrectMaxNumberOfGroupMembers},
          {HOOK_CALL, 0x44331B, (void *) &OverrideHospitalEndPosition<0x44331B>},
          {HOOK_CALL, 0x4435C6, (void *) &OverrideHospitalEndPosition<0x4435C6>},
-         {HOOK_CALL, 0x442F70, (void *) &OverrideHospitalEndPosition<0x442F70>}});
+         {HOOK_CALL, 0x442F70, (void *) &OverrideHospitalEndPosition<0x442F70>},
+         {HOOK_CALL, 0x469926, (void *) &RandomizeMissionReward},
+         {HOOK_CALL, 0x47DA2E, (void *) &RandomizeMissionRewardDisplay}});
 
     RegisterDelayedHooks (
         {{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},

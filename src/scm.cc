@@ -295,7 +295,8 @@ ApplyFixesBasedOnModel (int model, int newModel)
         || (model == MODEL_VORTEX && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "boat")
         || (model == MODEL_BOXVILLE && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "guns1")
         || (model == MODEL_PCJ && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "toreno2")
-        || (model == MODEL_DOZER && ScriptVehicleRandomizer::GetInstance()->mLastThread == "quarry"))
+        || (model == MODEL_DOZER && ScriptVehicleRandomizer::GetInstance()->mLastThread == "quarry" 
+            && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5)))
             ScriptVehicleRandomizer::GetInstance ()->ApplyCarCheckFix (newModel);
 }
 
@@ -1319,35 +1320,42 @@ void __fastcall Ryder2StoreBoxHandles(CRunningScript* scr, void* edx, short coun
     }
 }
 
+/*******************************************************/
+void
+GenericStoreObjects (int numberOfObjects)
+{
+    bool alreadyStored = false;
+    for (int i = 0; i < 17; i++)
+        {
+            if (i < numberOfObjects)
+                {
+                    if (quarry.objHandles[i] == ScriptParams[0])
+                        {
+                            alreadyStored = true;
+                            break;
+                        }
+                }
+            else if (i >= numberOfObjects)
+                quarry.objHandles[i] = 0;
+        }
+    if (!alreadyStored)
+        {
+            quarry.objHandles[quarry.currentObj] = ScriptParams[0];
+            quarry.currentObj++;
+        }
+}
+
 // Hooks 04e6 (is object near point)
 /*******************************************************/
 void __fastcall Quarry2StoreBarrelHandles (CRunningScript *scr, void *edx,
                                        short count)
 {
     scr->CollectParameters (count);
-    bool alreadyStored = false;
     if (scr->CheckName ("quarry") && ScriptSpace[8171] == 1 
         && ScriptVehicleRandomizer::GetInstance () ->GetNewCarForCheck ()
         != MODEL_DOZER)
     {
-        for (int i = 0; i < 17; i++)
-        {
-                if (i < 4)
-                    {
-                        if (quarry.objHandles[i] == ScriptParams[0])
-                            {
-                                alreadyStored = true;
-                                break;
-                            }
-                    }
-                else if (i >= 4)
-                    quarry.objHandles[i] = 0;
-        }
-        if (!alreadyStored)
-        {
-            quarry.objHandles[quarry.currentObj] = ScriptParams[0];
-            quarry.currentObj++;
-        }
+        GenericStoreObjects (4);
     }
 }
 
@@ -1357,30 +1365,11 @@ void __fastcall Quarry6StoreBarrelHandles (CRunningScript *scr, void *edx,
                                            short count)
 {
     scr->CollectParameters (count);
-    bool alreadyStored = false;
     if (scr->CheckName ("quarry") && ScriptSpace[8171] == 5
         && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
                != MODEL_DOZER)
     {
-
-        for (int i = 0; i < 17; i++)
-            {
-                if (i < 10)
-                    {
-                        if (quarry.objHandles[i] == ScriptParams[0])
-                            {
-                                alreadyStored = true;
-                                break;
-                            }
-                    }
-                else if (i >= 10)
-                    quarry.objHandles[i] = 0;
-            }
-        if (!alreadyStored)
-            {
-                quarry.objHandles[quarry.currentObj] = ScriptParams[0];
-                quarry.currentObj++;
-            }
+        GenericStoreObjects (10);
     }
 }
 

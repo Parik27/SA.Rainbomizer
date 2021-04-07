@@ -43,6 +43,7 @@ class ScriptVehiclePattern
         bool Hovercraft : 1;
         bool NoHovercraft : 1;
         bool SmallCar : 1;
+        bool CarryObjects : 1;
     } mFlags;
 
     Vector3        m_vecMovedCoords = {0.0, 0.0, 0.0};

@@ -136,6 +136,9 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
     if (mFlags.CarryObjects && vehID != 406 && vehID != 443 && vehID != 530)
         return false;
 
+    if (mFlags.Spray && vehID != 407 && vehID != 601)
+        return false;
+
     // Type check (it has to be both not moved and allowed)
     if (!mAllowedTypes.GetValue (GetVehicleType(vehID))
         && !mMovedTypes.GetValue (GetVehicleType(vehID)))
@@ -220,6 +223,8 @@ ScriptVehiclePattern::ReadFlag (const std::string &flag)
         mFlags.SmallCar = true;
     else if (flag == "carryobjects")
         mFlags.CarryObjects = true;
+    else if (flag == "spray")
+        mFlags.Spray = true;
 
     // Coordinates
     else if (flag.find ("x=") == 0)

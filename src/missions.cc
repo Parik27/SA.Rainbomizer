@@ -17,6 +17,7 @@
 #include "util/loader.hh"
 #include "dyom.hh"
 #include "missions_data.hh"
+#include "scm.hh"
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 
@@ -116,6 +117,45 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
 
     if (ScriptParams[0] == 134) // Buy Properties Mission
         RandomizePropertyToBuy ();
+
+    ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning
+        = ScriptParams[0];
+    switch (ScriptParams[0])
+    {
+        case 121:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
+                "taxiodd");
+            break;
+        case 122:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
+                "ambulan");
+            break;
+        case 123:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
+                "firetru");
+            break;
+        case 124:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
+                "copcar");
+            break;
+        case 125:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
+                "burgjb");
+            break;
+        case 127:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("pimp");
+            break;
+        case 131:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("bcour");
+            break;
+        case 132:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
+                "mtbiker");
+            break;
+        case 133:
+            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("stunt");
+            break;
+    }
 }
 
 /*******************************************************/

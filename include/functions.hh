@@ -926,6 +926,7 @@ struct CEntity
 
     cSimpleTransform *GetPosition ();
     int               SetHeading (float heading);
+    int               GetHeading ();
 };
 
 struct CObject : public CEntity

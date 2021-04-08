@@ -705,6 +705,13 @@ CEntity::SetHeading (float heading)
 }
 
 /*******************************************************/
+int
+CEntity::GetHeading ()
+{
+    return CallMethodAndReturn<int, 0x420B30> (this);
+}
+
+/*******************************************************/
 void
 CStats::IncrementStat (short id, float val)
 {

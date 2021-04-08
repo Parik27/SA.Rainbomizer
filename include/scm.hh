@@ -92,12 +92,16 @@ public:
         bool SkipWuZiMuCheck;
         bool SkipSweetsGirlCheck;
         bool SkipCourierCheck;
+        bool SkipBMXChallengeCheck;
         bool SkipNRGChallengeCheck;
         bool SkipChiliadCheck;
     } m_Config;
 
     uint8_t mSeatsCache[212];
-    std::string mLastThread;
+    std::string mLastThread = "";
+
+    static inline int mCurrentMissionRunning = -1;
+    static inline int mCourierMissionType    = -1;
 
     // Struct for RC heli magnet sections
     struct RCHeliMagnet

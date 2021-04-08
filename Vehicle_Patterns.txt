@@ -306,7 +306,7 @@ quarry	Dumper	1	N	N	N	N	N	N	N	N	N
 quarry	Copbike	1	Y	Y	Y	Y	N	Y	N	N	N	smallcar				
 cokec	Sanchez	1	Y	Y	Y	Y	N	N	N	N	N					
 bcesar2	Patriot	4	Y	N	N	N	N	N	N	N	N					
-mtbiker	Mtbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+mtbiker	Mtbike	1	Y	Y	Y	Y	N	N	N	N	N					
 firetru	Sentinel	4	Y	N	N	N	N	Y	N	N	N					
 firetru	Moonbeam	4	Y	N	N	N	N	Y	N	N	N					
 firetru	Washing	4	Y	N	N	N	N	Y	N	N	N					
@@ -417,3 +417,14 @@ copcar	stratum	4	Y	Y	Y	Y	Y	Y	N	N	N
 copcar	stafford	4	Y	Y	Y	Y	Y	Y	N	N	N					
 copcar	emperor	4	Y	Y	Y	Y	Y	Y	N	N	N					
 copcar	glenshit	4	Y	Y	Y	Y	Y	Y	N	N	N					
+bcour	Bmx	1	Y	Y	Y	Y	N	C	N	N	N	ignore	-10	6	0	
+bcour	Freeway	1	Y	Y	Y	Y	N	C	N	N	N	ignore	-13	12	0	
+bcour	Faggio	1	Y	Y	Y	Y	N	C	N	N	N	ignore	12	0	0	
+mtbiker	Nrg500	1	Y	Y	Y	Y	N	Y	N	N	N					
+stunt	Nrg500	1	N	Y	Y	N	N	C	N	N	N	ignore	-4	-23	0	
+stunt	Bike	1	N	N	Y	N	N	C	N	N	N	ignore	-20	-24	-5	
+taxiodd	Taxi	2	Y	N	N	N	Y	Y	N	N	N	smallplanes				
+ambulan	Ambulan	4	Y	N	N	N	N	Y	N	N	N					
+firetru	Firetruk	1	Y	N	N	N	N	N	N	N	N	spray				
+burgjb	Nrg500	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+pimp	Nrg500	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				

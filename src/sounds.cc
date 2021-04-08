@@ -268,6 +268,7 @@ SoundRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig ("VoiceLineRandomizer", 
             std::pair("MatchSubtitles", &m_Config.MatchSubtitles),
+            std::pair ("RandomizeGenericPedSpeech", &m_Config.RandomizePedSpeech),
             std::pair("ForcedAudioLine", &m_Config.ForcedAudioLine)))
         return;
 
@@ -280,10 +281,12 @@ SoundRandomizer::Initialise ()
          {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
          {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
          {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList},
-         {HOOK_JUMP, 0x5EFFE0, (void *) &RandomizeSayEvent}
+         {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList}
 /*         {HOOK_CALL, 0x4EE953, (void *) &RandomizeAudioEvents},
          {HOOK_CALL, 0x4EE994, (void *) &RandomizeAudioEvents}*/});
+
+    if (m_Config.RandomizePedSpeech)
+        RegisterHooks ({{HOOK_JUMP, 0x5EFFE0, (void *) &RandomizeSayEvent}});
 
     injector::WriteMemory<uint8_t> (0x4EC302 + 2, 3);
     InitaliseSoundTable ();

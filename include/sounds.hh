@@ -47,7 +47,8 @@ public:
     static inline struct Config
     {
         bool MatchSubtitles;
-        int ForcedAudioLine = -1;
+        bool RandomizePedSpeech;
+        int ForcedAudioLine;
     } m_Config;
 
     /// Returns the static instance for SoundRandomizer.

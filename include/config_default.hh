@@ -126,6 +126,16 @@ BMXChallenge = true # (LS BMX Challenge)
 NRG500Challenge = true # (SF NRG-500 Challenge)
 ChiliadChallenge = true # (All 3 Chiliad Challenge routes)
 
+# When side missions in a vehicle are started, the mod will re-randomize it into a different one for you to use.
+# Set to false to disable this behaviour for any of the following side missions.
+TaxiMissions = true
+Firefighting = true
+Burglary = true
+Pimping = true
+Paramedic = true
+Courier = true
+BikeChallenges = true
+
 # Gives you any vehicle for every mission (You might not be able to proceed with missions with this enabled)
 SkipChecks = false
 
@@ -146,6 +156,10 @@ ForcedMissionID = -1
 RandomizeOnce = true
 RandomizeOnceSeed = "" # https://en.wikipedia.org/wiki/Random_seed - useful for races
 ForcedRandomizeOnceSeed = false # Force the seed on existing save files
+
+# Set to true to keep your speed through end of mission teleports
+# If false, you will always be forced to a dead stop regardless of speed after a teleport
+ConserveMomentumThroughTeleports = true
 
 DisableMainScmCheck = false # Allow custom main.scm's to run with mission randomizer.
 		      	    # Note: Missions might not progress properly with a custom
@@ -172,18 +186,39 @@ ReplaceWithWeaponsOnly = true # Does nothing yet
 RandomizePlayerModel = true
 RandomizePlayerClothing = true
 
+# If both of the config options above are activated, this number dictates the chances of
+# the player becoming a new model vs the player becoming CJ with different clothes.
+# Odds are out of 100, so default odds are 80 in 100 chance of a new non-CJ model.
+OddsOfNewModel = 80
+
 # Set to true to allow models featuring nudity
 IncludeNSFWModels = false
+
+# Forces specific model for player when using random player models using their model ID.
+# Set to -1 for normal randomization.
+# Set to 298 to always use a special mission model.
+# To use a specific special mission model, set to 298 and set ForcedSpecialModel to the model name.
+ForcedModel = -1
+ForcedSpecialModel = ""
 
 #######################################################
 [PedRandomizer]
 
 RandomizeGenericModels = true # (Peds on the street or in interiors, non-named peds in missions)
-RandomizeCops = true # (Cops can look like any ped)
+RandomizeCops = true # (Cops can look like any ped, but will behave the same)
+RandomizeGangMembers = true # (Members of all gangs can look like anyone, but will behave the same)
 RandomizeSpecialModels = true # (Mission characters e.g. Sweet, Big Smoke, Cesar)
 
 # Set to true to allow models featuring nudity
 IncludeNSFWModels = false
+
+# Force specific ped model for generic street peds using their model ID. 
+# Set to -1 for normal randomization
+ForcedPedModel = -1
+
+# Force specific special model for mission characters using their model name.
+# Set to -1 for normal randomization
+ForcedSpecialModel = ""
 
 #######################################################
 [CutsceneRandomizer]
@@ -195,6 +230,10 @@ RandomizeLocations = true
 [VoiceLineRandomizer]
 
 MatchSubtitles = true
+
+# Randomizes the type of speech event a ped uses when they're about to speak
+# For example, a line about bumping into someone could become a line about falling to your death.
+RandomizeGenericPedSpeech = true
 
 # Force a single voice line. Set to -1 for normal randomization.
 ForcedAudioLine = -1
@@ -266,6 +305,7 @@ EnableEasterEgg = true
 
 # Voice Line Randomizer	
 # Randomizes dialogue spoken by characters in missions. (Requires original AudioEvents.txt)
+# Can also randomize generic ped lines with a config option.
 
 # Language Randomizer
 # Randomizes the language of text (except for subtitles when using Voice Line Randomizer). 

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <string>
 
 class ClothesRandomizer
 {
@@ -34,7 +35,12 @@ public:
         bool RandomizePlayerModel;
         bool RandomizePlayerClothing;
 
+        int OddsOfNewModel;
+
         bool IncludeNSFWModels;
+
+        int ForcedModel;
+        std::string ForcedSpecial;
     } m_Config;
 
     std::pair<int, int> GetRandomCRCForComponent (int componentId);

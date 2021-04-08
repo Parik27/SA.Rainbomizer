@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <map>
 #include <unordered_map>
 #include "scm_patterns.hh"
 
@@ -88,6 +89,8 @@ public:
     static inline struct Config
     {
         bool MoreSchoolTestTime;
+
+        // Vehicle Checks
         bool SkipLowriderCheck;
         bool SkipWuZiMuCheck;
         bool SkipSweetsGirlCheck;
@@ -95,10 +98,26 @@ public:
         bool SkipBMXChallengeCheck;
         bool SkipNRGChallengeCheck;
         bool SkipChiliadCheck;
+
+        // Vehicle Side Mission Randomization
+        bool Taxi;
+        bool Firefighting;
+        bool Burglary;
+        bool Pimping;
+        bool Paramedic;
+        bool Courier;
+        bool Bike;
+
     } m_Config;
 
     uint8_t mSeatsCache[212];
     std::string mLastThread = "";
+
+    static inline std::map<int, std::string> oddMissions{{121, "taxiodd"}, {122, "ambulan"},
+                                           {123, "firetru"}, {124, "copcar"},
+                                           {125, "burgjb"},  {127, "pimp"},
+                                           {131, "bcour"},   {132, "mtbiker"},
+                                           {133, "stunt"}};
 
     static inline int mCurrentMissionRunning = -1;
     static inline int mCourierMissionType    = -1;

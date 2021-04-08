@@ -30,12 +30,18 @@ ClothesRandomizer::RandomizePlayerModel ()
     while ((model = random (299)), !PedRandomizer::IsModelValidPedModel (model))
         ;
 
+    if (m_Config.ForcedModel >= 0)
+        model = m_Config.ForcedModel;
+
     if (PedRandomizer::IsSpecialModel (model))
         {
             model = 298;
-            CStreaming::RequestSpecialModel (
-                model, GetRandomElement (PedRandomizer::specialModels).c_str (),
-                1);
+            if (m_Config.ForcedSpecial == "")
+                CStreaming::RequestSpecialModel (
+                    model, GetRandomElement (PedRandomizer::specialModels).c_str (), 1);
+            else
+                CStreaming::RequestSpecialModel (
+                    model, m_Config.ForcedSpecial.c_str(), 1);
         }
     else
         CStreaming::RequestModel (model, 1);
@@ -76,10 +82,19 @@ ClothesRandomizer::HandleClothesChange ()
     if (CGame::bMissionPackGame)
         return;
 
-    if (random (100) >= 90)
+    if (m_Config.RandomizePlayerClothing && m_Config.RandomizePlayerModel)
+        {
+            if (random (100) >= m_Config.OddsOfNewModel)
+                RandomizePlayerClothes ();
+            else
+                RandomizePlayerModel ();
+        }
+    else if (m_Config.RandomizePlayerClothing && !m_Config.RandomizePlayerModel)
         RandomizePlayerClothes ();
-    else
+    else if (m_Config.RandomizePlayerModel && !m_Config.RandomizePlayerClothing)
         RandomizePlayerModel ();
+    else
+        return;
 }
 
 /*******************************************************/
@@ -148,8 +163,17 @@ ClothesRandomizer::GetRandomCRCForComponent (int componentId)
 void
 ClothesRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("PlayerRandomizer"))
+    if (!ConfigManager::ReadConfig ("PlayerRandomizer", 
+        std::pair("RandomizePlayerModel", &m_Config.RandomizePlayerModel),
+        std::pair("RandomizePlayerClothing", &m_Config.RandomizePlayerClothing),
+        std::pair("OddsOfNewModel", &m_Config.OddsOfNewModel),
+        std::pair("IncludeNSFWModels", &m_Config.IncludeNSFWModels),
+        std::pair("ForcedModel", &m_Config.ForcedModel),
+        std::pair("ForcedSpecialModel", &m_Config.ForcedSpecial)))
         return;
+
+    if (m_Config.OddsOfNewModel < 0 || m_Config.OddsOfNewModel > 100)
+        m_Config.OddsOfNewModel = 80;
 
     mInitialised = false;
 

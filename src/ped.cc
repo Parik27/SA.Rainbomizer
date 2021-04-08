@@ -24,6 +24,9 @@ PedRandomizer::ChooseRandomPedToLoad ()
                                      || ms_aInfoForModel[ped].m_nLoadState == 1)
         ;
 
+    if (m_Config.ForcedPed >= 0)
+        ped = m_Config.ForcedPed;
+
     return ped;
 }
 
@@ -32,6 +35,25 @@ uint32_t
 PedRandomizer::GetRandomModelIndex (uint32_t originalIdx)
 {
     if (originalIdx == 0)
+        return originalIdx;
+
+    if (!m_Config.RandomizeCops && originalIdx >= 280 && originalIdx <= 288)
+        return originalIdx;
+
+    if (m_Config.RandomizeCops && !m_Config.RandomizeGenericModels && !m_Config.RandomizeGangMembers 
+        && (originalIdx < 280 || originalIdx > 288))
+        return originalIdx;
+
+    if (!m_Config.RandomizeGangMembers && originalIdx >= 102
+        && originalIdx <= 127)
+        return originalIdx;
+
+    if (m_Config.RandomizeGangMembers && !m_Config.RandomizeGenericModels && !m_Config.RandomizeCops
+        && (originalIdx < 102 || originalIdx > 127))
+        return originalIdx;
+
+    if (m_Config.RandomizeGangMembers && !m_Config.RandomizeGenericModels && m_Config.RandomizeCops 
+        && ((!(originalIdx >= 102) && !(originalIdx <= 127)) || (!(originalIdx >= 280) && !(originalIdx <= 288))))
         return originalIdx;
 
     int newModel = originalIdx;
@@ -60,7 +82,10 @@ void
 PedRandomizer::RandomizeSpecialModels (int slot, const char *modelName,
                                        int flags)
 {
-    const std::string &newModel = GetRandomElement (specialModels);
+    std::string &newModel = GetRandomElement (specialModels);
+
+    if (m_Config.ForcedSpecial != "")
+        newModel = m_Config.ForcedSpecial;
 
     CStreaming::RequestSpecialModel (slot, newModel.c_str (), flags);
     CStreaming::LoadAllRequestedModels (false);
@@ -88,8 +113,10 @@ PedRandomizer::IsSpecialModel (int model)
 void
 PedRandomizer::Initialise ()
 {
-    if (ConfigManager::ReadConfig ("PedRandomizer")
-        || ConfigManager::ReadConfig ("PlayerRandomizer"))
+    if (ConfigManager::ReadConfig ("PedRandomizer",
+        std::pair ("IncludeNSFWModels", &m_Config.IncludeNSFWModels))
+        || ConfigManager::ReadConfig ("PlayerRandomizer", 
+            std::pair ("IncludeNSFWModels", &m_Config.IncludeNSFWModels)))
     {
         for (auto &model :
                  {"TRUTH",   "MACCER", "TENPEN",  "PULASKI", "HERN",
@@ -103,19 +130,35 @@ PedRandomizer::Initialise ()
                 specialModels.push_back (model);
 
         // If NSFW enabled
-        for (auto &model : {"GANGRL1", "MECGRL1", "GUNGRL1", "COPGRL1",
-            "NURGRL1", "CROGRL1", "GANGRL2", "COPGRL2"})
-            specialModels.push_back (model);
+        if (m_Config.IncludeNSFWModels)
+        {
+            for (auto &model : {"GANGRL1", "MECGRL1", "GUNGRL1", "COPGRL1",
+                                    "NURGRL1", "CROGRL1", "GANGRL2", "COPGRL2"})
+                specialModels.push_back (model);
+        }
     }
 
-    if (!ConfigManager::ReadConfig ("PedRandomizer"))
+    if (!ConfigManager::ReadConfig ("PedRandomizer", 
+        std::pair("RandomizeGenericModels", &m_Config.RandomizeGenericModels), 
+        std::pair("RandomizeCops", &m_Config.RandomizeCops),
+        std::pair("RandomizeGangMembers", &m_Config.RandomizeGangMembers),
+        std::pair("RandomizeSpecialModels", &m_Config.RandomizeSpecialModels), 
+        std::pair("IncludeNSFWModels", &m_Config.IncludeNSFWModels),
+        std::pair("ForcedPedModel", &m_Config.ForcedPed),
+        std::pair("ForcedSpecialModel", &m_Config.ForcedSpecial)))
         return;
 
     // If Special Models Enabled
-    injector::MakeJMP (0x40B45E, RandomizeSpecialModels);
-    injector::MakeJMP (0x60FFD0, ChooseRandomPedToLoad);
+    if (m_Config.RandomizeSpecialModels)
+        injector::MakeJMP (0x40B45E, RandomizeSpecialModels);
+    
+    if (m_Config.RandomizeGenericModels || m_Config.RandomizeCops || m_Config.RandomizeGangMembers)
+    {
+        injector::MakeJMP (0x60FFD0, ChooseRandomPedToLoad);
 
-    RegisterHooks ({{HOOK_CALL, 0x5E4890, (void *) RandomizePedModelIndex}});
+        RegisterHooks (
+                {{HOOK_CALL, 0x5E4890, (void *) RandomizePedModelIndex}});
+    }
 
     Logger::GetLogger ()->LogMessage ("Intialised PedRandomizer");
 }

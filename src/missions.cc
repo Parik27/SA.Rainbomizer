@@ -4,6 +4,8 @@
 #include "base.hh"
 #include "functions.hh"
 #include <vector>
+#include <map>
+#include <unordered_map>
 #include "injector/injector.hpp"
 #include "config.hh"
 #include "util/scrpt.hh"
@@ -36,14 +38,14 @@ int exceptions[] = {
 
 /*******************************************************/
 void
-Teleport (Position pos, bool endMission, bool refresh = true)
+Teleport (Position pos, bool saveMomentum, bool refresh = true)
 {
     CVector moveSpeed;
     CVector turnSpeed;
 
     CPhysical *player = (CPhysical *) FindPlayerEntity (-1);
 
-    if (endMission)
+    if (saveMomentum)
         {
             moveSpeed = player->m_vecMoveSpeed;
             turnSpeed = player->m_vecTurnSpeed;
@@ -63,14 +65,14 @@ Teleport (Position pos, bool endMission, bool refresh = true)
 
     CRunningScript::SetCharCoordinates (FindPlayerPed (), {pos.x, pos.y, pos.z},
                                         1, 1);
-    //Don't set heading if preserving momentum - will add config option for old teleport system
-    //FindPlayerEntity ()->SetHeading (pos.heading * 3.1415926 / 180.0);
 
-    if (endMission)
+    if (saveMomentum)
         {
             player->m_vecMoveSpeed = moveSpeed;
             player->m_vecTurnSpeed = turnSpeed;
         }
+    else
+        FindPlayerEntity ()->SetHeading (pos.heading * 3.1415926 / 180.0);
 }
 
 /*******************************************************/
@@ -120,42 +122,10 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
 
     ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning
         = ScriptParams[0];
-    switch (ScriptParams[0])
-    {
-        case 121:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
-                "taxiodd");
-            break;
-        case 122:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
-                "ambulan");
-            break;
-        case 123:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
-                "firetru");
-            break;
-        case 124:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
-                "copcar");
-            break;
-        case 125:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
-                "burgjb");
-            break;
-        case 127:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("pimp");
-            break;
-        case 131:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("bcour");
-            break;
-        case 132:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
-                "mtbiker");
-            break;
-        case 133:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("stunt");
-            break;
-    }
+    std::map oddMissions = ScriptVehicleRandomizer::GetInstance ()->oddMissions;
+    if (oddMissions.find (ScriptParams[0]) != oddMissions.end ())
+        ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
+            oddMissions[ScriptParams[0]]);
 }
 
 /*******************************************************/
@@ -176,7 +146,10 @@ MissionRandomizer::TeleportPlayerAfterMission ()
             Position pos = missionEndPos.at (mOriginalMissionNumber)[status];
             pos.z        = (mRandomizedMissionNumber == 80) ? 1500 : pos.z;
 
-            Teleport (pos, true);
+            bool saveMomentum = false;
+            if (m_Config.PreserveMomentum)
+                saveMomentum = true;
+            Teleport (pos, saveMomentum);
         }
     catch (const std::out_of_range &e)
         {
@@ -844,6 +817,7 @@ MissionRandomizer::Initialise ()
             std::pair ("RandomizeOnce", &m_Config.RandomizeOnce),
             std::pair ("RandomizeOnceSeed", &m_Config.RandomizeOnceSeed),
             std::pair ("ForcedRandomizeOnceSeed", &m_Config.ForcedRandomizeOnceSeed),
+            std::pair ("ConserveMomentumThroughTeleports", &m_Config.PreserveMomentum),
             std::pair ("DisableMainScmCheck", &m_Config.DisableMainSCMCheck)))
         return;
 

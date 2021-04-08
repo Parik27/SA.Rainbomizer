@@ -1,10 +1,12 @@
 #pragma once
 
+#include <map>
 #include <unordered_map>
 #include <vector>
 #include <cstring>
 #include <functional>
 #include <cstdint>
+#include <string>
 
 struct CRunningScript;
 
@@ -60,6 +62,7 @@ class MissionRandomizer
         int         MissionSeedHash         = 0;
         bool        ForcedRandomizeOnceSeed = false;
 
+        bool PreserveMomentum    = true;
         bool DisableMainSCMCheck = false;
     } m_Config;
 

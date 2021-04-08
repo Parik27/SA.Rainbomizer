@@ -29,8 +29,12 @@ public:
     {
         bool RandomizeGenericModels;
         bool RandomizeCops;
+        bool RandomizeGangMembers;
         bool RandomizeSpecialModels;
         bool IncludeNSFWModels;
+
+        int ForcedPed;
+        std::string ForcedSpecial;
     } m_Config;
 
     /// Initialises Hooks/etc.

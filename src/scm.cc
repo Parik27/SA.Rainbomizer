@@ -27,6 +27,7 @@
 #include "util/loader.hh"
 #include "config.hh"
 #include <cmath>
+#include <map>
 #include <unordered_map>
 #include "scm_patterns.hh"
 #include "util/scrpt.hh"
@@ -1593,36 +1594,9 @@ void __fastcall StoreStartedMission (CRunningScript *scr, void *edx,
 {
     scr->CollectParameters (count);
     ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning = ScriptParams[0];
-    switch (ScriptParams[0])
-        {
-        case 121:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("taxiodd");
-            break;
-        case 122:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("ambulan");
-            break;
-        case 123:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("firetru");
-            break;
-        case 124:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("copcar");
-            break;
-        case 125:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("burgjb");
-            break;
-        case 127:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("pimp");
-            break;
-        case 131:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread("bcour");
-            break;
-        case 132:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("mtbiker");
-            break;
-        case 133:
-            ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread ("stunt");
-            break;
-        }
+    std::map oddMissions = ScriptVehicleRandomizer::GetInstance ()->oddMissions;
+    if (oddMissions.find(ScriptParams[0]) != oddMissions.end())
+        ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (oddMissions[ScriptParams[0]]);
 }
 
 // Start Mission hook
@@ -1637,8 +1611,13 @@ SetThingsForMissionStart ()
     int currentMissionId
         = ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning;
 
-    if ((currentMissionId >= 121 && currentMissionId <= 123) || (currentMissionId == 125) 
-        || (currentMissionId == 127) || (currentMissionId >= 131 && currentMissionId <= 133))
+    if ((currentMissionId == 121 && ScriptVehicleRandomizer::m_Config.Taxi)
+        || (currentMissionId == 122 && ScriptVehicleRandomizer::m_Config.Paramedic)
+        || (currentMissionId == 123 && ScriptVehicleRandomizer::m_Config.Firefighting)
+        || (currentMissionId == 125 && ScriptVehicleRandomizer::m_Config.Burglary)
+        || (currentMissionId == 127 && ScriptVehicleRandomizer::m_Config.Pimping)
+        || (currentMissionId == 131 && ScriptVehicleRandomizer::m_Config.Courier)
+        || ((currentMissionId == 132 || currentMissionId == 133) && ScriptVehicleRandomizer::m_Config.Bike))
     {
         CPhysical *player = (CPhysical *) FindPlayerEntity (-1);
         CVector moveSpeed = player->m_vecMoveSpeed;
@@ -1958,7 +1937,14 @@ ScriptVehicleRandomizer::Initialise ()
         std::pair ("CourierMissions", &m_Config.SkipCourierCheck),
         std::pair ("BMXChallenge", &m_Config.SkipBMXChallengeCheck),
         std::pair("NRG500Challenge", &m_Config.SkipNRGChallengeCheck),
-        std::pair("ChiliadChallenge", &m_Config.SkipChiliadCheck)))
+        std::pair("ChiliadChallenge", &m_Config.SkipChiliadCheck),
+        std::pair("TaxiMissions", &m_Config.Taxi),
+        std::pair ("Firefighting", &m_Config.Firefighting), 
+        std::pair ("Burglary", &m_Config.Burglary), 
+        std::pair ("Pimping", &m_Config.Pimping), 
+        std::pair ("Paramedic", &m_Config.Paramedic), 
+        std::pair ("Courier", &m_Config.Courier), 
+        std::pair ("BikeChallenges", &m_Config.Bike)))
     return;
 
     TrafficRandomizer::GetInstance ()->MakeRCsEnterable ();

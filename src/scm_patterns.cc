@@ -139,6 +139,10 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
     if (mFlags.Spray && vehID != 407 && vehID != 601)
         return false;
 
+    if (GetThreadName () == "heist4" && GetOriginalVehicle () == 443
+        && vehID == 432)
+        return false;
+
     // Type check (it has to be both not moved and allowed)
     if (!mAllowedTypes.GetValue (GetVehicleType(vehID))
         && !mMovedTypes.GetValue (GetVehicleType(vehID)))

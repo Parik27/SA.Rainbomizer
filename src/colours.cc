@@ -451,9 +451,10 @@ ColourRandomizer::Initialise ()
 
             FadesManager::AddFadeCallback ([] { RandomizeColourTables<false>(); });
     if (m_Config.RandomizeText)
-    {
-        RegisterHooks ({{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
-                        {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours}});
+        {
+            RegisterHooks (
+                {{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
+                 {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours}});
 
         injector::MakeCALL (0x58D8FD, (void *) &RandomizeWeaponSpriteColours <0x58D8FD>); // Weapon Icon
         injector::MakeCALL (0x58E95B, (void *) &RandomizeWeaponSpriteColours<0x58E95B>); // FPS Crosshair 1

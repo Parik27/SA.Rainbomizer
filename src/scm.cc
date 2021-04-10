@@ -459,7 +459,6 @@ int16_t __fastcall UpdateLastThread (CRunningScript *script, void *edx,
                && std::string(script->m_szName) == "noname")
         return 0;
     
-    Logger::GetLogger ()->LogMessage ("Script updating");
     ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
         script->m_szName);
     return 0;
@@ -1920,7 +1919,8 @@ void __fastcall FixStuckAtDohertyGarage (CRunningScript *scr, void *edx,
 void __fastcall OverrideTaxiCheck (CRunningScript *scr, void *edx,
                                         char flag)
 {
-    if (scr->CheckName ("taxiodd"))
+    if (scr->CheckName ("taxiodd") && FindPlayerVehicle() 
+        && ScriptVehicleRandomizer::GetInstance()->m_Config.Taxi)
         flag = true;
     scr->UpdateCompareFlag (flag);
 }

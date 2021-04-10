@@ -189,17 +189,17 @@ char *__fastcall GxtRandomizer::GetTextHook (CText *text, void *edx, char *key)
     if (std::string (key) != std::string (RiotRandomizer::previousZone)
         && std::string (key) != std::string(GxtRandomizer::lastZone))
     {
-        typeOfZoneKey = 0;
+        typeOfZoneKey = 0; // This text is not zone-related
     }
     else if (std::string (key) == std::string (RiotRandomizer::previousZone)
              && std::string (key) != std::string (GxtRandomizer::lastZone))
     {
-        typeOfZoneKey = 1;
+        typeOfZoneKey = 1; // Zone changed, need new random zone text
     }
     else if (std::string (key) == std::string (RiotRandomizer::previousZone)
              && std::string (key) == std::string (GxtRandomizer::lastZone))
     {
-        typeOfZoneKey = 2;
+        typeOfZoneKey = 2; // Zone text but zone is the same
     }
 
     char currentCarKey[8];
@@ -215,12 +215,12 @@ char *__fastcall GxtRandomizer::GetTextHook (CText *text, void *edx, char *key)
         if (std::string (key) != std::string(GxtRandomizer::lastCar) 
             && std::string(key) == std::string(currentCarKey))
         {
-            typeOfVehKey = 1;
+            typeOfVehKey = 1; // Vehicle text has changed, need new random text
         }
         else if (std::string (key) == std::string (GxtRandomizer::lastCar)
                  && std::string (key) == std::string (currentCarKey))
         {
-            typeOfVehKey = 2;
+            typeOfVehKey = 2; // Vehicle text unchanged
         }
     }
     else

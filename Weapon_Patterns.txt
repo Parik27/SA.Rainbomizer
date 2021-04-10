@@ -1,7 +1,7 @@
 #Thread	Original Weapon	Ped	Melee	Pistols	Shotguns	SMG	Assault Rifles	Rifles	Heavy Weapons	Projectiles	Sprayables	Gadgets	Pickup?	Flags
 sweet1	spraycan	0	N	N	N	N	N	N	N	N	N	N	N	
 crash1	fire_ex	-1	N	N	N	N	N	N	N	N	N	N	Y	
-crash1	molotov	-1	N	N	N	N	N	N	Y	Y	N	N	Y	flame
+crash1	molotov	-1	N	N	N	N	N	N	Y	Y	N	N	Y	projectilecheck
 la1fin2	camera	0	N	N	N	N	N	N	N	N	N	N	N	
 bcrash1	camera	-1	N	N	N	N	N	N	N	N	N	N	Y	
 truth2	flame	0	N	N	N	N	N	N	Y	Y	N	N	N	flame
@@ -25,10 +25,11 @@ heist2	gun_para	0	N	N	N	N	N	N	N	N	N	N	N
 mansio1	gun_para	-1	N	N	N	N	N	N	N	N	N	N	N	
 cat4	satchel	0	N	N	N	N	N	N	Y	Y	N	N	N	explosive
 drugs4	ak47	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	
+finaleb	fire_ex	-1	N	N	N	N	N	N	N	N	N	N	N	
 finalec	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	candriveby
 drugs1	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	candriveby
 casino9	colt45	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	
-shrange	pistol	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
+shrange	colt45	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
 shrange	micro_uzi	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
 shrange	chromegun	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	
 shrange	ak47	0	N	Y	Y	Y	Y	Y	Y	N	N	N	N	

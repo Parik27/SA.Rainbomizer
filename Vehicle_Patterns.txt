@@ -38,13 +38,13 @@ smoke2	Sentinel	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes
 smoke3	Glendale	2	Y	Y	N	Y	C	C	N	N	N	x=2058+y=-1694+z=12+smallplanes	20	0	0	
 drugs1	Glendale	2	Y	Y	N	Y	C	C	N	N	N	x=2058+y=-1694+z=12+smallplanes	20	0	0	
 drugs1	Bf400	2	Y	Y	N	Y	N	N	N	N	N	rc				
-drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1374+y=-1394+z=13				
-drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1374+y=-1665+z=12				
-drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1373+y=-1633+z=12				
-drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=1496+y=-1731+z=6				
-drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=2002+y=-1890+z=8				
-drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=2008+y=-1897+z=8				
-drugs1	Sultan	2	Y	Y	N	Y	Y	Y	Y	Y	N	x=2529+y=-1892+z=13				
+drugs1	Sultan	2	Y	N	N	N	Y	Y	Y	Y	N	x=1374+y=-1394+z=13				
+drugs1	Sultan	2	Y	N	N	N	Y	Y	Y	Y	N	x=1374+y=-1665+z=12				
+drugs1	Sultan	2	Y	N	N	N	Y	Y	Y	Y	N	x=1373+y=-1633+z=12				
+drugs1	Sultan	2	Y	N	N	N	Y	Y	Y	Y	N	x=1496+y=-1731+z=6				
+drugs1	Sultan	2	Y	N	N	N	Y	Y	Y	Y	N	x=2002+y=-1890+z=8				
+drugs1	Sultan	2	Y	N	N	N	Y	Y	Y	Y	N	x=2008+y=-1897+z=8				
+drugs1	Sultan	2	Y	N	N	N	Y	Y	Y	Y	N	x=2529+y=-1892+z=13				
 music1	Pony	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 music1	Voodoo	1	Y	Y	Y	Y	Y	Y	N	N	N					
 music1	Oceanic	1	Y	Y	Y	Y	Y	Y	N	N	N					
@@ -57,19 +57,19 @@ music5	Tahoma	4	Y	N	N	N	N	N	N	N	N	x=2227+y=-1667+z=13
 cprace	Blade	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Savanna	2	Y	Y	N	Y	N	N	N	N	N					
 cprace	Majestic	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-cprace	Remingtn	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Remingtn	1	Y	Y	Y	Y	Y	N	N	N	Y	hovercraft				
 cprace	Nrg500	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Pcj600	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Bf400	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Fcr900	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Sunrise	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Blistac	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-cprace	Windsor	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Windsor	1	Y	Y	Y	Y	Y	N	N	N	Y	hovercraft				
 cprace	Uranus	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Sentinel	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Supergt	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Bullet	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-cprace	Buffalo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Buffalo	1	Y	Y	Y	Y	Y	N	N	N	Y	hovercraft				
 cprace	Banshee	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Cheetah	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Turismo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
@@ -92,15 +92,18 @@ cprace	Zr350	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft
 cprace	Sultan	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Sanchez	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Sabre	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-cprace	Stallion	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+cprace	Stallion	1	Y	Y	Y	Y	Y	N	N	N	Y	hovercraft				
 cprace	Hotring	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Hotrina	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 cprace	Hotrinb	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-cesar1	Savanna	2	Y	Y	N	Y	Y	Y	N	N	N	x=1793+y=-2138+z=12				
+cesar1	Savanna	2	Y	Y	N	Y	N	N	N	N	N	x=1793+y=-2138+z=12				
 cesar1	Savanna	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+cesar1	Majestic	1	Y	Y	Y	N	Y	Y	Y	Y	N					
+cesar1	Remingtn	1	Y	Y	Y	N	Y	Y	Y	Y	N					
+cesar1	Blade	1	Y	Y	Y	N	Y	Y	Y	Y	N					
 drugs4	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
 drugs4	Enforcer	2	Y	Y	N	Y	Y	Y	Y	Y	N					
-drugs4	Copcarla	2	Y	Y	N	Y	Y	Y	Y	Y	N					
+drugs4	Copcarla	2	Y	N	N	N	Y	Y	Y	Y	N					
 drugs4	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y					
 la1fin2	Bravura	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
 la1fin2	Pony	4	Y	N	N	N	N	Y	N	N	N					
@@ -145,7 +148,7 @@ driv6	Rancher	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes
 driv6	Sanchez	2	Y	Y	N	Y	Y	N	N	N	N					
 wuzi2	Tropic	1	N	N	N	N	Y	Y	Y	N	N	float				
 wuzi5	Dinghy	1	N	N	N	N	C	C	C	N	N	float	0	10	0	
-syn1	Savanna	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+syn1	Savanna	2	Y	N	N	N	Y	Y	N	N	N	smallplanes				
 syn1	Mtbike	1	N	N	N	N	N	N	N	N	N					
 syn1	Picador	2	Y	Y	N	Y	Y	Y	N	N	N					
 syn1	Zr350	1	Y	Y	Y	Y	Y	Y	N	N	Y					
@@ -155,6 +158,7 @@ syn2	Broadway	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes
 syn2	Hustler	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 syn2	Stretch	4	Y	N	N	N	N	N	N	N	N					
 syn2	Huntley	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
+driv2	Fcr900	1	Y	Y	Y	Y	Y	Y	Y	Y	N					
 syn3	Sanchez	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
 syn3	Rumpo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 syn3	Washing	4	Y	N	N	N	N	N	N	N	N					
@@ -201,7 +205,7 @@ des3	Maverick	1	Y	N	N	N	Y	Y	Y	Y	Y
 desert6	Rustler	1	Y	N	N	Y	C	C	N	N	N	nohovercraft+norc	0	-35	0	
 desert6	Hydra	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
 desert9	Pcj600	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
-maf4	Camper	2	Y	Y	N	Y	Y	Y	Y	Y	N					
+maf4	Camper	2	Y	N	N	N	Y	Y	N	N	N					
 desert5	Rustler	1	Y	N	N	Y	Y	N	N	N	N	norc+nohovercraft				
 desert5	Hunter	1	Y	N	N	Y	Y	Y	N	N	N	z=15				
 desert5	Hunter	1	Y	N	N	N	Y	Y	N	N	N	guns				
@@ -231,6 +235,7 @@ heist1	Washing	2	Y	Y	N	Y	N	N	N	N	N
 heist3	Club	1	Y	Y	Y	Y	N	N	N	N	N					
 heist2	Nevada	1	Y	N	N	Y	Y	Y	N	N	N	norc+nohovercraft				
 heist4	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y					
+heist4	Packer	1	Y	Y	Y	Y	Y	Y	Y	Y	Y					
 heist4	Copbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 heist4	Freeway	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
 heist5	Leviathn	1	N	N	N	N	Y	Y	N	N	N	vtol+norc				
@@ -261,9 +266,9 @@ finalea	Swatvan	1	Y	Y	Y	Y	N	N	N	N	N	x=2374+y=-1323+z=22
 finalea	Swatvan	2	Y	Y	N	Y	Y	Y	N	N	N	x=2561+y=-1275+z=1031				
 finalec	Firela	1	Y	Y	Y	Y	Y	Y	N	N	N					
 finalec	Feltzer	2	Y	Y	N	Y	N	Y	N	N	N					
-finalec	Copcarla	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
+finalec	Copcarla	2	Y	N	N	N	Y	Y	N	N	N					
 finalec	Sanchez	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
-finalec	Tornado	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
+finalec	Tornado	2	Y	N	N	N	Y	Y	N	N	N					
 kicksta	Sanchez	1	N	Y	Y	N	N	N	N	N	N					
 truck	Petro	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 truck	Petrotr	1	Y	N	N	Y	Y	Y	N	N	Y	smallplanes+norc				

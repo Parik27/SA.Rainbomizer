@@ -138,8 +138,6 @@ SelectCutsceneOffset (char *name)
         offset.z = CWorld::FindGroundZedForCoord (offset.x, offset.y);
     }
 
-    Logger::GetLogger ()->LogMessage ("Cutscene Z: " + std::to_string(offset.z));
-
     offset.z -= cutsceneOffsetCorrections[name];
 
     cutsceneRandomizer->offset = offset;

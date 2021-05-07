@@ -57,7 +57,9 @@ public:
         bool RandomizeText;
         bool RandomizeLights;
         bool RandomizeClouds;
-        bool RandomizeOtherSkyElements;
+        bool RandomizeStars;
+        bool RandomizeRainbows;
+        bool RandomizeFireLight;
 
         bool RainbowHueCycle;
 

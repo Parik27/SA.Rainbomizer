@@ -8,6 +8,7 @@
 #include <injector/injector.hpp>
 #include <algorithm>
 #include <vector>
+#include "util/scrpt.hh"
 
 // MODIFY PICKUPS TO SHUFFLE USING CPickups:aPickups ARRAY. COORDS CAN ONLY BE COMPARED / CHANGED THROUGH THE COBJECT POINTERS
 
@@ -31,7 +32,7 @@ struct Pickup
 
 /*******************************************************/
 std::vector<int> PickupsRandomizer::additional_pickups
-    = {1240, 1242, 1247, 1241};
+    = {370, 1210, 1212, 1240, 1242, 1247, 1241, 1581, 2894};
 /*******************************************************/
 int
 RandomizePickup (float x, float y, float z, unsigned int modelId,
@@ -70,7 +71,7 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
             }
              modelId = WeaponRandomizer::GetInstance ()
                 ->GetRandomWeapon (nullptr, modelId, true);
-            if (modelId == 47 || modelId == 20 || modelId == 21)
+            if (modelId >= 47 || modelId == 20 || modelId == 21)
                 {
                     modelId = PickupsRandomizer::additional_pickups[random (
                         PickupsRandomizer::additional_pickups.size () - 1)];
@@ -90,9 +91,29 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
 int
 InitialiseCacheForPickupRandomization (void *fileName)
 {
-    Logger::GetLogger ()->LogMessage ("Pickup Cache Hook");
      WeaponRandomizer::GetInstance()->CachePatterns ();
     return CGame::Init2 (fileName);
+}
+
+/*******************************************************/
+int
+RandomizeWeaponPickup (float x, float y, float z, unsigned int weaponType, 
+    char pickupType, int ammo, char isEmpty, char *message)
+{
+    return RandomizePickup (x, y, z, weaponType, pickupType, ammo, 0, isEmpty,
+                            message);
+}
+
+/*******************************************************/
+bool
+GiveMoneyForBriefcase (unsigned short model, int plrIndex)
+{
+    if (model == 1210)
+    {
+        if (FindPlayerPed ())
+            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2), random(1, 500));
+    }
+    return CallAndReturn <bool, 0x4564F0>(model, plrIndex); //GivePlayerGoodiesWithPickupMI
 }
 
 /*******************************************************/
@@ -109,9 +130,13 @@ PickupsRandomizer::Initialise ()
             injector::MakeCALL (address, (void *) &RandomizePickup);
         }
 
-    // Dead peds
-    injector::MakeCALL (0x4573C2, &RandomizePickup);
-    //injector::MakeCALL (0x156DF52, &RandomizePickup);
+    injector::MakeCALL (0x4592F7, &RandomizeWeaponPickup);
+    injector::MakeCALL (0x5921B5, &RandomizeWeaponPickup);
+
+    for (int address : {0x43989F, 0x457DF2, 0x457F91})
+    {
+        injector::MakeCALL (address, &GiveMoneyForBriefcase);
+    }
 
     injector::MakeCALL (0x53BCA6, (void *) &InitialiseCacheForPickupRandomization);
 

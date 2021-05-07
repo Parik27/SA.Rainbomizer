@@ -5,6 +5,7 @@
 #include "base.hh"
 #include "functions.hh"
 #include "config.hh"
+#include "fades.hh"
 
 BlipRandomizer *BlipRandomizer::mInstance = nullptr;
 static int             northIcon                 = random (2, 63);
@@ -74,6 +75,9 @@ BlipRandomizer::Initialise ()
         });
     for (auto i : {0x444403, 0x47F7FE, 0x48BCA8, 0x48DBE1, 0x5775DD})
         injector::MakeCALL (i, (void *) RandomizeBlipSprite);
+
+    FadesManager::AddFadeCallback (
+        [] { northIcon = random (2, 63); });
 }
 
 /*******************************************************/

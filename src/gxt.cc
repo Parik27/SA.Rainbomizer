@@ -70,8 +70,6 @@ GxtRandomizer::InitialiseStringTable ()
                     AddGxtFile (file);
                     if (p.path ().filename () == "american.gxt")
                     {
-                        Logger::GetLogger ()->LogMessage (
-                                "GXT Filename match");
                         for (int i = 0; i < 3; i++)
                         {
                             std::ifstream fileExtra (p.path ().string (),

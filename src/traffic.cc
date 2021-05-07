@@ -89,7 +89,6 @@ TrafficRandomizer::Initialise ()
     if (m_Config.ForcedVehicleID >= 400 && m_Config.ForcedVehicleID <= 611)
         this->SetForcedRandomCar (m_Config.ForcedVehicleID);
 
-    // TODO: Add Config option
     this->MakeRCsEnterable ();
 
     RegisterHooks ({{HOOK_JUMP, 0x421980, (void *) &RandomizePoliceCars},
@@ -99,9 +98,10 @@ TrafficRandomizer::Initialise ()
                     {HOOK_JUMP, 0x421900, (void *) &RandomizeCarToLoad},
                     {HOOK_CALL, 0x42C620, (void *) &FixEmptyPoliceCars},
                     {HOOK_CALL, 0x501F3B, (void *) &FixFreightTrainCrash},
-                    {HOOK_CALL, 0x61282F, (void *) &FixCopCrash}, 
-                    {HOOK_CALL, 0x462217, (void *) &RandomizeRoadblocks},
-                    {HOOK_CALL, 0x4998F0, (void *) &RandomizeRoadblocks}});
+                    {HOOK_CALL, 0x61282F, (void *) &FixCopCrash},
+                    {HOOK_CALL, 0x462217, (void *) &RandomizeRoadblocks<0x462217>}, // Actual Roadblocks
+                    {HOOK_CALL, 0x4998F0, (void *) &RandomizeRoadblocks<0x4998F0>}, // Scripted Cop Car Spawns
+                    {HOOK_CALL, 0x42B909, (void *) &RandomizeRoadblocks<0x42B909>}}); // Emergency Vehicles + Gang War Cars
 
     this->Install6AF420_Hook ();
 
@@ -114,10 +114,19 @@ TrafficRandomizer::Initialise ()
 }
 
 /*******************************************************/
+template <int address>
 void* __fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx,
                                                int model, char createdBy, char setupSuspensionLines)
 {
     auto trafficRandomizer = TrafficRandomizer::GetInstance ();
+
+    if (model == 416 || model == 407)
+    {
+        CallMethod<0x6B0A90> (vehicle, model, createdBy,
+                                  setupSuspensionLines);
+        return vehicle;
+    }
+
     int  random_id         = StreamingManager::GetRandomLoadedVehicle ();
     if (trafficRandomizer->mForcedCar)
         random_id = trafficRandomizer->mForcedCar;
@@ -258,7 +267,7 @@ LoadRandomVehiclesAtStart ()
                     if (trafficRandomizer->mForcedCar)
                         model = trafficRandomizer->mForcedCar;
                     if (model != -1)
-                        CStreaming::RequestModel (model, 8);
+                        CStreaming::RequestModel (model, 0);
                 }
 
             CStreaming::LoadAllRequestedModels (false);

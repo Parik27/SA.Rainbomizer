@@ -35,6 +35,7 @@ ColourRandomizer *ColourRandomizer::mInstance = nullptr;
 
 // Store RGB colours and light IDs to ensure each one stays consistent without flickering.
 static std::vector<ColourRandomizer::Pattern> colourPatterns;
+static ColourRandomizer::Pattern weaponHUDSprite;
 
 ColourRandomizer::Pattern GetColour (ColourRandomizer::Pattern pattern)
 {
@@ -317,34 +318,57 @@ void RandomizeWeaponSpriteColours (float x, float y, float z, float halfw,
                              float rhw, char intensity, char udir, char vdir)
 {
     CRGBA colour = {r, g, b, a};
-    static CRGBA weaponColour = {-1, -1, -1, -1};
-    if (weaponColour.a == -1)
+    if (address == 0x58D8FD)
+    {
+        colour.r = weaponHUDSprite.colours[0];
+        colour.g = weaponHUDSprite.colours[1];
+        colour.b = weaponHUDSprite.colours[2];
+    }
+    else
+    {
+        static CRGBA weaponColour = {-1, -1, -1, -1};
+        if (weaponColour.a == -1)
             weaponColour = {r, random (255), b, a};
-    colour = weaponColour;
+        colour = weaponColour;
+    }
     colour       = GetRainbowColour (HashColour (colour));
     CSprite::RenderOneXLUSprite (x, y, z, halfw, halfh, colour.r, colour.g,
                                  colour.b, a, rhw, intensity, udir, vdir);
 }
 
 /*******************************************************/
+template <int address>
 void
 RandomizeWeaponEffectColours (float arg1, float arg2, int arg3, int arg4,
                               int arg5, int arg6, float arg7, char r, char g,
                               char b, char a, float arg12, char arg13)
 {
     CRGBA colour = {r, g, b, a};
+    static CRGBA uniqueEffectColour = {r, g, b, -1};
+    if (uniqueEffectColour.a == -1)
+        {
+            uniqueEffectColour = {r, g, random (255), a};
+        }
+    colour = uniqueEffectColour;
     colour       = GetRainbowColour (HashColour (colour));
     CSprite::RenderOneXLUSprite_Triangle (arg1, arg2, arg3, arg4, arg5, arg6, arg7, colour.r, colour.g,
                                  colour.b, a, arg12, arg13);
 }
 
 /*******************************************************/
+template <int address>
 void
 RandomizeMoreWeaponEffectColours (float x, float y, float z, float halfw,
                                  float halfh, char r, char g, char b, char a,
                                  float rhw, float arg11, char intensity)
 {
     CRGBA colour = {r, g, b, a};
+    static CRGBA uniqueEffectColour = {r, g, b, -1};
+    if (uniqueEffectColour.a == -1)
+    {
+        uniqueEffectColour = {r, g, random (255), a};
+    }
+    colour = uniqueEffectColour;
     colour       = GetRainbowColour (HashColour (colour));
     CSprite::RenderOneXLUSprite_Rotate_Aspect (x, y, z, halfw, halfh, colour.r, colour.g,
                                  colour.b, a, rhw, arg11, intensity);
@@ -425,6 +449,34 @@ RandomizeRpLights (RpLight *light, RwRGBAReal *colour)
 }
 
 /*******************************************************/
+template <int address>
+CRGBA *__fastcall AddColourExceptions (CRGBA *thisCol, void *edx, uint8_t r,
+                                        uint8_t g, uint8_t b, uint8_t a)
+{
+    CRGBA colour = {r, g, b, a};
+    if (address == 0x58D978)
+    {
+        colour.r = weaponHUDSprite.colours[0];
+        colour.g = weaponHUDSprite.colours[1];
+        colour.b = weaponHUDSprite.colours[2];
+    }
+    colour       = GetRainbowColour (HashColour (colour));
+    thisCol->r   = colour.r;
+    thisCol->g   = colour.g;
+    thisCol->b   = colour.b;
+    thisCol->a   = a;
+    return thisCol;
+}
+
+/*******************************************************/
+void
+RandomizeBlipColourID (int blip, int colourID)
+{
+    colourID = random (0, 8);
+    Call<0x583AB0> (blip, colourID); // CRadar::ChangeBlipColour
+}
+
+/*******************************************************/
 void
 ColourRandomizer::Initialise ()
 {
@@ -434,13 +486,16 @@ ColourRandomizer::Initialise ()
             std::pair ("RandomizeText", &m_Config.RandomizeText),
             std::pair ("RandomizeLights", &m_Config.RandomizeLights),
             std::pair ("RandomizeClouds", &m_Config.RandomizeClouds),
-            std::pair ("RandomizeOtherSkyElements", &m_Config.RandomizeOtherSkyElements),
+            std::pair ("RandomizeStars", &m_Config.RandomizeStars),
+            std::pair ("RandomizeRainbows", &m_Config.RandomizeRainbows),
+            std::pair ("RandomizeFireLighting", &m_Config.RandomizeFireLight),
             std::pair ("RainbowHueCycle", &m_Config.RainbowHueCycle),
             std::pair ("RandomizeFades", &m_Config.RandomizeFades),
             std::pair ("CrazyMode", &m_Config.CrazyMode)))
         return;
 
     ColourRandomizer::HudRandomizerSeed = random (INT_MAX);
+    weaponHUDSprite = {1, {random (255), random (255), random (255)}};
 
     if (m_Config.RandomizeCarCols)
         RegisterHooks (
@@ -454,13 +509,36 @@ ColourRandomizer::Initialise ()
         {
             RegisterHooks (
                 {{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
-                 {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours}});
+                 {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours},
+                 {HOOK_CALL, 0x721CE0, (void *) &SkipRandomizeColours}});
+
+        injector::MakeCALL (0x58D978, (void *) &AddColourExceptions<0x58D978>); // Fist Sprite
+        injector::MakeCALL (0x586850, (void *) &AddColourExceptions<0x586850>); // Gang Territories
+
+        for (int address :
+             {0x444F5F, 0x44535A, 0x445840, 0x47C698, 0x60CB72, 0x73878A})
+        {
+                injector::MakeCALL (address, (void *) &RandomizeBlipColourID);
+        }
 
         injector::MakeCALL (0x58D8FD, (void *) &RandomizeWeaponSpriteColours <0x58D8FD>); // Weapon Icon
         injector::MakeCALL (0x58E95B, (void *) &RandomizeWeaponSpriteColours<0x58E95B>); // FPS Crosshair 1
         injector::MakeCALL (0x58E9CA, (void *) &RandomizeWeaponSpriteColours<0x58E9CA>); // FPS Crosshair 2
         injector::MakeCALL (0x58EA39, (void *) &RandomizeWeaponSpriteColours<0x58EA39>); // FPS Crosshair 3
         injector::MakeCALL (0x58EAA8, (void *) &RandomizeWeaponSpriteColours<0x58EAA8>); // FPS Crosshair 4
+
+        injector::MakeCALL (0x7433A3, (void *) &RandomizeWeaponEffectColours<0x7433A3>);
+        injector::MakeCALL (0x7434F2, (void *) &RandomizeWeaponEffectColours<0x7434F2>);
+        injector::MakeCALL (0x74378E, (void *) &RandomizeWeaponEffectColours<0x74378E>);
+        injector::MakeCALL (0x7438AB, (void *) &RandomizeWeaponEffectColours<0x7438AB>);
+
+        //injector::MakeCALL (0x56F18B, (void *) &RandomizeMoreWeaponEffectColours<0x56F18B>);
+        //injector::MakeCALL (0x742EAF, (void *) &RandomizeMoreWeaponEffectColours<0x742EAF>);
+        //injector::MakeCALL (0x742F45, (void *) &RandomizeMoreWeaponEffectColours<0x742F45>);
+        //injector::MakeCALL (0x743073, (void *) &RandomizeMoreWeaponEffectColours<0x743073>);
+        //injector::MakeCALL (0x74311D, (void *) &RandomizeMoreWeaponEffectColours<0x74311D>);
+        //injector::MakeCALL (0x743A0A, (void *) &RandomizeMoreWeaponEffectColours<0x743A0A>);
+        //injector::MakeCALL (0x743BD4, (void *) &RandomizeMoreWeaponEffectColours<0x743BD4>);
     }
 
     if (m_Config.RandomizeMarkers)
@@ -473,10 +551,9 @@ ColourRandomizer::Initialise ()
     {
             for (int address :
                  {0x45584E, 0x455F59, 0x456219, 0x47F18E, 0x48BFB4, 0x49DD4C,
-                  0x53B7E0, 0x53B893, 0x53B99C, 0x53BAA5, 0x6ABA60, 0x6ABB35,
-                  0x6ABC69, 0x6BD4DD, 0x6BD531, 0x6C5B1F, 0x6DDF28, 0x6E0D01,
-                  0x6E0DF7, 0x6E1A2D, 0x6E219F, 0x6E2297, 0x6E253E, 0x6E2633,
-                  0x7175C3, 0x7176BA, 0x7177B1, 0x73AAA2})
+                  0x6ABA60, 0x6ABB35, 0x6ABC69, 0x6BD4DD, 0x6BD531, 0x6C5B1F, 
+                  0x6DDF28, 0x6E0D01, 0x6E0DF7, 0x6E1A2D, 0x6E219F, 0x6E2297, 
+                  0x6E253E, 0x6E2633, 0x7175C3, 0x7176BA, 0x7177B1, 0x73AAA2})
                 {
                     injector::MakeCALL (address,
                                         (void *) &RandomizeCoronaColours);
@@ -488,25 +565,25 @@ ColourRandomizer::Initialise ()
                     injector::MakeCALL (address,
                                         (void *) &RandomizeLightColours);
                 }
-
-            for (int address : {0x7433A3, 0x7434F2, 0x74378E, 0x7438AB})
-                {
-                    injector::MakeCALL (address,
-                                        (void *) &RandomizeWeaponEffectColours);
-                }
-
-            for (int address : {0x56F18B, 0x742EAF, 0x742F45, 0x743073,
-                                0x74311D, 0x743A0A, 0x743BD4})
-                {
-                    injector::MakeCALL (
-                        address, (void *) &RandomizeMoreWeaponEffectColours);
-                }
     }
 
-    if (m_Config.RandomizeOtherSkyElements)
+    if (m_Config.RandomizeFireLight)
+    {
+            for (int address : {0x53B7E0, 0x53B893, 0x53B99C, 0x53BAA5})
+            {
+                    injector::MakeCALL (address,
+                                        (void *) &RandomizeCoronaColours);
+            }
+    }
+
+    if (m_Config.RandomizeStars)
     {
         //injector::MakeCALL (0x6FB9A6, (void *) &RandomizeWeatherEffectColours<0x6FB9A6>); // Wet Roads
         injector::MakeCALL (0x713F0F, (void *) &RandomizeWeatherEffectColours<0x713F0F>); // Stars
+    }
+
+    if (m_Config.RandomizeRainbows)
+    {
         injector::MakeCALL (0x714371, (void *) &RandomizeWeatherEffectColours<0x714371>); // Rainbows
     }
 

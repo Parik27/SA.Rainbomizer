@@ -73,11 +73,15 @@ ModifyCredits = true
 [ColourRandomizer]
 
 RandomizeCarCols = true # (Car Colours)
+
 RandomizeMarkers = true # (Mission Markers and Arrows)
 RandomizeText = true # (HUD elements and menu text)
+
 RandomizeLights = true # (Light emitters e.g. light posts, headlights)
 RandomizeClouds = true # (Clouds in the sky)
-RandomizeOtherSkyElements = true # (Stars, rainbows, sun, etc)
+RandomizeStars = true # (Stars at night time)
+RandomizeRainbows = false # (Natural rainbows that can occur after rainfall)
+RandomizeFireLighting = false # (Light effects emitted by fire. WARNING: Hard on eyes)
 
 RainbowHueCycle = false # (All randomized elements will have transition between rainbow colours)
 
@@ -114,7 +118,11 @@ DefaultModel = 0
 #######################################################
 [ScriptVehicleRandomizer]
 
+# Makes time requirements for schools more lenient so that they are completable with slower vehicles
 EnableExtraTimeForSchools = true
+
+# Randomizes the type of trains spawned in missions
+RandomizeTrains = true
 
 # Allow certain vehicle checks for sub-missions or markers to be skipped so they can be activated with any vehicle
 

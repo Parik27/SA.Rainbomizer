@@ -39,7 +39,7 @@ void __fastcall FixFreightTrainCrash (CAEVehicleAudioEntity *audio, void *edx,
                                       cVehicleParams *vehicle_params);
 void __fastcall PlaceOnRoadFix (CVehicle *vehicle, void *edx);
 int ChoosePoliceVehicleBasedOnModel (int model);
-void *__fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx, int model,
+template <int address> void *__fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx, int model,
                                      char createdBy, char setupSuspensionLines);
 
 /// Randomizes cars that spawn in traffic including the police cars

@@ -51,6 +51,7 @@ class WeaponPattern
     {
         bool Extra : 1;
         bool Explosive : 1;
+        bool NoExplode : 1;
         bool Flame : 1;
         bool LongRange : 1;
         bool Goggles : 1;

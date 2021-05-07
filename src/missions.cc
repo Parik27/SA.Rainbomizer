@@ -508,7 +508,7 @@ MissionRandomizer::SetGangTerritoriesForMission (int index)
 {
     bool wars = false;
 
-    if ((ScriptSpace[458] < 1 && ScriptSpace[452] >= 8) || index > 104)
+    if ((ScriptSpace[458] < 2 && ScriptSpace[452] >= 8) || index > 104)
         wars = true;
 
     Scrpt::CallOpcode (0x879, "enable_gang_wars", wars ? 1 : 0);

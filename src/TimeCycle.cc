@@ -133,7 +133,7 @@ void ChangeTimeCycleValues
     *WaterR        = random (255);
     *WaterG        = random (255);
     *WaterB        = random (255);
-    *WaterA        = random (255);
+    *WaterA        = random (30, 255);
     *Alpha1        = random (255);
     *RGB1R         = random (255);
     *RGB1G         = random (255);
@@ -222,6 +222,25 @@ void __fastcall LogTimeCycleValues (CTimeCycleCurrent *timecyc, void *edx, int w
 }
 
 /*******************************************************/
+void __fastcall LogBrightness (int *gamma, void *edx, float brightnessValue, bool changeNow)
+{
+    int menuBrightness = injector::ReadMemory<int> (0xBA6748 + 60);
+    Logger::GetLogger ()->LogMessage ("Brightness: "
+                                      + std::to_string (brightnessValue) 
+        + ", Menu Brightness: " + std::to_string(menuBrightness));
+    CallMethod<0x747200> (gamma, brightnessValue, changeNow);
+}
+
+/*******************************************************/
+int
+ReduceBrightness ()
+{
+    injector::WriteMemory<uint32_t> (0xBA6748 + 60, 0);
+    CallMethod<0x747200>(0xC92134, 0.0f, 1);
+    return CallAndReturn<int, 0x70F9E0>();
+}
+
+/*******************************************************/
 void
 TimeCycleRandomizer::Initialise ()
 {
@@ -249,6 +268,13 @@ TimeCycleRandomizer::Initialise ()
         RegisterHooks ({{HOOK_CALL, 0x5BBCE2, (void *) &ChangeTimeCycleValues}/*,
                         {HOOK_CALL, 0x560613, (void *) &LogTimeCycleValues}*/});
             FadesManager::AddFadeCallback (Call<0x5BBAC0>);
+
+            //for (int address :
+            //     {0x5734E1, 0x573B9A, 0x576D68, 0x576EEC, 0x57CBFF})
+            //{
+            //        injector::MakeCALL (address, (void *) &LogBrightness);
+            //}
+            injector::MakeCALL (0x53BCAB, (void *) &ReduceBrightness);
     }
 
     Logger::GetLogger ()->LogMessage ("Intialised TimeCycleRandomizer");

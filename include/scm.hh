@@ -89,6 +89,7 @@ public:
     static inline struct Config
     {
         bool MoreSchoolTestTime;
+        bool RandomizeTrains;
 
         // Vehicle Checks
         bool SkipLowriderCheck;
@@ -149,6 +150,8 @@ public:
         int   oldRecord         = -1;
         bool  newRecordAchieved = true;
     };
+
+    static inline CVector lastPlayerPos;
 
     void ApplyEOTLFixes (int newFiretruck);
 

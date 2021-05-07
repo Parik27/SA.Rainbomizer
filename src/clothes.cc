@@ -38,13 +38,13 @@ ClothesRandomizer::RandomizePlayerModel ()
             model = 298;
             if (m_Config.ForcedSpecial == "")
                 CStreaming::RequestSpecialModel (
-                    model, GetRandomElement (PedRandomizer::specialModels).c_str (), 1);
+                    model, GetRandomElement (PedRandomizer::specialModels).c_str (), 0);
             else
                 CStreaming::RequestSpecialModel (
-                    model, m_Config.ForcedSpecial.c_str(), 1);
+                    model, m_Config.ForcedSpecial.c_str(), 0);
         }
     else
-        CStreaming::RequestModel (model, 1);
+        CStreaming::RequestModel (model, 0);
 
     CStreaming::LoadAllRequestedModels (false);
 

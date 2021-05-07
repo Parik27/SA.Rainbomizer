@@ -140,8 +140,8 @@ EOTL3StartFix (unsigned char *data)
 void
 LosDesperadosFix (unsigned char *data)
 {
-    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN1", 1, 25);
-    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN2", 1, 25);
+    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN1", 1, 40);
+    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN2", 1, 40);
 }
 
 /*******************************************************/
@@ -268,6 +268,13 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
 
             // remove code setting max wanted level to 0
             Scrpt::CreateNop (data, 19211, 19216);
+            break;
+
+        // Customs Fast Track
+        case 69: 
+            data += 25736; 
+            data = Scrpt::CreateOpcode (0x2, "jump", data, -30732);
+            data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
 
         // End of the Line (3)

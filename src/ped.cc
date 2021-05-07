@@ -87,7 +87,7 @@ PedRandomizer::RandomizeSpecialModels (int slot, const char *modelName,
     if (m_Config.ForcedSpecial != "")
         newModel = m_Config.ForcedSpecial;
 
-    CStreaming::RequestSpecialModel (slot, newModel.c_str (), flags);
+    CStreaming::RequestSpecialModel (slot, newModel.c_str (), 0);
     CStreaming::LoadAllRequestedModels (false);
 }
 
@@ -111,6 +111,33 @@ PedRandomizer::IsSpecialModel (int model)
 
 /*******************************************************/
 void
+CheckDataAboutKilledPeds (CPed *pedKilled, int typeOfWeapon, char wasHeadShot,
+                          int vehicle)
+{
+    char canTriggerGangWar = injector::ReadMemory<char> (0x96AB93);
+    int  numSpecificZones  = injector::ReadMemory<int> (0x96AB94);
+    float gangAnger         = injector::ReadMemory<float> (0x96AB5C);
+    Logger::GetLogger()->LogMessage("Dead Ped Type: "
+                       + std::to_string (pedKilled->m_nPedType));
+    Logger::GetLogger ()->LogMessage (
+        "Gang Info (can trigger, num specific, anger): "
+        + std::to_string ((int) canTriggerGangWar) + ", "
+        + std::to_string (numSpecificZones) + ", "
+        + std::to_string (gangAnger));
+    Call<0x43DCD0>(pedKilled, typeOfWeapon, wasHeadShot, vehicle);
+}
+
+/*******************************************************/
+char
+MakeGangWarsConsistent (int pedType)
+{
+    if (pedType >= 7 && pedType <= 16)
+        pedType = 7;
+    return CallAndReturn<char, 0x443950> (pedType);
+}
+
+/*******************************************************/
+void
 PedRandomizer::Initialise ()
 {
     if (ConfigManager::ReadConfig ("PedRandomizer",
@@ -125,7 +152,7 @@ PedRandomizer::Initialise ()
                   "TORINO",  "JIZZY",  "MADDOGG", "CAT",     "CLAUDE",
                   "RYDER2",  "RYDER3", "EMMET",   "ANDRE",   "KENDL",
                   "JETHRO",  "ZERO",   "TBONE",   "SINDACO", "JANITOR",
-                  "BBTHIN",  "SMOKEV", "GUNGRL2", "COPGRL2", "NURGRL2",
+                  "BBTHIN",  "SMOKEV", "GUNGRL2", "NURGRL2",
                   "CROGRL2", "BB",     "SUZIE",   "PSYCHO"})
                 specialModels.push_back (model);
 
@@ -159,6 +186,15 @@ PedRandomizer::Initialise ()
         RegisterHooks (
                 {{HOOK_CALL, 0x5E4890, (void *) RandomizePedModelIndex}});
     }
+
+    if (m_Config.RandomizeGangMembers)
+        injector::MakeCALL (0x43DEE9, (void *) MakeGangWarsConsistent);
+
+    //RegisterHooks ({{HOOK_CALL, 0x4B93AA, (void *) &CheckDataAboutKilledPeds},
+    //                {HOOK_CALL, 0x6D1CBC, (void *) &CheckDataAboutKilledPeds},
+    //                {HOOK_CALL, 0x6D1D27, (void *) &CheckDataAboutKilledPeds},
+    //                {HOOK_CALL, 0x6D2276, (void *) &CheckDataAboutKilledPeds},
+    //                {HOOK_CALL, 0x6D22B7, (void *) &CheckDataAboutKilledPeds}});
 
     Logger::GetLogger ()->LogMessage ("Intialised PedRandomizer");
 }

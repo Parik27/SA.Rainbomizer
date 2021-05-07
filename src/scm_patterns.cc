@@ -139,6 +139,9 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
     if (mFlags.Spray && vehID != 407 && vehID != 601)
         return false;
 
+    if (mFlags.NoTank && vehID == 432)
+        return false;
+
     if (GetThreadName () == "heist4" && GetOriginalVehicle () == 443
         && vehID == 432)
         return false;
@@ -229,6 +232,8 @@ ScriptVehiclePattern::ReadFlag (const std::string &flag)
         mFlags.CarryObjects = true;
     else if (flag == "spray")
         mFlags.Spray = true;
+    else if (flag == "notank")
+        mFlags.NoTank = true;
 
     // Coordinates
     else if (flag.find ("x=") == 0)

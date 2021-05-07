@@ -517,7 +517,10 @@ struct CVehicle
 {
     uint8_t              __pad[0x22];
     uint16_t             m_nModelIndex;
-    uint8_t              __pad24[864];
+    uint8_t              __pad24[104];
+    float                m_fMass;
+    float                m_fTurnMass;
+    uint8_t              __pad94[752];
     tHandlingData *      m_pHandling;
     tFlyingHandlingData *m_pFlyingHandling;
     uint8_t              m_nFlags[8];
@@ -882,6 +885,12 @@ struct CAEPedSpeechAudioEntity
     char field_0x00[0x100];
 };
 
+struct CMenuManager
+{
+    char field_0x00[0x3c];
+    float m_dwBrightness;
+};
+
 struct CPed
 {
     int              vtable;
@@ -923,6 +932,8 @@ struct CEntity
     int              vtable;
     cSimpleTransform m_SimpleTransform;
     CMatrixLink *    m_pMatrix;
+    char             __pad018[10];
+    short            m_nModelIndex;
 
     cSimpleTransform *GetPosition ();
     int               SetHeading (float heading);

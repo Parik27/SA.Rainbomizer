@@ -94,6 +94,10 @@ WeaponPattern::DoesWeaponMatchPattern (int weaponID)
         && weaponID != 18 && weaponID != 35 && weaponID != 36)
         return false;
 
+    if (mFlags.NoExplode && (weaponID == 16 || weaponID == 35 
+        || weaponID == 36 || weaponID == 37 || weaponID == 39))
+        return false;
+
     // Type check (it has to be allowed)
     if (!mAllowedTypes.GetValue (weaponID))
         return false;
@@ -146,7 +150,7 @@ WeaponPattern::MatchWeapon (int weaponID, int ped,
     if (weaponID != GetOriginalWeapon ()
         || (!CRunningScripts::CheckForRunningScript (GetThreadName ().c_str ())
             && GetThreadName () != "any") 
-        || (ped != GetPedType() && ped != -1) || pickup != GetPickup())
+        || (ped != GetPedType() && GetPedType() != -1) || pickup != GetPickup())
         return false;
 
     return true;
@@ -162,6 +166,8 @@ WeaponPattern::ReadFlag (const std::string &flag)
         mFlags.Extra = true;
     else if (flag == "explosive")
         mFlags.Explosive = true;
+    else if (flag == "noexplosives")
+        mFlags.NoExplode = true;
     else if (flag == "flame")
         mFlags.Flame = true;
     else if (flag == "longrange")

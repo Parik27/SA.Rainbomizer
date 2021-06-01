@@ -16,6 +16,8 @@ public:
         bool Unprotect     = true;
         int  AutoSaveSlot  = 8;
         bool ModifyCredits = true;
+
+        Config () {}
     } m_Config;
 
     /// Initialises Hooks/etc.

@@ -64,6 +64,8 @@ class MissionRandomizer
 
         bool PreserveMomentum    = true;
         bool DisableMainSCMCheck = false;
+
+        Config () {}
     } m_Config;
 
     MissionRandomizer (){};

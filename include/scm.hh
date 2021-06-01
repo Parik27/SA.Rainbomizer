@@ -126,16 +126,16 @@ public:
     // Struct for RC heli magnet sections
     struct RCHeliMagnet
     {
-        int  currentObj = 0;
-        int  objHandles[17];
-        int  vehID             = 0;
-        bool isPlayerInVeh     = false;
-        bool isCutsceneActive  = false;
-        int  objectAttached    = -1;
-        int  pickUpObjectTimer = 1000;
-        int  fakeColHandle     = 0;
-        int  invalidHandle     = 0;
-        bool atMagnetSection   = false;
+        int  currentObj              = 0;
+        int  objHandles[17]          = {0};
+        int  vehID                   = 0;
+        bool isPlayerInVeh           = false;
+        bool isCutsceneActive        = false;
+        int  objectAttached          = -1;
+        int  pickUpObjectTimer       = 1000;
+        int  fakeColHandle           = 0;
+        int  invalidHandle           = 0;
+        bool atMagnetSection         = false;
         int  checkForObjectExistence = -1;
     };
 

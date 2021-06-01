@@ -36,39 +36,44 @@ ChangeForceWeather (short weather)
 
 /*******************************************************/
 void
-ShuffleWeatherRegions (CVector *coors)
+ShuffleWeatherRegions (CVector *p1)
 {
-    if (!coors)
-        coors = &FindPlayerCoors ();
-    if (coors->x <= 1000.0f || coors->y <= 910.0f)
-    {
-        if (coors->x <= -850.0f || coors->x >= 1000.0f || coors->y <= 1280.0f)
+    CVector coors  = p1 ? *p1 : FindPlayerCoors ();
+    short   region = 0;
+
+    if (coors.x <= 1000.0f || coors.y <= 910.0f)
         {
-            if (coors->x >= -1430.0f || coors->y <= -580.0f || coors->y >= 1430.0f)
-            {
-                if (coors->x <= 250.0f || coors->x >= 3000.0f || coors->y <= -3000.0f || coors->y >= -850.0f)
+            if (coors.x <= -850.0f || coors.x >= 1000.0f || coors.y <= 1280.0f)
                 {
-                    injector::WriteMemory<short> (0xC81314, weatherRegions[0]);
+                    if (coors.x >= -1430.0f || coors.y <= -580.0f
+                        || coors.y >= 1430.0f)
+                        {
+                            if (coors.x <= 250.0f || coors.x >= 3000.0f
+                                || coors.y <= -3000.0f || coors.y >= -850.0f)
+                                {
+                                    region = 0;
+                                }
+                            else
+                                {
+                                    region = 1;
+                                }
+                        }
+                    else
+                        {
+                            region = 2;
+                        }
                 }
-                else
-                {
-                    injector::WriteMemory<short> (0xC81314, weatherRegions[1]);
-                }
-            }
             else
-            {
-                injector::WriteMemory<short> (0xC81314, weatherRegions[2]);
-            }
+                {
+                    region = 4;
+                }
         }
-        else
-        {
-            injector::WriteMemory<short> (0xC81314, weatherRegions[4]);
-        }
-    }
     else
-    {
-        injector::WriteMemory<short> (0xC81314, weatherRegions[3]);
-    }
+        {
+            region = 3;
+        }
+
+    injector::WriteMemory<short> (0xC81314, weatherRegions[region]);
 }
 
 /*******************************************************/
@@ -135,109 +140,17 @@ void ChangeTimeCycleValues
     *WaterB        = random (255);
     *WaterA        = random (30, 255);
     *Alpha1        = random (255);
-    *RGB1R         = random (255);
-    *RGB1G         = random (255);
-    *RGB1B         = random (255);
+    *RGB1R         = random (100);
+    *RGB1G         = random (100);
+    *RGB1B         = random (100);
     *Alpha2        = random (255);
-    *RGB2R         = random (255);
-    *RGB2G         = random (255);
-    *RGB2B         = random (255);
+    *RGB2R         = random (100);
+    *RGB2G         = random (100);
+    *RGB2B         = random (100);
     *CloudAlpha1   = random (255);
     *CloudAlpha2   = random (255);
     *CloudAlpha3   = random (255);
     *Illumination  = 0;
-}
-
-/*******************************************************/
-void __fastcall LogTimeCycleValues (CTimeCycleCurrent *timecyc, void *edx, int weatherID,
-                            int timeID)
-{
-    CallMethod<0x55F4B0> (timecyc, weatherID, timeID);
-    Logger::GetLogger()->LogMessage("Amb RGB: " + std::to_string(timecyc->m_fAmbientRed) + ", " + std::to_string(timecyc->m_fAmbientGreen) + ", " + std::to_string(timecyc->m_fAmbientBlue));
-    Logger::GetLogger ()->LogMessage (
-        "Amb Obj RGB: " + std::to_string (timecyc->m_fAmbientRed_Obj) + ", "
-        + std::to_string (timecyc->m_fAmbientGreen_Obj) + ", "
-        + std::to_string (timecyc->m_fAmbientBlue_Obj));
-    Logger::GetLogger ()->LogMessage (
-        "Sky Top RGB: " + std::to_string (timecyc->m_wSkyTopRed) + ", "
-        + std::to_string (timecyc->m_wSkyTopGreen) + ", "
-        + std::to_string (timecyc->m_wSkyTopBlue));
-    Logger::GetLogger ()->LogMessage (
-        "Sky Bottom RGB: " + std::to_string (timecyc->m_wSkyBottomRed) + ", "
-        + std::to_string (timecyc->m_wSkyBottomGreen) + ", "
-        + std::to_string (timecyc->m_wSkyBottomBlue));
-    Logger::GetLogger ()->LogMessage (
-        "Sun Core RGB: " + std::to_string (timecyc->m_wSunCoreRed) + ", "
-        + std::to_string (timecyc->m_wSunCoreGreen) + ", "
-        + std::to_string (timecyc->m_wSunCoreBlue));
-    Logger::GetLogger ()->LogMessage (
-        "Sun Corona RGB: " + std::to_string (timecyc->m_wSunCoronaRed) + ", "
-        + std::to_string (timecyc->m_wSunCoronaGreen) + ", "
-        + std::to_string (timecyc->m_wSunCoronaBlue));
-    Logger::GetLogger ()->LogMessage (
-        "Sun Size: " + std::to_string (timecyc->m_fSunSize));
-    Logger::GetLogger ()->LogMessage ("Sprite Size: "
-                                      + std::to_string (timecyc->m_fSpriteSize));
-    Logger::GetLogger ()->LogMessage (
-        "Sprite Brightness: " + std::to_string (timecyc->m_fSpriteBrightness));
-    Logger::GetLogger ()->LogMessage (
-        "Shadows (base, light, pole): "
-        + std::to_string (timecyc->m_wShadowStrength) + ", "
-        + std::to_string (timecyc->m_wLightShadowStrength) + ", "
-        + std::to_string (timecyc->m_wPoleShadowStrength));
-    Logger::GetLogger ()->LogMessage ("Far Clip: "
-                                      + std::to_string (timecyc->m_fFarClip));
-    Logger::GetLogger ()->LogMessage ("Fog Strength: "
-                                      + std::to_string (timecyc->m_fFogSt));
-    Logger::GetLogger ()->LogMessage ("Light On Ground: "
-                                      + std::to_string (timecyc->m_fLightOnGround));
-    Logger::GetLogger ()->LogMessage (
-        "Low Clouds RGB: " + std::to_string (timecyc->m_wLowCloudsRed) + ", "
-        + std::to_string (timecyc->m_wLowCloudsGreen) + ", "
-        + std::to_string (timecyc->m_wLowCloudsBlue));
-    Logger::GetLogger ()->LogMessage (
-        "Bottom Clouds RGB: " + std::to_string (timecyc->m_wBottomCloudsRed) + ", " + std::to_string (timecyc->m_wBottomCloudsGreen) + ", "
-        + std::to_string (timecyc->m_wBottomCloudsBlue));
-    Logger::GetLogger ()->LogMessage (
-        "Water RGBA: " + std::to_string (timecyc->m_fWaterRed) + ", "
-        + std::to_string (timecyc->m_fWaterGreen) + ", "
-        + std::to_string (timecyc->m_fWaterBlue) + ", "
-        + std::to_string (timecyc->m_fWaterAlpha));
-    Logger::GetLogger ()->LogMessage (
-        "RGBA1: " + std::to_string (timecyc->m_fRGB1_R) + ", "
-        + std::to_string (timecyc->m_fRGB1_G) + ", "
-        + std::to_string (timecyc->m_fRGB1_B) + ", "
-        + std::to_string (timecyc->m_fAlpha1));
-    Logger::GetLogger ()->LogMessage (
-        "RGBA2: " + std::to_string (timecyc->m_fRGB2_R) + ", "
-        + std::to_string (timecyc->m_fRGB2_G) + ", "
-        + std::to_string (timecyc->m_fRGB2_B) + ", "
-        + std::to_string (timecyc->m_fAlpha2));
-    Logger::GetLogger ()->LogMessage (
-        "Cloud Alphas 1, 2, 3: " + std::to_string (timecyc->m_fCloudAlpha1) + ", "
-        + std::to_string (timecyc->m_dwCloudAlpha2) + ", "
-        + std::to_string (timecyc->m_wCloudAlpha3));
-    Logger::GetLogger ()->LogMessage (
-        "Illumination: " + std::to_string (timecyc->m_fIllumination) + "\n");
-}
-
-/*******************************************************/
-void __fastcall LogBrightness (int *gamma, void *edx, float brightnessValue, bool changeNow)
-{
-    int menuBrightness = injector::ReadMemory<int> (0xBA6748 + 60);
-    Logger::GetLogger ()->LogMessage ("Brightness: "
-                                      + std::to_string (brightnessValue) 
-        + ", Menu Brightness: " + std::to_string(menuBrightness));
-    CallMethod<0x747200> (gamma, brightnessValue, changeNow);
-}
-
-/*******************************************************/
-int
-ReduceBrightness ()
-{
-    injector::WriteMemory<uint32_t> (0xBA6748 + 60, 0);
-    CallMethod<0x747200>(0xC92134, 0.0f, 1);
-    return CallAndReturn<int, 0x70F9E0>();
 }
 
 /*******************************************************/
@@ -265,16 +178,8 @@ TimeCycleRandomizer::Initialise ()
 
     if (m_Config.RandomizeTimeCycle)
     {
-        RegisterHooks ({{HOOK_CALL, 0x5BBCE2, (void *) &ChangeTimeCycleValues}/*,
-                        {HOOK_CALL, 0x560613, (void *) &LogTimeCycleValues}*/});
+        RegisterHooks ({{HOOK_CALL, 0x5BBCE2, (void *) &ChangeTimeCycleValues}});
             FadesManager::AddFadeCallback (Call<0x5BBAC0>);
-
-            //for (int address :
-            //     {0x5734E1, 0x573B9A, 0x576D68, 0x576EEC, 0x57CBFF})
-            //{
-            //        injector::MakeCALL (address, (void *) &LogBrightness);
-            //}
-            injector::MakeCALL (0x53BCAB, (void *) &ReduceBrightness);
     }
 
     Logger::GetLogger ()->LogMessage ("Intialised TimeCycleRandomizer");

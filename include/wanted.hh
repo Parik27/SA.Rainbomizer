@@ -8,6 +8,8 @@ class WantedLevelRandomizer
     {
         bool RandomizeMission = true;
         bool RandomizeChaos;
+
+        Config () {}
     } m_Config;
 
     WantedLevelRandomizer (){};

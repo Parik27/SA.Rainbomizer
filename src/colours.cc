@@ -143,7 +143,7 @@ GetRainbowColour (int offset)
     return {colour[0], colour[1], colour[2]};
 }
 
-constexpr int
+int
 HashColour (const CRGBA &colour)
 {
     return (((colour.r + ColourRandomizer::HudRandomizerSeed) % 255) * 255

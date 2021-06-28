@@ -2328,6 +2328,7 @@ ScriptVehicleRandomizer::Initialise ()
     if (!ConfigManager::ReadConfig ("ScriptVehicleRandomizer", 
         std::pair ("EnableExtraTimeForSchools", &m_Config.MoreSchoolTestTime),
         std::pair ("RandomizeTrains", &m_Config.RandomizeTrains),
+
         std::pair ("LowriderMissions", &m_Config.SkipLowriderCheck),
         std::pair ("WuZiMu", &m_Config.SkipWuZiMuCheck),
         std::pair ("SweetsGirl", &m_Config.SkipSweetsGirlCheck),
@@ -2335,13 +2336,18 @@ ScriptVehicleRandomizer::Initialise ()
         std::pair ("BMXChallenge", &m_Config.SkipBMXChallengeCheck),
         std::pair("NRG500Challenge", &m_Config.SkipNRGChallengeCheck),
         std::pair("ChiliadChallenge", &m_Config.SkipChiliadCheck),
+
         std::pair("TaxiMissions", &m_Config.Taxi),
         std::pair ("Firefighting", &m_Config.Firefighting), 
         std::pair ("Burglary", &m_Config.Burglary), 
         std::pair ("Pimping", &m_Config.Pimping), 
         std::pair ("Paramedic", &m_Config.Paramedic), 
         std::pair ("Courier", &m_Config.Courier), 
-        std::pair ("BikeChallenges", &m_Config.Bike)))
+        std::pair ("BikeChallenges", &m_Config.Bike),
+        
+        std::pair ("ForcedVehicleId", &m_Config.ForcedVehicle),
+        std::pair ("UseGenericPatterns", &m_Config.GenericPatterns),
+        std::pair ("SkipChecks", &m_Config.SkipChecks)))
     return;
 
     TrafficRandomizer::GetInstance ()->MakeRCsEnterable ();

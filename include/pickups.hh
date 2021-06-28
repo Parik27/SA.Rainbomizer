@@ -1,6 +1,7 @@
 
 #pragma once
 #include <vector>
+#include <string>
 
 class PickupsRandomizer
 {
@@ -12,6 +13,18 @@ class PickupsRandomizer
 public:
     /// Returns the static instance for PickupsRandomizer.
     static PickupsRandomizer *GetInstance ();
+
+    static inline struct Config
+    {
+        bool RandomizeDeadPed;
+        bool ReplaceWithWeaponsOnly;
+        bool MoneyFromPickups;
+
+        std::string PickupsSeed;
+        int         PickupsSeedHash = 0;
+
+        bool SkipChecks;
+    } m_Config;
 
     /// Initialises Hooks/etc.
     void Initialise ();

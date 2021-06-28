@@ -53,18 +53,24 @@ public:
     static inline struct Config
     {
         bool RandomizeCarCols;
+        bool ChangeCarColsFade;
         bool RandomizeMarkers;
         bool RandomizeText;
+        bool RandomizeWeaponSprites;
+        bool OldColourRandomization;
+
         bool RandomizeLights;
+        bool ConsistentLights;
         bool RandomizeClouds;
         bool RandomizeStars;
         bool RandomizeRainbows;
         bool RandomizeFireLight;
+        bool ChangeOnFade;
 
         bool RainbowHueCycle;
 
         bool RandomizeFades;
-        bool                 CrazyMode;
+        bool CrazyMode;
     } m_Config;
 
     inline static std::uint32_t HudRandomizerSeed = 0;

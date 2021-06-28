@@ -378,7 +378,8 @@ WeaponRandomizer::Initialise ()
     }
 
     if (!ConfigManager::ReadConfig ("WeaponRandomizer",
-            std::pair("RandomizePlayerWeapons", &m_Config.RandomizePlayerWeapons)))
+            std::pair("RandomizePlayerWeapons", &m_Config.RandomizePlayerWeapons),
+            std::pair("SkipChecks", &m_Config.SkipChecks)))
         return;
 
     // CPed::GiveWeapon

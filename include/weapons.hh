@@ -23,6 +23,7 @@ public:
     static inline struct Config
     {
         bool RandomizePlayerWeapons;
+        bool SkipChecks;
     } m_Config;
 
     int GetRandomWeapon (CPed *ped, int weapon, bool isPickup);

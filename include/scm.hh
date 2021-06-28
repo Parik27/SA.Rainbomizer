@@ -109,6 +109,10 @@ public:
         bool Courier;
         bool Bike;
 
+        int ForcedVehicle;
+        bool GenericPatterns;
+        bool SkipChecks;
+
     } m_Config;
 
     uint8_t mSeatsCache[212];

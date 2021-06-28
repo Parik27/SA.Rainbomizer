@@ -483,13 +483,20 @@ ColourRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig ("ColourRandomizer", 
             std::pair ("RandomizeCarCols", &m_Config.RandomizeCarCols),
+            std::pair ("ChangeCarColsOnFade", &m_Config.ChangeCarColsFade),
             std::pair ("RandomizeMarkers", &m_Config.RandomizeMarkers),
             std::pair ("RandomizeText", &m_Config.RandomizeText),
+            std::pair ("RandomizeWeaponSprites", &m_Config.RandomizeWeaponSprites),
+            std::pair ("UseMinimalistTextRandomization", &m_Config.OldColourRandomization),
+
             std::pair ("RandomizeLights", &m_Config.RandomizeLights),
+            std::pair ("ConsistentLights", &m_Config.ConsistentLights),
             std::pair ("RandomizeClouds", &m_Config.RandomizeClouds),
             std::pair ("RandomizeStars", &m_Config.RandomizeStars),
             std::pair ("RandomizeRainbows", &m_Config.RandomizeRainbows),
             std::pair ("RandomizeFireLighting", &m_Config.RandomizeFireLight),
+            std::pair ("ChangeOnFade", &m_Config.ChangeOnFade),
+
             std::pair ("RainbowHueCycle", &m_Config.RainbowHueCycle),
             std::pair ("RandomizeFades", &m_Config.RandomizeFades),
             std::pair ("CrazyMode", &m_Config.CrazyMode)))

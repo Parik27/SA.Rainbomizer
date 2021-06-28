@@ -38,60 +38,47 @@ PlayPickupSound (int soundType)
 }
 
 /*******************************************************/
-int
-RandomizePickup (float x, float y, float z, unsigned int modelId,
-                 char pickupType, int ammo, unsigned int moneyPerDay,
-                 char isEmpty, char *message)
+unsigned int
+SelectRandomPickup (unsigned int modelId, bool isDeadPed)
 {
-    //std::vector<Pickup> pickups;
-
-    //for (int i = 0; i < 620; i++)
-    //{
-    //    CPickup *pickup = aPickups + (i * 32);
-    //    if (!pickup->m_PickupType || pickup->m_PickupType == 4
-    //        || pickup->m_PickupType == 5 || pickup->m_PickupType == 8)
-    //        continue;
-    //    pickups.push_back ({i, *pickup});
-    //}
-
-    //if (!pickups.empty())
-    //{
-    //        Pickup  otherPickup = GetRandomElement (pickups);
-    //        CVector pos1
-    //            = otherPickup.pickup.m_pObject->m_SimpleTransform.m_vPosn;
-    //        CVector pos2                                            = {x, y, z};
-    //        otherPickup.pickup.m_pObject->m_SimpleTransform.m_vPosn = pos2;
-    //        x                                                       = pos1.x;
-    //        y                                                       = pos1.y;
-    //        z                                                       = pos1.z;
-    //}
-
-    std::vector<int> additional_pickups = {370, 1240, 1240, 1240, 1242, 1242, 1242,
+    std::vector<int> additional_pickups
+        = {370,  1240, 1240, 1240, 1242, 1242, 1242,
            1247, 1247, 1241, 1241, 1581, 2894, 1550};
 
-    if (modelId == 5000)
+    if (isDeadPed)
         additional_pickups.push_back (1210);
 
     if (modelId != 1212 && modelId != 953 && modelId != 954 && modelId != 1253
         && modelId != 370 && modelId != 1277)
         {
             if (weaponToModel.find (modelId) != weaponToModel.end ())
-            {
-                modelId = weaponToModel[modelId];
-            }
-             modelId = WeaponRandomizer::GetInstance ()
-                ->GetRandomWeapon (nullptr, modelId, true);
+                {
+                    modelId = weaponToModel[modelId];
+                }
+            modelId
+                = WeaponRandomizer::GetInstance ()->GetRandomWeapon (nullptr,
+                                                                     modelId,
+                                                                     true);
             if (modelId >= 47 || modelId == 20 || modelId == 21)
                 {
                     modelId = additional_pickups[random (
                         additional_pickups.size () - 1)];
                 }
             else if (find (additional_pickups.begin (),
-                           additional_pickups.end (),
-                           modelId)
+                           additional_pickups.end (), modelId)
                      == additional_pickups.end ())
                 modelId = GetWeaponInfo (modelId, 1)[3];
         }
+    return modelId;
+}
+
+/*******************************************************/
+int
+RandomizePickup (float x, float y, float z, unsigned int modelId,
+                 char pickupType, int ammo, unsigned int moneyPerDay,
+                 char isEmpty, char *message)
+{
+    modelId = SelectRandomPickup (modelId, false);
 
     return CPickups::GenerateNewOne (x, y, z, modelId, pickupType, ammo,
                                      moneyPerDay, isEmpty, message);
@@ -110,8 +97,9 @@ int
 RandomizeWeaponPickup (float x, float y, float z, unsigned int weaponType, 
     char pickupType, int ammo, char isEmpty, char *message)
 {
-    return RandomizePickup (x, y, z, 5000, pickupType, ammo, 0, isEmpty,
-                            message);
+    weaponType = SelectRandomPickup (weaponType, true);
+    return CPickups::GenerateNewOne (x, y, z, weaponType, pickupType, ammo,
+                                     0, isEmpty, message);
 }
 
 /*******************************************************/
@@ -143,7 +131,12 @@ GiveMoneyForBriefcase (unsigned short model, int plrIndex)
 void
 PickupsRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("PickupsRandomizer"))
+    if (!ConfigManager::ReadConfig ("PickupsRandomizer",
+            std::pair ("RandomizePedWeaponDrops", &m_Config.RandomizeDeadPed),
+            std::pair ("ReplaceWithWeaponsOnly", &m_Config.ReplaceWithWeaponsOnly),
+            std::pair("MoneyFromRandomPickups", &m_Config.MoneyFromPickups),
+            std::pair ("PickupsCustomSeed", &m_Config.PickupsSeed),
+            std::pair ("SkipChecks", &m_Config.SkipChecks)))
         return;
 
     for (int address :

@@ -151,8 +151,8 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
             || vehID == 476 || vehID == 520))
         return false;
 
-    if (GetThreadName () == "heist4" && GetOriginalVehicle () == 443
-        && vehID == 432)
+    if ((GetThreadName () == "zero2" || GetThreadName () == "zero5")  
+        && GetOriginalVehicle () == 464 && vehID == 520)
         return false;
 
     // Type check (it has to be both not moved and allowed)

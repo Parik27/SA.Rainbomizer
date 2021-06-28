@@ -73,15 +73,28 @@ ModifyCredits = true
 [ColourRandomizer]
 
 RandomizeCarCols = true # (Car Colours)
+ChangeCarColsOnFade = true # (Re-randomizes car colours on every fade)
 
 RandomizeMarkers = true # (Mission Markers and Arrows)
 RandomizeText = true # (HUD elements and menu text)
+RandomizeWeaponSprites = true # (Weapon icons visible in the top right of the HUD)
+
+# Set to true to use older style of text colour randomization from previous versions
+# This means elements such as subtitles, the in-game time, etc, are not randomized.
+# Also disables weapon sprite colour randomization if enabled.
+UseMinimalistTextRandomization = false
 
 RandomizeLights = true # (Light emitters e.g. light posts, headlights)
+
+# Set to true to make random light colours consistent between every light of that type
+# rather than a different light colour for every single light.
+ConsistentLights = false
+
 RandomizeClouds = true # (Clouds in the sky)
 RandomizeStars = true # (Stars at night time)
 RandomizeRainbows = false # (Natural rainbows that can occur after rainfall)
 RandomizeFireLighting = false # (Light effects emitted by fire. WARNING: Hard on eyes)
+ChangeOnFade = true # (Re-randomizes all randomized colours other than car colours every fade)
 
 RainbowHueCycle = false # (All randomized elements will have transition between rainbow colours)
 
@@ -144,7 +157,23 @@ Paramedic = true
 Courier = true
 BikeChallenges = true
 
-# Gives you any vehicle for every mission (You might not be able to proceed with missions with this enabled)
+# Forces every script vehicle to be replaced by one of your choice.
+# Set to -1 to not force a vehicle.
+ForcedVehicleId = -1
+
+# Uses a generic set of rules for randomizing vehicles that doesn't require patterns.
+# By default, the Rainbomizer will randomize any vehicle with any other vehicle.
+# The main game has patterns to only allow vehicles that are possible for all scenarios.
+# Setting this to true will randomize vehicles in such a way that they match their original type and number of seats.
+# This results in less variation but guaranteed compatability with other mods and changes.
+# Can also be used if you want to keep vehicles from being too crazy.
+# By default the mod should use this setting automatically for unrecognised scripts,
+# however if it fails to do so and you want to combine the Rainbomizer with something else, set to true.
+UseGenericPatterns = false
+
+# Gives you any vehicle for every mission and ignores all VehiclePatterns.txt patterns
+# Please note that the pre-created patterns already allow all possible and stable vehicles for every mission
+# So expect additional softlocks and crashes using this.
 SkipChecks = false
 
 #######################################################
@@ -179,12 +208,26 @@ DisableMainScmCheck = false # Allow custom main.scm's to run with mission random
 RandomizePlayerWeapons = true
 SkipChecks = false # Checks related to weapons required for certain missions
 		   # You might not be able to complete some missions
-		   # without this enabled.
+		   # if this is true.
 
 #######################################################
 [PickupsRandomizer]
 
-ReplaceWithWeaponsOnly = true # Does nothing yet
+# Randomizes the weapons dropped by dead peds.
+RandomizePedWeaponDrops = true
+
+ReplaceWithWeaponsOnly = false # Randomizes only weapon-type pickups with other weapons.
+
+# Randomize money to be given by certain random pickups
+MoneyFromRandomPickups = true
+
+# Custom pickups seed - useful to guarantee a particular set of pickup spawns for races.
+# If empty, the seed will be random.
+PickupsCustomSeed = ""
+
+SkipChecks = false # Checks related to weapons required for certain missions
+		   # You might not be able to complete some missions
+		   # if this is true.
 
 #######################################################
 [PlayerRandomizer]
@@ -291,6 +334,10 @@ EnableEasterEgg = true
 # Colour Randomizer
 # Randomizes the colours of various in-game elements, including cars, the HUD, and fades. 
 
+# Timecycle Randomizer
+# Randomizes the appearance and colours of the sky, water, lighting, and other time-based elements.
+# Can also randomize the occurrence of weather.
+
 # Traffic Randomizer
 # Randomizes cars that spawn in traffic including law enforcement vehicles.
 
@@ -328,6 +375,11 @@ EnableEasterEgg = true
 
 # License Plate Randomizer
 # Randomizes the license plates of vehicles to random words from the game script.
+
+# Riot Randomizer
+# Activates a chance for the game's riot mode to activate briefly as you play the game.
+# Traffic Lights can also be randomized as part of this so that the 
+# time and order of lights is random rather than on a cycle.
 
 # Police Heli Randomizer
 # Randomizes the helicopters that the police spawn in with working spotlight and gun.

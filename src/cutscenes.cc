@@ -184,10 +184,17 @@ CutsceneRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig ("CutsceneRandomizer",
             std::pair ("RandomizeModels", &m_Config.RandomizeModels),
+            std::pair ("UseOnlyNormalCutsceneModels", &m_Config.NoBrokenJaws),
             std::pair ("RandomizeLocations", &m_Config.RandomizeLocation)))
         return;
 
-    FILE *modelFile = OpenRainbomizerFile ("Cutscene_Models.txt", "r", "data/");
+    std::string fileName;
+    if (m_Config.NoBrokenJaws)
+        fileName = "Cutscene_Models2.txt";
+    else
+        fileName = "Cutscene_Models.txt";
+
+    FILE * modelFile = OpenRainbomizerFile (fileName, "r", "data/");
     if (modelFile && m_Config.RandomizeModels)
         {
             char line[512] = {0};
@@ -209,7 +216,7 @@ CutsceneRandomizer::Initialise ()
         {
             // Log a message if file wasn't found
             Logger::GetLogger ()->LogMessage (
-                "Failed to read file: rainbomizer/data/Cutscene_Models.txt");
+                "Failed to read file: rainbomizer/data/" + fileName);
             Logger::GetLogger ()->LogMessage (
                 "Cutscene models will not be randomized");
         }

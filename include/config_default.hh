@@ -232,6 +232,10 @@ ForcedSpecialModel = ""
 [CutsceneRandomizer]
 
 RandomizeModels = true
+
+# Set to true to only randomize cutscene peds between other peds with proper facial animations (a.k.a. no missing jaws).
+UseOnlyNormalCutsceneModels = false
+
 RandomizeLocations = true
 
 #######################################################
@@ -242,6 +246,9 @@ MatchSubtitles = true
 # Randomizes the type of speech event a ped uses when they're about to speak
 # For example, a line about bumping into someone could become a line about falling to your death.
 RandomizeGenericPedSpeech = true
+
+# Randomizes generic frontend audio sound effects (mostly bleep and bloop sounds).
+RandomizeGenericSfx = true
 
 # Force a single voice line. Set to -1 for normal randomization.
 ForcedAudioLine = -1
@@ -313,7 +320,7 @@ EnableEasterEgg = true
 
 # Voice Line Randomizer	
 # Randomizes dialogue spoken by characters in missions. (Requires original AudioEvents.txt)
-# Can also randomize generic ped lines with a config option.
+# Can also randomize generic ped lines and some other types of sound effects.
 
 # Language Randomizer
 # Randomizes the language of text (except for subtitles when using Voice Line Randomizer). 

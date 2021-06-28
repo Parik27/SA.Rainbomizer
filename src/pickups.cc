@@ -31,8 +31,12 @@ struct Pickup
 };
 
 /*******************************************************/
-std::vector<int> PickupsRandomizer::additional_pickups
-    = {370, 1210, 1212, 1240, 1242, 1247, 1241, 1581, 2894};
+void
+PlayPickupSound (int soundType)
+{
+    CallMethod<0x506EA0> (0xB6BC90, soundType, 0.0f, 1.0f); // Play sound
+}
+
 /*******************************************************/
 int
 RandomizePickup (float x, float y, float z, unsigned int modelId,
@@ -62,6 +66,12 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
     //        z                                                       = pos1.z;
     //}
 
+    std::vector<int> additional_pickups = {370, 1240, 1240, 1240, 1242, 1242, 1242,
+           1247, 1247, 1241, 1241, 1581, 2894, 1550};
+
+    if (modelId == 5000)
+        additional_pickups.push_back (1210);
+
     if (modelId != 1212 && modelId != 953 && modelId != 954 && modelId != 1253
         && modelId != 370 && modelId != 1277)
         {
@@ -73,13 +83,13 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
                 ->GetRandomWeapon (nullptr, modelId, true);
             if (modelId >= 47 || modelId == 20 || modelId == 21)
                 {
-                    modelId = PickupsRandomizer::additional_pickups[random (
-                        PickupsRandomizer::additional_pickups.size () - 1)];
+                    modelId = additional_pickups[random (
+                        additional_pickups.size () - 1)];
                 }
-            else if (find (PickupsRandomizer::additional_pickups.begin (),
-                           PickupsRandomizer::additional_pickups.end (),
+            else if (find (additional_pickups.begin (),
+                           additional_pickups.end (),
                            modelId)
-                     == PickupsRandomizer::additional_pickups.end ())
+                     == additional_pickups.end ())
                 modelId = GetWeaponInfo (modelId, 1)[3];
         }
 
@@ -100,7 +110,7 @@ int
 RandomizeWeaponPickup (float x, float y, float z, unsigned int weaponType, 
     char pickupType, int ammo, char isEmpty, char *message)
 {
-    return RandomizePickup (x, y, z, weaponType, pickupType, ammo, 0, isEmpty,
+    return RandomizePickup (x, y, z, 5000, pickupType, ammo, 0, isEmpty,
                             message);
 }
 
@@ -111,7 +121,20 @@ GiveMoneyForBriefcase (unsigned short model, int plrIndex)
     if (model == 1210)
     {
         if (FindPlayerPed ())
-            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2), random(1, 500));
+        {
+            PlayPickupSound (7);
+            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2),
+                               random (1, 500));
+        }
+    }
+    else if (model == 1550)
+    {
+        if (FindPlayerPed ())
+        {
+            PlayPickupSound (7);
+            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2),
+                                   random (1000, 10000));
+        }
     }
     return CallAndReturn <bool, 0x4564F0>(model, plrIndex); //GivePlayerGoodiesWithPickupMI
 }

@@ -133,6 +133,10 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
             || vehID == 578 || vehID == 588))
         return false;
 
+    if (mFlags.SmallBoat && CModelInfo::IsBoatModel (vehID)
+        && (vehID == 484 || vehID == 453 || vehID == 454))
+        return false;
+
     if (mFlags.CarryObjects && vehID != 406 && vehID != 443 && vehID != 530)
         return false;
 
@@ -140,6 +144,11 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
         return false;
 
     if (mFlags.NoTank && vehID == 432)
+        return false;
+
+    if (mFlags.NoWeirdDoors
+        && (vehID == 425 || vehID == 431 || vehID == 437 || vehID == 432
+            || vehID == 476 || vehID == 520))
         return false;
 
     if (GetThreadName () == "heist4" && GetOriginalVehicle () == 443
@@ -228,12 +237,16 @@ ScriptVehiclePattern::ReadFlag (const std::string &flag)
         mFlags.NoHovercraft = true;
     else if (flag == "smallcar")
         mFlags.SmallCar = true;
+    else if (flag == "smallboat")
+        mFlags.SmallBoat = true;
     else if (flag == "carryobjects")
         mFlags.CarryObjects = true;
     else if (flag == "spray")
         mFlags.Spray = true;
     else if (flag == "notank")
         mFlags.NoTank = true;
+    else if (flag == "standarddoor")
+        mFlags.NoWeirdDoors = true;
 
     // Coordinates
     else if (flag.find ("x=") == 0)

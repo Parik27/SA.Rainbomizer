@@ -472,7 +472,8 @@ CRGBA *__fastcall AddColourExceptions (CRGBA *thisCol, void *edx, uint8_t r,
 void
 RandomizeBlipColourID (int blip, int colourID)
 {
-    colourID = random (0, 8);
+    if (!CRunningScripts::CheckForRunningScript ("steal1"))
+        colourID = random (0, 8);
     Call<0x583AB0> (blip, colourID); // CRadar::ChangeBlipColour
 }
 
@@ -527,10 +528,10 @@ ColourRandomizer::Initialise ()
         injector::MakeCALL (0x58EA39, (void *) &RandomizeWeaponSpriteColours<0x58EA39>); // FPS Crosshair 3
         injector::MakeCALL (0x58EAA8, (void *) &RandomizeWeaponSpriteColours<0x58EAA8>); // FPS Crosshair 4
 
-        injector::MakeCALL (0x7433A3, (void *) &RandomizeWeaponEffectColours<0x7433A3>);
-        injector::MakeCALL (0x7434F2, (void *) &RandomizeWeaponEffectColours<0x7434F2>);
-        injector::MakeCALL (0x74378E, (void *) &RandomizeWeaponEffectColours<0x74378E>);
-        injector::MakeCALL (0x7438AB, (void *) &RandomizeWeaponEffectColours<0x7438AB>);
+        //injector::MakeCALL (0x7433A3, (void *) &RandomizeWeaponEffectColours<0x7433A3>);
+        //injector::MakeCALL (0x7434F2, (void *) &RandomizeWeaponEffectColours<0x7434F2>);
+        //injector::MakeCALL (0x74378E, (void *) &RandomizeWeaponEffectColours<0x74378E>);
+        //injector::MakeCALL (0x7438AB, (void *) &RandomizeWeaponEffectColours<0x7438AB>);
 
         //injector::MakeCALL (0x56F18B, (void *) &RandomizeMoreWeaponEffectColours<0x56F18B>);
         //injector::MakeCALL (0x742EAF, (void *) &RandomizeMoreWeaponEffectColours<0x742EAF>);

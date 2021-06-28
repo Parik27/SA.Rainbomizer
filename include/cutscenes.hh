@@ -29,6 +29,7 @@ public:
     static inline struct Config
     {
         bool RandomizeModels;
+        bool NoBrokenJaws;
         bool RandomizeLocation;
     } m_Config;
 

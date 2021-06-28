@@ -315,8 +315,16 @@ struct CRunningScripts
     static bool             CheckForRunningScript (const char *thread);
 };
 
+struct CAEFrontendAudioEntity
+{
+    char field_0x00[0x9c];
+};
+
 struct CAudioEngine
 {
+    char                   field_0x00[0xb4];
+    CAEFrontendAudioEntity m_FrontendAudio;
+
     void PreloadMissionAudio (unsigned char slot, int id);
     bool GetMissionAudioLoadingStatus (unsigned char id);
     bool IsMissionAudioSampleFinished (unsigned char slot);
@@ -524,6 +532,8 @@ struct CVehicle
     tHandlingData *      m_pHandling;
     tFlyingHandlingData *m_pFlyingHandling;
     uint8_t              m_nFlags[8];
+    uint8_t              __pad430[48];
+    CPed *               m_pDriver;
     int                  GetVehicleAppearence ();
     void                 AutomobilePlaceOnRoadProperly ();
     void                 BikePlaceOnRoadProperly ();

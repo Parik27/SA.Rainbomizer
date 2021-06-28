@@ -71,11 +71,17 @@ WeaponPattern::DoesWeaponMatchPattern (int weaponID)
             && weaponID != 37 && weaponID != 39)
         return false;
 
+    if (mFlags.NoFlame && (weaponID == 18 || weaponID == 37))
+        return false;
+
+    if (mFlags.NoUselessProj && (weaponID == 17 || weaponID == 39))
+        return false;
+
     if (mFlags.Explosive && weaponID != 16 && weaponID != 18 && weaponID != 35 
         && weaponID != 36 && weaponID != 39)
         return false;
 
-    if (mFlags.LongRange && weaponID != 16 && weaponID != 27 && weaponID != 30
+    if (mFlags.LongRange && weaponID != 27 && weaponID != 30
         && weaponID != 31 && weaponID != 33 && weaponID != 34 && weaponID != 35
         && weaponID != 36 && weaponID != 38)
         return false;
@@ -170,6 +176,10 @@ WeaponPattern::ReadFlag (const std::string &flag)
         mFlags.NoExplode = true;
     else if (flag == "flame")
         mFlags.Flame = true;
+    else if (flag == "noflame")
+        mFlags.NoFlame = true;
+    else if (flag == "uselessproj")
+        mFlags.NoUselessProj = true;
     else if (flag == "longrange")
         mFlags.LongRange = true;
     else if (flag == "goggles")

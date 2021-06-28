@@ -48,6 +48,7 @@ public:
     {
         bool MatchSubtitles;
         bool RandomizePedSpeech;
+        bool RandomizeGenericSfx;
         int ForcedAudioLine;
     } m_Config;
 

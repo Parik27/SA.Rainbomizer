@@ -109,6 +109,11 @@ SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
         && ScriptVehicleRandomizer::GetInstance()->mLastThread == "desert9")
         speed = 0.7;
 
+    if (speed < 0.92
+        && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5" 
+        && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck() != MODEL_VORTEX)
+        speed = 0.84;
+
     CVehicleRecording::SetPlaybackSpeed (vehicle, speed);
 }
 
@@ -320,7 +325,7 @@ ScriptVehicleRandomizer::ApplyEOTLFixes (int newFiretruck)
 
 /*******************************************************/
 void
-ApplyFixesBasedOnModel (int model, int newModel)
+ApplyFixesBasedOnModel (int model, int newModel, float x, float y, float z)
 {
     if (model == MODEL_FIRELA)
         ScriptVehicleRandomizer::GetInstance ()->ApplyEOTLFixes (newModel);
@@ -335,6 +340,10 @@ ApplyFixesBasedOnModel (int model, int newModel)
         || (model == MODEL_BOXVILLE && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "guns1")
         || (model == MODEL_PCJ && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "toreno2")
         || (model == MODEL_COMBINE && ScriptVehicleRandomizer::GetInstance()->mLastThread == "truth1")
+        || (model == 417 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "des3")
+        || (model == 501 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "zero4" && int (x) > -1000)
+        || (model == MODEL_VORTEX && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5" 
+            && int (y) == -1116)
         || (model == MODEL_DOZER && ScriptVehicleRandomizer::GetInstance()->mLastThread == "quarry" 
             && (ScriptSpace[8171] == 1 || ScriptSpace[8171] == 5)))
             ScriptVehicleRandomizer::GetInstance ()->ApplyCarCheckFix (newModel);
@@ -359,11 +368,21 @@ GetModelExceptions (int model, int &newModel)
     else if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry"
         && ScriptSpace[8171] == 4 && model == MODEL_DUMPER)
         newModel = MODEL_DUMPER;
-    else if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "dskool" 
-        && ScriptSpace[247] == 15 && model == 429)
+    else if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "dskool")
         {
-            std::vector<int> alleyOopCars = {429, 541, 480, 494, 506, 451};
-            newModel                      = GetRandomElement (alleyOopCars);
+            if (ScriptSpace[247] == 15 && model == 429)
+            {
+                std::vector<int> alleyOopCars = {429, 541, 480, 494, 506, 451};
+                newModel = GetRandomElement (alleyOopCars);
+            }
+            else if (ScriptSpace[247] == 11)
+            {
+                std::vector<int> wheelieWeaveCars
+                        = {429, 541, 480, 494, 506, 451, 477, 603, 596,
+                           597, 598, 599, 576, 504, 505, 490, 528, 542,
+                           533, 587, 559, 402, 411, 412, 415};
+                newModel = GetRandomElement (wheelieWeaveCars);
+            }
         }
 }
 
@@ -385,7 +404,7 @@ ApplyFixesBasedOnMission ()
         else if (currentTest == 2)
             ScriptSpace[253] = 26000;
         else if (currentTest == 3 || currentTest == 4)
-            ScriptSpace[253] = 14000;
+            ScriptSpace[253] = 20000;
         else if (currentTest == 5)
                 ScriptSpace[253] = 15000;
         else if (currentTest == 8 || currentTest == 9)
@@ -420,6 +439,21 @@ ApplySpecificPosChanges (int model, int &newModel, float &x, float &y, float &z)
     {
         x += 3.0f;
     }
+    else if (ScriptVehicleRandomizer::GetInstance()->mLastThread == "manson5")
+    {
+        if (newModel == 460)
+        {
+            x += 40.0f;
+            z -= 6.0f;
+        }
+        else if (CModelInfo::IsPlaneModel (newModel) && newModel != 539 
+            && newModel != 520)
+        {
+                x -= 30.1f;
+                y -= 67.8f;
+                z -= 3.0f;
+        }
+    }
 }
 
 /*******************************************************/
@@ -433,7 +467,7 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
     Logger::GetLogger ()->LogMessage ("Vehicle Spawned: "
                                       + std::to_string (newModel));
 
-    ApplyFixesBasedOnModel (model, newModel);
+    ApplyFixesBasedOnModel (model, newModel, x, y, z);
     GetModelExceptions (model, newModel);
     ApplyFixesBasedOnMission ();
     ApplySpecificPosChanges (model, newModel, x, y, z);
@@ -464,7 +498,7 @@ RandomizeRCVehicleForScript (float x, float y, float z, float angle, short model
                                                                          x, y,
                                                                          z);
 
-    ApplyFixesBasedOnModel (model, newModel);
+    ApplyFixesBasedOnModel (model, newModel, x, y, z);
     ApplyFixesBasedOnMission ();
 
     if (StreamingManager::AttemptToLoadVehicle (newModel) == ERR_FAILED)
@@ -699,19 +733,21 @@ void __fastcall ProcessModifiedSchoolTimesBoat (CRunningScript *scr,
             else if (currentTest == 2)
             {
                 boatSchool.oldRecord = ScriptSpace[1964];
-                ScriptSpace[8197] -= 50000;
+                ScriptSpace[8197] -= 40000;
             }
             else if (currentTest == 3)
             {
                 boatSchool.oldRecord = ScriptSpace[1965];
-                ScriptSpace[8197] -= 120000;
+                ScriptSpace[8197] -= 60000;
             }
             else if (currentTest == 5)
             {
                 boatSchool.oldRecord = ScriptSpace[1967];
-                ScriptSpace[8197] -= 120000;
+                ScriptSpace[8197] -= 60000;
             }
     }
+    else if (scr->CheckName ("zero1"))
+        ((float *) ScriptParams)[1] = 35.0f;
 }
 
 /*******************************************************/
@@ -765,17 +801,17 @@ void __fastcall DisplayCorrectBoatTimeOnTV (CRunningScript *scr, void *edx,
                 else if (currentTest == 2 && ScriptSpace[1964] != 80000)
                 {
                     boatSchool.tempActualTime = ScriptSpace[1964];
-                    ScriptSpace[1964] -= 50000;
+                    ScriptSpace[1964] -= 40000;
                 }
                 else if (currentTest == 3 && ScriptSpace[1965] != 180000) 
                 {
                     boatSchool.tempActualTime = ScriptSpace[1965];
-                    ScriptSpace[1965] -= 120000;
+                    ScriptSpace[1965] -= 60000;
                 }
                 else if (currentTest == 5 && ScriptSpace[1967] != 200000) 
                 {
                     boatSchool.tempActualTime = ScriptSpace[1967];
-                    ScriptSpace[1967] -= 120000;
+                    ScriptSpace[1967] -= 60000;
                 }
         }
         else if ((((float *) ScriptParams)[0] >= 322.0f
@@ -889,11 +925,11 @@ void __fastcall DisplayCorrectBoatTimePart2 (CRunningScript *scr, void *edx,
                     if (currentTest == 1)
                         ((float *) ScriptParams)[0] += 18.0f;
                     else if (currentTest == 2)
-                        ((float *) ScriptParams)[0] += 50.0f;
+                        ((float *) ScriptParams)[0] += 40.0f;
                     else if (currentTest == 3)
-                        ((float *) ScriptParams)[0] += 2.0f;
+                        ((float *) ScriptParams)[0] += 1.0f;
                     else if (currentTest == 5)
-                        ((float *) ScriptParams)[0] += 2.0f;
+                        ((float *) ScriptParams)[0] += 1.0f;
             }
             else if (boatSchool.type != -1)
                 {
@@ -980,6 +1016,32 @@ void __fastcall FixMaddDogg (CRunningScript *scr, void *edx, short count)
                 ((float *) ScriptParams)[2] -= 4.0f;
             }
     }
+    else if (scr->CheckName ("zero4")
+             && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    != 501
+             && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    != 465)
+    {
+            CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
+                                              + 0xA18 * (ScriptParams[0] >> 8));
+        if (CModelInfo::IsHeliModel(ScriptVehicleRandomizer::GetInstance ()
+            ->GetNewCarForCheck ()) || CModelInfo::IsPlaneModel(
+                ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()))
+            ((float *) ScriptParams)[3] = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                          ->m_pColModel->m_boundBox.m_vecMin.z;
+        else
+        {
+                ((float *) ScriptParams)[2]
+                    = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                          ->m_pColModel->m_boundBox.m_vecMax.y
+                      + 2.0f;
+                ((float *) ScriptParams)[3]
+                    = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                          ->m_pColModel->m_boundBox.m_vecMax.z
+                      + 1.0f;
+        }
+
+    }
 }
 
 /*******************************************************/
@@ -1010,6 +1072,67 @@ void __fastcall FixMaddDoggBoxes (CRunningScript *scr, void *edx, short count)
                 && lastTrainNewType != 10 && lastTrainNewType != 12 && lastTrainNewType != 13)
                 SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0);
         }
+    else if (scr->CheckName ("zero4") && ScriptVehicleRandomizer::GetInstance ()
+        ->GetNewCarForCheck () != 501
+        && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck () != 465)
+        {
+            CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
+                                              + 0xA18 * (ScriptParams[1] >> 8));
+            if (CModelInfo::IsHeliModel (ScriptVehicleRandomizer::GetInstance ()
+                ->GetNewCarForCheck ()) || CModelInfo::IsPlaneModel (
+                    ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()))
+            {
+                if (((float *) ScriptParams)[4] > -0.5)
+                        ((float *) ScriptParams)[4]
+                            = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                  ->m_pColModel->m_boundBox.m_vecMin.z
+                              + 1.0f;
+                else if (((float *) ScriptParams)[4] < -1.1)
+                        ((float *) ScriptParams)[4]
+                            = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                  ->m_pColModel->m_boundBox.m_vecMin.z;
+                else
+                        ((float *) ScriptParams)[4]
+                            = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                  ->m_pColModel->m_boundBox.m_vecMin.z
+                              + 0.2f;
+            }
+            else
+            {
+                if (((float *) ScriptParams)[4] > -0.5)
+                {
+                        ((float *) ScriptParams)[3]
+                            = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                  ->m_pColModel->m_boundBox.m_vecMax.y + 2.0f;
+                        ((float *) ScriptParams)[4]
+                            = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                  ->m_pColModel->m_boundBox.m_vecMax.z + 2.0f;
+                }
+                else if (((float *) ScriptParams)[4] < -1.1)
+                {
+                    ((float *) ScriptParams)[3]
+                            = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                  ->m_pColModel->m_boundBox.m_vecMax.y
+                              + 2.0f;
+                    ((float *) ScriptParams)[4]
+                        = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                              ->m_pColModel->m_boundBox.m_vecMax.z
+                          + 1.0f;
+                }
+                else
+                {
+                        ((float *) ScriptParams)[3]
+                            = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                  ->m_pColModel->m_boundBox.m_vecMax.y
+                              + 2.0f;
+                        ((float *) ScriptParams)[4]
+                            = ms_modelInfoPtrs[vehicle->m_nModelIndex]
+                                  ->m_pColModel->m_boundBox.m_vecMax.z
+                              + 1.2f;
+                }
+            }
+    }
+
 }
 
 /*******************************************************/
@@ -1019,12 +1142,15 @@ void __fastcall FixHeightInDrugs4Auto (CRunningScript *scr, void *edx,
     scr->CollectParameters (count);
     if (scr->CheckName ("drugs4")
         && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
-               != MODEL_GREENWOO
-        && ScriptParams[0] == ScriptSpace[3])
+               != MODEL_GREENWOO)
         {
             CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
                                               + 0xA18 * (ScriptParams[1] >> 8));
-            SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0.2);
+            if (ScriptParams[0] == ScriptSpace[3])
+                SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0.35);
+            else if (((float *) ScriptParams)[3] > 2.9f
+                     || ((float *) ScriptParams)[3] < -3.5f)
+                SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0.1);
         }
     else if (scr->CheckName ("des10") && ScriptVehicleRandomizer::m_Config.RandomizeTrains)
     {
@@ -1174,20 +1300,28 @@ void __fastcall InitialiseExtraText (CText *text, void *edx, char a2)
 void __fastcall Ryder2AttachMagnet (CRunningScript *scr, void *edx, short count)
 {
     scr->CollectParameters (count);
-    if (scr->CheckName ("ryder2") && 
-        ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck () != MODEL_FORKLIFT)
+    if (scr->CheckName ("ryder2")
+        && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+               != MODEL_FORKLIFT)
+        {
+            if (ScriptParams[1] == 1 && ScriptParams[2] == 0
+                && ScriptParams[3] == 0 && ScriptParams[4] == 0
+                && ScriptParams[5] == 0)
+                {
+                    ryder2.vehID = ScriptParams[0];
+                    Scrpt::CallOpcode (0x107, "create_object", 3056, 2791.426f,
+                                       -2418.577f, 6.66f, GlobalVar (10947));
+                    Scrpt::CallOpcode (0x681, "attach_object",
+                                       GlobalVar (10947), ryder2.vehID, 0.0f,
+                                       0.0f, -0.2f, 0.0f, 0.0f, 0.0f);
+                    Scrpt::CallOpcode (0x382, "set_object_collision",
+                                       GlobalVar (10947), 0);
+                }
+        }
+    else if (scr->CheckName ("des3"))
     {
-            if (ScriptParams[1] == 1 && ScriptParams[2] == 0 && ScriptParams[3] == 0
-            && ScriptParams[4] == 0 && ScriptParams[5] == 0)
-            {
-                ryder2.vehID = ScriptParams[0];
-                Scrpt::CallOpcode (0x107, "create_object", 3056, 2791.426f,
-                                   -2418.577f, 6.66f, GlobalVar (10947));
-                Scrpt::CallOpcode (0x681, "attach_object", GlobalVar (10947), ryder2.vehID,
-                                   0.0f, 0.0f, -0.2f, 0.0f, 0.0f, 0.0f);
-                Scrpt::CallOpcode (0x382, "set_object_collision",
-                                   GlobalVar (10947), 0);
-            }
+        ScriptVehicleRandomizer::mDes3HeliHandle = ScriptParams[0];
+        ScriptVehicleRandomizer::mDes3Stuck      = true;
     }
     //else if (scr->CheckName("finalea"))
     //{
@@ -1408,6 +1542,18 @@ void __fastcall Ryder2IsCutsceneActive(CRunningScript* scr, void* edx, short cou
             ryder2.objectAttached = -1;
         }
     }
+    else if (scr->CheckName ("manson5")
+             && ConfigManager::ReadConfig ("ScriptVehicleRandomizer"))
+    {
+        if (ScriptParams[0] == 1)
+        {
+            bool isWaterCarsOn = injector::ReadMemory<bool> (waterCarsCheatActive);
+            if (isWaterCarsOn)
+                injector::WriteMemory (waterCarsCheatActive, 0);
+            else
+                injector::WriteMemory (waterCarsCheatActive, 1);
+        }
+    }
     else if (scr->CheckName ("litcas")
              && ConfigManager::ReadConfig ("MissionRandomizer"))
     {
@@ -1484,6 +1630,25 @@ void __fastcall Quarry2StoreBarrelHandles (CRunningScript *scr, void *edx,
         != MODEL_DOZER)
     {
         GenericStoreObjects (4);
+    }
+    else if (scr->CheckName ("zero4"))
+    {
+        if (!CModelInfo::IsHeliModel (ScriptVehicleRandomizer::GetInstance ()
+            ->GetNewCarForCheck ()) && !CModelInfo::IsPlaneModel (
+                ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()))
+        {
+            ((float *) ScriptParams)[4] = 2.0f;
+            ((float *) ScriptParams)[5] = 2.0f;
+            ((float *) ScriptParams)[6] = 10.0f;
+        }
+        else if (ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                     != 501 && ScriptVehicleRandomizer::GetInstance ()
+            ->GetNewCarForCheck () != 465)
+        {
+            ((float *) ScriptParams)[4] = 2.0f;
+            ((float *) ScriptParams)[5] = 2.0f;
+            ((float *) ScriptParams)[6] = 2.0f;  
+        }
     }
 }
 
@@ -1648,7 +1813,7 @@ void __fastcall Ryder2IncreaseRadius (CRunningScript *scr, void *edx,
 // Mission Cleanup hook
 /*******************************************************/
 char
-Ryder2ForgetMagnet (char enable)
+ResetEndOfMissionStuff (char enable)
 {
     if (ScriptVehicleRandomizer::GetInstance()->mLastThread == "ryder2" || 
         ScriptVehicleRandomizer::GetInstance ()->mLastThread == "quarry")
@@ -1667,6 +1832,10 @@ Ryder2ForgetMagnet (char enable)
             Scrpt::CallOpcode (0x1c3, "remove_references_to_vehicle", GlobalVar (9002));
     }
 
+    if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5")
+        injector::WriteMemory (waterCarsCheatActive, 0);
+    
+    ScriptVehicleRandomizer::mDes3HeliHandle = -1;
     ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning = -1;
     return CallAndReturn<char, 0x6F5DB0> (enable);
 }
@@ -1684,6 +1853,7 @@ void __fastcall StoreStartedMission (CRunningScript *scr, void *edx,
 
 // Start Mission hook
 // Reset variables for RC box magnet section at start of Robbing Uncle Sam
+// Also resets other variables and handles randomizing vehicle sub-missions
 /*******************************************************/
 char
 SetThingsForMissionStart ()
@@ -1691,6 +1861,7 @@ SetThingsForMissionStart ()
     Logger::GetLogger ()->LogMessage ("Clearing variables for mission start");
     ryder2 = emptyTemplate;
     quarry = emptyTemplate;
+    ScriptVehicleRandomizer::mDes3Stuck = false;
     int currentMissionId
         = ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning;
 
@@ -1809,10 +1980,10 @@ void __fastcall TrailerAttachmentCheck (CRunningScript *scr, void *edx,
                     float xCompare = GetGlobalVar<float>(8924) - GetGlobalVar<float>(8927);
                     float yCompare = GetGlobalVar<float> (8925) - GetGlobalVar<float>(8928);
                     float zCompare = GetGlobalVar<float> (8926) - GetGlobalVar<float>(8929);
-                    if (angleCompare >= -10.0f && angleCompare <= 10.0f
-                        && xCompare >= -1.0f && xCompare <= 1.0f
-                        && yCompare >= -1.0f && yCompare <= 1.0f
-                        && zCompare >= -2.5f && zCompare <= 2.5f)
+                    if (angleCompare >= -45.0f && angleCompare <= 45.0f
+                        && xCompare >= -1.5f && xCompare <= 1.5f
+                        && yCompare >= -1.5f && yCompare <= 1.5f
+                        && zCompare >= -3.5f && zCompare <= 3.5f)
                         {
                             Scrpt::CallOpcode (0x893, "attach_trailer",
                                                ScriptParams[0],
@@ -1876,7 +2047,7 @@ void __fastcall RandomizeTrainForScript (CRunningScript *scr, void *edx,
         }
     else if (scr->CheckName ("drugs4"))
     {
-            std::vector<int> shortTrains = {8, 9, 10, 14, 15};
+            std::vector<int> shortTrains = {9, 14, 15};
             lastTrainNewType             = GetRandomElement (shortTrains);
     }
     eLoadError loadState1 = ERR_LOADED;
@@ -2025,6 +2196,10 @@ void __fastcall MoveLargeCarsApart (CRunningScript *scr, void *edx, short count)
                     ((float *) ScriptParams)[3] = 3.655376f;
                 }
     }
+    else if (scr->CheckName ("zero4"))
+    {
+        ((float *) ScriptParams)[1] -= 8.0f;
+    }
 }
 
 /*******************************************************/
@@ -2061,8 +2236,8 @@ void __fastcall ReduceCarWeight (CRunningScript *scr, void *edx,
     {
         CVehicle *vehicle = (CVehicle *) (ms_pVehiclePool->m_pObjects
                                           + 0xA18 * (ScriptParams[0] >> 8));
-        vehicle->m_fMass  = 100.0f;
-        vehicle->m_pHandling->fMass = 100.0f;
+        vehicle->m_fMass  = 500.0f;
+        vehicle->m_pHandling->fMass = 500.0f;
     }
 }
 
@@ -2074,6 +2249,73 @@ void __fastcall OverrideTaxiCheck (CRunningScript *scr, void *edx,
         && ScriptVehicleRandomizer::GetInstance()->m_Config.Taxi)
         flag = true;
     scr->UpdateCompareFlag (flag);
+}
+
+/*******************************************************/
+double __fastcall IgnoreHeightLimit (float a1, void *edx, float a2) 
+{ 
+    if (CRunningScripts::CheckForRunningScript("zero4"))
+        return -1.0;
+    return CallMethodAndReturn<double, 0x6D2600> (a1, a2);
+}
+
+/*******************************************************/
+void __fastcall DetectVehicleDestruction (CRunningScript *scr, void *edx,
+                                          short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("des3"))
+    {
+        if (ScriptParams[0] == ScriptVehicleRandomizer::mDes3HeliHandle)
+        {
+            if (FindPlayerVehicle ())
+            {
+                Scrpt::CallOpcode (0x3c0, "store_car_char_is_in",
+                    GlobalVar (3), GlobalVar (9002));
+                if (GetGlobalVar<int> (9002) == ScriptVehicleRandomizer::mDes3HeliHandle)
+                {
+                    Scrpt::CallOpcode (0x792, "disembark_actor",
+                                           GlobalVar (3));
+                }
+            }
+        }
+    }
+}
+
+/*******************************************************/
+void __fastcall CheckDes3HeliDriver (CRunningScript *scr, void *edx,
+                                          short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("des3"))
+    {
+        if (CModelInfo::IsCarModel(ScriptVehicleRandomizer::GetInstance()
+            ->GetNewCarForCheck()) && ScriptParams[0] == ScriptVehicleRandomizer::mDes3HeliHandle)
+        {
+            if (!ScriptVehicleRandomizer::mDes3Stuck)
+            {
+                    Scrpt::CallOpcode (0x519, "freeze_car",
+                                       ScriptVehicleRandomizer::mDes3HeliHandle,
+                                       0);
+            }
+            else if (ScriptVehicleRandomizer::mDes3Stuck)
+            {
+                    Scrpt::CallOpcode (0x519, "freeze_car",
+                                       ScriptVehicleRandomizer::mDes3HeliHandle,
+                                       1);
+                if (FindPlayerVehicle ())
+                {
+                        Scrpt::CallOpcode (0x3c0, "store_car_char_is_in",
+                                           GlobalVar (3), GlobalVar (9002));
+                        if (GetGlobalVar<int> (9002)
+                            == ScriptVehicleRandomizer::mDes3HeliHandle)
+                        {
+                            ScriptVehicleRandomizer::mDes3Stuck = false;
+                        }
+                }
+            }
+        }
+    }
 }
 
 /*******************************************************/
@@ -2149,7 +2391,7 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x47F90C, (void *) &Ryder2AttachMagnet},
          {HOOK_CALL, 0x47CCF2, (void *) &Ryder2StoreBoxHandles},
          {HOOK_CALL, 0x469773, (void *) &Ryder2IncreaseRadius},
-         {HOOK_CALL, 0x4685A8, (void *) &Ryder2ForgetMagnet},
+         {HOOK_CALL, 0x4685A8, (void *) &ResetEndOfMissionStuff},
          {HOOK_CALL, 0x4831FC, (void *) &Ryder2CheckBoxForDamage},
          {HOOK_CALL, 0x48322F, (void *) &Ryder2CheckBoxForDamage2},
          {HOOK_CALL, 0x4698C6, (void *) &Ryder2WasBoxDestroyedSomehow},
@@ -2161,7 +2403,14 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x4912E8, (void *) &OverrideTaxiCheck},
          {HOOK_CALL, 0x467DB9, (void *) &MoveLargeCarsApart},
          {HOOK_CALL, 0x48954E, (void *) &ReduceCarWeight},
+         {HOOK_CALL, 0x467B1E, (void *) &DetectVehicleDestruction},
+         {HOOK_CALL, 0x469B71, (void *) &CheckDes3HeliDriver},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
+
+    // Hooks function for plane / heli height checks
+    for (int address : {0x6D8A2F, 0x6D97B9, 0x6D97B9, 0x6D9813, 0x6D9E33,
+                        0x6D9E56, 0x6CC234, 0x6CC234, 0x6CC2A0})
+        injector::MakeCALL (address, (void *) &IgnoreHeightLimit);
 
     if (m_Config.MoreSchoolTestTime)
         RegisterHooks (

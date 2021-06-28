@@ -14,7 +14,7 @@ sweet1	Greenwoo	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes
 sweet3	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
 sweet3	Voodoo	2	Y	Y	N	Y	Y	Y	N	N	N					
 sweet2	Glendale	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
-sweet4	Greenwoo	4	Y	N	N	N	N	Y	N	N	N					
+sweet4	Greenwoo	4	Y	N	N	N	N	Y	N	N	N	standarddoor				
 hoods5	Sentinel	1	Y	Y	Y	Y	Y	Y	N	N	N					
 sweet6	Savanna	2	Y	Y	Y	Y	Y	Y	N	N	N	x=2644+y=-2028+z=12+smallplanes				Added code to cancel entering mod shop
 sweet6	Savanna	2	Y	Y	Y	Y	Y	Y	Y	Y	N					
@@ -50,8 +50,8 @@ music1	Voodoo	1	Y	Y	Y	Y	Y	Y	N	N	N
 music1	Oceanic	1	Y	Y	Y	Y	Y	Y	N	N	N					
 music1	Esperant	1	Y	Y	Y	Y	Y	Y	N	N	N					
 music3	Elegant	4	Y	N	N	N	N	N	N	N	N					
-music5	Greenwoo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-music5	Voodoo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+music5	Greenwoo	1	Y	Y	Y	Y	N	N	N	N	N					
+music5	Voodoo	1	Y	Y	Y	Y	N	N	N	N	N					
 music5	Tahoma	4	Y	N	N	N	N	N	N	N	N	x=2224+y=-1677+z=13				
 music5	Tahoma	4	Y	N	N	N	N	N	N	N	N	x=2227+y=-1667+z=13				
 cprace	Blade	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
@@ -136,6 +136,7 @@ wuzi1	Sentinel	2	Y	Y	N	Y	N	N	N	N	N	x=-2245+y=715+z=48
 wuzi1	Sentinel	2	Y	Y	N	Y	N	N	N	N	N	x=-2251+y=612+z=48				
 wuzi1	Sanchez	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
 wuzi1	Sentinel	2	Y	Y	N	Y	Y	Y	N	N	N	x=-2267+y=659+z=48				
+wuzi1	Sentinel	1	Y	N	N	N	Y	Y	N	N	Y					
 farlie4	Manana	1	Y	Y	Y	Y	Y	N	N	N	N	x=-1425+y=-21+z=5+hovercraft				
 farlie4	Mule	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 farlie4	Mule	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	x=-1478+y=-470+z=10				
@@ -178,12 +179,13 @@ driv3	Stretch	4	Y	N	N	N	Y	Y	N	N	N
 steal1	Uranus	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 steal1	Alpha	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 steal2	Sultan	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-steal4	Savanna	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+steal2	Elegy	1	Y	Y	Y	Y	Y	Y	N	N	Y					
+steal4	Savanna	2	C	Y	N	Y	C	C	N	N	N	smallplanes	8	-4	0	
 steal4	Jester	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 steal4	Sentinel	4	Y	N	N	N	N	Y	N	N	N					
 steal5	Tampa	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 steal5	Stratum	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
-dskool	Infernus	1	Y	Y	Y	Y	N	Y	N	N	N	x=-2050+y=-130+smallcar				
+dskool	Infernus	1	Y	Y	Y	Y	N	N	N	N	N	x=-2050+y=-130+smallcar				
 dskool	Blistac	1	Y	Y	Y	Y	Y	Y	N	N	N	hovercraft				
 dskool	Copcarsf	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-2050+y=-130+hovercraft				
 dskool	Copcarsf	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
@@ -195,15 +197,17 @@ dskool	Infernus	1	Y	Y	Y	Y	Y	Y	N	N	Y	smallplanes
 zero1	Rcbaron	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
 zero2	Rcbaron	1	N	N	N	N	C	C	N	N	N	guns	-5	0	0	
 zero2	Sanchez	2	Y	Y	N	Y	Y	Y	N	N	N					
+zero4	Rcbandit	1	Y	Y	Y	Y	Y	Y	N	N	Y					
 zero4	Bmx	1	N	N	N	N	N	N	N	N	N					
-zero4	Rcgoblin	1	N	N	N	N	N	Y	N	N	N	rc				
+zero4	Rcgoblin	1	C	N	N	N	N	C	N	N	N	x=-973+y=1077+z=1350+smallcar	-8	0	0	
+zero4	Rcgoblin	1	N	N	N	N	N	C	N	N	N	x=-1131+y=1041+z=1350	15	0	-5	
 toreno1	Monster	1	Y	Y	Y	Y	C	C	N	N	N	smallplanes	-10	0	0	
 toreno2	Pcj600	2	Y	Y	N	Y	N	N	N	N	N					
 toreno2	Petro	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
 toreno2	Petrotr	1	Y	N	N	Y	Y	Y	N	N	N	smallplanes+norc				
 des3	Journey	2	Y	Y	N	Y	Y	Y	N	N	N					
 des3	Maverick	1	Y	N	N	N	Y	Y	Y	Y	N					
-des3	Leviathn	1	C	N	N	N	C	Y	C	C	N	x=-772+y=2419+z=174	-19	1	-16	
+des3	Leviathn	1	C	N	N	N	C	Y	C	C	N	x=-772+y=2419+z=174	-19	1	-18	
 des3	Leviathn	1	Y	N	N	N	Y	Y	Y	Y	Y					
 desert6	Rustler	1	Y	N	N	Y	C	C	N	N	N	nohovercraft+norc	0	-35	0	
 desert6	Hydra	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
@@ -212,8 +216,8 @@ maf4	Camper	2	Y	N	N	N	Y	Y	N	N	N
 desert5	Rustler	1	Y	N	N	Y	Y	N	N	N	N	norc+nohovercraft				
 desert5	Hunter	1	Y	N	N	Y	Y	Y	N	N	N	z=15				
 desert5	Hunter	1	Y	N	N	N	Y	Y	N	N	N	guns				
-desert5	Landstal	1	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
-desert5	Petro	1	Y	Y	N	Y	Y	Y	Y	Y	Y					
+desert5	Landstal	1	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
+desert5	Petro	1	Y	Y	N	Y	Y	N	Y	Y	Y					
 desert5	Stunt	1	Y	N	N	Y	Y	N	N	N	N	nohovercraft				
 casino1	Feltzer	1	Y	N	N	N	N	N	N	N	N					
 casino2	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
@@ -241,7 +245,7 @@ heist4	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y
 heist4	Packer	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	notank				
 heist4	Copbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 heist4	Freeway	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
-heist5	Leviathn	1	N	N	N	N	N	Y	N	N	N	norc				
+heist5	Leviathn	1	N	N	N	N	N	Y	N	N	N					
 heist5	Securica	1	Y	N	N	N	N	N	N	N	N					
 heist5	Patriot	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 heist5	Hunter	1	N	N	N	N	N	Y	N	N	N					
@@ -260,9 +264,10 @@ mansio2	Hydra	1	Y	N	N	N	Y	Y	N	N	N	x=-1416+y=518+z=16+norc+guns
 mansio2	Hydra	1	N	N	N	N	Y	Y	N	N	N	smallplanes+norc+guns				
 mansio2	Tropic	1	N	N	N	N	Y	Y	Y	N	N	float				
 mansio2	Launch	1	N	N	N	N	N	N	N	N	N	float				
-manson5	Vortex	1	Y	Y	Y	Y	Y	Y	C	N	N	x=-7+y=-1116+z=7+smallplanes	40	0	-6	
-manson5	Marquis	1	N	N	N	N	Y	Y	Y	N	N	float				
-manson5	Reefer	1	N	N	N	N	Y	Y	Y	N	N	float				
+manson5	Vortex	1	Y	N	N	Y	Y	Y	C	N	N	x=-7+y=-1116+z=7+smallplanes+smallboat	40	0	-6	
+manson5	Vortex	1	Y	Y	Y	Y	Y	Y	N	N	Y					
+manson5	Marquis	1	N	N	N	N	C	Y	Y	N	N	float	0	0	5	
+manson5	Reefer	1	N	N	N	N	C	Y	Y	N	N	float	0	0	5	
 manson5	Kart	1	Y	Y	Y	Y	Y	Y	N	N	N	x=832+y=-2046+z=11+smallplanes				
 manson5	Kart	1	Y	Y	Y	Y	Y	Y	N	N	Y					
 grove1	Infernus	1	Y	Y	Y	Y	Y	Y	N	N	N	x=2003+y=-1132+z=24+smallplanes				
@@ -290,7 +295,7 @@ boat	Vortex	1	N	N	N	N	N	N	N	N	N
 boat	Tropic	1	C	N	N	C	C	Y	Y	N	N	float	0	0	15	
 boat	Marquis	1	C	N	N	C	C	Y	Y	N	N	float	0	0	15	
 boat	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y					
-bskool	Bf400	1	Y	Y	Y	Y	N	Y	N	N	N	smallcar				
+bskool	Bf400	1	Y	Y	Y	Y	N	N	N	N	N	smallcar				
 bskool	Pcj600	1	Y	Y	Y	Y	Y	Y	N	N	N	hovercraft				
 bskool	Fcr900	1	N	Y	Y	N	N	N	N	N	N					
 bskool	Nrg500	1	N	Y	Y	N	N	N	N	N	N					

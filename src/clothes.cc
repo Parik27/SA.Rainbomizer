@@ -92,10 +92,10 @@ ClothesRandomizer::RandomizePlayerClothes ()
 
             if (m_Config.RandomizePlayerOnce
                 && !m_RandomizeOnceInfo.Initialised)
-                m_RandomizeOnceInfo.RandomClothes->push_back (cloth);
+                m_RandomizeOnceInfo.RandomClothes.push_back (cloth);
             else if (m_Config.RandomizePlayerOnce
                      && m_RandomizeOnceInfo.Initialised)
-                cloth = m_RandomizeOnceInfo.RandomClothes->at(i);
+                cloth = m_RandomizeOnceInfo.RandomClothes.at(i);
 
             Scrpt::CallOpcode (0x784, "set_player_model_tex_crc", GlobalVar (2),
                                cloth.second, cloth.first, i);

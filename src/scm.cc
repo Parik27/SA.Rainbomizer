@@ -582,30 +582,41 @@ ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
                     case VEHICLE_BMX:
                     case VEHICLE_QUAD:
                         validVehicles.insert (validVehicles.end (),
-                                              cars.begin (), cars.end ());
+                            carTypes[int (CarType::CAR)].begin (),
+                            carTypes[int (CarType::CAR)].end ());
+                        
                         validVehicles.insert (validVehicles.end (),
-                                              bikes.begin (), bikes.end ());
+                            carTypes[int (CarType::BIKE)].begin (),
+                            carTypes[int (CarType::BIKE)].end ());
+                        
                         validVehicles.insert (validVehicles.end (),
-                                              helis.begin (), helis.end ());
+                            carTypes[int (CarType::HELI)].begin (),
+                            carTypes[int (CarType::HELI)].end ());
                         break;
 
                     case VEHICLE_PLANE:
                     case VEHICLE_FPLANE:
                         validVehicles.insert (validVehicles.end (),
-                                              planes.begin (), planes.end ());
+                            carTypes[int (CarType::PLANE)].begin (),
+                            carTypes[int (CarType::PLANE)].end ());
+                        
                         validVehicles.insert (validVehicles.end (),
-                                              helis.begin (), helis.end ());
+                            carTypes[int (CarType::HELI)].begin (),
+                            carTypes[int (CarType::HELI)].end ());
                         break;
 
                     case VEHICLE_HELI:
                     case VEHICLE_FHELI:
                         validVehicles.insert (validVehicles.end (),
-                                              helis.begin (), helis.end ());
+                            carTypes[int (CarType::HELI)].begin (),
+                            carTypes[int (CarType::HELI)].end ());
                         break;
 
                     case VEHICLE_BOAT:
                         validVehicles.insert (validVehicles.end (),
-                                              boats.begin (), boats.end ());
+                            carTypes[int (CarType::BOAT)].begin (),
+                            carTypes[int (CarType::BOAT)].end ());
+                        
                         validVehicles.push_back (460);
                         validVehicles.push_back (539);
                         validVehicles.push_back (447);
@@ -614,19 +625,26 @@ ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
 
                     case VEHICLE_TRAIN:
                         validVehicles.insert (validVehicles.end (),
-                                              trains.begin (), trains.end ());
+                            carTypes[int (CarType::TRAIN)].begin (),
+                            carTypes[int (CarType::TRAIN)].end ());
                         break;
 
                     case VEHICLE_TRAILER:
                         validVehicles.insert (validVehicles.end (),
-                                              cars.begin (), cars.end ());
+                            carTypes[int (CarType::CAR)].begin (),
+                            carTypes[int (CarType::CAR)].end ());
+                        
                         validVehicles.insert (validVehicles.end (),
-                                              planes.begin (), planes.end ());
+                            carTypes[int (CarType::PLANE)].begin (),
+                            carTypes[int (CarType::PLANE)].end ());
+                        
                         validVehicles.insert (validVehicles.end (),
-                                              helis.begin (), helis.end ());
+                            carTypes[int (CarType::HELI)].begin (),
+                            carTypes[int (CarType::HELI)].end ());
+                        
                         validVehicles.insert (validVehicles.end (),
-                                              trailers.begin (),
-                                              trailers.end ());
+                            carTypes[int (CarType::TRAILER)].begin (),
+                            carTypes[int (CarType::TRAILER)].end ());
                         break;
                     }
                 for (auto vehicle : validVehicles)

@@ -45,36 +45,36 @@ CacheSeats ()
                     {
                         case VEHICLE_AUTOMOBILE: 
                         case VEHICLE_MTRUCK:
-                            ScriptVehicleRandomizer::cars.push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes[int(CarType::CAR)].push_back (i + 400);
                             break;
 
                         case VEHICLE_BIKE:
                         case VEHICLE_BMX:
                         case VEHICLE_QUAD:
-                            ScriptVehicleRandomizer::bikes.push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes[int(CarType::BIKE)].push_back (i + 400);
                             break;
 
                         case VEHICLE_PLANE:
                         case VEHICLE_FPLANE:
                             if ((i + 400) != 539)
-                                ScriptVehicleRandomizer::planes.push_back (i + 400);
+                                ScriptVehicleRandomizer::carTypes[int (CarType::PLANE)].push_back (i + 400);
                             break;
 
                         case VEHICLE_HELI:
                         case VEHICLE_FHELI:
-                            ScriptVehicleRandomizer::helis.push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes[int (CarType::HELI)].push_back (i + 400);
                             break;
 
                         case VEHICLE_BOAT:
-                            ScriptVehicleRandomizer::boats.push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes[int (CarType::BOAT)].push_back (i + 400);
                             break;
 
                         case VEHICLE_TRAIN:
-                            ScriptVehicleRandomizer::trains.push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes[int (CarType::TRAIN)].push_back (i + 400);
                             break;
 
                         case VEHICLE_TRAILER:
-                            ScriptVehicleRandomizer::trains.push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes[int (CarType::TRAILER)].push_back (i + 400);
                     }
 
                     if (err != ERR_ALREADY_LOADED)

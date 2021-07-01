@@ -51,7 +51,7 @@ public:
         bool Initialised = false;
 
         bool isClothes;
-        std::vector<std::pair<int, int>> RandomClothes[18];
+        std::vector<std::pair<int, int>> RandomClothes;
         int  ChosenModel;
         std::string SpecialModel;
     } m_RandomizeOnceInfo;

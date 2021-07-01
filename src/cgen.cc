@@ -26,6 +26,7 @@
 #include "traffic.hh"
 #include "config.hh"
 #include "scm.hh"
+#include <array>
 
 ParkedCarRandomizer *ParkedCarRandomizer::mInstance = nullptr;
 
@@ -71,54 +72,16 @@ ParkedCarRandomizer::GetInstance ()
 /*******************************************************/
 int
 GetRandomCarOfType (int originalCar)
-{
-    if (find (ScriptVehicleRandomizer::cars.begin (),
-              ScriptVehicleRandomizer::cars.end (), originalCar)
-        != ScriptVehicleRandomizer::cars.end ())
-        {
-            originalCar = GetRandomElement (ScriptVehicleRandomizer::cars);
-        }
-    else if (find (ScriptVehicleRandomizer::bikes.begin (),
-                   ScriptVehicleRandomizer::bikes.end (), originalCar)
-             != ScriptVehicleRandomizer::bikes.end ())
-        {
-            originalCar = GetRandomElement (ScriptVehicleRandomizer::bikes);
-        }
-    else if (find (ScriptVehicleRandomizer::planes.begin (),
-                   ScriptVehicleRandomizer::planes.end (), originalCar)
-             != ScriptVehicleRandomizer::planes.end ())
-        {
-            originalCar = GetRandomElement (ScriptVehicleRandomizer::planes);
-        }
-    else if (find (ScriptVehicleRandomizer::helis.begin (),
-                   ScriptVehicleRandomizer::helis.end (), originalCar)
-             != ScriptVehicleRandomizer::helis.end ())
-        {
-            originalCar = GetRandomElement (ScriptVehicleRandomizer::helis);
-        }
-    else if (find (ScriptVehicleRandomizer::boats.begin (),
-                   ScriptVehicleRandomizer::boats.end (), originalCar)
-             != ScriptVehicleRandomizer::boats.end ())
-        {
-            originalCar = GetRandomElement (ScriptVehicleRandomizer::boats);
-        }
-    else if (find (ScriptVehicleRandomizer::trains.begin (),
-                   ScriptVehicleRandomizer::trains.end (), originalCar)
-             != ScriptVehicleRandomizer::trains.end ())
-        {
-            originalCar = GetRandomElement (ScriptVehicleRandomizer::trains);
-        }
-    else if (find (ScriptVehicleRandomizer::trailers.begin (),
-                   ScriptVehicleRandomizer::trailers.end (), originalCar)
-             != ScriptVehicleRandomizer::trailers.end ())
-        {
-            originalCar = GetRandomElement (ScriptVehicleRandomizer::trailers);
-        }
-    else
-        {
-            originalCar = random (400, 611);
-        }
-    return originalCar;
+{ 
+    for (auto &i : ScriptVehicleRandomizer::carTypes)
+    {
+        if (std::find (i.begin (), i.end (), originalCar)
+            != i.end ())
+                {
+                    return GetRandomElement (i);
+                }
+    }
+    return random (400, 611);
 }
 
 /*******************************************************/

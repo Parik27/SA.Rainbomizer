@@ -20,6 +20,17 @@
 
 #pragma once
 
+enum class CarType
+{
+    CAR,
+    BIKE,
+    PLANE,
+    HELI,
+    BOAT,
+    TRAIN,
+    TRAILER
+};
+
 #include <vector>
 #include <cstdint>
 #include <cstdio>
@@ -27,6 +38,7 @@
 #include <map>
 #include <unordered_map>
 #include "scm_patterns.hh"
+#include <array>
 
 struct CMatrix;
 struct CRunningScript;
@@ -115,13 +127,7 @@ public:
 
     } m_Config;
 
-    static inline std::vector<int>  cars;
-    static inline std::vector<int>  bikes;
-    static inline std::vector<int>  planes;
-    static inline std::vector<int>  helis;
-    static inline std::vector<int>  boats;
-    static inline std::vector<int>  trains;
-    static inline std::vector<int>  trailers;
+    static inline std::array<std::vector<int>, 7> carTypes;
 
     uint8_t mSeatsCache[212];
     std::string mLastThread = "";

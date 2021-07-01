@@ -105,8 +105,8 @@ CrazyMode = false # Changes images and menu background (WARNING: VERY hard on ey
 [TimeCycleRandomizer]
 
 # Randomizes timecyc.dat values, which will change appearance and colours of sky and objects.
-# Re-randomizes every fade.
 RandomizeTimeCycle = true
+ChangeOnFade = true # (Generates a new random timecycle set every fade, otherwise is the same from game start)
 
 # Randomizes weather cycle at regular intervals.
 RandomizeWeather = true
@@ -182,6 +182,9 @@ SkipChecks = false
 RandomizeFixedSpawns = true # (Fixed spawns like Sweet's car)
 RandomizeRandomSpawns = true # (For example: Car Parks)
 
+# Randomizes fixed car spawns within their original group (e.g. boats randomize between only other boats)
+RandomizeToSameType = false
+
 #######################################################
 [MissionRandomizer]
 
@@ -221,10 +224,6 @@ ReplaceWithWeaponsOnly = false # Randomizes only weapon-type pickups with other 
 # Randomize money to be given by certain random pickups
 MoneyFromRandomPickups = true
 
-# Custom pickups seed - useful to guarantee a particular set of pickup spawns for races.
-# If empty, the seed will be random.
-PickupsCustomSeed = ""
-
 SkipChecks = false # Checks related to weapons required for certain missions
 		   # You might not be able to complete some missions
 		   # if this is true.
@@ -244,6 +243,9 @@ OddsOfNewModel = 80
 
 # Set to true to allow models featuring nudity
 IncludeNSFWModels = false
+
+# Chooses a single random model or outfit for CJ that is maintained for the entire session.
+RandomizePlayerOnce = false
 
 # Forces specific model for player when using random player models using their model ID.
 # Set to -1 for normal randomization.

@@ -40,6 +40,43 @@ CacheSeats ()
                         GetInstance()->mSeatsCache[i]
                         = CModelInfo:: GetMaximumNumberOfPassengersFromNumberOfDoors (i + 400);
 
+                    eVehicleClass vehicleType = GetVehicleType (i + 400);
+                    switch (vehicleType)
+                    {
+                        case VEHICLE_AUTOMOBILE: 
+                        case VEHICLE_MTRUCK:
+                            ScriptVehicleRandomizer::cars.push_back (i + 400);
+                            break;
+
+                        case VEHICLE_BIKE:
+                        case VEHICLE_BMX:
+                        case VEHICLE_QUAD:
+                            ScriptVehicleRandomizer::bikes.push_back (i + 400);
+                            break;
+
+                        case VEHICLE_PLANE:
+                        case VEHICLE_FPLANE:
+                            if ((i + 400) != 539)
+                                ScriptVehicleRandomizer::planes.push_back (i + 400);
+                            break;
+
+                        case VEHICLE_HELI:
+                        case VEHICLE_FHELI:
+                            ScriptVehicleRandomizer::helis.push_back (i + 400);
+                            break;
+
+                        case VEHICLE_BOAT:
+                            ScriptVehicleRandomizer::boats.push_back (i + 400);
+                            break;
+
+                        case VEHICLE_TRAIN:
+                            ScriptVehicleRandomizer::trains.push_back (i + 400);
+                            break;
+
+                        case VEHICLE_TRAILER:
+                            ScriptVehicleRandomizer::trains.push_back (i + 400);
+                    }
+
                     if (err != ERR_ALREADY_LOADED)
                         CStreaming::RemoveModel (i + 400);
                     continue;
@@ -54,7 +91,7 @@ CacheSeats ()
 
 /*******************************************************/
 eVehicleClass
-ScriptVehiclePattern::GetVehicleType (int vehID)
+GetVehicleType (int vehID)
 {
     if (CModelInfo::IsBikeModel(vehID))
         return VEHICLE_BIKE;

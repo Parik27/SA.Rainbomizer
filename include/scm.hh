@@ -115,8 +115,54 @@ public:
 
     } m_Config;
 
+    static inline std::vector<int>  cars;
+    static inline std::vector<int>  bikes;
+    static inline std::vector<int>  planes;
+    static inline std::vector<int>  helis;
+    static inline std::vector<int>  boats;
+    static inline std::vector<int>  trains;
+    static inline std::vector<int>  trailers;
+
     uint8_t mSeatsCache[212];
     std::string mLastThread = "";
+
+    static inline std::vector<std::string> recognisedScripts
+        = {"initial", "initil2", "intro",   "none",    "dual",    "shtr",
+           "grav",    "otb",     "pool2",   "lowr",    "zero5",   "intro1",
+           "intro2",  "sweet1",  "sweet1b", "sweet3",  "sweet2",  "sweet4",
+           "hoods5",  "sweet6",  "sweet7",  "crash4",  "crash1",  "drugs3",
+           "guns1",   "ryder3",  "ryder2",  "twar7",   "smoke2",  "smoke3",
+           "drugs1",  "music1",  "music2",  "music3",  "music5",  "cprace",
+           "cesar1",  "drugs4",  "la1fin2", "bcrash1", "catalin", "cat1",
+           "cat2",    "cat3",    "cat4",    "catcut",  "truth1",  "truth2",
+           "bcesar4", "garag1",  "decon",   "scrash3", "scrash2", "wuzi1",
+           "farlie4", "driv6",   "wuzi2",   "wuzi5",   "syn1",    "syn2",
+           "syn3",    "synd4",   "syn6",    "syn7",    "syn5",    "driv2",
+           "driv3",   "steal1",  "steal2",  "steal4",  "steal5",  "dskool",
+           "zero1",   "zero2",   "zero4",   "toreno1", "toreno2", "des3",
+           "desert4", "desert6", "desert9", "maf4",    "des10",   "desert5",
+           "casino1", "casino2", "casino3", "casino7", "casino4", "casino5",
+           "casino6", "casino9", "casin10", "vcrash1", "vcr2",    "doc2",
+           "heist1",  "heist3",  "heist2",  "heist4",  "heist5",  "heist9",
+           "mansio1", "mansio2", "mansio3", "manson5", "grove1",  "grove2",
+           "riot1",   "riot2",   "finalea", "finaleb", "finalec", "shrange",
+           "gymls",   "gymsf",   "gymlv",   "truck",   "quarry",  "boat",
+           "bskool",  "taxiodd", "ambulan", "firetru", "copcar",  "burgjb",
+           "freight", "pimp",    "blood",   "kicksta", "tria",    "bcour",
+           "mtbiker", "stunt",   "buypro1", "plchute", "parach",  "bcesar2",
+           "cokec",   "bandit",  "roulete", "otb_msc", "arcade",  "vending",
+           "fodvend", "gateos",  "gymbike", "gymbenc", "gymtrea", "gymdumb",
+           "bball",   "vidpok",  "blackj",  "wof",     "dealer",  "hmles",
+           "pool",    "lowrcon", "burglar", "gfmeet",  "gfdate",  "gfsex",
+           "casamb",  "bar",     "pshop",   "otbshp",  "strip",   "planes",
+           "trains",  "rcshop",  "dance",   "skbrain", "ffpnc",   "barstaf",
+           "bouncer", "otbstaf", "pchair",  "pcustom", "otbwtch", "otbslp",
+           "otbtill", "fboothr", "fboothl", "barguy",  "pedroul", "pedcard",
+           "pedslot", "dancer",  "stripw",  "stripm",  "browse",  "copsit",
+           "coplook", "ticket",  "shopper", "amunat",  "tatto",   "barb",
+           "warrobe", "cloth",   "jfud",    "carmod",  "crane1",  "crane2",
+           "crane3",  "carprk1", "impnd",   "valet",   "photo",   "prisonr",
+           "camera",  "debt",    "hotdogv"};
 
     static inline std::map<int, std::string> oddMissions{{121, "taxiodd"}, {122, "ambulan"},
                                            {123, "firetru"}, {124, "copcar"},

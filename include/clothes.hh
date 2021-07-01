@@ -38,12 +38,23 @@ public:
         int OddsOfNewModel;
 
         bool IncludeNSFWModels;
+        bool RandomizePlayerOnce;
 
         int ForcedModel;
         std::string ForcedSpecial;
     } m_Config;
 
     std::pair<int, int> GetRandomCRCForComponent (int componentId);
+
+    static inline struct RandomizeOnceData
+    {
+        bool Initialised = false;
+
+        bool isClothes;
+        std::vector<std::pair<int, int>> RandomClothes[18];
+        int  ChosenModel;
+        std::string SpecialModel;
+    } m_RandomizeOnceInfo;
 
     /// Initialises Hooks/etc.
     void Initialise ();

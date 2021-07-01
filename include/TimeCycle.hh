@@ -14,6 +14,7 @@ public:
     static inline struct Config
     {
         bool RandomizeTimeCycle;
+        bool ChangeOnFade;
         bool RandomizeWeather;
     } m_Config;
 

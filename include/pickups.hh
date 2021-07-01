@@ -20,9 +20,6 @@ public:
         bool ReplaceWithWeaponsOnly;
         bool MoneyFromPickups;
 
-        std::string PickupsSeed;
-        int         PickupsSeedHash = 0;
-
         bool SkipChecks;
     } m_Config;
 

@@ -30,18 +30,19 @@ class ParkedCarRandomizer
 {
     static ParkedCarRandomizer *mInstance;
 
-    static inline struct Config
-    {
-        bool RandomizeFixedSpawns;
-        bool RandomizeRandomSpawns;
-    } m_Config;
-
     ParkedCarRandomizer (){};
     static void DestroyInstance ();
 
 public:
     /// Returns the static instance for ParkedCarRandomizer.
     static ParkedCarRandomizer *GetInstance ();
+
+    static inline struct Config
+    {
+        bool RandomizeFixedSpawns;
+        bool RandomizeRandomSpawns;
+        bool UseSameType;
+    } m_Config;
 
     /// Initialises Hooks/etc.
     void Initialise ();

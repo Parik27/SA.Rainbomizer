@@ -25,6 +25,7 @@
 #include "functions.hh"
 #include "traffic.hh"
 #include "config.hh"
+#include "scm.hh"
 
 ParkedCarRandomizer *ParkedCarRandomizer::mInstance = nullptr;
 
@@ -34,7 +35,8 @@ ParkedCarRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig ("ParkedCarRandomizer", 
             std::pair ("RandomizeFixedSpawns", &m_Config.RandomizeFixedSpawns),
-            std::pair ("RandomizeRandomSpawns", &m_Config.RandomizeRandomSpawns)))
+            std::pair ("RandomizeRandomSpawns", &m_Config.RandomizeRandomSpawns),
+            std::pair ("RandomizeToSameType", &m_Config.UseSameType)))
         return;
 
     if (m_Config.RandomizeRandomSpawns)
@@ -67,13 +69,72 @@ ParkedCarRandomizer::GetInstance ()
 }
 
 /*******************************************************/
+int
+GetRandomCarOfType (int originalCar)
+{
+    if (find (ScriptVehicleRandomizer::cars.begin (),
+              ScriptVehicleRandomizer::cars.end (), originalCar)
+        != ScriptVehicleRandomizer::cars.end ())
+        {
+            originalCar = GetRandomElement (ScriptVehicleRandomizer::cars);
+        }
+    else if (find (ScriptVehicleRandomizer::bikes.begin (),
+                   ScriptVehicleRandomizer::bikes.end (), originalCar)
+             != ScriptVehicleRandomizer::bikes.end ())
+        {
+            originalCar = GetRandomElement (ScriptVehicleRandomizer::bikes);
+        }
+    else if (find (ScriptVehicleRandomizer::planes.begin (),
+                   ScriptVehicleRandomizer::planes.end (), originalCar)
+             != ScriptVehicleRandomizer::planes.end ())
+        {
+            originalCar = GetRandomElement (ScriptVehicleRandomizer::planes);
+        }
+    else if (find (ScriptVehicleRandomizer::helis.begin (),
+                   ScriptVehicleRandomizer::helis.end (), originalCar)
+             != ScriptVehicleRandomizer::helis.end ())
+        {
+            originalCar = GetRandomElement (ScriptVehicleRandomizer::helis);
+        }
+    else if (find (ScriptVehicleRandomizer::boats.begin (),
+                   ScriptVehicleRandomizer::boats.end (), originalCar)
+             != ScriptVehicleRandomizer::boats.end ())
+        {
+            originalCar = GetRandomElement (ScriptVehicleRandomizer::boats);
+        }
+    else if (find (ScriptVehicleRandomizer::trains.begin (),
+                   ScriptVehicleRandomizer::trains.end (), originalCar)
+             != ScriptVehicleRandomizer::trains.end ())
+        {
+            originalCar = GetRandomElement (ScriptVehicleRandomizer::trains);
+        }
+    else if (find (ScriptVehicleRandomizer::trailers.begin (),
+                   ScriptVehicleRandomizer::trailers.end (), originalCar)
+             != ScriptVehicleRandomizer::trailers.end ())
+        {
+            originalCar = GetRandomElement (ScriptVehicleRandomizer::trailers);
+        }
+    else
+        {
+            originalCar = random (400, 611);
+        }
+    return originalCar;
+}
+
+/*******************************************************/
 /* This function hooks the CheckForBlockage function of a car generator
    to change the model index of a car generator. */
 /*******************************************************/
 void __fastcall RandomizeFixedSpawn (CCarGenerator *gen)
 {
     auto oldModel   = gen->m_nModelId;
-    gen->m_nModelId = random (400, 611);
+    
+    if (!ParkedCarRandomizer::m_Config.UseSameType)
+        gen->m_nModelId = random (400, 611);
+    else
+    {
+        gen->m_nModelId = GetRandomCarOfType (oldModel);
+    }
 
     gen->DoInternalProcessing ();
     gen->m_nModelId = oldModel;

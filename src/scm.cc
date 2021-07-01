@@ -468,9 +468,15 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                                       + std::to_string (newModel));
 
     ApplyFixesBasedOnModel (model, newModel, x, y, z);
-    GetModelExceptions (model, newModel);
+    
+    if (!ScriptVehicleRandomizer::m_Config.SkipChecks)
+        GetModelExceptions (model, newModel);
+    
     ApplyFixesBasedOnMission ();
     ApplySpecificPosChanges (model, newModel, x, y, z);
+
+    if (ScriptVehicleRandomizer::m_Config.ForcedVehicle > 350)
+        newModel = ScriptVehicleRandomizer::m_Config.ForcedVehicle;
 
     // Load the new vehicle. Fallback to the original if needed
     if (StreamingManager::AttemptToLoadVehicle (newModel) == ERR_FAILED)
@@ -539,18 +545,102 @@ int
 ScriptVehicleRandomizer::ProcessVehicleChange (int id, float &x, float &y,
                                                float &z)
 {
-    Vector3 pos = {x, y, z};
-    for (auto &pattern : mPatterns)
-        {
-            if (pattern.MatchVehicle(id, mLastThread, pos))
+    if (!m_Config.SkipChecks)
+    {
+        Vector3 pos = {x, y, z};
+        for (auto &pattern : mPatterns)
                 {
-                    int newVehID = pattern.GetRandom (pos);
-                    x            = pos.x;
-                    y            = pos.y;
-                    z            = pos.z;
-                    return newVehID;
+                    if (pattern.MatchVehicle (id, mLastThread, pos))
+                        {
+                            int newVehID = pattern.GetRandom (pos);
+                            x            = pos.x;
+                            y            = pos.y;
+                            z            = pos.z;
+                            return newVehID;
+                        }
+                }
+    }
+    if (find (recognisedScripts.begin (), recognisedScripts.end (),
+                       mLastThread)
+                 == recognisedScripts.end () || m_Config.GenericPatterns)
+    {
+        std::vector<uint16_t> validVehicles;
+        std::vector<uint16_t> validSeats;
+        eVehicleClass         vehicleType = GetVehicleType (id);
+
+        if (id == 530)
+            validSeats.push_back (530);
+        else if (id == 539)
+            validSeats.push_back (539);
+        else
+        {
+                switch (vehicleType)
+                    {
+                    case VEHICLE_AUTOMOBILE:
+                    case VEHICLE_MTRUCK:
+                    case VEHICLE_BIKE:
+                    case VEHICLE_BMX:
+                    case VEHICLE_QUAD:
+                        validVehicles.insert (validVehicles.end (),
+                                              cars.begin (), cars.end ());
+                        validVehicles.insert (validVehicles.end (),
+                                              bikes.begin (), bikes.end ());
+                        validVehicles.insert (validVehicles.end (),
+                                              helis.begin (), helis.end ());
+                        break;
+
+                    case VEHICLE_PLANE:
+                    case VEHICLE_FPLANE:
+                        validVehicles.insert (validVehicles.end (),
+                                              planes.begin (), planes.end ());
+                        validVehicles.insert (validVehicles.end (),
+                                              helis.begin (), helis.end ());
+                        break;
+
+                    case VEHICLE_HELI:
+                    case VEHICLE_FHELI:
+                        validVehicles.insert (validVehicles.end (),
+                                              helis.begin (), helis.end ());
+                        break;
+
+                    case VEHICLE_BOAT:
+                        validVehicles.insert (validVehicles.end (),
+                                              boats.begin (), boats.end ());
+                        validVehicles.push_back (460);
+                        validVehicles.push_back (539);
+                        validVehicles.push_back (447);
+                        validVehicles.push_back (417);
+                        break;
+
+                    case VEHICLE_TRAIN:
+                        validVehicles.insert (validVehicles.end (),
+                                              trains.begin (), trains.end ());
+                        break;
+
+                    case VEHICLE_TRAILER:
+                        validVehicles.insert (validVehicles.end (),
+                                              cars.begin (), cars.end ());
+                        validVehicles.insert (validVehicles.end (),
+                                              planes.begin (), planes.end ());
+                        validVehicles.insert (validVehicles.end (),
+                                              helis.begin (), helis.end ());
+                        validVehicles.insert (validVehicles.end (),
+                                              trailers.begin (),
+                                              trailers.end ());
+                        break;
+                    }
+                for (auto vehicle : validVehicles)
+                {
+                        if (mSeatsCache[id - 400] <= mSeatsCache[vehicle - 400])
+                            validSeats.push_back (vehicle);
                 }
         }
+
+        if (validSeats.size () > 0)
+            return GetRandomElement (validSeats);
+
+        return id;
+    }
     return random(400, 611);
 }
 
@@ -2323,7 +2413,8 @@ void
 ScriptVehicleRandomizer::Initialise ()
 {
     RegisterHooks ({{HOOK_CALL, 0x486DB1, (void *) &MoveFlyingSchoolTrigger},
-                    {HOOK_CALL, 0x47F688, (void *) &Ryder2IsCutsceneActive}});
+         {HOOK_CALL, 0x47F688, (void *) &Ryder2IsCutsceneActive},
+         {HOOK_CALL, 0x53BCD9, (void *) &InitialiseCacheForRandomization}});
 
     if (!ConfigManager::ReadConfig ("ScriptVehicleRandomizer", 
         std::pair ("EnableExtraTimeForSchools", &m_Config.MoreSchoolTestTime),
@@ -2368,7 +2459,6 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x4985DA, (void *) &VehicleUpdateFix},
          {HOOK_CALL, 0x49128C, (void *) &FixGTAMadman},
          {HOOK_CALL, 0x475BBC, (void *) &FixGearUp},
-         {HOOK_CALL, 0x53BCD9, (void *) &InitialiseCacheForRandomization},
          {HOOK_CALL, 0x489835, (void *) &FixMaddDogg},
          {HOOK_CALL, 0x495429, (void *) &FixMaddDoggBoxes},
          {HOOK_CALL, 0x48ABB0, (void *) &AlwaysPickUpPackagesTBone},
@@ -2465,10 +2555,17 @@ ScriptVehicleRandomizer::Initialise ()
 void
 ScriptVehicleRandomizer::InitialiseCache ()
 {
-    CacheSeats ();
-    this->CachePatterns ();
-
-    Logger::GetLogger ()->LogMessage ("Initialised Script Vehicles cache");
+    if (ConfigManager::ReadConfig ("ScriptVehicleRandomizer") || 
+        ConfigManager::ReadConfig ("ParkedCarRandomizer"))
+        CacheSeats ();
+    
+    if (ConfigManager::ReadConfig ("ScriptVehicleRandomizer") 
+        && !m_Config.SkipChecks)
+    {
+            this->CachePatterns ();
+            Logger::GetLogger ()->LogMessage (
+                "Initialised Script Vehicles cache");
+    }
 }
 
 /*******************************************************/

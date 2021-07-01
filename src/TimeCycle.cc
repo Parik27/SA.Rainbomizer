@@ -159,6 +159,7 @@ TimeCycleRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig ("TimeCycleRandomizer",
         std::pair("RandomizeTimeCycle", &m_Config.RandomizeTimeCycle),
+        std::pair("ChangeOnFade", &m_Config.ChangeOnFade),
         std::pair("RandomizeWeather", &m_Config.RandomizeWeather)))
         return;
 
@@ -179,6 +180,7 @@ TimeCycleRandomizer::Initialise ()
     if (m_Config.RandomizeTimeCycle)
     {
         RegisterHooks ({{HOOK_CALL, 0x5BBCE2, (void *) &ChangeTimeCycleValues}});
+        if (m_Config.ChangeOnFade)
             FadesManager::AddFadeCallback (Call<0x5BBAC0>);
     }
 

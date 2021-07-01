@@ -37,8 +37,20 @@ ClothesRandomizer::RandomizePlayerModel ()
         {
             model = 298;
             if (m_Config.ForcedSpecial == "")
+            {
+                std::string randomSpecialModel
+                        = GetRandomElement (PedRandomizer::specialModels);
+                
+                if (m_Config.RandomizePlayerOnce
+                 && !m_RandomizeOnceInfo.Initialised)
+                {
+                        m_RandomizeOnceInfo.SpecialModel = randomSpecialModel;
+                        m_Config.ForcedSpecial           = randomSpecialModel;
+                }
+
                 CStreaming::RequestSpecialModel (
-                    model, GetRandomElement (PedRandomizer::specialModels).c_str (), 0);
+                        model, randomSpecialModel.c_str (), 0);
+            }
             else
                 CStreaming::RequestSpecialModel (
                     model, m_Config.ForcedSpecial.c_str(), 0);
@@ -47,6 +59,18 @@ ClothesRandomizer::RandomizePlayerModel ()
         CStreaming::RequestModel (model, 0);
 
     CStreaming::LoadAllRequestedModels (false);
+
+    if (m_Config.RandomizePlayerOnce && !m_RandomizeOnceInfo.Initialised)
+        {
+            m_RandomizeOnceInfo.isClothes = false;
+            if (m_Config.ForcedModel >= 0)
+                m_RandomizeOnceInfo.ChosenModel = m_Config.ForcedModel;
+            else
+                m_RandomizeOnceInfo.ChosenModel = model;
+            
+            m_Config.ForcedModel = m_RandomizeOnceInfo.ChosenModel;
+            m_RandomizeOnceInfo.Initialised = true;
+        }
 
     if (ms_aInfoForModel[model].m_nLoadState != 1)
         model = 0;
@@ -66,10 +90,20 @@ ClothesRandomizer::RandomizePlayerClothes ()
                 = ClothesRandomizer::GetInstance ()->GetRandomCRCForComponent (
                     i);
 
+            if (m_Config.RandomizePlayerOnce
+                && !m_RandomizeOnceInfo.Initialised)
+                m_RandomizeOnceInfo.RandomClothes->push_back (cloth);
+            else if (m_Config.RandomizePlayerOnce
+                     && m_RandomizeOnceInfo.Initialised)
+                cloth = m_RandomizeOnceInfo.RandomClothes->at(i);
+
             Scrpt::CallOpcode (0x784, "set_player_model_tex_crc", GlobalVar (2),
                                cloth.second, cloth.first, i);
             Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
         }
+
+    if (m_Config.RandomizePlayerOnce && !m_RandomizeOnceInfo.Initialised)
+        m_RandomizeOnceInfo.Initialised = true;
 
     Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
     CStreaming::LoadAllRequestedModels (false);
@@ -82,14 +116,23 @@ ClothesRandomizer::HandleClothesChange ()
     if (CGame::bMissionPackGame)
         return;
 
+    if (m_Config.RandomizePlayerOnce && m_RandomizeOnceInfo.Initialised)
+    {
+        if (m_RandomizeOnceInfo.isClothes)
+            RandomizePlayerClothes ();
+        else
+            RandomizePlayerModel ();
+    }
+
     if (m_Config.RandomizePlayerClothing && m_Config.RandomizePlayerModel)
         {
-            if (random (100) >= m_Config.OddsOfNewModel)
+            if (random (100) >= m_Config.OddsOfNewModel && m_Config.ForcedModel < 0)
                 RandomizePlayerClothes ();
             else
                 RandomizePlayerModel ();
         }
-    else if (m_Config.RandomizePlayerClothing && !m_Config.RandomizePlayerModel)
+    else if (m_Config.RandomizePlayerClothing && !m_Config.RandomizePlayerModel
+             && m_Config.ForcedModel < 0)
         RandomizePlayerClothes ();
     else if (m_Config.RandomizePlayerModel && !m_Config.RandomizePlayerClothing)
         RandomizePlayerModel ();
@@ -168,6 +211,7 @@ ClothesRandomizer::Initialise ()
         std::pair("RandomizePlayerClothing", &m_Config.RandomizePlayerClothing),
         std::pair("OddsOfNewModel", &m_Config.OddsOfNewModel),
         std::pair("IncludeNSFWModels", &m_Config.IncludeNSFWModels),
+        std::pair ("RandomizePlayerOnce", &m_Config.RandomizePlayerOnce),
         std::pair("ForcedModel", &m_Config.ForcedModel),
         std::pair("ForcedSpecialModel", &m_Config.ForcedSpecial)))
         return;

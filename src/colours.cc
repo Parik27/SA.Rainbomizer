@@ -166,7 +166,16 @@ CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
     int hash = HashColour ({r, g, b, a});
     HSVtoRGB ((int) (time / 10 + hash) % 360, 0.7, 0.7, colour);
 
-    if (((r != 255 && g != 255 && b != 255) && (r != 0 && g != 0 && b != 0)) || crazyMode)
+    bool randomizeColour = false;
+
+    if (ColourRandomizer::m_Config.OldColourRandomization && r != g && g != b)
+        randomizeColour = true;
+    else if (!ColourRandomizer::m_Config.OldColourRandomization
+             && ((r != 255 && g != 255 && b != 255)
+                 && (r != 0 && g != 0 && b != 0)))
+        randomizeColour = true;
+
+    if (randomizeColour || crazyMode)
         {
             thisCol->r = colour[0];
             thisCol->g = colour[1];
@@ -182,41 +191,6 @@ CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
         }
     return thisCol;
 }
-    //CRGBA
-//GenerateRandomColour (uint8_t r, uint8_t g, uint8_t b,
-//                      bool hueCycle)
-//{
-//    HSL h ({r, g, b, 255});
-//
-//    if (!hueCycle)
-//        {
-//
-//            h.h = fmod (h.h + ColourRandomizer::HudRandomizerSeed, 360.0f);
-//            h.s = fmod (h.s + ColourRandomizer::HudRandomizerSeed, 0.5f) + 0.5f;
-//            //h.l = randomFloat (0.0f, 1.0f);
-//        }
-//    else
-//        {
-//            double time = 1000.0 * clock () / CLOCKS_PER_SEC;
-//            h.h += fmod (time / 10 + h.h, 360);
-//            h.s = 0.8f;
-//        }
-//
-//    return h.ToRGBA ();
-//}
-
-///*******************************************************/
-//static CRGBA *__fastcall RandomizeColours (CRGBA *col, void *, uint8_t r,
-//                                           uint8_t g, uint8_t b, uint8_t a)
-//{
-//    auto colour = GenerateRandomColour (r, g, b);
-//    col->r      = colour.r;
-//    col->g      = colour.g;
-//    col->b      = colour.b;
-//    col->a      = a;
-//
-//    return col;
-//}
 
 /*******************************************************/
 CRGBA *__fastcall SkipRandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
@@ -255,19 +229,22 @@ RandomizeCoronaColours (int ID, CEntity *attachTo, char red, char green,
                         bool reflectionDelay)
 {
     CRGBA colour = {red, green, blue, alpha};
-    ColourRandomizer::Pattern currentID = {ID, {colour.r, colour.g, colour.b}};
-    if (GetColour (currentID).ID == -1)
+    if (!ColourRandomizer::m_Config.ConsistentLights)
     {
-        currentID.colours[0] = random (255);
-        currentID.colours[1] = random (255);
-        currentID.colours[2] = random (255);
-        colourPatterns.push_back (currentID);
-    }
-    else
-    {
-        colour.r = GetColour (currentID).colours[0];
-        colour.g = GetColour (currentID).colours[1];
-        colour.b = GetColour (currentID).colours[2];
+        ColourRandomizer::Pattern currentID = {ID, {colour.r, colour.g, colour.b}};
+        if (GetColour (currentID).ID == -1)
+        {
+            currentID.colours[0] = random (255);
+            currentID.colours[1] = random (255);
+            currentID.colours[2] = random (255);
+            colourPatterns.push_back (currentID);
+        }
+        else
+        {
+            colour.r = GetColour (currentID).colours[0];
+            colour.g = GetColour (currentID).colours[1];
+            colour.b = GetColour (currentID).colours[2];
+        }
     }
     colour = GetRainbowColour (HashColour (colour));
     CCoronas::RegisterCorona (ID, attachTo, colour.r, colour.g, colour.b, alpha, posn, radius,
@@ -289,20 +266,23 @@ RandomizeLightColours (int ID, CEntity *attachTo, char red, char green,
                         bool reflectionDelay)
 {
     CRGBA colour = {red, green, blue, alpha};
-    ColourRandomizer::Pattern currentID = {ID, {colour.r, colour.g, colour.b}};
-    if (GetColour (currentID).ID == -1)
+    if (!ColourRandomizer::m_Config.ConsistentLights)
     {
-        currentID.colours[0] = random (255);
-        currentID.colours[1] = random (255);
-        currentID.colours[2] = random (255);
-        colourPatterns.push_back (currentID);
-    }
-    else
+        ColourRandomizer::Pattern currentID = {ID, {colour.r, colour.g, colour.b}};
+        if (GetColour (currentID).ID == -1)
+        {
+            currentID.colours[0] = random (255);
+            currentID.colours[1] = random (255);
+            currentID.colours[2] = random (255);
+            colourPatterns.push_back (currentID);
+        }
+        else
         {
             colour.r = GetColour (currentID).colours[0];
             colour.g = GetColour (currentID).colours[1];
             colour.b = GetColour (currentID).colours[2];
         }
+    }
     colour = GetRainbowColour (HashColour (colour));
     CCoronas::RegisterCorona (ID, attachTo, colour.r, colour.g, colour.b, alpha,
                               posn, radius, farClip, texture, flaretype,
@@ -506,21 +486,31 @@ ColourRandomizer::Initialise ()
     weaponHUDSprite = {1, {random (255), random (255), random (255)}};
 
     if (m_Config.RandomizeCarCols)
-        RegisterHooks (
-            {{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables<true>},
-             {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour}, 
-             {HOOK_CALL, 0x47EA9B, (void *) &RandomizeScriptVehicleColours},
-             {HOOK_CALL, 0x47B8FE, (void *) &RandomizeScriptVehicleColours}});
+    {
+            RegisterHooks (
+                {{HOOK_CALL, 0x5B8F17, (void *) &RandomizeColourTables<true>},
+                 {HOOK_JUMP, 0x4C8500, (void *) &RandomizeVehicleColour},
+                 {HOOK_CALL, 0x47EA9B, (void *) &RandomizeScriptVehicleColours},
+                 {HOOK_CALL, 0x47B8FE,
+                  (void *) &RandomizeScriptVehicleColours}});
 
-            FadesManager::AddFadeCallback ([] { RandomizeColourTables<false>(); });
+            if (m_Config.ChangeCarColsFade)
+            {
+                FadesManager::AddFadeCallback (
+                        [] { RandomizeColourTables<false> (); });
+            }
+    }
+
     if (m_Config.RandomizeText)
         {
             RegisterHooks (
                 {{HOOK_JUMP, 0x7170C0, (void *) &RandomizeColours},
                  {HOOK_CALL, 0x728788, (void *) &SkipRandomizeColours},
                  {HOOK_CALL, 0x721CE0, (void *) &SkipRandomizeColours}});
-
-        injector::MakeCALL (0x58D978, (void *) &AddColourExceptions<0x58D978>); // Fist Sprite
+            
+        if (m_Config.RandomizeWeaponSprites && !m_Config.OldColourRandomization)
+            injector::MakeCALL (0x58D978, (void *) &AddColourExceptions<0x58D978>); // Fist Sprite
+        
         injector::MakeCALL (0x586850, (void *) &AddColourExceptions<0x586850>); // Gang Territories
 
         for (int address :
@@ -528,25 +518,14 @@ ColourRandomizer::Initialise ()
         {
                 injector::MakeCALL (address, (void *) &RandomizeBlipColourID);
         }
-
-        injector::MakeCALL (0x58D8FD, (void *) &RandomizeWeaponSpriteColours <0x58D8FD>); // Weapon Icon
+        
+        if (m_Config.RandomizeWeaponSprites && !m_Config.OldColourRandomization)
+            injector::MakeCALL (0x58D8FD, (void *) &RandomizeWeaponSpriteColours <0x58D8FD>); // Weapon Icon
+        
         injector::MakeCALL (0x58E95B, (void *) &RandomizeWeaponSpriteColours<0x58E95B>); // FPS Crosshair 1
         injector::MakeCALL (0x58E9CA, (void *) &RandomizeWeaponSpriteColours<0x58E9CA>); // FPS Crosshair 2
         injector::MakeCALL (0x58EA39, (void *) &RandomizeWeaponSpriteColours<0x58EA39>); // FPS Crosshair 3
         injector::MakeCALL (0x58EAA8, (void *) &RandomizeWeaponSpriteColours<0x58EAA8>); // FPS Crosshair 4
-
-        //injector::MakeCALL (0x7433A3, (void *) &RandomizeWeaponEffectColours<0x7433A3>);
-        //injector::MakeCALL (0x7434F2, (void *) &RandomizeWeaponEffectColours<0x7434F2>);
-        //injector::MakeCALL (0x74378E, (void *) &RandomizeWeaponEffectColours<0x74378E>);
-        //injector::MakeCALL (0x7438AB, (void *) &RandomizeWeaponEffectColours<0x7438AB>);
-
-        //injector::MakeCALL (0x56F18B, (void *) &RandomizeMoreWeaponEffectColours<0x56F18B>);
-        //injector::MakeCALL (0x742EAF, (void *) &RandomizeMoreWeaponEffectColours<0x742EAF>);
-        //injector::MakeCALL (0x742F45, (void *) &RandomizeMoreWeaponEffectColours<0x742F45>);
-        //injector::MakeCALL (0x743073, (void *) &RandomizeMoreWeaponEffectColours<0x743073>);
-        //injector::MakeCALL (0x74311D, (void *) &RandomizeMoreWeaponEffectColours<0x74311D>);
-        //injector::MakeCALL (0x743A0A, (void *) &RandomizeMoreWeaponEffectColours<0x743A0A>);
-        //injector::MakeCALL (0x743BD4, (void *) &RandomizeMoreWeaponEffectColours<0x743BD4>);
     }
 
     if (m_Config.RandomizeMarkers)
@@ -621,8 +600,11 @@ ColourRandomizer::Initialise ()
             injector::MakeRangedNOP (0x50BF22 + 5, 0x50BF33);
         }
 
-    FadesManager::AddFadeCallback (
-        [] { ColourRandomizer::HudRandomizerSeed = random (INT_MAX); });
+    if (m_Config.ChangeOnFade)
+    {
+        FadesManager::AddFadeCallback (
+                [] { ColourRandomizer::HudRandomizerSeed = random (INT_MAX); });
+    }
 
     Logger::GetLogger ()->LogMessage ("Initialised ColourRandomizer");
 }

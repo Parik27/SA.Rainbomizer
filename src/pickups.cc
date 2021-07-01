@@ -78,7 +78,13 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
                  char pickupType, int ammo, unsigned int moneyPerDay,
                  char isEmpty, char *message)
 {
-    modelId = SelectRandomPickup (modelId, false);
+    if (PickupsRandomizer::m_Config.ReplaceWithWeaponsOnly)
+    {
+        if (weaponToModel.find (modelId) != weaponToModel.end ())
+            modelId = SelectRandomPickup (modelId, false);
+    }
+    else
+        modelId = SelectRandomPickup (modelId, false);
 
     return CPickups::GenerateNewOne (x, y, z, modelId, pickupType, ammo,
                                      moneyPerDay, isEmpty, message);
@@ -88,7 +94,7 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
 int
 InitialiseCacheForPickupRandomization (void *fileName)
 {
-     WeaponRandomizer::GetInstance()->CachePatterns ();
+    WeaponRandomizer::GetInstance()->CachePatterns ();
     return CGame::Init2 (fileName);
 }
 
@@ -135,7 +141,6 @@ PickupsRandomizer::Initialise ()
             std::pair ("RandomizePedWeaponDrops", &m_Config.RandomizeDeadPed),
             std::pair ("ReplaceWithWeaponsOnly", &m_Config.ReplaceWithWeaponsOnly),
             std::pair("MoneyFromRandomPickups", &m_Config.MoneyFromPickups),
-            std::pair ("PickupsCustomSeed", &m_Config.PickupsSeed),
             std::pair ("SkipChecks", &m_Config.SkipChecks)))
         return;
 
@@ -149,12 +154,14 @@ PickupsRandomizer::Initialise ()
     injector::MakeCALL (0x4592F7, &RandomizeWeaponPickup);
     injector::MakeCALL (0x5921B5, &RandomizeWeaponPickup);
 
-    for (int address : {0x43989F, 0x457DF2, 0x457F91})
+    if (m_Config.MoneyFromPickups)
     {
-        injector::MakeCALL (address, &GiveMoneyForBriefcase);
+        for (int address : {0x43989F, 0x457DF2, 0x457F91})
+            injector::MakeCALL (address, &GiveMoneyForBriefcase);
     }
 
-    injector::MakeCALL (0x53BCA6, (void *) &InitialiseCacheForPickupRandomization);
+    if (!m_Config.SkipChecks)
+        injector::MakeCALL (0x53BCA6, (void *) &InitialiseCacheForPickupRandomization);
 
     Logger::GetLogger ()->LogMessage ("Intialised PickupsRandomizer");
 }

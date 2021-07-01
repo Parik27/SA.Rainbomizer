@@ -275,6 +275,8 @@ void __fastcall RandomizeFrontendAudio (CAudioEngine *audioEngine,
         = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
            13, 14, 15, 17, 18, 19, 20, 32, 40, 43, 44, 45, 46};
 
+    std::vector<int> onlyInGameSounds = {16, 27, 28, 29, 30, 49};
+
     int randomEvent;
     if (find (validSounds.begin (), validSounds.end (), eventId)
         == validSounds.end ())
@@ -285,12 +287,8 @@ void __fastcall RandomizeFrontendAudio (CAudioEngine *audioEngine,
     {
         if (eventId > 5)
         {
-            soundsToPickFrom.push_back (16);
-            soundsToPickFrom.push_back (27);
-            soundsToPickFrom.push_back (28);
-            soundsToPickFrom.push_back (29);
-            soundsToPickFrom.push_back (30);
-            soundsToPickFrom.push_back (49);
+                soundsToPickFrom.insert (soundsToPickFrom.end (),
+                                         onlyInGameSounds.begin (), onlyInGameSounds.end ());
         }
         randomEvent = soundsToPickFrom[random (soundsToPickFrom.size () - 1)];
     }

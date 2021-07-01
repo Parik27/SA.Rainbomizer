@@ -10,6 +10,9 @@
 
 void    CacheSeats ();
 
+// Determines the type of vehicle of current ID (car, bike, boat, plane, etc)
+eVehicleClass GetVehicleType (int vehID);
+
 /*******************************************************/
 /* Class to handle a single script vehicle pattern.    */
 /*******************************************************/
@@ -199,9 +202,6 @@ public:
     {
         return static_cast<uint32_t> (m_aCache.size ());
     }
-
-    // Determines the type of vehicle of current ID (car, bike, boat, plane, etc)
-    eVehicleClass GetVehicleType (int vehID);
 
     // Returns if a vehicle matches a certain pattern
     bool DoesVehicleMatchPattern (int vehID);

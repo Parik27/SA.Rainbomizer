@@ -178,7 +178,7 @@ public:
 
     static inline int mCurrentMissionRunning = -1;
     static inline int mCourierMissionType    = -1;
-    static inline int mDes3HeliHandle = -1;
+    static inline int mTempVehHandle = -1;
     static inline int mDes3Stuck          = false;
 
     // Struct for RC heli magnet sections

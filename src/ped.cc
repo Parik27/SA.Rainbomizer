@@ -34,8 +34,8 @@ PedRandomizer::ChooseRandomPedToLoad ()
 uint32_t
 PedRandomizer::GetRandomModelIndex (uint32_t originalIdx)
 {
-    if (originalIdx == 0)
-        return originalIdx;
+    //if (originalIdx == 0)
+    //    return originalIdx;
 
     if (!m_Config.RandomizeCops && originalIdx >= 280 && originalIdx <= 288)
         return originalIdx;
@@ -72,9 +72,12 @@ PedRandomizer::GetRandomModelIndex (uint32_t originalIdx)
 /*******************************************************/
 void __fastcall PedRandomizer::RandomizePedModelIndex (CEntity *entity, void *,
                                                        uint32_t index)
-{
+{   
+    if (entity != FindPlayerPed ())
+        index = GetRandomModelIndex (index);
+   
     HookManager::CallOriginal<injector::thiscall<void (CEntity *, uint32_t)>,
-                              0x5E4890> (entity, GetRandomModelIndex (index));
+                              0x5E4890> (entity, index);
 }
 
 /*******************************************************/
@@ -107,24 +110,6 @@ PedRandomizer::IsSpecialModel (int model)
         return true;
 
     return false;
-}
-
-/*******************************************************/
-void
-CheckDataAboutKilledPeds (CPed *pedKilled, int typeOfWeapon, char wasHeadShot,
-                          int vehicle)
-{
-    char canTriggerGangWar = injector::ReadMemory<char> (0x96AB93);
-    int  numSpecificZones  = injector::ReadMemory<int> (0x96AB94);
-    float gangAnger         = injector::ReadMemory<float> (0x96AB5C);
-    Logger::GetLogger()->LogMessage("Dead Ped Type: "
-                       + std::to_string (pedKilled->m_nPedType));
-    Logger::GetLogger ()->LogMessage (
-        "Gang Info (can trigger, num specific, anger): "
-        + std::to_string ((int) canTriggerGangWar) + ", "
-        + std::to_string (numSpecificZones) + ", "
-        + std::to_string (gangAnger));
-    Call<0x43DCD0>(pedKilled, typeOfWeapon, wasHeadShot, vehicle);
 }
 
 /*******************************************************/
@@ -189,12 +174,6 @@ PedRandomizer::Initialise ()
 
     if (m_Config.RandomizeGangMembers)
         injector::MakeCALL (0x43DEE9, (void *) MakeGangWarsConsistent);
-
-    //RegisterHooks ({{HOOK_CALL, 0x4B93AA, (void *) &CheckDataAboutKilledPeds},
-    //                {HOOK_CALL, 0x6D1CBC, (void *) &CheckDataAboutKilledPeds},
-    //                {HOOK_CALL, 0x6D1D27, (void *) &CheckDataAboutKilledPeds},
-    //                {HOOK_CALL, 0x6D2276, (void *) &CheckDataAboutKilledPeds},
-    //                {HOOK_CALL, 0x6D22B7, (void *) &CheckDataAboutKilledPeds}});
 
     Logger::GetLogger ()->LogMessage ("Intialised PedRandomizer");
 }

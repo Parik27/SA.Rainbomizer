@@ -65,9 +65,6 @@ CZone *CheckNewZone (CVector *point, char checkType)
             // Memory address storing if riot cheat is enabled
             // Checked before randomizing riot and written to in order to enable it
             int riotCheatActive = 0x969130 + 69;
-
-            Logger::GetLogger ()->LogMessage ("Zone changed to "
-                    + std::string (currentZone->m_szTextKey));
             
             // Check if riots already enabled separate from randomizer
             // Doesn't take effect in these cases for simplicity

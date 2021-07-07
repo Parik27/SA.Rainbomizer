@@ -443,8 +443,8 @@ WeaponRandomizer::GetRandomWeapon(CPed* ped, int weapon, bool isPickup)
 {
     std::vector<int> buggy_weapons;
 
-    if (!isPickup && weapon == 46)
-        return 46;
+    if (!isPickup && weapon >= 44 && weapon <= 46)
+        return weapon;
 
     if (isPickup && PickupsRandomizer::m_Config.ReplaceWithWeaponsOnly)
     {

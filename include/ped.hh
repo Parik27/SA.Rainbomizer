@@ -16,7 +16,6 @@ class PedRandomizer
 
     static void __fastcall RandomizePedModelIndex (CEntity *entity, void *,
                                                    uint32_t index);
-
     static int  ChooseRandomPedToLoad ();
     static void RandomizeSpecialModels (int slot, const char *modelName,
                                         int flags);

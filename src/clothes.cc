@@ -103,7 +103,10 @@ ClothesRandomizer::RandomizePlayerClothes ()
         }
 
     if (m_Config.RandomizePlayerOnce && !m_RandomizeOnceInfo.Initialised)
+    {
+        m_RandomizeOnceInfo.isClothes   = true;
         m_RandomizeOnceInfo.Initialised = true;
+    }
 
     Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
     CStreaming::LoadAllRequestedModels (false);
@@ -123,8 +126,8 @@ ClothesRandomizer::HandleClothesChange ()
         else
             RandomizePlayerModel ();
     }
-
-    if (m_Config.RandomizePlayerClothing && m_Config.RandomizePlayerModel)
+    else if (m_Config.RandomizePlayerClothing && m_Config.RandomizePlayerModel
+             && !m_RandomizeOnceInfo.Initialised)
         {
             if (random (100) >= m_Config.OddsOfNewModel && m_Config.ForcedModel < 0)
                 RandomizePlayerClothes ();

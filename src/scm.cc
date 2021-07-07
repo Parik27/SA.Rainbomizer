@@ -340,6 +340,7 @@ ApplyFixesBasedOnModel (int model, int newModel, float x, float y, float z)
         || (model == MODEL_BOXVILLE && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "guns1")
         || (model == MODEL_PCJ && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "toreno2")
         || (model == MODEL_COMBINE && ScriptVehicleRandomizer::GetInstance()->mLastThread == "truth1")
+        || (model == 553 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "heist2")
         || (model == 417 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "des3")
         || (model == 501 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "zero4" && int (x) > -1000)
         || (model == MODEL_VORTEX && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5" 
@@ -1320,18 +1321,39 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx, short c
     }
     else if (scr->CheckName ("guns1")
              && ConfigManager::ReadConfig ("ScriptVehicleRandomizer")
-             && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
-                    != 431
-             && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
-                    != 437)
+             && (ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    == 431
+             || ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    == 437))
     {
         float xRadius = ((float *) ScriptParams)[4];
         float yRadius = ((float *) ScriptParams)[5];
         float zRadius = ((float *) ScriptParams)[6];
         if (int (xRadius) == 2 && int (yRadius) == 3 && int (zRadius) == 5)
-        {
             ((float *) ScriptParams)[5] += 2.0f;
-        }
+    }
+    else if (scr->CheckName ("heist2")
+             && ConfigManager::ReadConfig ("ScriptVehicleRandomizer")
+             && (CModelInfo::IsCarModel(ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()) 
+                 || CModelInfo::IsMonsterTruckModel(ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ())))
+    {
+            float xRadius = ((float *) ScriptParams)[4];
+            float yRadius = ((float *) ScriptParams)[5];
+            float zRadius = ((float *) ScriptParams)[6];
+            if (int (xRadius) == 50 && int (yRadius) == 50 && int (zRadius) == 25 
+                && ScriptVehicleRandomizer::mTempVehHandle != -1)
+            {
+                CVector playerLoc = FindPlayerCoors ();
+                if (playerLoc.x >= -642.42f && playerLoc.x <= -542.42f && 
+                    playerLoc.y >= 1505.88f && playerLoc.y <= 1605.88f && 
+                    playerLoc.z >= 725.0f && playerLoc.z <= 775.0f)
+                {
+                        short isKeyPressed = CallAndReturn<short, 0x485B10> (0, 15);
+                        if (isKeyPressed == 255)
+                            Scrpt::CallOpcode (0x633, "actor_exit_car",
+                                               GlobalVar (3));
+                }
+            }
     }
     else if (scr->CheckName ("litcas") && 
         ConfigManager::ReadConfig("MissionRandomizer"))
@@ -1428,28 +1450,9 @@ void __fastcall Ryder2AttachMagnet (CRunningScript *scr, void *edx, short count)
         }
     else if (scr->CheckName ("des3"))
     {
-        ScriptVehicleRandomizer::mDes3HeliHandle = ScriptParams[0];
+        ScriptVehicleRandomizer::mTempVehHandle = ScriptParams[0];
         ScriptVehicleRandomizer::mDes3Stuck      = true;
     }
-    //else if (scr->CheckName("finalea"))
-    //{
-    //        if (ScriptParams[1] == 1 && ScriptParams[2] == 1 && ScriptParams[3] == 0 
-    //            && ScriptParams[4] == 0 && ScriptParams[5] == 0)
-    //        {
-    //                CVehicle *swatVan = (CVehicle *) (ms_pVehiclePool->m_pObjects
-    //                                    + 0xA18 * (ScriptParams[0] >> 8));
-    //            if (swatVan->m_fMass < 15000.0f)
-    //            {
-    //                    swatVan->m_pHandling->fMass     = 15000.0f;
-    //                    swatVan->m_pHandling->fTurnMass = 50000.0f;
-    //                    swatVan->m_fMass = 15000.0f;
-    //                    swatVan->m_fTurnMass = 50000.0f;
-    //                    Logger::GetLogger ()->LogMessage (
-    //                        "Mass updated to "
-    //                        + std::to_string (swatVan->m_fMass));
-    //            }
-    //        }
-    //}
 }
 
 // Hooks 0175 (set car Z angle)
@@ -1943,7 +1946,7 @@ ResetEndOfMissionStuff (char enable)
     if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5")
         injector::WriteMemory (waterCarsCheatActive, 0);
     
-    ScriptVehicleRandomizer::mDes3HeliHandle = -1;
+    ScriptVehicleRandomizer::mTempVehHandle                         = -1;
     ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning = -1;
     return CallAndReturn<char, 0x6F5DB0> (enable);
 }
@@ -1969,6 +1972,7 @@ SetThingsForMissionStart ()
     Logger::GetLogger ()->LogMessage ("Clearing variables for mission start");
     ryder2 = emptyTemplate;
     quarry = emptyTemplate;
+    ScriptVehicleRandomizer::mTempVehHandle = -1;
     ScriptVehicleRandomizer::mDes3Stuck = false;
     int currentMissionId
         = ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning;
@@ -2148,24 +2152,21 @@ void __fastcall RandomizeTrainForScript (CRunningScript *scr, void *edx,
     scr->CollectParameters (count);
     lastTrainOldType = ScriptParams[0];
     lastTrainNewType = random (0, 15);
+    
     if (scr->CheckName ("ryder3"))
         {
-            std::vector<int> usableTrains = {0, 3, 6, 8, 9, 10, 12, 13, 14, 15};
-            lastTrainNewType = GetRandomElement(usableTrains);
+            std::vector<int> usableTrains = {6, 8, 9, 10, 14, 15};
+            lastTrainNewType              = GetRandomElement (usableTrains);
         }
-    else if (scr->CheckName ("drugs4"))
+    else
     {
-            std::vector<int> shortTrains = {9, 14, 15};
-            lastTrainNewType             = GetRandomElement (shortTrains);
+        while (trainTypes[lastTrainNewType] > trainTypes[lastTrainOldType])
+            lastTrainNewType = random (0, 15);
     }
+    
     eLoadError loadState1 = ERR_LOADED;
     eLoadError loadState2 = ERR_LOADED;
     ScriptParams[0] = lastTrainNewType;
-    Logger::GetLogger ()
-        ->LogMessage ("Last Train Old Type: "
-                          + std::to_string (lastTrainOldType));
-    Logger::GetLogger ()->LogMessage ("Last Train New Type: "
-                                      + std::to_string (lastTrainNewType));
 
     if (lastTrainNewType == 0 || lastTrainNewType == 3 || lastTrainNewType == 6 
         || lastTrainNewType == 10 || lastTrainNewType == 12
@@ -2374,13 +2375,14 @@ void __fastcall DetectVehicleDestruction (CRunningScript *scr, void *edx,
     scr->CollectParameters (count);
     if (scr->CheckName ("des3"))
     {
-        if (ScriptParams[0] == ScriptVehicleRandomizer::mDes3HeliHandle)
+            if (ScriptParams[0] == ScriptVehicleRandomizer::mTempVehHandle)
         {
             if (FindPlayerVehicle ())
             {
                 Scrpt::CallOpcode (0x3c0, "store_car_char_is_in",
                     GlobalVar (3), GlobalVar (9002));
-                if (GetGlobalVar<int> (9002) == ScriptVehicleRandomizer::mDes3HeliHandle)
+                if (GetGlobalVar<int> (9002)
+                    == ScriptVehicleRandomizer::mTempVehHandle)
                 {
                     Scrpt::CallOpcode (0x792, "disembark_actor",
                                            GlobalVar (3));
@@ -2396,34 +2398,41 @@ void __fastcall CheckDes3HeliDriver (CRunningScript *scr, void *edx,
 {
     scr->CollectParameters (count);
     if (scr->CheckName ("des3"))
-    {
-        if (CModelInfo::IsCarModel(ScriptVehicleRandomizer::GetInstance()
-            ->GetNewCarForCheck()) && ScriptParams[0] == ScriptVehicleRandomizer::mDes3HeliHandle)
         {
-            if (!ScriptVehicleRandomizer::mDes3Stuck)
-            {
-                    Scrpt::CallOpcode (0x519, "freeze_car",
-                                       ScriptVehicleRandomizer::mDes3HeliHandle,
-                                       0);
-            }
-            else if (ScriptVehicleRandomizer::mDes3Stuck)
-            {
-                    Scrpt::CallOpcode (0x519, "freeze_car",
-                                       ScriptVehicleRandomizer::mDes3HeliHandle,
-                                       1);
-                if (FindPlayerVehicle ())
+            if (CModelInfo::IsCarModel (ScriptVehicleRandomizer::GetInstance ()
+                                            ->GetNewCarForCheck ())
+                && ScriptParams[0] == ScriptVehicleRandomizer::mTempVehHandle)
                 {
-                        Scrpt::CallOpcode (0x3c0, "store_car_char_is_in",
-                                           GlobalVar (3), GlobalVar (9002));
-                        if (GetGlobalVar<int> (9002)
-                            == ScriptVehicleRandomizer::mDes3HeliHandle)
+                    if (!ScriptVehicleRandomizer::mDes3Stuck)
                         {
-                            ScriptVehicleRandomizer::mDes3Stuck = false;
+                            Scrpt::CallOpcode (
+                                0x519, "freeze_car",
+                                ScriptVehicleRandomizer::mTempVehHandle, 0);
+                        }
+                    else if (ScriptVehicleRandomizer::mDes3Stuck)
+                        {
+                            Scrpt::CallOpcode (
+                                0x519, "freeze_car",
+                                ScriptVehicleRandomizer::mTempVehHandle, 1);
+                            if (FindPlayerVehicle ())
+                                {
+                                    Scrpt::CallOpcode (0x3c0,
+                                                       "store_car_char_is_in",
+                                                       GlobalVar (3),
+                                                       GlobalVar (9002));
+                                    if (GetGlobalVar<int> (9002)
+                                        == ScriptVehicleRandomizer::
+                                            mTempVehHandle)
+                                        {
+                                            ScriptVehicleRandomizer::mDes3Stuck
+                                                = false;
+                                        }
+                                }
                         }
                 }
-            }
         }
-    }
+    else if (scr->CheckName ("heist2"))
+        ScriptVehicleRandomizer::mTempVehHandle = ScriptParams[0];
 }
 
 /*******************************************************/

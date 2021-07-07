@@ -32,7 +32,6 @@ struct CVector;
 struct CBox;
 struct CColModel;
 struct CPhysical;
-struct CPed;
 struct CPool;
 struct CEntity;
 struct tHandlingData;
@@ -243,6 +242,97 @@ struct CCivilianPed
     void CivilianPed (ePedType type, unsigned int modelIndex);
 };
 
+struct CVector
+{
+    float x;
+    float y;
+    float z;
+};
+
+struct CMatrix
+{
+    CVector      right;
+    unsigned int flags;
+    CVector      up;
+    unsigned int pad1;
+    CVector      at;
+    unsigned int pad2;
+    CVector      pos;
+    unsigned int pad3;
+
+    void Attach (CMatrix *attach, char link);
+    void SetRotateZOnly (float angle);
+};
+
+struct CMatrixLink
+{
+    CMatrix matrix;
+};
+
+struct cSimpleTransform
+{
+    CVector m_vPosn;
+    float   m_fAngle;
+};
+
+struct CAEPedAudioEntity
+{
+    char field_0x00[0x15c];
+};
+
+struct CAEPedSpeechAudioEntity
+{
+    char field_0x00[0x100];
+};
+
+struct CEntity
+{
+    int              vtable;
+    cSimpleTransform m_SimpleTransform;
+    CMatrixLink *    m_pMatrix;
+    union
+    {
+        struct RwObject *m_pRwObject;
+        struct RpClump * m_pRwClump;
+        struct RpAtomic *m_pRwAtomic;
+    };
+
+    char  __pad01C[4];
+    short m_nRandomSeed;
+    short m_nModelIndex;
+    char  __pad024[0x14];
+
+    cSimpleTransform *GetPosition ();
+    int               SetHeading (float heading);
+    int               GetHeading ();
+};
+
+struct CPhysical : public CEntity
+{
+    char    __pad038[0xc];
+    CVector m_vecMoveSpeed;
+    CVector m_vecTurnSpeed;
+    char    __pad05c[0xdc];
+};
+
+struct CPed : public CPhysical
+{
+    CAEPedAudioEntity       m_pedAudio;
+    CAEPedSpeechAudioEntity m_pedSpeech;
+    char                    __pad394[216];
+    int                     flags[4];
+    char                    __pad47C[272];
+    CEntity *               m_pVehicle;
+    int                     field_590;
+    int                     field_594;
+    int                     m_nPedType;
+
+    int   GiveWeapon (int weapon, int ammo, int slot);
+    void  SetCurrentWeapon (int slot);
+    void *CCopPed__CCopPed (int type);
+    void  SetModelIndex (int modelIndex);
+};
+
 struct CRunningScript
 {
 public:
@@ -359,6 +449,10 @@ struct CText
     CData     tDataMain;
     CKeyArray tKeyMission;
     CData     tDataMission;
+    char               field_20;
+    char               haveTabl;
+    char               cderrorInitialized;
+    char               missionLoaded;
 
     void  Load (char a2);
     char *Get (char *key);
@@ -470,13 +564,6 @@ struct CAEMp3BankLoader
 
     int  GetLoopOffset (unsigned short sfxId, short bankSlotInfoId);
     char Initialise ();
-};
-
-struct CVector
-{
-    float x;
-    float y;
-    float z;
 };
 
 struct CGenericGameStorage
@@ -626,21 +713,6 @@ struct RwRGBAReal
     float g;
     float b;
     float a;
-};
-
-struct CMatrix
-{
-    CVector      right;
-    unsigned int flags;
-    CVector      up;
-    unsigned int pad1;
-    CVector      at;
-    unsigned int pad2;
-    CVector      pos;
-    unsigned int pad3;
-
-    void Attach (CMatrix *attach, char link);
-    void SetRotateZOnly (float angle);
 };
 
 struct tTransmissionGear
@@ -824,12 +896,6 @@ struct cHandlingDataMgr
     tBoatHandlingData boatHandling[12];
 };
 
-struct cSimpleTransform
-{
-    CVector m_vPosn;
-    float   m_fAngle;
-};
-
 enum eFontAlignment
 {
     ALIGN_CENTRE,
@@ -880,74 +946,16 @@ struct CRect
     float top;
 };
 
-struct CMatrixLink
-{
-    CMatrix matrix;
-};
-
-struct CAEPedAudioEntity
-{
-    char field_0x00[0x15c];
-};
-
-struct CAEPedSpeechAudioEntity
-{
-    char field_0x00[0x100];
-};
-
 struct CMenuManager
 {
     char field_0x00[0x3c];
     float m_dwBrightness;
 };
 
-struct CPed
+struct CPlayerInfo
 {
-    int              vtable;
-    cSimpleTransform m_SimpleTransform;
-    CMatrixLink *    m_pMatrix;
-    union
-    {
-        struct RwObject *m_pRwObject;
-        struct RpClump * m_pRwClump;
-        struct RpAtomic *m_pRwAtomic;
-    };
-
-    char     __pad1C[284];
-    CAEPedAudioEntity m_pedAudio;
-    CAEPedSpeechAudioEntity m_pedSpeech;
-    char                    __pad394[216];
-    int      flags[4];
-    char     __pad47C[272];
-    CEntity *m_pVehicle;
-    int      field_590;
-    int      field_594;
-    int      m_nPedType;
-
-    int   GiveWeapon (int weapon, int ammo, int slot);
-    void  SetCurrentWeapon (int slot);
-    void *CCopPed__CCopPed (int type);
-    void  SetModelIndex (int modelIndex);
-};
-
-struct CPhysical
-{
-    char    field_0x00[0x44];
-    CVector m_vecMoveSpeed;
-    CVector m_vecTurnSpeed;
-};
-
-struct CEntity
-{
-    int              vtable;
-    cSimpleTransform m_SimpleTransform;
-    CMatrixLink *    m_pMatrix;
-    char             __pad018[10];
-    short            m_nModelIndex;
-
-    cSimpleTransform *GetPosition ();
-    int               SetHeading (float heading);
-    int               GetHeading ();
+    CPed *m_pPed;
+    char field_0x00[0x18c];
 };
 
 struct CObject : public CEntity

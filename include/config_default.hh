@@ -138,7 +138,6 @@ EnableExtraTimeForSchools = true
 RandomizeTrains = true
 
 # Allow certain vehicle checks for sub-missions or markers to be skipped so they can be activated with any vehicle
-
 LowriderMissions = true # (Lowrider Minigame, High Stakes Low-Rider)
 WuZiMu = true # (Wu Zi Mu start mission marker)
 SweetsGirl = true # (Picking up Sweet in Sweet's Girl)
@@ -374,6 +373,7 @@ EnableEasterEgg = true
 # Language Randomizer
 # Randomizes the language of text (except for subtitles when using Voice Line Randomizer). 
 # Some types of text will change language at a regular interval which can be adjusted above.
+# WARNING: This randomizer may be incompatible with other mods that add text and should be disabled in such cases.
 
 # License Plate Randomizer
 # Randomizes the license plates of vehicles to random words from the game script.

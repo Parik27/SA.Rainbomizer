@@ -180,8 +180,14 @@ GxtRandomizer::ReadDatEntry (std::istream &in, uint32_t crc32)
 /*******************************************************/
 char *__fastcall GxtRandomizer::GetTextHook (CText *text, void *edx, char *key)
 {
-    //if (CGame::bMissionPackGame)
-    //    return;
+    bool pFound = false;
+    if (CGame::bMissionPackGame)
+    {
+        // CKeyArray::Search
+        char * result = CallMethodAndReturn<char * , 0x6A0000> (text, key, &pFound);
+        if (!pFound)
+            return key;
+    }
 
     int typeOfZoneKey = 0;
     int typeOfVehKey = 0;

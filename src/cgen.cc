@@ -95,9 +95,7 @@ void __fastcall RandomizeFixedSpawn (CCarGenerator *gen)
     if (!ParkedCarRandomizer::m_Config.UseSameType)
         gen->m_nModelId = random (400, 611);
     else
-    {
         gen->m_nModelId = GetRandomCarOfType (oldModel);
-    }
 
     gen->DoInternalProcessing ();
     gen->m_nModelId = oldModel;

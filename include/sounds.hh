@@ -46,6 +46,7 @@ public:
 
     static inline struct Config
     {
+        bool RandomizeMissionLines;
         bool MatchSubtitles;
         bool RandomizePedSpeech;
         bool RandomizeGenericSfx;

@@ -509,7 +509,10 @@ ColourRandomizer::Initialise ()
                  {HOOK_CALL, 0x721CE0, (void *) &SkipRandomizeColours}});
             
         if (m_Config.RandomizeWeaponSprites && !m_Config.OldColourRandomization)
+        {
+            injector::MakeCALL (0x58D8FD, (void *) &RandomizeWeaponSpriteColours<0x58D8FD>); // Weapon Icon
             injector::MakeCALL (0x58D978, (void *) &AddColourExceptions<0x58D978>); // Fist Sprite
+        }
         
         injector::MakeCALL (0x586850, (void *) &AddColourExceptions<0x586850>); // Gang Territories
 
@@ -518,9 +521,6 @@ ColourRandomizer::Initialise ()
         {
                 injector::MakeCALL (address, (void *) &RandomizeBlipColourID);
         }
-        
-        if (m_Config.RandomizeWeaponSprites && !m_Config.OldColourRandomization)
-            injector::MakeCALL (0x58D8FD, (void *) &RandomizeWeaponSpriteColours <0x58D8FD>); // Weapon Icon
         
         injector::MakeCALL (0x58E95B, (void *) &RandomizeWeaponSpriteColours<0x58E95B>); // FPS Crosshair 1
         injector::MakeCALL (0x58E9CA, (void *) &RandomizeWeaponSpriteColours<0x58E9CA>); // FPS Crosshair 2

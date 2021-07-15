@@ -15,23 +15,26 @@
 TimeCycleRandomizer *TimeCycleRandomizer::mInstance = nullptr;
 
 static std::vector<int> weatherRegions = {0, 1, 2, 3, 4};
-static int              lastMissionWeather;
+static int              lastForcedWeather;
+static int              lastNewWeather = 0;
 
 /*******************************************************/
 void
 ChangeForceWeather (short weather)
 {
-    if (weather >= 500 && weather <= 520)
+    if (weather == lastForcedWeather)
     {
-        weather = lastMissionWeather;
+        weather = lastNewWeather;
     }
     else
     {
-        weather = random (19);
+        lastForcedWeather = weather;
+        lastNewWeather = random (19);
+        weather           = lastNewWeather;
     }
-    injector::WriteMemory (0xC81318, weather);
-    injector::WriteMemory (0xC81320, weather);
-    injector::WriteMemory (0xC8131C, weather);
+    injector::WriteMemory (0xC81318, weather); // ForcedWeatherType
+    injector::WriteMemory (0xC81320, weather); // OldWeatherType
+    injector::WriteMemory (0xC8131C, weather); // NewWeatherType
 }
 
 /*******************************************************/
@@ -74,13 +77,6 @@ ShuffleWeatherRegions (CVector *p1)
         }
 
     injector::WriteMemory<short> (0xC81314, weatherRegions[region]);
-}
-
-/*******************************************************/
-void __fastcall SaveMissionWeather (CRunningScript *scr, void *edx, short count)
-{
-    scr->CollectParameters (count);
-    ScriptParams[0] += 500;
 }
 
 /*******************************************************/
@@ -166,15 +162,14 @@ TimeCycleRandomizer::Initialise ()
     if (m_Config.RandomizeWeather)
     {
         RegisterHooks ({{HOOK_JUMP, 0x72A4F0, (void *) &ChangeForceWeather},
-                        {HOOK_JUMP, 0x72A640, (void *) &ShuffleWeatherRegions},
-                        {HOOK_CALL, 0x47D460, (void *) &SaveMissionWeather}});
+                        {HOOK_JUMP, 0x72A640, (void *) &ShuffleWeatherRegions}});
         FadesManager::AddFadeCallback (Call<0x72A4F0>);
         
         FadesManager::AddFadeCallback ([] {
             std::shuffle (weatherRegions.begin (),
                           weatherRegions.end (), std::default_random_engine(time(NULL)));});
         FadesManager::AddFadeCallback (
-            [] { lastMissionWeather = random (19); });
+            [] { lastNewWeather = random (19); });
     }
 
     if (m_Config.RandomizeTimeCycle)

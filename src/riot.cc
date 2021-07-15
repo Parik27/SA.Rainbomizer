@@ -79,8 +79,6 @@ CZone *CheckNewZone (CVector *point, char checkType)
             {
                 RiotRandomizer::riotModeRandomized = true;
                 injector::WriteMemory (riotCheatActive, 1);
-                Logger::GetLogger ()->LogMessage (
-                        "Randomized riot mode for zone");
             }
             else if (!injector::ReadMemory<bool> (gbLARiots)
                 && RiotRandomizer::riotModeRandomized 
@@ -88,8 +86,6 @@ CZone *CheckNewZone (CVector *point, char checkType)
             {
                 RiotRandomizer::riotModeRandomized = false;
                 injector::WriteMemory (riotCheatActive, 0);
-                Logger::GetLogger ()->LogMessage (
-                    "Randomized no riot mode for new zone");
             }
         }
     }

@@ -34,9 +34,6 @@ PedRandomizer::ChooseRandomPedToLoad ()
 uint32_t
 PedRandomizer::GetRandomModelIndex (uint32_t originalIdx)
 {
-    //if (originalIdx == 0)
-    //    return originalIdx;
-
     if (!m_Config.RandomizeCops && originalIdx >= 280 && originalIdx <= 288)
         return originalIdx;
 

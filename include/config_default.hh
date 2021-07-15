@@ -285,6 +285,8 @@ RandomizeLocations = true
 #######################################################
 [VoiceLineRandomizer]
 
+# Main part of this randomizer which changes spoken dialogue in missions.
+RandomizeScriptVoiceLines = true
 MatchSubtitles = true
 
 # Randomizes the type of speech event a ped uses when they're about to speak

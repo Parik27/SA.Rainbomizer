@@ -53,7 +53,6 @@ const int MODEL_BMX      = 481;
 const int MODEL_DOZER    = 486;
 const int MODEL_MAVERICK = 487;
 const int MODEL_GREENWOO = 492;
-const int MODEL_BOXVILLE = 498;
 const int MODEL_BIKE     = 509;
 const int MODEL_MTBIKE   = 510;
 const int MODEL_HYDRA    = 520;
@@ -63,6 +62,7 @@ const int MODEL_FORKLIFT = 530;
 const int MODEL_COMBINE  = 532;
 const int MODEL_VORTEX   = 539;
 const int MODEL_ANDROM   = 592;
+const int MODEL_BOXBURG  = 609;
 
 const int waterCarsCheatActive  = 0x969130 + 34;
 const int flyingCarsCheatActive = 0x969130 + 48;
@@ -337,7 +337,7 @@ ApplyFixesBasedOnModel (int model, int newModel, float x, float y, float z)
         || (model == MODEL_ANDROM && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "desert9")
         || (model == MODEL_GREENWOO && ScriptVehicleRandomizer::GetInstance()->mLastThread == "drugs4")
         || (model == MODEL_VORTEX && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "boat")
-        || (model == MODEL_BOXVILLE && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "guns1")
+        || (model == MODEL_BOXBURG && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "guns1")
         || (model == MODEL_PCJ && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "toreno2")
         || (model == MODEL_COMBINE && ScriptVehicleRandomizer::GetInstance()->mLastThread == "truth1")
         || (model == 553 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "heist2")
@@ -465,19 +465,20 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
                            ()->ProcessVehicleChange (model,
                                                                          x, y,
                                                                          z);
+    if (ScriptVehicleRandomizer::m_Config.ForcedVehicle > 350)
+        newModel = ScriptVehicleRandomizer::m_Config.ForcedVehicle;
+
     Logger::GetLogger ()->LogMessage ("Vehicle Spawned: "
                                       + std::to_string (newModel));
 
     ApplyFixesBasedOnModel (model, newModel, x, y, z);
     
-    if (!ScriptVehicleRandomizer::m_Config.SkipChecks)
+    if (!ScriptVehicleRandomizer::m_Config.SkipChecks
+        && ScriptVehicleRandomizer::m_Config.ForcedVehicle < 350)
         GetModelExceptions (model, newModel);
     
     ApplyFixesBasedOnMission ();
     ApplySpecificPosChanges (model, newModel, x, y, z);
-
-    if (ScriptVehicleRandomizer::m_Config.ForcedVehicle > 350)
-        newModel = ScriptVehicleRandomizer::m_Config.ForcedVehicle;
 
     // Load the new vehicle. Fallback to the original if needed
     if (StreamingManager::AttemptToLoadVehicle (newModel) == ERR_FAILED)
@@ -1259,7 +1260,7 @@ void __fastcall FixHeightInDrugs4Auto (CRunningScript *scr, void *edx,
                 SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0.35);
             else if (((float *) ScriptParams)[3] > 2.9f
                      || ((float *) ScriptParams)[3] < -3.5f)
-                SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0.1);
+                SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0.01);
         }
     else if (scr->CheckName ("des10") && ScriptVehicleRandomizer::m_Config.RandomizeTrains)
     {
@@ -1324,13 +1325,23 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx, short c
              && (ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
                     == 431
              || ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
-                    == 437))
+                            == 437
+             || ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
+                    == 443))
     {
         float xRadius = ((float *) ScriptParams)[4];
         float yRadius = ((float *) ScriptParams)[5];
         float zRadius = ((float *) ScriptParams)[6];
         if (int (xRadius) == 2 && int (yRadius) == 3 && int (zRadius) == 5)
+        {
             ((float *) ScriptParams)[5] += 2.0f;
+        }
+        else if (int (xRadius) == 1 && int (yRadius) == 1 && int (zRadius) == 2)
+        {
+            ((float *) ScriptParams)[4] += 1.0f;
+            ((float *) ScriptParams)[5] += 1.0f;
+            ((float *) ScriptParams)[6] += 1.0f;
+        }
     }
     else if (scr->CheckName ("heist2")
              && ConfigManager::ReadConfig ("ScriptVehicleRandomizer")
@@ -1590,6 +1601,7 @@ RCHeliPlayerJustExited (ScriptVehicleRandomizer::RCHeliMagnet *RCCurrent, int cu
                                RCCurrent->objHandles[RCCurrent->objectAttached],
                                0);
         }
+    // DO NOT REMOVE THIS LOG
     Logger::GetLogger ()->LogMessage ("Player has exited heli, reset collision");
 }
 
@@ -1969,6 +1981,7 @@ void __fastcall StoreStartedMission (CRunningScript *scr, void *edx,
 char
 SetThingsForMissionStart ()
 {
+    // DO NOT REMOVE THIS LOG
     Logger::GetLogger ()->LogMessage ("Clearing variables for mission start");
     ryder2 = emptyTemplate;
     quarry = emptyTemplate;
@@ -2316,7 +2329,8 @@ void __fastcall FixStuckAtDohertyGarage (CRunningScript *scr, void *edx,
                                          short count)
 {
     scr->CollectParameters (count);
-    if (scr->CheckName ("scrash3"))
+    if (scr->CheckName ("scrash3") || (scr->CheckName("steal5") 
+        && ScriptParams[1] == 1489))
     {
         if (ScriptParams[0] == GetGlobalVar<int>(3))
         {
@@ -2325,7 +2339,7 @@ void __fastcall FixStuckAtDohertyGarage (CRunningScript *scr, void *edx,
                 timerStartTime = clock ();
             }
             timerCurrent = clock () - timerStartTime;
-            if ((int)timerCurrent >= 6000)
+            if ((int)timerCurrent >= 10000)
             {
                 CRunningScript::SetCharCoordinates (
                         FindPlayerPed (),

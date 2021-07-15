@@ -241,14 +241,6 @@ SoundRandomizer::InitaliseSoundTable ()
 }
 
 /*******************************************************/
-void __fastcall RandomizeAudioEvents (CRunningScript *scr, void *edx,
-                                         short count)
-{
-    scr->CollectParameters (count);
-    ScriptParams[3] = random (1000, 1190);
-}
-
-/*******************************************************/
 signed short __fastcall 
 RandomizeSayEvent (CPed *ped, void *edx, int phraseID, int a3, float a4, int a5, char a6, char a7)
 {
@@ -301,6 +293,7 @@ void
 SoundRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig ("VoiceLineRandomizer", 
+            std::pair ("RandomizeScriptVoiceLines",&m_Config.RandomizeMissionLines),
             std::pair("MatchSubtitles", &m_Config.MatchSubtitles),
             std::pair ("RandomizeGenericPedSpeech", &m_Config.RandomizePedSpeech),
             std::pair ("RandomizeGenericSfx", &m_Config.RandomizeGenericSfx),
@@ -308,26 +301,28 @@ SoundRandomizer::Initialise ()
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised SoundRandomizer");
-    RegisterHooks (
-        {{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
-         {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles},
-         {HOOK_CALL, 0x4680E7, (void *) &CorrectSubtitles},
-         {HOOK_CALL, 0x485397, (void *) &RemoveSubtitlesHook},
-         {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList},
-/*         {HOOK_CALL, 0x4EE953, (void *) &RandomizeAudioEvents},
-         {HOOK_CALL, 0x4EE994, (void *) &RandomizeAudioEvents}*/});
+
+    if (m_Config.RandomizeMissionLines)
+    {
+        RegisterHooks (
+                {{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
+                 {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles},
+                 {HOOK_CALL, 0x4680E7, (void *) &CorrectSubtitles},
+                 {HOOK_CALL, 0x485397, (void *) &RemoveSubtitlesHook},
+                 {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
+                 {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
+                 {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
+                 {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList}});
+
+        injector::WriteMemory<uint8_t> (0x4EC302 + 2, 3);
+        InitaliseSoundTable ();
+    }
 
     if (m_Config.RandomizePedSpeech)
         RegisterHooks ({{HOOK_JUMP, 0x5EFFE0, (void *) &RandomizeSayEvent}});
 
     if (m_Config.RandomizeGenericSfx)
         RegisterHooks ({{HOOK_JUMP, 0x506EA0, (void *) &RandomizeFrontendAudio}});
-
-    injector::WriteMemory<uint8_t> (0x4EC302 + 2, 3);
-    InitaliseSoundTable ();
 }
 
 /*******************************************************/

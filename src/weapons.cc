@@ -211,6 +211,11 @@ void __fastcall ChangeLockedPlayerWeapon (CRunningScript *scr, void *edx,
                 ms_pPedPool->m_pObjects + 0x7C4 * (ScriptParams[0] >> 8));
             ped->SetCurrentWeapon (GetWeaponInfo (ScriptParams[1], 1)[5]);
     }
+
+    if (CRunningScripts::CheckForRunningScript ("heist9")
+        && ScriptParams[1] == 22)
+        Scrpt::CallOpcode (0x1b2, "give_weapon_and_ammo", GlobalVar (3), 44,
+                           300);
 }
 
 /*******************************************************/
@@ -443,7 +448,7 @@ WeaponRandomizer::GetRandomWeapon(CPed* ped, int weapon, bool isPickup)
 {
     std::vector<int> buggy_weapons;
 
-    if (!isPickup && weapon >= 44 && weapon <= 46)
+    if (!isPickup && weapon == 46)
         return weapon;
 
     if (isPickup && PickupsRandomizer::m_Config.ReplaceWithWeaponsOnly)
@@ -468,7 +473,7 @@ WeaponRandomizer::GetRandomWeapon(CPed* ped, int weapon, bool isPickup)
 
     // Code handling shooting range stuff cause it's weird
     std::string shootingRange = "shrange";
-    if (CRunningScripts::CheckForRunningScript(shootingRange.c_str()) 
+    if (!isPickup && CRunningScripts::CheckForRunningScript(shootingRange.c_str()) 
         && ped->m_nPedType == ePedType::PED_TYPE_PLAYER1)
     {
             if (weapon == 43)

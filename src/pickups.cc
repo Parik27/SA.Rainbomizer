@@ -151,7 +151,9 @@ PickupsRandomizer::Initialise ()
             injector::MakeCALL (address, (void *) &RandomizePickup);
         }
 
-    injector::MakeCALL (0x4592F7, &RandomizeWeaponPickup);
+    if (m_Config.RandomizeDeadPed)
+        injector::MakeCALL (0x4592F7, &RandomizeWeaponPickup);
+    
     injector::MakeCALL (0x5921B5, &RandomizeWeaponPickup);
 
     if (m_Config.MoneyFromPickups)

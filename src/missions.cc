@@ -809,6 +809,71 @@ void __fastcall RandomizeMissionReward (CRunningScript *scr, void *edx,
 }
 
 /*******************************************************/
+void __fastcall CheckForChaosMissionPass (CRunningScript *scr, void *edx,
+                                            char flag)
+{
+    if (flag && MissionRandomizer::GetInstance ()->mRandomizedScript && 
+        !scr->CheckName("zero1") && !scr->CheckName("zero2") && 
+        !scr->CheckName ("zero4") && !scr->CheckName ("driv3")
+        && !scr->CheckName ("garag1"))
+        {
+            MissionRandomizer::GetInstance ()->SetScriptByPass ();
+            scr->UpdateCompareFlag (0);
+        }
+    else
+        scr->UpdateCompareFlag (flag);
+}
+
+/*******************************************************/
+void __fastcall CheckIfKeyPressOpcode (CRunningScript *scr, void *edx,
+                                        short count)
+{
+    scr->CollectParameters (count);
+    MissionRandomizer::GetInstance ()->mKeyPressOpcode = true;
+}
+
+/*******************************************************/
+void __fastcall CheckForChaosMissionPass2 (CRunningScript *scr, void *edx,
+                                          char flag)
+{
+    if (!MissionRandomizer::GetInstance ()->mKeyPressOpcode)
+        scr->UpdateCompareFlag (flag);
+    else
+    {
+        MissionRandomizer::GetInstance ()->mKeyPressOpcode = false;
+        if (flag && MissionRandomizer::GetInstance ()->mRandomizedScript 
+            && !scr->CheckName ("zero1") && !scr->CheckName ("zero2") && 
+            !scr->CheckName ("zero4") && !scr->CheckName ("driv3") && 
+            !scr->CheckName("garag1"))
+            {
+                MissionRandomizer::GetInstance ()->SetScriptByPass ();
+                scr->UpdateCompareFlag (0);
+            }
+        else
+            scr->UpdateCompareFlag (flag);
+    }
+}
+
+/*******************************************************/
+void __fastcall CheckForFalsePass (CRunningScript *scr, void *edx,
+                                                 short count)
+{
+    scr->CollectParameters (count);
+    int origMissionId
+        = MissionRandomizer::GetInstance ()->mOriginalMissionNumber;
+    int randomMissionId
+        = MissionRandomizer::GetInstance ()->mRandomizedMissionNumber;
+    if ((randomMissionId == 67 && origMissionId != 67 && 
+        ScriptParams[0] == ScriptSpace[2790]) || 
+        (randomMissionId == 70 && origMissionId != 70 
+            && ScriptParams[0] == ScriptSpace[2794]))
+    {
+        ScriptSpace[544] -= 1;
+        MissionRandomizer::GetInstance ()->SetScriptByPass ();
+    }
+}
+
+/*******************************************************/
 void
 MissionRandomizer::Initialise ()
 {
@@ -850,7 +915,11 @@ MissionRandomizer::Initialise ()
          {HOOK_CALL, 0x4435C6, (void *) &OverrideHospitalEndPosition<0x4435C6>},
          {HOOK_CALL, 0x442F70, (void *) &OverrideHospitalEndPosition<0x442F70>},
          {HOOK_CALL, 0x469926, (void *) &RandomizeMissionReward},
-         {HOOK_CALL, 0x47DA2E, (void *) &RandomizeMissionRewardDisplay}});
+         {HOOK_CALL, 0x47DA2E, (void *) &RandomizeMissionRewardDisplay},
+         {HOOK_CALL, 0x46DE02, (void *) &CheckForChaosMissionPass},
+         {HOOK_CALL, 0x46DE12, (void *) &CheckIfKeyPressOpcode},
+         {HOOK_CALL, 0x46D652, (void *) &CheckForChaosMissionPass2},
+         {HOOK_CALL, 0x47C233, (void *) &CheckForFalsePass}});
 
     RegisterDelayedHooks (
         {{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},

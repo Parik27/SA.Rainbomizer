@@ -37,6 +37,13 @@ public:
     /// Returns the static instance for ParkedCarRandomizer.
     static ParkedCarRandomizer *GetInstance ();
 
+    static inline struct Config
+    {
+        bool RandomizeFixedSpawns;
+        bool RandomizeRandomSpawns;
+        bool UseSameType;
+    } m_Config;
+
     /// Initialises Hooks/etc.
     void Initialise ();
 };

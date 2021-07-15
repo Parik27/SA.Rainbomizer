@@ -35,6 +35,11 @@ class CheatRandomizer
     static void DestroyInstance ();
 
 public:
+
+    static inline struct Config
+    {
+        bool EasterEgg;
+    } m_Config;
     /// Returns the static instance for CheatRandomizer.
     static CheatRandomizer *GetInstance ();
 

@@ -36,9 +36,9 @@ const char *__fastcall RandomizeHashesAfterCheatActivated (CText *text,
                                                            void *edx, char *key)
 {
     CheatRandomizer::GetInstance ()->RandomizeCheatHashes ();
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().cheat;
 
-    if (config.enableEasterEgg)
+
+    if (CheatRandomizer::m_Config.EasterEgg)
         {
             int         chits_len = sizeof (chits) / sizeof (chits[0]);
             const char *chit      = chits[random (chits_len - 1)].c_str ();
@@ -53,8 +53,8 @@ const char *__fastcall RandomizeHashesAfterCheatActivated (CText *text,
 void
 CheatRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().cheat;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("CheatRandomizer", 
+            std::pair("EnableEasterEgg", &m_Config.EasterEgg)))
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised CheatRandomizer");

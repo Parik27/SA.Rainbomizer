@@ -5,9 +5,10 @@
 #include "base.hh"
 #include "functions.hh"
 #include "config.hh"
+#include "fades.hh"
 
 BlipRandomizer *BlipRandomizer::mInstance = nullptr;
-int             northIcon                 = -1;
+static int             northIcon                 = random (2, 63);
 
 /*******************************************************/
 void
@@ -63,8 +64,7 @@ DisplayBlipsInInteriors (int a1, char a2)
 void
 BlipRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().blips;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("BlipRandomizer")) 
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised BlipRandomizer");
@@ -75,6 +75,9 @@ BlipRandomizer::Initialise ()
         });
     for (auto i : {0x444403, 0x47F7FE, 0x48BCA8, 0x48DBE1, 0x5775DD})
         injector::MakeCALL (i, (void *) RandomizeBlipSprite);
+
+    FadesManager::AddFadeCallback (
+        [] { northIcon = random (2, 63); });
 }
 
 /*******************************************************/

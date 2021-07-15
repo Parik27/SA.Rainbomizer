@@ -52,7 +52,7 @@ GetTimeNow ()
 Logger::Logger ()
 {
 
-    mFile = OpenRainbomizerFile ("logs/" + GetTimeNow () + ".txt", "a+");
+    mFile = OpenRainbomizerFile (GetTimeNow () + ".txt", "a+", "logs/");
 
     if (!mFile)
         return;

@@ -1,10 +1,12 @@
 #pragma once
 
+#include <map>
 #include <unordered_map>
 #include <vector>
 #include <cstring>
 #include <functional>
 #include <cstdint>
+#include <string>
 
 struct CRunningScript;
 
@@ -51,6 +53,21 @@ class MissionRandomizer
 {
     static MissionRandomizer *mInstance;
 
+    static inline struct Config
+    {
+        int ForcedMissionID;
+
+        bool        RandomizeOnce = true;
+        std::string RandomizeOnceSeed;
+        int         MissionSeedHash         = 0;
+        bool        ForcedRandomizeOnceSeed = false;
+
+        bool PreserveMomentum    = true;
+        bool DisableMainSCMCheck = false;
+
+        Config () {}
+    } m_Config;
+
     MissionRandomizer (){};
     static void DestroyInstance ();
 
@@ -96,6 +113,7 @@ public:
     int                 mContinuedMission        = -1;
     int                 mSkipNextMission         = -1;
     std::pair<int, int> mCorrectedMissionStatus  = {-1, -1};
+    static inline bool                mKeyPressOpcode          = false;
 
     /// Returns the static instance for MissionRandomizer.
     static MissionRandomizer *GetInstance ();

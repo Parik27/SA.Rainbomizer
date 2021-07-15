@@ -29,6 +29,7 @@
 #include <unordered_map>
 #include <dbghelp.h>
 #include <sstream>
+#include <filesystem>
 
 typedef injector::memory_pointer_raw memptr_t;
 HookManager *                        HookManager::mInstance = nullptr;
@@ -57,17 +58,11 @@ HookManager::Initialise ()
 
 /*******************************************************/
 std::string
-GetRainbomizerFileName (std::string name)
+GetRainbomizerFileName (std::string name, std::string subdirs)
 {
-    return GetGameDirRelativePathA (("rainbomizer/" + name).c_str ());
-}
-
-/*******************************************************/
-void
-CreateRainbomizerFolder ()
-{
-    CreateDirectory (GetRainbomizerFileName ("").c_str (), NULL);
-    CreateDirectory (GetRainbomizerFileName ("logs/").c_str (), NULL);
+    std::string baseDir = GetGameDirRelativePathA (("rainbomizer/" + subdirs).c_str ());
+    std::filesystem::create_directories (baseDir);
+    return baseDir + name;
 }
 
 /*******************************************************/
@@ -89,9 +84,22 @@ VerifyGameVersion ()
 
 /*******************************************************/
 FILE *
-OpenRainbomizerFile (std::string name, std::string mode)
+OpenRainbomizerFile (std::string name, std::string mode, std::string subdirs)
 {
-    return fopen (GetRainbomizerFileName (name).c_str (), mode.c_str ());
+    return fopen (GetRainbomizerFileName (name, subdirs).c_str (), mode.c_str ());
+}
+
+/*******************************************************/
+FILE *
+GetRainbomizerDataFile (const std::string &name, const std::string &mode)
+{
+    FILE *f = OpenRainbomizerFile (name, mode, "data/");
+
+    if (!f)
+        Logger::GetLogger ()->LogMessage (
+            "Failed to read Rainbomizer data file: data/" + name);
+
+    return f;
 }
 
 /*******************************************************/

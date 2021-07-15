@@ -32,8 +32,7 @@ FxSystemBP_c *__fastcall RandomizeParticles (FxManager_c *thisManager,
 void
 ParticleRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().particles;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("ParticleRandomizer"))
         return;
 
     RegisterHooks ({{HOOK_CALL, 0x4A9BF9, (void *) RandomizeParticles}});

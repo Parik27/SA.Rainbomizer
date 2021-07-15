@@ -26,6 +26,19 @@ class GxtRandomizer
     static void DestroyInstance ();
 
 public:
+
+    static inline struct Config
+    {
+        int MinTime;
+        int MaxTime;
+    } m_Config;
+
+    inline static char lastZone[8];
+    inline static char *randomZoneText;
+
+    inline static char  lastCar[8];
+    inline static char *randomCarText;
+
     /// Returns the static instance for GxtRandomizer.
     static GxtRandomizer *GetInstance ();
 

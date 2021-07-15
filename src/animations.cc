@@ -5,6 +5,7 @@
 #include "functions.hh"
 #include "injector/calling.hpp"
 #include "fades.hh"
+#include "config.hh"
 
 AnimationRandomizer *AnimationRandomizer::mInstance = nullptr;
 
@@ -67,6 +68,8 @@ AnimationRandomizer::RandomizeAnimAssocDefs ()
 void
 AnimationRandomizer::Initialise ()
 {
+    if (!ConfigManager::ReadConfig ("AnimationRandomizer"))
+        return;
 
     RegisterHooks ({{HOOK_CALL, 0x5BC99C, (void *) AddAnimAssocDefinition}});
     FadesManager::AddFadeCallback (RandomizeAnimAssocDefs);

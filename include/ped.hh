@@ -16,7 +16,6 @@ class PedRandomizer
 
     static void __fastcall RandomizePedModelIndex (CEntity *entity, void *,
                                                    uint32_t index);
-
     static int  ChooseRandomPedToLoad ();
     static void RandomizeSpecialModels (int slot, const char *modelName,
                                         int flags);
@@ -24,6 +23,18 @@ class PedRandomizer
 public:
     /// Returns the static instance for PedRandomizer.
     static PedRandomizer *GetInstance ();
+
+    static inline struct Config
+    {
+        bool RandomizeGenericModels;
+        bool RandomizeCops;
+        bool RandomizeGangMembers;
+        bool RandomizeSpecialModels;
+        bool IncludeNSFWModels;
+
+        int ForcedPed;
+        std::string ForcedSpecial;
+    } m_Config;
 
     /// Initialises Hooks/etc.
     void Initialise ();

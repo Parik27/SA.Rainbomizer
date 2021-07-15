@@ -25,7 +25,7 @@ void __fastcall InitialiseText (CText *text, void *edx, char a2)
 
 /*******************************************************/
 void
-GetNewPlateText (char *buf, int len)
+GenerateNewText (char *buf)
 {
     memset (buf, 0, 8);
 
@@ -37,10 +37,16 @@ GetNewPlateText (char *buf, int len)
 
 /*******************************************************/
 void
+GetNewPlateText (char *buf, int len)
+{
+    GenerateNewText (buf);
+}
+
+/*******************************************************/
+void
 LicensePlateRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().licensePlate;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("LicensePlateRandomizer"))
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised LicensePlateRandomizer");

@@ -39,8 +39,9 @@ WantedLevelRandomizer::RandomizeChaosPoints ()
 void
 WantedLevelRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().wanted;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("WantedLevelRandomizer",
+            std::pair("RandomizeMissionWantedLevels", &m_Config.RandomizeMission),
+            std::pair("RandomizeChaosPoints", &m_Config.RandomizeChaos)))
         return;
 
     for (auto ref :
@@ -50,11 +51,11 @@ WantedLevelRandomizer::Initialise ()
             injector::WriteMemory (ref + 2, &mNextChaosPoints);
         }
 
-    if (config.chaos)
+    if (m_Config.RandomizeChaos)
         RegisterHooks (
             {{HOOK_CALL, 0x56218E, (void *) RandomizeChaosIncrement}});
 
-    if (config.missions)
+    if (m_Config.RandomizeMission)
         RegisterHooks (
             {{HOOK_CALL, 0x4699BF, (void *) RandomizeMissionWantedLevel},
              {HOOK_CALL, 0x4699EC, (void *) RandomizeMissionWantedLevel}});

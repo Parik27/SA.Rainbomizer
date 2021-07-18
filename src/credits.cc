@@ -4,16 +4,17 @@
 #include "injector/calling.hpp"
 #include <vector>
 #include "config.hh"
+#include "generalsettings.hh"
 
-std::vector<std::string> lead_devs = {"Parik", "GTAMadman"};
+std::vector<std::string> lead_devs = {"Parik", "123robot", "GTA_Madman"};
 
 std::vector<std::string> concept = {"NABN00B", "MrMateczko", "Veigar"};
 
 std::vector<std::string> contribs
-    = {"123robot", "iguana", "SpeedyFolf", "SRewo"};
+    = {"iguana", "opain-replika", "sisco0", "SpeedyFolf", "SRewo"};
 
 std::vector<std::string> beta_testers
-    = {"Fryterp23", "Hugo_One", "Lordmau5", "Waris"};
+    = {"Fryterp23", "Hugo_One", "Lordmau5", "Riekelt", "Waris"};
 
 /*******************************************************/
 void
@@ -60,8 +61,6 @@ PrintCredits (float scaleX, float scaleY, char *text, int *position,
 void
 CreditsExtender::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().general;
-
-    if (config.enable_credits)
+    if (GeneralSettings::m_Config.ModifyCredits)
         RegisterHooks ({{HOOK_CALL, 0x5A88AC, (void *) PrintCredits}});
 }

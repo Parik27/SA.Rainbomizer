@@ -4,6 +4,14 @@ class WantedLevelRandomizer
 {
     static WantedLevelRandomizer *mInstance;
 
+    static inline struct Config
+    {
+        bool RandomizeMission = true;
+        bool RandomizeChaos;
+
+        Config () {}
+    } m_Config;
+
     WantedLevelRandomizer (){};
     static void DestroyInstance ();
 

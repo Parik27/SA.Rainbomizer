@@ -26,6 +26,13 @@ public:
     int     originalLevel;
     COffset offset;
 
+    static inline struct Config
+    {
+        bool RandomizeModels;
+        bool NoBrokenJaws;
+        bool RandomizeLocation;
+    } m_Config;
+
     /// Returns the static instance for CutsceneRandomizer.
     static CutsceneRandomizer *GetInstance ();
 

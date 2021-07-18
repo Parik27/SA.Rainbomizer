@@ -21,6 +21,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 // Hooks
 // - Select car colour
@@ -29,11 +30,14 @@
 // Hooked Functions
 
 struct CRGBA;
+struct CRunningScript;
 
 void __fastcall RandomizeVehicleColour (void *info, void *edx, uint8_t *prim,
                                         uint8_t *secn, uint8_t *tert,
                                         uint8_t *quat, int variation);
-int RandomizeColourTables ();
+void __fastcall RandomizeScriptVehicleColours (CRunningScript *scr, void *edx,
+                                               short count);
+template <bool callOriginal> int RandomizeColourTables ();
 
 CRGBA GetRainbowColour (int offset = 0);
 
@@ -45,8 +49,43 @@ class ColourRandomizer
     static void DestroyInstance ();
 
 public:
+
+    static inline struct Config
+    {
+        bool RandomizeCarCols;
+        bool ChangeCarColsFade;
+        bool RandomizeMarkers;
+        bool RandomizeText;
+        bool RandomizeWeaponSprites;
+        bool OldColourRandomization;
+
+        bool RandomizeLights;
+        bool ConsistentLights;
+        bool RandomizeClouds;
+        bool RandomizeStars;
+        bool RandomizeRainbows;
+        bool RandomizeFireLight;
+        bool ChangeOnFade;
+
+        bool RainbowHueCycle;
+
+        bool RandomizeFades;
+        bool CrazyMode;
+    } m_Config;
+
+    inline static std::uint32_t HudRandomizerSeed = 0;
+
     /// Returns the static instance for CarColRandomizer.
     static ColourRandomizer *GetInstance ();
 
     void Initialise ();
+
+    struct Pattern
+    {
+        int ID;
+        int colours[3];
+    };
 };
+
+CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
+                                    uint8_t g, uint8_t b, uint8_t a);

@@ -4,6 +4,8 @@
 #include "autosave.hh"
 #include "logger.hh"
 
+static int millieProgress = -1;
+
 /*******************************************************/
 void
 InsertRaceJumpAt (unsigned char *data, int index)
@@ -73,6 +75,7 @@ GreenSabreStartFix (unsigned char *data)
 void
 CustomsFastTrackStartFix (unsigned char *data)
 {
+    Scrpt::CreateOpcode (0x51, "return", data + 30732);
     data += 25110;
     data = Scrpt::CreateOpcode (0x6, "set_lvar", data, LocalVar (36), 1);
     data = Scrpt::CreateOpcode (0x51, "return", data);
@@ -137,8 +140,16 @@ EOTL3StartFix (unsigned char *data)
 void
 LosDesperadosFix (unsigned char *data)
 {
-    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN1", 1, 25);
-    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN2", 1, 25);
+    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN1", 1, 40);
+    Scrpt::CallOpcode (0x076C, "set_zone_gang_density", "GAN2", 1, 40);
+}
+
+/*******************************************************/
+void
+KeyToHerHeartFix (unsigned char *data)
+{
+    millieProgress = ScriptSpace[364];
+    ScriptSpace[364] = 20;
 }
 
 /*******************************************************/
@@ -165,6 +176,7 @@ MissionRandomizer::ApplyMissionStartSpecificFixes (unsigned char *data)
         case 32: MaddDoggRhymesFix (data); break;
         case 109: LosDesperadosFix (data); break;
         case 112: EOTL3StartFix (data); break;
+        case 97: KeyToHerHeartFix (data); break;
         case 21: DobermanStartFix (data); break;
         }
 }
@@ -192,6 +204,11 @@ MissionRandomizer::ApplyMissionFailFixes ()
         {
         // King in Exile
         case 45: ScriptSpace[719] = 1; break;
+        }
+    switch (this->mRandomizedMissionNumber)
+        {
+            // Key To Her Heart
+            case 97: ScriptSpace[364] = millieProgress; break;
         }
 }
 
@@ -239,14 +256,6 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
             data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
 
-        // Customs Fast Track
-        case 69:
-            // STEAL4_25110
-            data += 25743;
-            data = Scrpt::CreateOpcode (0x2, "jump", data, -30732);
-
-            break;
-
         // New Model Army
         case 74:
             Scrpt::CreateNop (data, 27236, 27254);
@@ -259,6 +268,13 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
 
             // remove code setting max wanted level to 0
             Scrpt::CreateNop (data, 19211, 19216);
+            break;
+
+        // Customs Fast Track
+        case 69: 
+            data += 25736; 
+            data = Scrpt::CreateOpcode (0x2, "jump", data, -30732);
+            data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
 
         // End of the Line (3)
@@ -283,6 +299,21 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         // Tagging up Turf - Infinite ammo
         case 13:
             Scrpt::CallOpcode (0x555, "remove_weapon", GlobalVar (3), 41);
+            break;
+        
+        // Customs Fast Track - Fade in
+        case 69: 
+            Scrpt::CallOpcode (0x16A, "do_fade", 500, 1); 
+            break;
+
+        // Zeroing In - Remove player from car
+        case 67: 
+            Scrpt::CallOpcode (0x792, "disembark_actor", GlobalVar (3)); 
+            break;
+
+       // Key To Her Heart - Reset Millie progress
+        case 97: 
+            ScriptSpace[364] = millieProgress; 
             break;
         }
 }

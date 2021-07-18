@@ -136,9 +136,7 @@ int __fastcall RandomizeStats (int *address, int weaponid)
 void
 WeaponStatsRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().weaponStats;
-
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("WeaponStatsRandomizer"))
         return;
 
     RegisterHooks ({{HOOK_CALL, 0x73B4C8, (void *) &RandomizeStats}});

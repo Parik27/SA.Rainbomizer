@@ -39,15 +39,13 @@ void __fastcall FixFreightTrainCrash (CAEVehicleAudioEntity *audio, void *edx,
                                       cVehicleParams *vehicle_params);
 void __fastcall PlaceOnRoadFix (CVehicle *vehicle, void *edx);
 int ChoosePoliceVehicleBasedOnModel (int model);
+template <int address> void *__fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx, int model,
+                                     char createdBy, char setupSuspensionLines);
 
 /// Randomizes cars that spawn in traffic including the police cars
 class TrafficRandomizer
 {
-    std::deque<int> mMostRecentSpawnedVehicles;
-    std::deque<int> mMostRecentLoadedVehicles;
-
     bool                      mInitialVehiclesLoaded = false;
-    int                       mForcedCar             = 0;
     static TrafficRandomizer *mInstance;
 
     unsigned char mOriginalData[5];
@@ -55,18 +53,36 @@ class TrafficRandomizer
     TrafficRandomizer (){};
     static void DestroyInstance ();
 
-    void MakeRCsEnterable ();
-
-    bool IsVehicleAllowed (int model);
-
     void FixTrainSpawns ();
 
 public:
+    std::deque<int> mMostRecentSpawnedVehicles;
+    std::deque<int> mMostRecentLoadedVehicles;
+    int mForcedCar = 0;
+
+    static inline struct Config
+    {
+        int ForcedVehicleID;
+
+        bool Trains;
+        bool Boats;
+        bool Aircraft;
+        bool Cars;
+        bool Bikes;
+        bool Trailers;
+
+        int DefaultModel;
+    } m_Config;
+
     /// Initialises Hooks/etc.
     void Initialise ();
 
     void Install6AF420_Hook ();
     void Revert6AF420_Hook ();
+
+    bool IsVehicleAllowed (int model);
+
+    void MakeRCsEnterable ();
 
     /// Exception Handling
     static void ExceptionHandlerCallback (_EXCEPTION_POINTERS *ep);

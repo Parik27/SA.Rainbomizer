@@ -14,38 +14,75 @@ ClothesRandomizer *ClothesRandomizer::mInstance = nullptr;
 
 /*******************************************************/
 void
+SetModel (int modelIndex)
+{
+    auto ped          = FindPlayerPed ();
+    auto associations = RpAnimBlendClumpExtractAssociations (ped->m_pRwClump);
+    Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2), modelIndex);
+    RpAnimBlendClumpGiveAssociations (ped->m_pRwClump, associations);
+}
+
+/*******************************************************/
+void
 ClothesRandomizer::RandomizePlayerModel ()
 {
     int model = 0;
     while ((model = random (299)), !PedRandomizer::IsModelValidPedModel (model))
         ;
 
+    if (m_Config.ForcedModel >= 0)
+        model = m_Config.ForcedModel;
+
     if (PedRandomizer::IsSpecialModel (model))
         {
             model = 298;
-            CStreaming::RequestSpecialModel (
-                model, GetRandomElement (PedRandomizer::specialModels).c_str (),
-                1);
+            if (m_Config.ForcedSpecial == "")
+            {
+                std::string randomSpecialModel
+                        = GetRandomElement (PedRandomizer::specialModels);
+                
+                if (m_Config.RandomizePlayerOnce
+                 && !m_RandomizeOnceInfo.Initialised)
+                {
+                        m_RandomizeOnceInfo.SpecialModel = randomSpecialModel;
+                        m_Config.ForcedSpecial           = randomSpecialModel;
+                }
+
+                CStreaming::RequestSpecialModel (
+                        model, randomSpecialModel.c_str (), 0);
+            }
+            else
+                CStreaming::RequestSpecialModel (
+                    model, m_Config.ForcedSpecial.c_str(), 0);
         }
     else
-        CStreaming::RequestModel (model, 1);
+        CStreaming::RequestModel (model, 0);
 
     CStreaming::LoadAllRequestedModels (false);
+
+    if (m_Config.RandomizePlayerOnce && !m_RandomizeOnceInfo.Initialised)
+        {
+            m_RandomizeOnceInfo.isClothes = false;
+            if (m_Config.ForcedModel >= 0)
+                m_RandomizeOnceInfo.ChosenModel = m_Config.ForcedModel;
+            else
+                m_RandomizeOnceInfo.ChosenModel = model;
+            
+            m_Config.ForcedModel = m_RandomizeOnceInfo.ChosenModel;
+            m_RandomizeOnceInfo.Initialised = true;
+        }
 
     if (ms_aInfoForModel[model].m_nLoadState != 1)
         model = 0;
 
-    Logger::GetLogger ()->LogMessage ("Player Model: "
-                                      + std::to_string (model));
-
-    Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2), model);
+    SetModel (model);
 }
 
 /*******************************************************/
 void
 ClothesRandomizer::RandomizePlayerClothes ()
 {
-    Scrpt::CallOpcode (0x09C7, "set_player_model", GlobalVar (2), 0);
+    SetModel (0);
 
     for (int i = 0; i < 17; i++)
         {
@@ -53,10 +90,26 @@ ClothesRandomizer::RandomizePlayerClothes ()
                 = ClothesRandomizer::GetInstance ()->GetRandomCRCForComponent (
                     i);
 
+            if (m_Config.RandomizePlayerOnce
+                && !m_RandomizeOnceInfo.Initialised)
+                m_RandomizeOnceInfo.RandomClothes.push_back (cloth);
+            else if (m_Config.RandomizePlayerOnce
+                     && m_RandomizeOnceInfo.Initialised)
+                cloth = m_RandomizeOnceInfo.RandomClothes.at(i);
+
             Scrpt::CallOpcode (0x784, "set_player_model_tex_crc", GlobalVar (2),
                                cloth.second, cloth.first, i);
             Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
         }
+
+    if (m_Config.RandomizePlayerOnce && !m_RandomizeOnceInfo.Initialised)
+    {
+        m_RandomizeOnceInfo.isClothes   = true;
+        m_RandomizeOnceInfo.Initialised = true;
+    }
+
+    Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
+    CStreaming::LoadAllRequestedModels (false);
 }
 
 /*******************************************************/
@@ -66,10 +119,28 @@ ClothesRandomizer::HandleClothesChange ()
     if (CGame::bMissionPackGame)
         return;
 
-    if (random (100) >= 50)
+    if (m_Config.RandomizePlayerOnce && m_RandomizeOnceInfo.Initialised)
+    {
+        if (m_RandomizeOnceInfo.isClothes)
+            RandomizePlayerClothes ();
+        else
+            RandomizePlayerModel ();
+    }
+    else if (m_Config.RandomizePlayerClothing && m_Config.RandomizePlayerModel
+             && !m_RandomizeOnceInfo.Initialised)
+        {
+            if (random (100) >= m_Config.OddsOfNewModel && m_Config.ForcedModel < 0)
+                RandomizePlayerClothes ();
+            else
+                RandomizePlayerModel ();
+        }
+    else if (m_Config.RandomizePlayerClothing && !m_Config.RandomizePlayerModel
+             && m_Config.ForcedModel < 0)
         RandomizePlayerClothes ();
-    else
+    else if (m_Config.RandomizePlayerModel && !m_Config.RandomizePlayerClothing)
         RandomizePlayerModel ();
+    else
+        return;
 }
 
 /*******************************************************/
@@ -112,6 +183,15 @@ ClothesRandomizer::FixChangingClothes (int modelId, uint32_t *newClothes,
     Call<0x5A81E0> (model, newClothes, oldClothes, CutscenePlayer);
 }
 /*******************************************************/
+int __fastcall ClothesRandomizer::FixAnimCrash (uint32_t *anim, void *edx,
+                                                int arg0, int animGroup)
+{
+    if (animGroup > 0)
+        animGroup = 0;
+
+    return CallMethodAndReturn<int, 0x6E3D10> (anim, arg0, animGroup);
+}
+/*******************************************************/
 std::pair<int, int>
 ClothesRandomizer::GetRandomCRCForComponent (int componentId)
 {
@@ -129,15 +209,29 @@ ClothesRandomizer::GetRandomCRCForComponent (int componentId)
 void
 ClothesRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().clothes;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("PlayerRandomizer", 
+        std::pair("RandomizePlayerModel", &m_Config.RandomizePlayerModel),
+        std::pair("RandomizePlayerClothing", &m_Config.RandomizePlayerClothing),
+        std::pair("OddsOfNewModel", &m_Config.OddsOfNewModel),
+        std::pair("IncludeNSFWModels", &m_Config.IncludeNSFWModels),
+        std::pair ("RandomizePlayerOnce", &m_Config.RandomizePlayerOnce),
+        std::pair("ForcedModel", &m_Config.ForcedModel),
+        std::pair("ForcedSpecialModel", &m_Config.ForcedSpecial)))
         return;
+
+    if (m_Config.OddsOfNewModel < 0 || m_Config.OddsOfNewModel > 100)
+        m_Config.OddsOfNewModel = 80;
 
     mInitialised = false;
 
     FadesManager::AddFadeCallback (HandleClothesChange);
     injector::MakeCALL (0x5A834D, FixChangingClothes);
     injector::MakeCALL (0x5A82AF, FixChangingClothes);
+
+
+    for (int addr : {0x64561B, 0x64C3FE, 0x64E7EE, 0x64EA43, 0x64EB0F, 0x64FD1E,
+                     0x64FD57, 0x64FE54})
+        injector::MakeCALL (addr, FixAnimCrash);
 
     Logger::GetLogger ()->LogMessage ("Intialised ClothesRandomizer");
 }

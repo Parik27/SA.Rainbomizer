@@ -4,26 +4,30 @@
 #include "base.hh"
 #include "functions.hh"
 #include <vector>
+#include <map>
+#include <unordered_map>
 #include "injector/injector.hpp"
 #include "config.hh"
 #include "util/scrpt.hh"
 #include <algorithm>
 #include "injector/calling.hpp"
 #include "autosave.hh"
-#include "missions_data.hh"
 #include <stdexcept>
 #include <array>
 #include <random>
 #include <memory>
 #include "util/loader.hh"
 #include "dyom.hh"
+#include "missions_data.hh"
+#include "scm.hh"
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 
 const int START_MISSIONS     = 11;
 const int END_MISSIONS       = 112;
 const int UNLOCKED_CITY_STAT = 181;
-int       missionNumberOfLastMissionStarted = -1;
+static int       missionNumberOfLastMissionStarted = -1;
+static int newMissionReward                  = -1;
 
 int exceptions[] = {
     40, // First Date
@@ -34,14 +38,14 @@ int exceptions[] = {
 
 /*******************************************************/
 void
-Teleport (Position pos, bool endMission, bool refresh = true)
+Teleport (Position pos, bool saveMomentum, bool refresh = true)
 {
     CVector moveSpeed;
     CVector turnSpeed;
 
     CPhysical *player = (CPhysical *) FindPlayerEntity (-1);
 
-    if (endMission)
+    if (saveMomentum)
         {
             moveSpeed = player->m_vecMoveSpeed;
             turnSpeed = player->m_vecTurnSpeed;
@@ -61,14 +65,14 @@ Teleport (Position pos, bool endMission, bool refresh = true)
 
     CRunningScript::SetCharCoordinates (FindPlayerPed (), {pos.x, pos.y, pos.z},
                                         1, 1);
-    //Don't set heading if preserving momentum - will add config option for old teleport system
-    //FindPlayerEntity ()->SetHeading (pos.heading * 3.1415926 / 180.0);
 
-    if (endMission)
+    if (saveMomentum)
         {
             player->m_vecMoveSpeed = moveSpeed;
             player->m_vecTurnSpeed = turnSpeed;
         }
+    else
+        FindPlayerEntity ()->SetHeading (pos.heading * 3.1415926 / 180.0);
 }
 
 /*******************************************************/
@@ -115,6 +119,13 @@ void __fastcall RandomizeMissionToStart (CRunningScript *scr, void *edx,
 
     if (ScriptParams[0] == 134) // Buy Properties Mission
         RandomizePropertyToBuy ();
+
+    ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning
+        = ScriptParams[0];
+    std::map oddMissions = ScriptVehicleRandomizer::GetInstance ()->oddMissions;
+    if (oddMissions.find (ScriptParams[0]) != oddMissions.end ())
+        ScriptVehicleRandomizer::GetInstance ()->UpdateLastThread (
+            oddMissions[ScriptParams[0]]);
 }
 
 /*******************************************************/
@@ -135,7 +146,10 @@ MissionRandomizer::TeleportPlayerAfterMission ()
             Position pos = missionEndPos.at (mOriginalMissionNumber)[status];
             pos.z        = (mRandomizedMissionNumber == 80) ? 1500 : pos.z;
 
-            Teleport (pos, true);
+            bool saveMomentum = false;
+            if (m_Config.PreserveMomentum)
+                saveMomentum = true;
+            Teleport (pos, saveMomentum);
         }
     catch (const std::out_of_range &e)
         {
@@ -170,11 +184,10 @@ MissionRandomizer::GetRandomMission (int originalMission)
             return originalMission;
 
     // Forced Mission
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
-    if (config.forcedMissionEnabled)
-        return config.forcedMissionID;
+    if (m_Config.ForcedMissionID >= 2 && m_Config.ForcedMissionID <= 134)
+        return m_Config.ForcedMissionID;
 
-    if (config.shufflingEnabled)
+    if (m_Config.RandomizeOnce)
         {
             if (mShuffledOrder.count (originalMission))
                 {
@@ -495,7 +508,7 @@ MissionRandomizer::SetGangTerritoriesForMission (int index)
 {
     bool wars = false;
 
-    if ((ScriptSpace[458] < 1 && ScriptSpace[452] >= 8) || index > 104)
+    if ((ScriptSpace[458] < 2 && ScriptSpace[452] >= 8) || index > 104)
         wars = true;
 
     Scrpt::CallOpcode (0x879, "enable_gang_wars", wars ? 1 : 0);
@@ -612,13 +625,12 @@ InitAtNewGame ()
 void
 MissionRandomizer::ResetSaveData ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
     this->mRandomizedScript = nullptr;
     missionNumberOfLastMissionStarted = -1;
 
-    mSaveInfo.randomSeed = config.shufflingSeed;
-    if (config.shufflingEnabled && config.shufflingSeed == -1)
-        mSaveInfo.randomSeed = random (UINT_MAX);
+    mSaveInfo.randomSeed = m_Config.MissionSeedHash;
+    if (m_Config.RandomizeOnce && m_Config.MissionSeedHash == 0)
+        mSaveInfo.randomSeed = random (INT_MAX);
 
     memset (mSaveInfo.missionStatus.data, 1,
             sizeof (mSaveInfo.missionStatus.data));
@@ -644,7 +656,6 @@ MissionRandomizer::Save ()
 void
 MissionRandomizer::Load ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
     MissionRandomizerSaveStructure saveInfo;
     CGenericGameStorage::LoadDataFromWorkBuffer (&saveInfo, sizeof (saveInfo));
 
@@ -656,8 +667,8 @@ MissionRandomizer::Load ()
     Logger::GetLogger ()->LogMessage ("Setting seed "
                                       + std::to_string (mSaveInfo.randomSeed)
                                       + " from save file");
-    if (config.forceShufflingSeed && config.shufflingSeed != -1)
-        mSaveInfo.randomSeed = config.shufflingSeed;
+    if (m_Config.ForcedRandomizeOnceSeed && m_Config.MissionSeedHash != -1)
+        mSaveInfo.randomSeed = m_Config.MissionSeedHash;
 
     InitShuffledMissionOrder ();
 
@@ -760,13 +771,126 @@ MissionRandomizer::VerifyMainSCM ()
 }
 
 /*******************************************************/
+void __fastcall RandomizeMissionRewardDisplay (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    int origMissionId
+        = MissionRandomizer::GetInstance ()->mOriginalMissionNumber;
+    int randomMissionId
+        = MissionRandomizer::GetInstance ()->mRandomizedMissionNumber;
+
+    if (origMissionId != randomMissionId && ScriptParams[0] == 0)
+    {
+            switch (origMissionId)
+                {
+                case 19: newMissionReward = random (1000); break;
+                case 43: newMissionReward = 5000; break;
+                case 69: newMissionReward = random (9000); break;
+                case 75: newMissionReward = random (5000); break;
+                }  
+
+            if (newMissionReward != -1)
+                ScriptParams[0] = newMissionReward;
+    }
+}
+
+/*******************************************************/
+void __fastcall RandomizeMissionReward (CRunningScript *scr, void *edx,
+                                               short count)
+{
+    scr->CollectParameters (count);
+    if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
+            != MissionRandomizer::GetInstance ()->mRandomizedMissionNumber
+        && ScriptParams[0] == 0 && newMissionReward != -1)
+    {
+        ScriptParams[1] = newMissionReward;
+        newMissionReward = -1;
+    }
+}
+
+/*******************************************************/
+void __fastcall CheckForChaosMissionPass (CRunningScript *scr, void *edx,
+                                            char flag)
+{
+    if (flag && MissionRandomizer::GetInstance ()->mRandomizedScript && 
+        !scr->CheckName("zero1") && !scr->CheckName("zero2") && 
+        !scr->CheckName ("zero4") && !scr->CheckName ("driv3")
+        && !scr->CheckName ("garag1"))
+        {
+            MissionRandomizer::GetInstance ()->SetScriptByPass ();
+            scr->UpdateCompareFlag (0);
+        }
+    else
+        scr->UpdateCompareFlag (flag);
+}
+
+/*******************************************************/
+void __fastcall CheckIfKeyPressOpcode (CRunningScript *scr, void *edx,
+                                        short count)
+{
+    scr->CollectParameters (count);
+    MissionRandomizer::GetInstance ()->mKeyPressOpcode = true;
+}
+
+/*******************************************************/
+void __fastcall CheckForChaosMissionPass2 (CRunningScript *scr, void *edx,
+                                          char flag)
+{
+    if (!MissionRandomizer::GetInstance ()->mKeyPressOpcode)
+        scr->UpdateCompareFlag (flag);
+    else
+    {
+        MissionRandomizer::GetInstance ()->mKeyPressOpcode = false;
+        if (flag && MissionRandomizer::GetInstance ()->mRandomizedScript 
+            && !scr->CheckName ("zero1") && !scr->CheckName ("zero2") && 
+            !scr->CheckName ("zero4") && !scr->CheckName ("driv3") && 
+            !scr->CheckName("garag1"))
+            {
+                MissionRandomizer::GetInstance ()->SetScriptByPass ();
+                scr->UpdateCompareFlag (0);
+            }
+        else
+            scr->UpdateCompareFlag (flag);
+    }
+}
+
+/*******************************************************/
+void __fastcall CheckForFalsePass (CRunningScript *scr, void *edx,
+                                                 short count)
+{
+    scr->CollectParameters (count);
+    int origMissionId
+        = MissionRandomizer::GetInstance ()->mOriginalMissionNumber;
+    int randomMissionId
+        = MissionRandomizer::GetInstance ()->mRandomizedMissionNumber;
+    if ((randomMissionId == 67 && origMissionId != 67 && 
+        ScriptParams[0] == ScriptSpace[2790]) || 
+        (randomMissionId == 70 && origMissionId != 70 
+            && ScriptParams[0] == ScriptSpace[2794]))
+    {
+        ScriptSpace[544] -= 1;
+        MissionRandomizer::GetInstance ()->SetScriptByPass ();
+    }
+}
+
+/*******************************************************/
 void
 MissionRandomizer::Initialise ()
 {
+    if (!ConfigManager::ReadConfig (
+            "MissionRandomizer", std::pair ("ForcedMissionID", &m_Config.ForcedMissionID),
+            std::pair ("RandomizeOnce", &m_Config.RandomizeOnce),
+            std::pair ("RandomizeOnceSeed", &m_Config.RandomizeOnceSeed),
+            std::pair ("ForcedRandomizeOnceSeed", &m_Config.ForcedRandomizeOnceSeed),
+            std::pair ("ConserveMomentumThroughTeleports", &m_Config.PreserveMomentum),
+            std::pair ("DisableMainScmCheck", &m_Config.DisableMainSCMCheck)))
+        return;
 
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
+    if (m_Config.RandomizeOnceSeed != "")
+        m_Config.MissionSeedHash
+            = std::hash<std::string>{}(m_Config.RandomizeOnceSeed);
 
-    if (!config.enabled || (!config.disableMainScmCheck && !VerifyMainSCM ()))
+    if (!m_Config.DisableMainSCMCheck && !VerifyMainSCM ())
         return;
 
     if (!mTempMissionData)
@@ -781,12 +905,21 @@ MissionRandomizer::Initialise ()
          {HOOK_CALL, 0x4417F5, (void *) &UnlockCities},
          {HOOK_CALL, 0x60C943, (void *) &UnlockCities},
          {HOOK_CALL, 0x60C95D, (void *) &UnlockCities},
+         {HOOK_CALL, 0x4418F2, (void *) &UnlockCities},
+         {HOOK_CALL, 0x4419CE, (void *) &UnlockCities},
+         {HOOK_CALL, 0x441A9C, (void *) &UnlockCities},
          {HOOK_CALL, 0x5D15A6, (void *) &SaveMissionData},
          {HOOK_CALL, 0x5D19CE, (void *) &LoadMissionData},
          {HOOK_CALL, 0x60C925, (void *) &CorrectMaxNumberOfGroupMembers},
          {HOOK_CALL, 0x44331B, (void *) &OverrideHospitalEndPosition<0x44331B>},
          {HOOK_CALL, 0x4435C6, (void *) &OverrideHospitalEndPosition<0x4435C6>},
-         {HOOK_CALL, 0x442F70, (void *) &OverrideHospitalEndPosition<0x442F70>}});
+         {HOOK_CALL, 0x442F70, (void *) &OverrideHospitalEndPosition<0x442F70>},
+         {HOOK_CALL, 0x469926, (void *) &RandomizeMissionReward},
+         {HOOK_CALL, 0x47DA2E, (void *) &RandomizeMissionRewardDisplay},
+         {HOOK_CALL, 0x46DE02, (void *) &CheckForChaosMissionPass},
+         {HOOK_CALL, 0x46DE12, (void *) &CheckIfKeyPressOpcode},
+         {HOOK_CALL, 0x46D652, (void *) &CheckForChaosMissionPass2},
+         {HOOK_CALL, 0x47C233, (void *) &CheckForFalsePass}});
 
     RegisterDelayedHooks (
         {{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
@@ -808,9 +941,8 @@ MissionRandomizer::Initialise ()
 void
 MissionRandomizer::InitShuffledMissionOrder ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().missions;
     mShuffledOrder.clear ();
-    if (!config.shufflingEnabled)
+    if (!m_Config.RandomizeOnce)
         return;
 
     std::mt19937 engine{mSaveInfo.randomSeed};

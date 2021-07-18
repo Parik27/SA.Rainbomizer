@@ -20,9 +20,7 @@ void __fastcall RandomizeObjectIndices (CRunningScript *script, void *edx,
 void
 ObjectsRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().objects;
-
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("ObjectRandomizer"))
         return;
 
     RegisterHooks ({{HOOK_CALL, 0x469773, (void *) RandomizeObjectIndices}});

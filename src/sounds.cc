@@ -53,9 +53,8 @@ char *__fastcall RemoveSubtitlesHook (CText *TheText, void *edx, char *key)
 char *__fastcall CorrectSubtitles (CText *text, void *edx, char *key)
 {
     auto soundsR = SoundRandomizer::GetInstance ();
-    auto config  = ConfigManager::GetInstance ()->GetConfigs ().sounds;
 
-    if (!config.matchSubtitles)
+    if (!SoundRandomizer::m_Config.MatchSubtitles)
         return text->Get (key);
 
     try
@@ -242,26 +241,88 @@ SoundRandomizer::InitaliseSoundTable ()
 }
 
 /*******************************************************/
+signed short __fastcall 
+RandomizeSayEvent (CPed *ped, void *edx, int phraseID, int a3, float a4, int a5, char a6, char a7)
+{
+    signed short result;
+    if (phraseID)
+        result = CallMethodAndReturn<signed short, 0x4E6550> (&ped->m_pedSpeech, 52,
+                                                              random (358), a3,
+                                                              a4, a5, a6, a7);
+    else
+        result = -1;
+    return result;
+}
+
+/*******************************************************/
+void __fastcall RandomizeFrontendAudio (CAudioEngine *audioEngine, 
+    void *edx, int eventId, float volumeChange, float speed)
+{
+    static std::vector<int> validSounds
+        = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+        16, 17, 18, 19, 20, 27, 28, 29, 30, 32, 
+        40, 41, 42, 43, 44, 45, 46, 49};
+
+    std::vector<int> soundsToPickFrom
+        = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+           13, 14, 15, 17, 18, 19, 20, 32, 40, 43, 44, 45, 46};
+
+    std::vector<int> onlyInGameSounds = {16, 27, 28, 29, 30, 49};
+
+    int randomEvent;
+    if (find (validSounds.begin (), validSounds.end (), eventId)
+        == validSounds.end ())
+    {
+        randomEvent = eventId;
+    }
+    else
+    {
+        if (eventId > 5)
+        {
+                soundsToPickFrom.insert (soundsToPickFrom.end (),
+                                         onlyInGameSounds.begin (), onlyInGameSounds.end ());
+        }
+        randomEvent = soundsToPickFrom[random (soundsToPickFrom.size () - 1)];
+    }
+    CallMethod<0x4DD4A0> (&audioEngine->m_FrontendAudio, randomEvent, 
+        volumeChange, speed);
+}
+
+/*******************************************************/
 void
 SoundRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().sounds;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("VoiceLineRandomizer", 
+            std::pair ("RandomizeScriptVoiceLines",&m_Config.RandomizeMissionLines),
+            std::pair("MatchSubtitles", &m_Config.MatchSubtitles),
+            std::pair ("RandomizeGenericPedSpeech", &m_Config.RandomizePedSpeech),
+            std::pair ("RandomizeGenericSfx", &m_Config.RandomizeGenericSfx),
+            std::pair("ForcedAudioLine", &m_Config.ForcedAudioLine)))
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised SoundRandomizer");
-    RegisterHooks (
-        {{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
-         {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles},
-         {HOOK_CALL, 0x4680E7, (void *) &CorrectSubtitles},
-         {HOOK_CALL, 0x485397, (void *) &RemoveSubtitlesHook},
-         {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
-         {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList}});
 
-    injector::WriteMemory<uint8_t> (0x4EC302 + 2, 3);
-    InitaliseSoundTable ();
+    if (m_Config.RandomizeMissionLines)
+    {
+        RegisterHooks (
+                {{HOOK_CALL, 0x4851BB, (void *) &RandomizeAudioLoad},
+                 {HOOK_CALL, 0x468173, (void *) &CorrectSubtitles},
+                 {HOOK_CALL, 0x4680E7, (void *) &CorrectSubtitles},
+                 {HOOK_CALL, 0x485397, (void *) &RemoveSubtitlesHook},
+                 {HOOK_CALL, 0x468E9A, (void *) &InitialiseTexts},
+                 {HOOK_CALL, 0x618E97, (void *) &InitialiseTexts},
+                 {HOOK_CALL, 0x5BA167, (void *) &InitialiseTexts},
+                 {HOOK_CALL, 0x4D99B3, (void *) &InitialiseLoopedSoundList}});
+
+        injector::WriteMemory<uint8_t> (0x4EC302 + 2, 3);
+        InitaliseSoundTable ();
+    }
+
+    if (m_Config.RandomizePedSpeech)
+        RegisterHooks ({{HOOK_JUMP, 0x5EFFE0, (void *) &RandomizeSayEvent}});
+
+    if (m_Config.RandomizeGenericSfx)
+        RegisterHooks ({{HOOK_JUMP, 0x506EA0, (void *) &RandomizeFrontendAudio}});
 }
 
 /*******************************************************/

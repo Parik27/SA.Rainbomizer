@@ -32,12 +32,12 @@ struct CVector;
 struct CBox;
 struct CColModel;
 struct CPhysical;
-struct CPed;
 struct CPool;
 struct CEntity;
 struct tHandlingData;
 struct tFlyingHandlingData;
 struct CAnimBlendAssociation;
+struct RpClump;
 
 enum eVehicleClass
 {
@@ -91,6 +91,15 @@ enum ePedType
     PED_TYPE_MISSION8
 };
 
+enum eWeatherRegion
+{
+    WEATHER_REGION_DEFAULT,
+    WEATHER_REGION_LA,
+    WEATHER_REGION_SF,
+    WEATHER_REGION_LV,
+    WEATHER_REGION_DESERT
+};
+
 inline static int *ms_numPedsLoaded = reinterpret_cast<int *> (0x8E4BB0);
 inline static int *ms_pedsLoaded    = reinterpret_cast<int *> (0x8E4C00);
 
@@ -124,6 +133,29 @@ public:
     int            field_48;
 };
 
+struct RwTexture
+{
+    char field_0x00[0x58];
+};
+
+struct RpLight
+{
+    char field_0x00[0x40];
+};
+
+struct CCamera
+{
+    char field_0x00[0xd78];
+};
+
+struct CTrain
+{
+    char field_0x00[0x5d0];
+    CTrain  *m_pPrevCarriage;
+    CTrain *m_pNextCarriage;
+    char __pad1[0xd4];
+};
+
 struct CCarGenerator
 {
     int16_t m_nModelId;
@@ -149,6 +181,49 @@ struct CHud
     static void SetMessage (char *str);
 };
 
+struct CCoronas
+{
+    static void RegisterCorona (int ID, CEntity *attachTo, char red, char green,
+                         char blue, char alpha, CVector const &posn,
+                         float radius, float farClip, int coronaType,
+                         int flareType, bool enableReflection,
+                         bool checkObstacles, int _param_not_used, float angle,
+                         bool longDistance, float nearClip, char fadeState,
+                         float fadeSpeed, bool onlyFromBelow,
+                         bool reflectionDelay);
+    static void RegisterCorona (int ID, CEntity *attachTo, char red, char green,
+                                char blue, char alpha, CVector const &posn,
+                                float radius, float farClip, RwTexture* texture,
+                                int flareType, bool enableReflection,
+                                bool checkObstacles, int _param_not_used, float angle,
+                                bool longDistance, float nearClip, char fadeState,
+                                float fadeSpeed, bool onlyFromBelow,
+                                bool reflectionDelay);
+};
+
+struct CSprite
+{
+    static void RenderOneXLUSprite (float x, float y, float z, float halfw,
+                                    float halfh, char r, char g, char b, char a,
+                                    float rhw, char intensity, char udir,
+                                    char vdir);
+    static void RenderOneXLUSprite_Triangle (float arg1, float arg2, int arg3, int arg4, 
+                                            int arg5, int arg6, float arg7, char r, char g, 
+                                            char b, char a, float arg12, char arg13);
+    static void RenderOneXLUSprite_Rotate_Aspect (float x, float y, float z, float halfw, 
+                                                 float halfh, char r, char g, char b, char a, 
+                                                 float rhw, float arg11, char intensity);
+    static void RenderBufferedOneXLUSprite (float x, float y, float z, float w, float h,
+                                            char r, char g, char b, char a, 
+                                            float recipNearZ, char arg11);
+    static void RenderBufferedOneXLUSprite_Rotate_Aspect (float x, float y, float z, float w,
+                                            float h, char r, char g, char b, char a, 
+                                            float recipNearZ, float angle, char arg12);
+    static void RenderBufferedOneXLUSprite_Rotate_Dimension (float x, float y, float z, float w, 
+                                                            float h, char r, char g, char b, char a, 
+                                                            float recipNearZ, float angle, char arg12);
+};
+
 struct CMessages
 {
     static char *AddMessage (char *string, int time, int16_t flags,
@@ -165,6 +240,97 @@ struct CCarCtrl
 struct CCivilianPed
 {
     void CivilianPed (ePedType type, unsigned int modelIndex);
+};
+
+struct CVector
+{
+    float x;
+    float y;
+    float z;
+};
+
+struct CMatrix
+{
+    CVector      right;
+    unsigned int flags;
+    CVector      up;
+    unsigned int pad1;
+    CVector      at;
+    unsigned int pad2;
+    CVector      pos;
+    unsigned int pad3;
+
+    void Attach (CMatrix *attach, char link);
+    void SetRotateZOnly (float angle);
+};
+
+struct CMatrixLink
+{
+    CMatrix matrix;
+};
+
+struct cSimpleTransform
+{
+    CVector m_vPosn;
+    float   m_fAngle;
+};
+
+struct CAEPedAudioEntity
+{
+    char field_0x00[0x15c];
+};
+
+struct CAEPedSpeechAudioEntity
+{
+    char field_0x00[0x100];
+};
+
+struct CEntity
+{
+    int              vtable;
+    cSimpleTransform m_SimpleTransform;
+    CMatrixLink *    m_pMatrix;
+    union
+    {
+        struct RwObject *m_pRwObject;
+        struct RpClump * m_pRwClump;
+        struct RpAtomic *m_pRwAtomic;
+    };
+
+    char  __pad01C[4];
+    short m_nRandomSeed;
+    short m_nModelIndex;
+    char  __pad024[0x14];
+
+    cSimpleTransform *GetPosition ();
+    int               SetHeading (float heading);
+    int               GetHeading ();
+};
+
+struct CPhysical : public CEntity
+{
+    char    __pad038[0xc];
+    CVector m_vecMoveSpeed;
+    CVector m_vecTurnSpeed;
+    char    __pad05c[0xdc];
+};
+
+struct CPed : public CPhysical
+{
+    CAEPedAudioEntity       m_pedAudio;
+    CAEPedSpeechAudioEntity m_pedSpeech;
+    char                    __pad394[216];
+    int                     flags[4];
+    char                    __pad47C[272];
+    CEntity *               m_pVehicle;
+    int                     field_590;
+    int                     field_594;
+    int                     m_nPedType;
+
+    int   GiveWeapon (int weapon, int ammo, int slot);
+    void  SetCurrentWeapon (int slot);
+    void *CCopPed__CCopPed (int type);
+    void  SetModelIndex (int modelIndex);
 };
 
 struct CRunningScript
@@ -212,7 +378,7 @@ private:
 
 public:
     char *GetPointerToScriptVariable (int a2);
-    char  ReadTextLabelFromScript (char *text, char length);
+    void  ReadTextLabelFromScript (char *text, char length);
     void  CollectParameters (short num);
     bool  CheckName (const char *name);
     void  ProcessCommands1526to1537 (int opcode);
@@ -239,8 +405,16 @@ struct CRunningScripts
     static bool             CheckForRunningScript (const char *thread);
 };
 
+struct CAEFrontendAudioEntity
+{
+    char field_0x00[0x9c];
+};
+
 struct CAudioEngine
 {
+    char                   field_0x00[0xb4];
+    CAEFrontendAudioEntity m_FrontendAudio;
+
     void PreloadMissionAudio (unsigned char slot, int id);
     bool GetMissionAudioLoadingStatus (unsigned char id);
     bool IsMissionAudioSampleFinished (unsigned char slot);
@@ -275,6 +449,10 @@ struct CText
     CData     tDataMain;
     CKeyArray tKeyMission;
     CData     tDataMission;
+    char               field_20;
+    char               haveTabl;
+    char               cderrorInitialized;
+    char               missionLoaded;
 
     void  Load (char a2);
     char *Get (char *key);
@@ -388,13 +566,6 @@ struct CAEMp3BankLoader
     char Initialise ();
 };
 
-struct CVector
-{
-    float x;
-    float y;
-    float z;
-};
-
 struct CGenericGameStorage
 {
     static char *MakeValidSaveFileName (int saveNum);
@@ -430,34 +601,30 @@ struct CColModel
     CColData *m_pColData;
 };
 
+struct CVehicleModelInfo
+{
+    char field_0x00[0x32];
+    char m_szGameName[8];
+    char _pad[0x2ce];
+};
+
 struct CVehicle
 {
     uint8_t              __pad[0x22];
     uint16_t             m_nModelIndex;
-    uint8_t              __pad24[864];
+    uint8_t              __pad24[104];
+    float                m_fMass;
+    float                m_fTurnMass;
+    uint8_t              __pad94[752];
     tHandlingData *      m_pHandling;
     tFlyingHandlingData *m_pFlyingHandling;
     uint8_t              m_nFlags[8];
+    uint8_t              __pad430[48];
+    CPed *               m_pDriver;
     int                  GetVehicleAppearence ();
     void                 AutomobilePlaceOnRoadProperly ();
     void                 BikePlaceOnRoadProperly ();
     char                 SetGearUp ();
-};
-
-struct CPed
-{
-    char     __pad00[0x46C];
-    int      flags[4];
-    char     __pad47C[272];
-    CEntity *m_pVehicle;
-    int      field_590;
-    int      field_594;
-    int      m_nPedType;
-
-    int   GiveWeapon (int weapon, int ammo, int slot);
-    void  SetCurrentWeapon (int slot);
-    void *CCopPed__CCopPed (int type);
-    void  SetModelIndex (int modelIndex);
 };
 
 struct CPickups
@@ -471,7 +638,7 @@ struct CPickups
 struct CBaseModelInfo
 {
 public:
-    char             pad[0x14];
+    char             pad[0x10];
     CColModel *      m_pColModel;
     float            m_fDrawDistance;
     struct RwObject *m_pRwObject;
@@ -540,19 +707,12 @@ struct RwRGBA
     unsigned char a;
 };
 
-struct CMatrix
+struct RwRGBAReal
 {
-    CVector      right;
-    unsigned int flags;
-    CVector      up;
-    unsigned int pad1;
-    CVector      at;
-    unsigned int pad2;
-    CVector      pos;
-    unsigned int pad3;
-
-    void Attach (CMatrix *attach, char link);
-    void SetRotateZOnly (float angle);
+    float r;
+    float g;
+    float b;
+    float a;
 };
 
 struct tTransmissionGear
@@ -736,12 +896,6 @@ struct cHandlingDataMgr
     tBoatHandlingData boatHandling[12];
 };
 
-struct cSimpleTransform
-{
-    CVector m_vPosn;
-    float   m_fAngle;
-};
-
 enum eFontAlignment
 {
     ALIGN_CENTRE,
@@ -792,26 +946,48 @@ struct CRect
     float top;
 };
 
-struct CMatrixLink
+struct CMenuManager
 {
-    CMatrix matrix;
+    char field_0x00[0x3c];
+    float m_dwBrightness;
 };
 
-struct CPhysical
+struct CPlayerInfo
 {
-    char    field_0x00[0x44];
-    CVector m_vecMoveSpeed;
-    CVector m_vecTurnSpeed;
+    CPed *m_pPed;
+    char field_0x00[0x18c];
 };
 
-struct CEntity
+struct CObject : public CEntity
 {
-    int              vtable;
-    cSimpleTransform m_SimpleTransform;
-    CMatrixLink *    m_pMatrix;
+};
 
-    cSimpleTransform *GetPosition ();
-    int               SetHeading (float heading);
+struct CPickup
+{
+    float m_fRevenueValue;
+    CObject * m_pObject;
+    int   m_dwAmmo;
+    int   m_dwRegenerationTime;
+    char  m_vPos[6];
+    short m_nMoneyPerDay;
+    short m_wModelId;
+    short m_wReferenceIndex;
+    char  m_PickupType;
+    char  m_nFlags;
+    char  _pad[2];
+};
+
+struct CZone
+{
+    char name[8];
+    char m_szTextKey[8];
+    short x1;
+    short  y1;
+    short  z1;
+    short  x2;
+    short  y2;
+    short  z2;
+    char __pad[4];
 };
 
 struct RsGlobalType
@@ -919,7 +1095,70 @@ struct C3dMarker
 struct CGame
 {
     static unsigned char &bMissionPackGame;
+    static int            Init2 (void *fileName);
     static int            Init3 (void *fileName);
+};
+
+struct CTimeCycleCurrent
+{
+    float  m_fAmbientRed;
+    float  m_fAmbientGreen;
+    float  m_fAmbientBlue;
+    float  m_fAmbientRed_Obj;
+    float  m_fAmbientGreen_Obj;
+    float  m_fAmbientBlue_Obj;
+    float  m_fDirectionalRed;
+    float  m_fDirectionalGreen;
+    float  m_fDirectionalBlue;
+    short  m_wSkyTopRed;
+    short m_wSkyTopGreen;
+    short  m_wSkyTopBlue;
+    short  m_wSkyBottomRed;
+    short  m_wSkyBottomGreen;
+    short  m_wSkyBottomBlue;
+    short  m_wSunCoreRed;
+    short  m_wSunCoreGreen;
+    short  m_wSunCoreBlue;
+    short  m_wSunCoronaRed;
+    short  m_wSunCoronaGreen;
+    short  m_wSunCoronaBlue;
+    float m_fSunSize;
+    float m_fSpriteSize;
+    float m_fSpriteBrightness;
+    short  m_wShadowStrength;
+    short  m_wLightShadowStrength;
+    short  m_wPoleShadowStrength;
+    char  _padding0[2];
+    float m_fFarClip;
+    float m_fFogSt;
+    float m_fLightOnGround;
+    short  m_wLowCloudsRed;
+    short  m_wLowCloudsGreen;
+    short  m_wLowCloudsBlue;
+    short  m_wBottomCloudsRed;
+    short  m_wBottomCloudsGreen;
+    short  m_wBottomCloudsBlue;
+    float m_fWaterRed;
+    float m_fWaterGreen;
+    float m_fWaterBlue;
+    float m_fWaterAlpha;
+    float m_fRGB1_R;
+    float m_fRGB1_G;
+    float m_fRGB1_B;
+    float m_fAlpha1;
+    float m_fRGB2_R;
+    float m_fRGB2_G;
+    float m_fRGB2_B;
+    float m_fAlpha2;
+    float m_fCloudAlpha1;
+    long m_dwCloudAlpha2;
+    short m_wCloudAlpha3;
+    char  _padding1[2];
+    float m_fIllumination;
+    char  field_A8[4];
+
+    static CTimeCycleCurrent *GetInfo (CTimeCycleCurrent *timecyc,
+                                       int weatherID, int timeID);
 };
 
 struct CAnimBlock
@@ -957,7 +1196,13 @@ struct CAnimationStyleDescriptor
     static int Init3 (void *fileName);
 };
 
+void GivePlayerRemoteControlledCar (float x, float y, float z, float angle,
+                                    short model);
+
 CMatrix *RwFrameGetLTM (void *frame);
+CAnimBlendAssociation *RpAnimBlendClumpExtractAssociations (RpClump *clump);
+void     RpAnimBlendClumpGiveAssociations (RpClump *clump, CAnimBlendAssociation *association);
+RpLight* RpLightSetColor (RpLight *light, RwRGBAReal *colour);
 
 int    random (int max);
 int    random (int min, int max);
@@ -983,6 +1228,7 @@ GetRandomElement (T* container, uint32_t size)
 
 CMatrix *RwFrameGetLTM (void *frame);
 
+extern CPickup *        aPickups;
 extern CStreamingInfo * ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
 extern RwRGBA *         ms_vehicleColourTable;
@@ -993,9 +1239,3 @@ extern CPool *&         ms_pVehiclePool;
 extern CWeaponInfo *    aWeaponInfos;
 extern RsGlobalType *   RsGlobal;
 extern float *          ms_fTimeStep;
-
-#define REGISTER_HOOK(offset, function, ret, ...)                     \
-    {                                                                 \
-        static ret (*F) (__VA_ARGS__);                                \
-        RegisterHook (offset, F, function<F>);                        \
-    }

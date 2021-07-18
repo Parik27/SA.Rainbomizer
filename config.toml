@@ -1,3 +1,4 @@
+
 ########################################################
 
 # Rainbomizer - A (probably fun) Grand Theft Auto San Andreas Mod that
@@ -18,26 +19,103 @@
 # along with this program.	If not, see <https://www.gnu.org/licenses/>.
 #
 #######################################################
-
 # General Configuration
 
-Enabled	  = true
+[Randomizers]
+# Set to false to disable all Rainbomizer features regardless of other settings
+EnableRainbomizer = true
+
+# Set to true or false to enable / disable specific randomizers. 
+# Brief explanations of each can be found at the end of this file.
+
+ColourRandomizer = true
+TimeCycleRandomizer = true
+TrafficRandomizer = true
+ScriptVehicleRandomizer = true
+ParkedCarRandomizer = true
+MissionRandomizer = true
+WeaponRandomizer = true
+PickupsRandomizer = true
+PlayerRandomizer = true
+PedRandomizer = true
+CutsceneRandomizer = true
+VoiceLineRandomizer = true
+LanguageRandomizer = true
+LicensePlateRandomizer = true
+RiotRandomizer = true
+PoliceHeliRandomizer = true
+BlipRandomizer = true
+WantedLevelRandomizer = true
+DYOMRandomizer = true
+CheatRandomizer = false
+
+# EXPERIMENTAL RANDOMIZERS (high risk of crashes / softlocks)
+
+HandlingRandomizer = false
+WeaponStatsRandomizer = false
+ParticleRandomizer = false
+ObjectRandomizer = false
+RespawnPointRandomizer = false
+AnimationRandomizer = false
+
+# General Settings
+[EnableRainbomizer]
+
 Seed	  = -1 # -1 for random
 
 Unprotect = true
 AutosaveSlot = 8 # Set it to a non-existent slot (eg. -1 or 9) to disable
 ModifyCredits = true
 
-#######################################################
-# Traffic Randomizer - Randomizes cars that spawn in traffic including law enforcement vehicles
+# Additional settings for individual randomizers follow.
 
+#######################################################
+[ColourRandomizer]
+
+RandomizeCarCols = true # (Car Colours)
+ChangeCarColsOnFade = true # (Re-randomizes car colours on every fade)
+
+RandomizeMarkers = true # (Mission Markers and Arrows)
+RandomizeText = true # (HUD elements and menu text)
+RandomizeWeaponSprites = true # (Weapon icons visible in the top right of the HUD)
+
+# Set to true to use older style of text colour randomization from previous versions
+# This means elements such as subtitles, the in-game time, etc, are not randomized.
+# Also disables weapon sprite colour randomization if enabled.
+UseMinimalistTextRandomization = false
+
+RandomizeLights = true # (Light emitters e.g. light posts, headlights)
+
+# Set to true to make random light colours consistent between every light of that type
+# rather than a different light colour for every single light.
+ConsistentLights = false
+
+RandomizeClouds = true # (Clouds in the sky)
+RandomizeStars = true # (Stars at night time)
+RandomizeRainbows = false # (Natural rainbows that can occur after rainfall)
+RandomizeFireLighting = false # (Light effects emitted by fire. WARNING: Hard on eyes)
+ChangeOnFade = true # (Re-randomizes all randomized colours other than car colours every fade)
+
+RainbowHueCycle = false # (All randomized elements will have transition between rainbow colours)
+
+RandomizeFades = false # (In-game fade-in/outs. WARNING: Hard on eyes)
+CrazyMode = false # Changes images and menu background (WARNING: VERY hard on eyes)
+
+#######################################################
+[TimeCycleRandomizer]
+
+# Randomizes timecyc.dat values, which will change appearance and colours of sky and objects.
+RandomizeTimeCycle = true
+ChangeOnFade = true # (Generates a new random timecycle set every fade, otherwise is the same from game start)
+
+# Randomizes weather cycle at regular intervals.
+RandomizeWeather = true
+
+#######################################################
 [TrafficRandomizer]
 
-Enabled = true
-
-# This will make a specific vehicle spawn in traffic
-ForcedVehicleEnabled = false
-ForcedVehicleID = 500
+# Forces one specific vehicle to spawn in traffic. Set to -1 to not force a vehicle.
+ForcedVehicleID = -1
 
 # Change these options to disable certain types of vehicles from spawning in traffic
 EnableTrains = true
@@ -51,173 +129,194 @@ EnableTrailers = true
 DefaultModel = 0
 
 #######################################################
-# Colour Randomizer - Randomizes the colours of various in-game elements, including cars, the HUD, and fades. 
-[ColourRandomizer]
+[ScriptVehicleRandomizer]
 
-Enabled = true
+# Makes time requirements for schools more lenient so that they are completable with slower vehicles
+EnableExtraTimeForSchools = true
 
-RandomizeCarCols = true # (Car Colours)
-# TODO: RandomizeMarkers = true # (Mission Markers and Arrows)
-RandomizeFades = false # (In-game fade-in/outs. WARNING: Hard on eyes)
-RainbowText = true # (HUD elements and menu text)
+# Randomizes the type of trains spawned in missions
+RandomizeTrains = true
 
-RainbowHueCycle = false # (All randomized elements will have transition between rainbow colours)
+# Allow certain vehicle checks for sub-missions or markers to be skipped so they can be activated with any vehicle
+LowriderMissions = true # (Lowrider Minigame, High Stakes Low-Rider)
+WuZiMu = true # (Wu Zi Mu start mission marker)
+SweetsGirl = true # (Picking up Sweet in Sweet's Girl)
+CourierMissions = true # (Courier Missions in LS / SF / LV)
+BMXChallenge = true # (LS BMX Challenge)
+NRG500Challenge = true # (SF NRG-500 Challenge)
+ChiliadChallenge = true # (All 3 Chiliad Challenge routes)
 
-# CrazyMode = false # Changes images and menu background (WARNING: VERY hard on eyes)
-Exceptions = [0, 1] # These are exceptions to car colours. (Default: Black and white car colours)
+# When side missions in a vehicle are started, the mod will re-randomize it into a different one for you to use.
+# Set to false to disable this behaviour for any of the following side missions.
+TaxiMissions = true
+Firefighting = true
+Burglary = true
+Pimping = true
+Paramedic = true
+Courier = true
+BikeChallenges = true
 
-#######################################################
-# Police Heli Randomizer - Randomizes the helicopters that the police spawn in with working spotlight and gun.
-[PoliceHeliRandomizer]
+# Forces every script vehicle to be replaced by one of your choice.
+# Set to -1 to not force a vehicle.
+ForcedVehicleId = -1
 
-Enabled = true
+# Uses a generic set of rules for randomizing vehicles that doesn't require patterns.
+# By default, the Rainbomizer will randomize any vehicle with any other vehicle.
+# The main game has patterns to only allow vehicles that are possible for all scenarios.
+# Setting this to true will randomize vehicles in such a way that they match their original type and number of seats.
+# This results in less variation but guaranteed compatability with other mods and changes.
+# Can also be used if you want to keep vehicles from being too crazy.
+# By default the mod should use this setting automatically for unrecognised scripts,
+# however if it fails to do so and you want to combine the Rainbomizer with something else, set to true.
+UseGenericPatterns = false
 
-#######################################################
-# Cheat Randomizer - Randomizes which cheat activates when you enter a cheat.
-[CheatRandomizer]
-
-Enabled = false
-EnableEasterEgg = true
-
-#######################################################
-# Handling Randomizer (EXPERIMENTAL) - Shuffles the handlings of vehicles.
-[HandlingRandomizer]
-
-Enabled = false
-
-#######################################################
-# Weapon Randomizer - Randomizes the weapons that are dropped/wielded by the player/enemies.
-[WeaponRandomizer]
-
-Enabled = true
-RandomizePlayerWeapons = true
-SkipChecks = false # Checks related to weapons required for certain missions
-		   # You might not be able to complete some missions
-		   # without this enabled.
-
-# -----------------------------------------------------------------------------
-# Don't change this unless you know what you're doing
-# These patterns dictate what weapons you get during the missions.
-# Description of the format: (all sections are optional)
-
-# thread => main.scm thread name (in small case) for missions this pattern is applicable for
-# ped => (0 for player-only)
-# weapon => The actual weapon to replace
-# allowed => A list of allowed weapons. (Special strings: "slot": allows only weapons of the same slot)
-
-#-------------------------------------------------------
-
-Patterns = [
-	{ thread = "drugs4", ped = 0, weapon = 30, allowed = ["slot"]},
-	{ thread = "finalec", ped = 0, weapon = 28, allowed = ["slot"]},
-	{ thread = "drugs1", weapon = 28, allowed = ["slot"]},
-	{ weapon = 43, allowed = [43]},
-	{ weapon = 44, allowed = [44, 45]},
-	{ thread = "sweet1", weapon = 41, allowed = [41]},
-	{ thread = "heist5", weapon = 38, allowed = ["slot"]},
-	{ thread = "zero1", weapon = 38, allowed = [38]},
-	{ thread = "casino6", weapon = 37, allowed = [37]},
-	{ thread = "casino6", weapon = 37, allowed = [37]},
-	{ thread = "shrange", allowed = ["slot"]},
-	{ thread = "truth2", weapon = 37, allowed = [37]},
-	{ thread = "truth2", weapon = 35, allowed = [35, 36, 38]},
-	{ thread = "des10", ped = 0, allowed = [28, 32]},
-	{ thread = "casino9", weapon = 22, allowed = [22, 23, 24]},
-	{ thread = "heist9", ped = 0, weapon = 17, allowed = [17]},
-	{ weapon = 39, allowed = [39]},
-	{ weapon = 46, allowed = [46]}
-]
+# Gives you any vehicle for every mission and ignores all VehiclePatterns.txt patterns
+# Please note that the pre-created patterns already allow all possible and stable vehicles for every mission
+# So expect additional softlocks and crashes using this.
+SkipChecks = false
 
 #######################################################
-# Pickups Randomizer - Randomizes weapon pickups scattered around the map, as well as the appearance of certain other types of pickups.
-[PickupsRandomizer]
-
-Enabled = true
-ReplaceWithWeaponsOnly = true # Does nothing yet
-
-#######################################################
-# Parked Car Randomizer - Randomizes cars which are found parked around the map including airplanes at airports with entirely random spawns.
 [ParkedCarRandomizer]
 
-Enabled = true
 RandomizeFixedSpawns = true # (Fixed spawns like Sweet's car)
 RandomizeRandomSpawns = true # (For example: Car Parks)
 
-########################################################
-# Weapon Stats Randomizer (EXPERIMENTAL)  - Randomizes properties of all weapons, including their damage, fire rate, and clip size.
-# Thanks to SRewo for creating the randomizer
-[WeaponStatsRandomizer]
-
-Enabled = false
+# Randomizes fixed car spawns within their original group (e.g. boats randomize between only other boats)
+RandomizeToSameType = false
 
 #######################################################
-# Mission Randomizer: Randomizes which mission is started by each mission marker
 [MissionRandomizer]
 
-Enabled = true
+# Forces every mission to start a specific mission using its respective ID from the main.scm file. 
+# Set to -1 to not force a mission and randomize normally.
+ForcedMissionID = -1
 
-# Makes every misssion a specific mission. (Take mission number from main.scm)
-ForcedMissionEnabled = false
-ForcedMissionID = 11
-
-# RandomizeOnce - means the starting a specific mission will give the same mission for every new game/load game
+# RandomizeOnce - means that each mission marker is always linked to the same random mission
 RandomizeOnce = true
 RandomizeOnceSeed = "" # https://en.wikipedia.org/wiki/Random_seed - useful for races
 ForcedRandomizeOnceSeed = false # Force the seed on existing save files
+
+# Set to true to keep your speed through end of mission teleports
+# If false, you will always be forced to a dead stop regardless of speed after a teleport
+ConserveMomentumThroughTeleports = true
 
 DisableMainScmCheck = false # Allow custom main.scm's to run with mission randomizer.
 		      	    # Note: Missions might not progress properly with a custom
 			    #       main.scm file.
 
 #######################################################
-# Cutscene Randomizer - Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
+[WeaponRandomizer]
+
+RandomizePlayerWeapons = true
+SkipChecks = false # Checks related to weapons required for certain missions
+		   # You might not be able to complete some missions
+		   # if this is true.
+
+#######################################################
+[PickupsRandomizer]
+
+# Randomizes the weapons dropped by dead peds.
+RandomizePedWeaponDrops = true
+
+ReplaceWithWeaponsOnly = false # Randomizes only weapon-type pickups with other weapons.
+
+# Randomize money to be given by certain random pickups
+MoneyFromRandomPickups = true
+
+SkipChecks = false # Checks related to weapons required for certain missions
+		   # You might not be able to complete some missions
+		   # if this is true.
+
+#######################################################
+[PlayerRandomizer]
+
+# If both activated, you will have a chance to randomize between both other ped models and 
+# CJ wearing random clothing at any point.
+RandomizePlayerModel = true
+RandomizePlayerClothing = true
+
+# If both of the config options above are activated, this number dictates the chances of
+# the player becoming a new model vs the player becoming CJ with different clothes.
+# Odds are out of 100, so default odds are 80 in 100 chance of a new non-CJ model.
+OddsOfNewModel = 80
+
+# Set to true to allow models featuring nudity
+IncludeNSFWModels = false
+
+# Chooses a single random model or outfit for CJ that is maintained for the entire session.
+RandomizePlayerOnce = false
+
+# Forces specific model for player when using random player models using their model ID.
+# Set to -1 for normal randomization.
+# Set to 298 to always use a special mission model.
+# To use a specific special mission model, set to 298 and set ForcedSpecialModel to the model name.
+ForcedModel = -1
+ForcedSpecialModel = ""
+
+#######################################################
+[PedRandomizer]
+
+RandomizeGenericModels = true # (Peds on the street or in interiors, non-named peds in missions)
+RandomizeCops = true # (Cops can look like any ped, but will behave the same)
+RandomizeGangMembers = true # (Members of all gangs can look like anyone, but will behave the same)
+RandomizeSpecialModels = true # (Mission characters e.g. Sweet, Big Smoke, Cesar)
+
+# Set to true to allow models featuring nudity
+IncludeNSFWModels = false
+
+# Force specific ped model for generic street peds using their model ID. 
+# Set to -1 for normal randomization
+ForcedPedModel = -1
+
+# Force specific special model for mission characters using their model name.
+# Set to -1 for normal randomization
+ForcedSpecialModel = ""
+
+#######################################################
 [CutsceneRandomizer]
 
-Enabled = true
-
 RandomizeModels = true
+
+# Set to true to only randomize cutscene peds between other peds with proper facial animations (a.k.a. no missing jaws).
+UseOnlyNormalCutsceneModels = false
+
 RandomizeLocations = true
 
-# Relative to rainbomizer/. 
-CutsceneFile = "data/Cutscene_Models.txt"
+#######################################################
+[VoiceLineRandomizer]
+
+# Main part of this randomizer which changes spoken dialogue in missions.
+RandomizeScriptVoiceLines = true
+MatchSubtitles = true
+
+# Randomizes the type of speech event a ped uses when they're about to speak
+# For example, a line about bumping into someone could become a line about falling to your death.
+RandomizeGenericPedSpeech = true
+
+# Randomizes generic frontend audio sound effects (mostly bleep and bloop sounds).
+RandomizeGenericSfx = true
+
+# Force a single voice line. Set to -1 for normal randomization.
+ForcedAudioLine = -1
 
 #######################################################
-# Blip Randomizer - Randomizes every radar blip on the map with a different icon.
-# WARNING: Blips are permanently saved in the save file
-[BlipsRandomizer]
+[LanguageRandomizer]
 
-Enabled = false
-
-#######################################################
-# Particle Randomizer (EXPERIMENTAL) - Randomizes all of the game's particle effects
-[ParticleRandomizer]
-
-Enabled = false
+MinTimeBeforeTextChange = 1 # seconds
+MaxTimeBeforeTextChange = 5 # seconds
 
 #######################################################
-# Object Randomizer (EXPERIMENTAL) - Randomizes objects spawned by mission scripts into other objects
-[ObjectRandomizer]
+[RiotRandomizer]
 
-Enabled = false
+# Adds a small chance of riot mode briefly activating as you enter new areas.
+RandomizeRiots = true
 
-#######################################################
-# DYOM Randomizer - Adds an option to download and play a random mission from the dyom website
-[DyomRandomizer]
-
-Enabled = true
-
+# Randomizes which light is activated next (green, yellow, red) as well as
+# the time between light changes.
+RandomizeTrafficLights = true
 
 #######################################################
-# Clothes Randomizer - Randomizes clothes every fade
-[ClothesRandomizer]
-
-Enabled = true
-
-#######################################################
-# Wanted Level Randomizer - Randomizes how you get wanted level during and outside missions
 [WantedLevelRandomizer]
-
-Enabled = true
 
 # Randomizes number of wanted stars you get in missions like 2 stars in Drive-by
 RandomizeMissionWantedLevels = true
@@ -228,110 +327,97 @@ RandomizeMissionWantedLevels = true
 RandomizeChaosPoints = false
 
 #######################################################
-# Respawn Point Randomizer - Randomizes where you respawn after deatharrest
-[RespawnPointRandomizer]
+[CheatRandomizer]
 
-Enabled = false
-
+EnableEasterEgg = true
 
 #######################################################
-# License Plate Randomizer - Randomizes the license plates of vehicles to a random word.
-[LicensePlateRandomizer]
+# EXPLANATIONS OF RANDOMIZERS
 
-Enabled = true
+# Colour Randomizer
+# Randomizes the colours of various in-game elements, including cars, the HUD, and fades. 
 
-#######################################################
-# Voice Line Randomizer - Randomizes dialogues spoken by characters in missions. (Requires original AudioEvents.txt)
-[SoundsRandomizer] # Random Dialogues for now
+# Timecycle Randomizer
+# Randomizes the appearance and colours of the sky, water, lighting, and other time-based elements.
+# Can also randomize the occurrence of weather.
 
-Enabled = true
-MatchSubtitles = true
-AudioEventsFile = "data/AudioEvents.txt" # Relative to game directory
-ForcedAudioLineEnabled = false
-ForcedAudioLine = 0
+# Traffic Randomizer
+# Randomizes cars that spawn in traffic including law enforcement vehicles.
 
-#######################################################
+# Script Vehicle Randomizer 
+# Randomizes the vehicles you are given in missions.
+
+# Parked Car Randomizer 
+# Randomizes cars which are found parked around the map including airplanes at airports with entirely random spawns.
+
+# Mission Randomizer
+# Randomizes which mission is started by each mission marker.
+
+# Weapon Randomizer
+# Randomizes the weapons that are wielded by the player and other NPCs.
+
+# Pickups Randomizer
+# Randomizes pickups around the map upon starting a new game, as well as pickups during missions.
+
+# Player Randomizer
+# Randomizes the player's appearance every fade between other NPC models and random clothing options for CJ.
+
+# Ped Randomizer
+# Randomizes the appearance of peds on the street, cops, and mission peds.
+
+# Cutscene Randomizer
+# Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
+
+# Voice Line Randomizer	
+# Randomizes dialogue spoken by characters in missions. (Requires original AudioEvents.txt)
+# Can also randomize generic ped lines and some other types of sound effects.
+
 # Language Randomizer
-[LanguageRandomizer]
+# Randomizes the language of text (except for subtitles when using Voice Line Randomizer). 
+# Some types of text will change language at a regular interval which can be adjusted above.
+# WARNING: This randomizer may be incompatible with other mods that add text and should be disabled in such cases.
 
-Enabled = true
-MinTimeBeforeTextChange = 1 # seconds
-MaxTimeBeforeTextChange = 5 # seconds
+# License Plate Randomizer
+# Randomizes the license plates of vehicles to random words from the game script.
 
-#######################################################
-# Script Vehicle Randomizer - Randomizes the vehicles you are given in missions.
-[ScriptVehicleRandomizer]
+# Riot Randomizer
+# Activates a chance for the game's riot mode to activate briefly as you play the game.
+# Traffic Lights can also be randomized as part of this so that the 
+# time and order of lights is random rather than on a cycle.
 
-Enabled = true
+# Police Heli Randomizer
+# Randomizes the helicopters that the police spawn in with working spotlight and gun.
 
-# Gives you any vehicle for every mission (You might not be able to proceed with missions with this enabled)
-SkipChecks = false
+# Blip Randomizer
+# Randomizes every radar blip on the map with a different icon. WARNING: Blips are permanently saved when you save the game.
 
-# --------------------------------------------------------------
-# List that decides what vehicles will spawn in a specific mission.
-# Format Description:
+# Wanted Level Randomizer
+# Randomizes how you get wanted levels during and outside of missions.
 
-# thread => Mission thread (from main.scm, in lower case)
-# vehicle => the actual vehicle to replace. Can be a special string ("bmx", "planes", "bikes", "bmx" etc.)
-# allowed => Vehicles allowed to spawn for this vehicle. (Can use the same special strings as above)
-# denied => Vehicles that will be exempt from the allowed list.
-# coords => A list of *integer* coordinates for matching vehicles at a specific coordinates
-# move [x, y, z, unused] => Move the vehicle to a different position (relative to original)
-# --------------------------------------------------------------
+# DYOM Randomizer
+# When using the Design Your Own Mission (DYOM) mod, an option is added to the menu to download and play a 
+# random mission from the DYOM website.
 
-Patterns = [
+# Cheat Randomizer
+# Randomizes which cheat activates when you enter a cheat code.
 
-	# Mission specific-patterns
+# EXPERIMENTAL RANDOMIZERS (high risk of crashes / softlocks)
 
-	{vehicle = 487, allowed = ["helis", "planes"], thread = "cprace", seat_check = false},
-	{thread = "dskool", vehicle = 429, allowed = [429, 541, 480, 494, 506, 451]},
-	{coords	 = [-2584, 2213, 0], vehicle = 539, allowed = [460, 539]},
-	{thread = "boat", vehicle = 539, allowed = ["460", "539", "boats"], move  = [-60, 0, 0, 0]},
-	{vehicle = 487, allowed = ["all"], seat_check = false},
-	{vehicle = 406, allowed = [406]},
-	{vehicle = 486, allowed = [486]},
-	{vehicle = 489, allowed = ["cars"]},
-	{vehicle = 581, thread = "drugs1", allowed = ["bikes", "594"]},
-	{thread = "bskool", vehicle = 521, allowed = ["bikes"]},
-	{vehicle = 522, allowed = ["bikes"]},
-	{vehicle = 601, allowed = [601]},
-	{vehicle = 524, allowed = [524]},
-	{vehicle = 501, allowed = [465, 501]},
-	{vehicle = 530, allowed = [530]},
-	{coords = [323, 2540, 15], vehicle = 476, move = [0, -35, 0, 0], allowed = ["planes"], denied = ["rc"]},
-	{thread = "drugs4", vehicle = 514, allowed = ["all"], seat_check = false},
-	{thread = "drugs4", vehicle = 584, allowed = ["all"], seat_check = false},
-	{vehicle = 514, allowed = [514, 515, 403]},
-	{vehicle = 515, allowed = [514, 515, 403]},
-	{vehicle = 403, allowed = [514, 515, 403]},
-	{vehicle = 478, coords = [2107, 1409, 9], allowed = ["cars", "bikes", "593", "476", "511", "460", "513", "520", "512"], seat_check = false},
-	{vehicle = 544, allowed = ["all"], seat_check = false, denied = ["trains", "boats"]},
-	{vehicle = 567, coords = [2644, -2028, 12], allowed = [
-			536, 575, 534, 567, 535, 576, 412, 566
-	], seat_check = false},
-	{vehicle = 584, allowed = [435, 450, 591, 584]},
-	{vehicle = 435, allowed = [435, 450, 591, 584]},
-	{vehicle = 450, allowed = [435, 450, 591, 584]},
-	{vehicle = 591, allowed = [435, 450, 591, 584]},
-	{vehicle = 510, coords = [-2171, -2422, 33], allowed = [510]},
-	{vehicle = "bmx", allowed = ["cars", "bikes"], denied = [428, 443, 406]},
-	{vehicle = 425, allowed = [425, 520]},
-	{vehicle = 520, allowed = [520]},
-	{vehicle = 425, allowed = [425, 520]},
-	{vehicle = 539, coords = [-7, -1116, 7], move = [40, 0, -6, 0], allowed = ["boats", "539"], seat_check = false}, # Player
-	{vehicle = 539, coords = [-7, -1111, 6], allowed = ["all"], seat_check = false},  # OG Loc
-	{vehicle = 539, coords = [-4, -1120, 7], allowed = ["boats", "539", "464", "501", "465"]}, # Madd Dogg
-	{vehicle = 593, coords = [1279, 1361, 9], move = [50, 0, 0, -90], allowed = ["planes"], denied = ["rc"]},
-	{vehicle = 553, allowed = ["planes"], denied = ["rc"]},
-	{coords = [1479, 1758, 12], vehicle = 519, allowed = ["planes"], denied = ["rc"]},
-	{coords = [2322, 73, 26], vehicle = 523, move = [0, 18, 0, 0], allowed = ["cars", "bikes", "helis"]}, # Catalina (STB)
-	{coords = [2323, 70, 26], vehicle = 523, move = [0, 18, 0, 0], allowed = ["cars", "bikes", "helis"]}, # Player (STB)
-	{coords = [-1472, 1563, 1051], vehicle = 468, allowed = ["bikes"]}, # Kickstart
-	
-	# General Patterns
-	{vehicle = "cars", allowed = ["cars", "bikes"]},
-	{vehicle = "helis", allowed = ["helis"]},
-	{vehicle = "planes", allowed = ["planes"], denied = [539]},
-	{vehicle = "boats", allowed = ["boats", "539"]},
-	{vehicle = "bikes", allowed = ["bikes", "cars"]}
-]
+# Handling Randomizer
+# Shuffles the handlings of vehicles.
+
+# Weapon Stats Randomizer
+# Randomizes properties of all weapons, including their damage, fire rate, and clip size. 
+# Thanks to SRewo for creating this randomizer.
+
+# Particle Randomizer
+# Randomizes all of the game's particle effects.
+
+# Object Randomizer
+# Randomizes objects spawned by mission scripts into other objects.
+
+# Respawn Point Randomizer
+# Randomizes where you respawn after death or arrest.
+
+# Animation Randomizer
+# Randomizes every animation in the game.

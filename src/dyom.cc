@@ -7,6 +7,7 @@
 #include <wininet.h>
 #include "config.hh"
 #include <cstring>
+#include "missions.hh"
 
 using namespace std::literals;
 
@@ -64,11 +65,10 @@ AdjustCodeForDYOM (FILE *file, void *buf, size_t len)
 void
 DyomRandomizer::Initialise ()
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().dyom;
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("DYOMRandomizer"))
         return;
 
-    if (!ConfigManager::GetInstance ()->GetConfigs ().missions.enabled)
+    if (!ConfigManager::ReadConfig ("MissionRandomizer"))
         {
             RegisterDelayedHooks (
                 {{HOOK_CALL, 0x469FB0,

@@ -48,6 +48,9 @@
 #include "dyom.hh"
 #include "animations.hh"
 #include "ped.hh"
+#include "TimeCycle.hh"
+#include "riot.hh"
+#include "generalsettings.hh"
 
 ///////////////////////////////////////////////
 //  _ ____  _____           _           _    //
@@ -64,16 +67,13 @@ public:
     /*******************************************************/
     Rainbomizer ()
     {
-        CreateRainbomizerFolder ();
-
-        auto config = ConfigManager::GetInstance ();
-        config->Initialise ("config.toml");
-
-        if (!config->GetConfigs ().general.enabled)
+        if (!ConfigManager::ReadConfig ("EnableRainbomizer"))
             return;
 
+        GeneralSettings::GetInstance ()->Initialise ();
+
         // Unprotect if required
-        if (!config->GetConfigs ().general.unprotect)
+        if (GeneralSettings::m_Config.Unprotect)
             UnProtectInstance ();
 
         auto logger = Logger::GetLogger ();
@@ -88,6 +88,7 @@ public:
 
         TrafficRandomizer::GetInstance ()->Initialise ();
         ColourRandomizer::GetInstance ()->Initialise ();
+        TimeCycleRandomizer::GetInstance ()->Initialise ();
         ParkedCarRandomizer::GetInstance ()->Initialise ();
         PoliceHeliRandomizer::GetInstance ()->Initialise ();
         ScriptVehicleRandomizer::GetInstance ()->Initialise ();
@@ -107,7 +108,8 @@ public:
         WantedLevelRandomizer::GetInstance ()->Initialise ();
         RespawnPointRandomizer::GetInstance ()->Initialise ();
         DyomRandomizer::GetInstance ()->Initialise ();
-        // AnimationRandomizer::GetInstance ()->Initialise ();
+        RiotRandomizer::GetInstance ()->Initialise ();
+        AnimationRandomizer::GetInstance ()->Initialise ();
         GxtRandomizer::GetInstance ()->Initialise ();
         PedRandomizer::GetInstance ()->Initialise ();
 

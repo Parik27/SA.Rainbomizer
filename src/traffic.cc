@@ -75,17 +75,20 @@ void __fastcall PlaceOnRoadFix (CVehicle *vehicle, void *edx)
 void
 TrafficRandomizer::Initialise ()
 {
-
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
-
-    if (!config.enabled)
+    if (!ConfigManager::ReadConfig ("TrafficRandomizer",
+            std::pair("ForcedVehicleID", &m_Config.ForcedVehicleID),
+            std::pair("EnableTrains", &m_Config.Trains),
+            std::pair("EnableBoats", &m_Config.Boats),
+            std::pair("EnableAircrafts", &m_Config.Aircraft),
+            std::pair("EnableCars", &m_Config.Cars),
+            std::pair("EnableBikes", &m_Config.Bikes),
+            std::pair("EnableTrailers", &m_Config.Trailers),
+            std::pair("DefaultModel", &m_Config.DefaultModel)))
         return;
 
-    if (config.forcedVehicleEnabled && config.forcedVehicleID >= 400
-        && config.forcedVehicleID <= 611)
-        this->SetForcedRandomCar (config.forcedVehicleID);
+    if (m_Config.ForcedVehicleID >= 400 && m_Config.ForcedVehicleID <= 611)
+        this->SetForcedRandomCar (m_Config.ForcedVehicleID);
 
-    // TODO: Add Config option
     this->MakeRCsEnterable ();
 
     RegisterHooks ({{HOOK_JUMP, 0x421980, (void *) &RandomizePoliceCars},
@@ -95,7 +98,10 @@ TrafficRandomizer::Initialise ()
                     {HOOK_JUMP, 0x421900, (void *) &RandomizeCarToLoad},
                     {HOOK_CALL, 0x42C620, (void *) &FixEmptyPoliceCars},
                     {HOOK_CALL, 0x501F3B, (void *) &FixFreightTrainCrash},
-                    {HOOK_CALL, 0x61282F, (void *) &FixCopCrash}});
+                    {HOOK_CALL, 0x61282F, (void *) &FixCopCrash},
+                    {HOOK_CALL, 0x462217, (void *) &RandomizeRoadblocks<0x462217>}, // Actual Roadblocks
+                    {HOOK_CALL, 0x4998F0, (void *) &RandomizeRoadblocks<0x4998F0>}, // Scripted Cop Car Spawns
+                    {HOOK_CALL, 0x42B909, (void *) &RandomizeRoadblocks<0x42B909>}}); // Emergency Vehicles + Gang War Cars
 
     this->Install6AF420_Hook ();
 
@@ -105,6 +111,64 @@ TrafficRandomizer::Initialise ()
     Logger::GetLogger ()->LogMessage ("Registered Traffic Randomizer");
 
     FixTrainSpawns ();
+}
+
+/*******************************************************/
+template <int address>
+void* __fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx,
+                                               int model, char createdBy, char setupSuspensionLines)
+{
+    auto trafficRandomizer = TrafficRandomizer::GetInstance ();
+
+    if (model == 416 || model == 407)
+    {
+        CallMethod<0x6B0A90> (vehicle, model, createdBy,
+                                  setupSuspensionLines);
+        return vehicle;
+    }
+
+    int  random_id         = StreamingManager::GetRandomLoadedVehicle ();
+    if (trafficRandomizer->mForcedCar)
+        random_id = trafficRandomizer->mForcedCar;
+
+    if (ms_aInfoForModel[random_id].m_nLoadState == 1)
+        {
+            // Add to the recently spawned list
+            trafficRandomizer->mMostRecentSpawnedVehicles.push_back (random_id);
+
+            if (trafficRandomizer->mMostRecentSpawnedVehicles.size ()
+                > LOG_MOST_RECENT_VEHICLES)
+                trafficRandomizer->mMostRecentSpawnedVehicles.pop_front ();
+        }
+
+    if (CModelInfo::IsBoatModel (random_id) || CModelInfo::IsTrainModel(random_id))
+        CallMethod<0x6F2940> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsPlaneModel (random_id))
+        CallMethod<0x6C8E20> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsHeliModel (random_id))
+        CallMethod<0x6C4190> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsBikeModel (random_id))
+        CallMethod<0x6BF430> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsBmxModel (random_id))
+        CallMethod<0x6BF820> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsTrailerModel (random_id))
+        CallMethod<0x6D03A0> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsQuadBikeModel (random_id))
+        CallMethod<0x6CE370> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsMonsterTruckModel (random_id))
+        CallMethod<0x6C8D60> (vehicle, random_id, createdBy);
+
+    if (CModelInfo::IsCarModel (random_id))
+        CallMethod<0x6B0A90> (vehicle, random_id, createdBy, setupSuspensionLines);
+
+    return vehicle;
 }
 
 /*******************************************************/
@@ -200,8 +264,10 @@ LoadRandomVehiclesAtStart ()
             for (int i = 0; i < 5; i++)
                 {
                     int model = RandomizeCarToLoad ();
+                    if (trafficRandomizer->mForcedCar)
+                        model = trafficRandomizer->mForcedCar;
                     if (model != -1)
-                        CStreaming::RequestModel (model, 8);
+                        CStreaming::RequestModel (model, 0);
                 }
 
             CStreaming::LoadAllRequestedModels (false);
@@ -256,34 +322,33 @@ RandomizeTrafficCars (int *type)
 bool
 TrafficRandomizer::IsVehicleAllowed (int model)
 {
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
 
     // Aircrafts
     if ((CModelInfo::IsHeliModel (model) || CModelInfo::IsPlaneModel (model))
-        && !config.enableAircrafts)
+        && !m_Config.Aircraft)
         return false;
 
     // Boats
-    if (CModelInfo::IsBoatModel (model) && !config.enableBoats)
+    if (CModelInfo::IsBoatModel (model) && !m_Config.Boats)
         return false;
 
     // Bikes
     if ((CModelInfo::IsBikeModel (model) || CModelInfo::IsBmxModel (model))
-        && !config.enableBikes)
+        && !m_Config.Bikes)
         return false;
 
     // Trains
-    if (CModelInfo::IsTrainModel (model) && !config.enableTrains)
+    if (CModelInfo::IsTrainModel (model) && !m_Config.Trains)
         return false;
 
     // Cars
     if ((CModelInfo::IsCarModel (model) || CModelInfo::IsQuadBikeModel (model)
          || CModelInfo::IsMonsterTruckModel (model))
-        && !config.enableCars)
+        && !m_Config.Cars)
         return false;
 
     // Trailers
-    if (CModelInfo::IsTrailerModel (model) && !config.enableTrailers)
+    if (CModelInfo::IsTrailerModel (model) && !m_Config.Trailers)
         return false;
 
     return true;
@@ -350,10 +415,8 @@ RandomizeCarPeds (int type, int model, float *pos, bool unk)
     if (ms_aInfoForModel[model].m_nLoadState == 1)
         return CPopulation::AddPed (type, model, pos, unk);
 
-    auto config = ConfigManager::GetInstance ()->GetConfigs ().traffic;
-
     // spawn CJ because why not :P
-    return CPopulation::AddPed (type, config.defaultModel, pos, unk);
+    return CPopulation::AddPed (type, TrafficRandomizer::m_Config.DefaultModel, pos, unk);
 }
 
 /*******************************************************/

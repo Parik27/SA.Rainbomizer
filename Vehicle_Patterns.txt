@@ -176,7 +176,7 @@ driv3	Premier	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes
 driv3	Burrito	4	Y	N	N	N	N	N	N	N	N					
 driv3	Freeway	1	Y	Y	Y	Y	N	N	N	N	N					
 driv3	Stretch	4	Y	N	N	N	Y	Y	N	N	N					
-steal1	Uranus	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+steal1	Uranus	1	Y	Y	Y	Y	C	C	N	N	N	smallplanes	0	-4	0	
 steal1	Alpha	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 steal2	Sultan	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 steal2	Elegy	1	Y	Y	Y	Y	Y	Y	N	N	Y					
@@ -265,7 +265,7 @@ mansio2	Hydra	1	N	N	N	N	Y	Y	N	N	N	smallplanes+norc+guns
 mansio2	Tropic	1	N	N	N	N	Y	Y	Y	N	N	float				
 mansio2	Launch	1	N	N	N	N	N	N	N	N	N	float				
 manson5	Vortex	1	Y	N	N	Y	Y	Y	C	N	N	x=-7+y=-1116+z=7+smallplanes+smallboat	40	0	-6	
-manson5	Vortex	1	Y	Y	Y	Y	Y	Y	N	N	Y					
+manson5	Vortex	1	Y	N	N	N	Y	Y	N	N	Y					
 manson5	Marquis	1	N	N	N	N	C	Y	Y	N	N	float	0	0	5	
 manson5	Reefer	1	N	N	N	N	C	Y	Y	N	N	float	0	0	5	
 manson5	Kart	1	Y	Y	Y	Y	Y	Y	N	N	N	x=832+y=-2046+z=11+smallplanes				

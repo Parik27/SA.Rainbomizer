@@ -1602,6 +1602,7 @@ RCHeliPlayerJustExited (ScriptVehicleRandomizer::RCHeliMagnet *RCCurrent, int cu
                                0);
         }
     // DO NOT REMOVE THIS LOG
+    // For some reason the game crashes getting in the RC heli without it?
     Logger::GetLogger ()->LogMessage ("Player has exited heli, reset collision");
 }
 
@@ -1945,8 +1946,12 @@ ResetEndOfMissionStuff (char enable)
                     != MODEL_FORKLIFT && ryder2.atMagnetSection) || 
             (ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
                     != MODEL_DOZER && quarry.atMagnetSection))
-                Scrpt::CallOpcode (0x1c4, "remove_references_to_object",
-                           GlobalVar (10947)); // Stops magnet from persisting in save forever
+        {
+            Scrpt::CallOpcode (0x1c4, "remove_references_to_object", 
+                GlobalVar (10947)); // Stops magnet from persisting in save forever
+            ryder2.isPlayerInVeh = false;
+            quarry.isPlayerInVeh = false;
+        }
     }
 
     if (ScriptVehicleRandomizer::GetInstance()->mCurrentMissionRunning >= 121
@@ -1982,6 +1987,7 @@ char
 SetThingsForMissionStart ()
 {
     // DO NOT REMOVE THIS LOG
+    // For some reason the game crashes getting in the RC heli without it?
     Logger::GetLogger ()->LogMessage ("Clearing variables for mission start");
     ryder2 = emptyTemplate;
     quarry = emptyTemplate;
@@ -2341,6 +2347,9 @@ void __fastcall FixStuckAtDohertyGarage (CRunningScript *scr, void *edx,
             timerCurrent = clock () - timerStartTime;
             if ((int)timerCurrent >= 10000)
             {
+                CVector newCoords = {-2047.5f, 178.5f, 27.8f};
+                if (scr->CheckName ("steal5"))
+                    newCoords = {-2045.4f, 178.3f, 27.6f};
                 CRunningScript::SetCharCoordinates (
                         FindPlayerPed (),
                         {-2047.5f, 178.5f, 27.8f}, 1, 1);

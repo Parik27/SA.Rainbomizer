@@ -14,7 +14,7 @@ std::vector<std::string> contribs
     = {"iguana", "opain-replika", "sisco0", "SpeedyFolf", "SRewo"};
 
 std::vector<std::string> beta_testers
-    = {"Fryterp23", "Hugo_One", "Lordmau5", "Waris"};
+    = {"Fryterp23", "Hugo_One", "Lordmau5", "Riekelt", "Waris"};
 
 /*******************************************************/
 void

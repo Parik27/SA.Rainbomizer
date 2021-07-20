@@ -39,7 +39,7 @@ PickupsRandomizer = true
 PlayerRandomizer = true
 PedRandomizer = true
 CutsceneRandomizer = true
-VoiceLineRandomizer = true
+SoundRandomizer = true
 LanguageRandomizer = true
 LicensePlateRandomizer = true
 RiotRandomizer = true
@@ -283,7 +283,7 @@ UseOnlyNormalCutsceneModels = false
 RandomizeLocations = true
 
 #######################################################
-[VoiceLineRandomizer]
+[SoundRandomizer]
 
 # Main part of this randomizer which changes spoken dialogue in missions.
 RandomizeScriptVoiceLines = true

@@ -8,22 +8,22 @@ Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 
 ## Features 🌈
 
-- **Colour Randomizer**: Randomizes the colours of various in-game elements, including cars, the HUD, and fades. Includes 128 colours hue cycle. The intensity of this randomizer can be modified extensively in the configuration file.
-- **(NEW) Timecycle Randomizer**: Randomizes the appearance and colours of the game world, such as the sky, water, lighting, and other time-based elements. Also includes weather randomization which can be configured separately. *Use with caution if you are sensitive to bright lights and colours.*
+- **Colour Randomizer**: Randomizes the colours of various in-game elements, including cars, the HUD, and fades. Includes 128 colours hue cycle.
+- **(NEW) Timecycle Randomizer**: Randomizes the appearance and colours of the game world, such as the sky, water, lighting, and other time-based elements. Also includes weather randomization. *Use with caution if you are sensitive to bright lights and colours.*
 - **Traffic Randomizer**: Randomizes cars that spawn in traffic including law enforcement vehicles.
-- **Script Vehicle Randomizer**: Randomizes the vehicles you are given in missions. The randomizer makes sure that you get vehicles that are usable for the mission. For unrecognised scripts not in the default game, the randomizer will use a set of generic patterns to try and ensure compatibility.
-- **Parked Car Randomizer**: Randomizes cars which are found parked around the map including boats and airplanes at airports, with entirely random spawns. This can be configured to only randomize between the same type of parked vehicle.
+- **Script Vehicle Randomizer**: Randomizes the vehicles you are given in missions. The randomizer makes sure that you get vehicles that are usable for the mission.
+- **Parked Car Randomizer**: Randomizes cars which are found parked around the map including boats and airplanes at airports, with entirely random spawns.
 - **Mission Randomizer**: Randomizes which mission is started by each mission marker. When the randomized mission is complete, the game progresses as if you completed the original.
-- **Weapons Randomizer**: Randomizes the weapons that are wielded by the player and other NPCs.
+- **Weapon Randomizer**: Randomizes the weapons that are wielded by the player and other NPCs.
 - **Pickup Randomizer**: Randomizes all pickups to other random weapons and pickups, including spawns created on starting a new game, mission pickups, and drops from dead peds.
 - **(NEW) Player Randomizer**: Randomizes the player's apperance every fade between other NPC models in the game and/or CJ wearing random clothing options.
-- **(NEW) Ped Randomizer**: Randomizes the appearance of every single ped, including those on the street, cops, gang members, and mission characters. This only affects their appearance, and so their behaviour will remain the same (e.g. GSF members randomized to look like someone else can still be recruited).
+- **(NEW) Ped Randomizer**: Randomizes the appearance of every single ped, including those on the street, cops, gang members, and mission characters.
 - **Cutscene Randomizer**: Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
-- **Voice Line Randomizer**: Randomizes dialogues spoken by characters in missions. *(Requires original AudioEvents.txt)* This can also randomize the generic voice lines spoken by peds on the street and various other sound effects.
-- **(NEW) Language Randomizer**: Randomize the language of in-game text between other game languages. Some types of text will change at regular intervals defined within the config file.
+- **Sound Randomizer**: Randomizes dialogues spoken by characters in missions. *(Requires original AudioEvents.txt)* This can also randomize the generic voice lines spoken by peds on the street and various other sound effects.
+- **(NEW) Language Randomizer**: Randomize the language of in-game text between other game languages.
 - **License Plate Randomizer**: Randomizes the license plates of vehicles to random words from the game script.
 - **(NEW) Riot Randomizer**: Activates a small chance for the game's riot mode to randomly activate upon entering new zones, as well as an additional feature that randomizes the timing and order of Traffic Lights.
-- **Police Helicopters Randomizer**: Randomizes the helicopters that the police spawn in with working spotlight and gun.
+- **Police Helicopter Randomizer**: Randomizes the helicopters that the police spawn in with working spotlight and gun.
 - **Blip Randomizer**: Randomizes every radar blip on the map with a different icon.
 - **Wanted Level Randomizer**: Randomizes how you get wanted levels during and outside of missions.
 - **DYOM Randomizer**: Adds an option to download and play a random mission from the DYOM website.
@@ -88,7 +88,7 @@ Please note that compatibility with other mods not mentioned here is not guarant
 #### Lead Developers
 
 - [Parik](https://github.com/Parik27) - Creation and implementation of the initial ASI.
-- [123robot](https://www.twitch.tv/123robot) - Development of several new features and improvements for V3.0, as well as previous assistance with external files, data gathering, testing and other support.
+- [123robot](https://www.twitch.tv/123robot) - Development of several new features and improvements for v3.0, as well as previous assistance with creating external files, testing, and other support.
 - [GTA Madman](https://github.com/GTAMadman) - Assistance with the creation of Ped and Player Randomizers, as well as contributing other fixes, feedback, and extensive testing.
 
 #### Original Concept
@@ -100,8 +100,6 @@ Please note that compatibility with other mods not mentioned here is not guarant
 #### Additional Contributors
 
 - [iguana](https://www.twitch.tv/iguana_) - Assisted with looking through code and helped inspire the mission randomizer.
-- [opain-replika](https://github.com/opain-replika) - Identified issue with Kickstart vehicles.
-- [sisco0](https://github.com/sisco0) - Implemented the config option for random car colours.
 - [SpeedyFolf](https://www.twitch.tv/speedyfolf) - Creating the tutorial video, beta testing, and feedback during development.
 - [SRewo](https://github.com/SRewo) - Creating the Weapon Stats Randomizer.
 

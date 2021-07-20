@@ -292,7 +292,7 @@ void __fastcall RandomizeFrontendAudio (CAudioEngine *audioEngine,
 void
 SoundRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("VoiceLineRandomizer", 
+    if (!ConfigManager::ReadConfig ("SoundRandomizer", 
             std::pair ("RandomizeScriptVoiceLines",&m_Config.RandomizeMissionLines),
             std::pair("MatchSubtitles", &m_Config.MatchSubtitles),
             std::pair ("RandomizeGenericPedSpeech", &m_Config.RandomizePedSpeech),

@@ -11,7 +11,7 @@ std::vector<std::string> lead_devs = {"Parik", "123robot", "GTA_Madman"};
 std::vector<std::string> concept = {"NABN00B", "MrMateczko", "Veigar"};
 
 std::vector<std::string> contribs
-    = {"iguana", "opain-replika", "sisco0", "SpeedyFolf", "SRewo"};
+    = {"iguana", "SpeedyFolf", "SRewo"};
 
 std::vector<std::string> beta_testers
     = {"Fryterp23", "Hugo_One", "Lordmau5", "Riekelt", "Waris"};

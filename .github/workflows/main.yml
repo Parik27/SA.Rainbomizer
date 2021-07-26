@@ -25,9 +25,9 @@ jobs:
         mkdir output/scripts
         cp rainbomizer.asi output/scripts/SA.Rainbomizer.asi
         cp ../config.toml output/rainbomizer/
+        cp ../FAQ.md output/FAQ.txt
         cp -r ../data output/rainbomizer/data/
         cp ../README.md output/readme.txt
-        cp ../FAQ.md output/FAQ.txt
         
     - name: Upload
       uses: actions/upload-artifact@v1

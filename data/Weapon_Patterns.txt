@@ -47,3 +47,4 @@ blood	mp5lng	0	N	N	N	Y	N	N	N	N	N	N	N
 music3	camera	-1	N	N	N	N	N	N	N	N	N	Y	N	goggles
 smoke3	tec9	-1	N	Y	Y	Y	Y	Y	Y	Y	Y	N	N	
 casino9	colt45	24	N	Y	Y	Y	Y	Y	Y	Y	Y	N	N	
+pool2	poolcue	0	Y	N	N	N	N	N	N	N	N	Y	N

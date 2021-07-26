@@ -5,8 +5,8 @@ lowr	Savanna	2	Y	Y	Y	Y	Y	Y	Y	Y	N
 zero5	Rcbaron	1	C	N	N	N	C	C	N	N	N	guns	-5	0	0	
 intro1	Peren	2	Y	Y	Y	Y	Y	Y	N	N	N					
 intro1	Voodoo	2	Y	Y	Y	Y	Y	Y	N	N	N					
-intro1	Bmx	1	C	Y	Y	Y	C	N	N	N	N	x=971+y=-1115+z=23+smallplanes	-20	-37	0	Ryder bike
-intro1	Bmx	1	C	Y	Y	Y	C	N	N	N	N	x=971+y=-1113+z=23+smallplanes	-9	0	0	Sweet bike
+intro1	Bmx	1	C	Y	Y	Y	N	N	N	N	N	x=971+y=-1115+z=23+smallplanes	-20	-37	0	Ryder bike
+intro1	Bmx	1	C	Y	Y	Y	N	N	N	N	N	x=971+y=-1113+z=23+smallplanes	-9	0	0	Sweet bike
 intro1	Bmx	1	C	Y	Y	Y	C	C	C	C	C	x=971+y=-1110+z=23+smallplanes	-20	-30	0	Smoke bike
 intro1	Bmx	1	C	Y	Y	Y	C	C	N	N	C	x=971+y=-1108+z=23+smallplanes	5	4	0	Player bike
 intro2	Picador	2	Y	Y	N	Y	C	C	N	N	N	smallplanes	0	27	0	

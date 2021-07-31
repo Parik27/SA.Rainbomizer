@@ -908,6 +908,7 @@ cshelper2
 csho
 csho
 csmech
+cssweet
 csom2
 csomost
 csplas1
@@ -1473,6 +1474,7 @@ csmoneysing
 csmoneystck
 csmop
 csbookb
+csm16
 
 csgoldrec
 
@@ -1487,7 +1489,6 @@ cspapers
 csammobox
 cscastray
 csgoldrec
-csm16
 csmopbucket
 cshatch
 

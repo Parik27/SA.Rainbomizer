@@ -24,7 +24,7 @@ PedRandomizer::ChooseRandomPedToLoad ()
                                      || ms_aInfoForModel[ped].m_nLoadState == 1)
         ;
 
-    if (m_Config.ForcedPed >= 0)
+    if (m_Config.ForcedPed >= 1)
         ped = m_Config.ForcedPed;
 
     return ped;
@@ -62,6 +62,9 @@ PedRandomizer::GetRandomModelIndex (uint32_t originalIdx)
     if (ms_aInfoForModel[newModel].m_nLoadState != 1
         || IsSpecialModel (originalIdx))
         newModel = originalIdx;
+
+    if (m_Config.ForcedPed == 0 || random (1000) > 990)
+        newModel = 0;
 
     return newModel;
 }

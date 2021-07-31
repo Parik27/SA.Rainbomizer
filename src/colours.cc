@@ -306,52 +306,17 @@ void RandomizeWeaponSpriteColours (float x, float y, float z, float halfw,
     }
     else
     {
-        static CRGBA weaponColour = {-1, -1, -1, -1};
-        if (weaponColour.a == -1)
-            weaponColour = {r, random (255), b, a};
-        colour = weaponColour;
+        static ColourRandomizer::Pattern weaponSpriteColours
+                = {-1, {-1, -1, -1}};
+        if (weaponSpriteColours.ID == -1)
+            weaponSpriteColours = {1, {random (255), random (255), b}};
+        colour
+            = {weaponSpriteColours.colours[0], weaponSpriteColours.colours[1],
+               weaponSpriteColours.colours[2], a};
     }
     colour       = GetRainbowColour (HashColour (colour));
     CSprite::RenderOneXLUSprite (x, y, z, halfw, halfh, colour.r, colour.g,
                                  colour.b, a, rhw, intensity, udir, vdir);
-}
-
-/*******************************************************/
-template <int address>
-void
-RandomizeWeaponEffectColours (float arg1, float arg2, int arg3, int arg4,
-                              int arg5, int arg6, float arg7, char r, char g,
-                              char b, char a, float arg12, char arg13)
-{
-    CRGBA colour = {r, g, b, a};
-    static CRGBA uniqueEffectColour = {r, g, b, -1};
-    if (uniqueEffectColour.a == -1)
-        {
-            uniqueEffectColour = {r, g, random (255), a};
-        }
-    colour = uniqueEffectColour;
-    colour       = GetRainbowColour (HashColour (colour));
-    CSprite::RenderOneXLUSprite_Triangle (arg1, arg2, arg3, arg4, arg5, arg6, arg7, colour.r, colour.g,
-                                 colour.b, a, arg12, arg13);
-}
-
-/*******************************************************/
-template <int address>
-void
-RandomizeMoreWeaponEffectColours (float x, float y, float z, float halfw,
-                                 float halfh, char r, char g, char b, char a,
-                                 float rhw, float arg11, char intensity)
-{
-    CRGBA colour = {r, g, b, a};
-    static CRGBA uniqueEffectColour = {r, g, b, -1};
-    if (uniqueEffectColour.a == -1)
-    {
-        uniqueEffectColour = {r, g, random (255), a};
-    }
-    colour = uniqueEffectColour;
-    colour       = GetRainbowColour (HashColour (colour));
-    CSprite::RenderOneXLUSprite_Rotate_Aspect (x, y, z, halfw, halfh, colour.r, colour.g,
-                                 colour.b, a, rhw, arg11, intensity);
 }
 
 /*******************************************************/
@@ -364,10 +329,12 @@ RandomizeWeatherEffectColours (float x, float y, float z, float w, float h,
     CRGBA colour = {r, g, b, a};
     if (address == 0x715EDF)
     {
-        static CRGBA cloudColourHigh = {-1, -1, -1, -1};
-        if (cloudColourHigh.a == -1)
-            cloudColourHigh = {random(255), colour.g, colour.b, colour.a};
-        colour = cloudColourHigh;
+        static ColourRandomizer::Pattern cloudColourHigh
+                = {-1, {-1, -1, -1}};
+        if (cloudColourHigh.ID == -1)
+            cloudColourHigh = {1, {random (255), b, a}};
+        colour = {cloudColourHigh.colours[0], cloudColourHigh.colours[1],
+                  cloudColourHigh.colours[2], a};
     }
     colour = GetRainbowColour (HashColour (colour));
     CSprite::RenderBufferedOneXLUSprite (x, y, z, w, h, colour.r, colour.g,

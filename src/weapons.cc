@@ -180,7 +180,6 @@ void __fastcall AllowMoreExplosionTypes (CRunningScript *scr, void *edx,
         float corner1Y = ((float *) ScriptParams)[2];
         float corner1Z = ((float *) ScriptParams)[3];
         float corner2X = ((float *) ScriptParams)[4];
-        float corner2Y = ((float *) ScriptParams)[5];
         float corner2Z = ((float *) ScriptParams)[6];
         if (int (corner1X) == 823 && int (corner1Y) == 8 && int (corner1Z) == 1000)
         {

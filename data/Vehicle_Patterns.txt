@@ -1,4 +1,4 @@
-#Thread	Original Vehicle	Seats	Cars	Bikes	Bicycles	Quadbikes	Planes	Helicopters	Boats	Trains	Trailers	Flags	Alternate Coordinates			Alt Coord Notes
+ #Thread	Original Vehicle	Seats	Cars	Bikes	Bicycles	Quadbikes	Planes	Helicopters	Boats	Trains	Trailers	Flags	Alternate Coordinates			Alt Coord Notes
 #													X	Y	Z	
 intro	Copcarla	4	Y	N	N	N	Y	Y	N	Y	N					
 lowr	Savanna	2	Y	Y	Y	Y	Y	Y	Y	Y	N					
@@ -161,7 +161,7 @@ syn2	Stretch	4	Y	N	N	N	N	N	N	N	N
 syn2	Huntley	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
 driv2	Fcr900	1	Y	Y	Y	Y	Y	Y	Y	Y	N					
 syn3	Sanchez	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
-syn3	Rumpo	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+syn3	Rumpo	1	Y	Y	Y	Y	Y	N	N	N	N	norc+hovercraft				
 syn3	Washing	4	Y	N	N	N	N	N	N	N	N					
 synd4	Broadway	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 synd4	Pizzaboy	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				

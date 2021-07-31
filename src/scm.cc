@@ -112,7 +112,7 @@ SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
     if (speed < 0.92
         && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5" 
         && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck() != MODEL_VORTEX)
-        speed = 0.84;
+        speed = 0.82;
 
     CVehicleRecording::SetPlaybackSpeed (vehicle, speed);
 }
@@ -440,7 +440,8 @@ ApplySpecificPosChanges (int model, int &newModel, float &x, float &y, float &z)
     {
         x += 3.0f;
     }
-    else if (ScriptVehicleRandomizer::GetInstance()->mLastThread == "manson5")
+    else if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5"
+             && int(y) == -1116 && model == 539)
     {
         if (newModel == 460)
         {
@@ -453,6 +454,10 @@ ApplySpecificPosChanges (int model, int &newModel, float &x, float &y, float &z)
                 x -= 30.1f;
                 y -= 67.8f;
                 z -= 3.0f;
+        }
+        else if (CModelInfo::IsHeliModel(newModel))
+        {
+            y -= 17.8f;
         }
     }
 }
@@ -531,9 +536,9 @@ int16_t __fastcall UpdateLastThread (CRunningScript *script, void *edx,
     script->CollectParameters (count);
     int currentMissionId
         = ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning;
-    if ((currentMissionId >= 121 && currentMissionId <= 123)
+    if (((currentMissionId >= 121 && currentMissionId <= 123)
         || (currentMissionId == 125) || (currentMissionId == 127)
-        || (currentMissionId >= 131 && currentMissionId <= 133)
+        || (currentMissionId >= 131 && currentMissionId <= 133))
                && std::string(script->m_szName) == "noname")
         return 0;
     
@@ -857,7 +862,7 @@ void __fastcall ProcessModifiedSchoolTimesBoat (CRunningScript *scr,
             }
     }
     else if (scr->CheckName ("zero1"))
-        ((float *) ScriptParams)[1] = 35.0f;
+        ((float *) ScriptParams)[1] = 45.0f;
 }
 
 /*******************************************************/
@@ -865,8 +870,8 @@ void __fastcall DisplayCorrectSchoolTime (CRunningScript *scr, void *edx,
                                             short count)
 {
     scr->CollectParameters (count);
-    if (scr->CheckName ("dskool") && ScriptSpace[247] == 6 
-        || ScriptSpace[247] == 7 || ScriptSpace[247] == 16)
+    if (scr->CheckName ("dskool") && (ScriptSpace[247] == 6 
+        || ScriptSpace[247] == 7 || ScriptSpace[247] == 16))
     {
         int actualTime
                 = ScriptVehicleRandomizer::GetInstance ()->GetOriginalTestTime();
@@ -1482,6 +1487,12 @@ void __fastcall QuarryAttachMagnet (CRunningScript *scr, void *edx, short count)
         Scrpt::CallOpcode (0x382, "set_object_collision", GlobalVar (10947), 0);
         quarry.atMagnetSection = true;
     }
+    else if (scr->CheckName ("manson5"))
+    {
+        float carAngle = ((float *) ScriptParams)[1];
+        if (int (carAngle) == 343)
+            ScriptVehicleRandomizer::mTempVehHandle = ScriptParams[0];
+    }
 }
 
 /*******************************************************/
@@ -1676,6 +1687,12 @@ void __fastcall Ryder2IsCutsceneActive(CRunningScript* scr, void* edx, short cou
                 injector::WriteMemory (waterCarsCheatActive, 0);
             else
                 injector::WriteMemory (waterCarsCheatActive, 1);
+        }
+        else if (ScriptParams[0] == 0 && 
+            ScriptVehicleRandomizer::mTempVehHandle != -1)
+        {
+            Scrpt::CallOpcode (0x825, "start_rotors_instantly",
+                ScriptVehicleRandomizer::mTempVehHandle);
         }
     }
     else if (scr->CheckName ("litcas")
@@ -2459,6 +2476,61 @@ void __fastcall CheckDes3HeliDriver (CRunningScript *scr, void *edx,
 }
 
 /*******************************************************/
+void __fastcall GetCurrentPlayerRCVeh (CRunningScript *scr, void *edx,
+                                           short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("zero4"))
+        ScriptVehicleRandomizer::mTempVehHandle = ScriptParams[1];
+}
+
+/*******************************************************/
+void __fastcall ActivateZero4SelfDestruct (CRunningScript *scr, void *edx,
+                                       short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("zero4"))
+        {
+            static bool firstRun          = false;
+            static int timerStartMessage = 0.0f;
+            if (timerStartMessage < 0.0f)
+                timerStartMessage = clock ();
+            int timerMessageCurrent = clock () - timerStartMessage;
+            if ((int) timerMessageCurrent >= 40000 || !firstRun)
+                {
+                    firstRun            = true;
+                    timerStartMessage = -1.0f;
+                    std::string tempKey = "Z4_H1";
+                    Scrpt::CallOpcode (0xbb, "print_text_lowpriority",
+                                       tempKey.c_str (), 20000, 1);
+                }
+            short isKeyPressed = CallAndReturn<short, 0x485B10> (0, 11);
+            if (ScriptVehicleRandomizer::mTempVehHandle != -1)
+                if (isKeyPressed == 255)
+                    Scrpt::CallOpcode (0x20b, "explode_car",
+                                       ScriptVehicleRandomizer::mTempVehHandle);
+        }
+}
+
+/*******************************************************/
+char *
+ReplaceMessageText (char *str, int time, short flag, char bAddToPreviousBrief)
+{
+    if (time == 20000 && CRunningScripts::CheckForRunningScript("zero4"))
+    {
+        std::string text = "Press ~k~~CONVERSATION_YES~ to self-destruct "
+                           "your vehicle if you are stuck.";
+        return CallAndReturn<char *, 0x69F0B0> (text.c_str (), time, flag,
+                                                bAddToPreviousBrief);
+    }
+    else
+    {
+        return CallAndReturn<char *, 0x69F0B0> (str, time, flag,
+            bAddToPreviousBrief);
+    }
+}
+
+/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -2551,6 +2623,9 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x48954E, (void *) &ReduceCarWeight},
          {HOOK_CALL, 0x467B1E, (void *) &DetectVehicleDestruction},
          {HOOK_CALL, 0x469B71, (void *) &CheckDes3HeliDriver},
+         {HOOK_CALL, 0x46D549, (void *) &GetCurrentPlayerRCVeh},
+         {HOOK_CALL, 0x487A50, (void *) &ActivateZero4SelfDestruct},
+         {HOOK_CALL, 0x468137, (void *) &ReplaceMessageText},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     // Hooks function for plane / heli height checks

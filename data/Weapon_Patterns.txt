@@ -37,8 +37,8 @@ shrange	colt45	-1	N	Y	Y	Y	Y	Y	Y	N	N	N	N	noexplosives+noflame
 shrange	micro_uzi	-1	N	Y	Y	Y	Y	Y	Y	N	N	N	N	noexplosives+noflame
 shrange	chromegun	-1	N	Y	Y	Y	Y	Y	Y	N	N	N	N	noexplosives+noflame
 shrange	ak47	-1	N	Y	Y	Y	Y	Y	Y	N	N	N	N	noexplosives+noflame
-zero1	minigun	0	N	N	Y	Y	Y	Y	Y	N	N	N	N	longrange+noexplosives
-heist5	minigun	0	N	N	Y	N	Y	N	Y	N	N	N	N	longrange
+zero1	minigun	0	N	N	N	Y	Y	Y	Y	N	N	N	N	longrange+noexplosives
+heist5	minigun	0	N	N	N	N	Y	N	Y	N	N	N	N	longrange
 wuzi5	minigun	0	N	Y	Y	Y	Y	Y	Y	Y	N	N	N	uselessproj
 sweet2	colt45	0	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	N	
 maf4	micro_uzi	0	N	Y	Y	Y	N	N	N	N	N	N	N	dualwield
@@ -46,5 +46,5 @@ des10	micro_uzi	0	N	Y	Y	Y	N	N	N	N	N	N	N	dualwield
 blood	mp5lng	0	N	N	N	Y	N	N	N	N	N	N	N	
 music3	camera	-1	N	N	N	N	N	N	N	N	N	Y	N	goggles
 smoke3	tec9	-1	N	Y	Y	Y	Y	Y	Y	Y	Y	N	N	
-casino9	colt45	24	N	Y	Y	Y	Y	Y	Y	Y	Y	N	N	
+casino9	colt45	24	N	Y	Y	Y	Y	Y	Y	Y	Y	Y	N	
 pool2	poolcue	0	Y	N	N	N	N	N	N	N	N	Y	N

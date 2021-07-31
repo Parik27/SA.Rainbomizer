@@ -307,9 +307,7 @@ void RandomizeWeaponSpriteColours (float x, float y, float z, float halfw,
     else
     {
         static ColourRandomizer::Pattern weaponSpriteColours
-                = {-1, {-1, -1, -1}};
-        if (weaponSpriteColours.ID == -1)
-            weaponSpriteColours = {1, {random (255), random (255), b}};
+            = { 1, {random (255), random (255), b}};
         colour
             = {weaponSpriteColours.colours[0], weaponSpriteColours.colours[1],
                weaponSpriteColours.colours[2], a};
@@ -330,9 +328,7 @@ RandomizeWeatherEffectColours (float x, float y, float z, float w, float h,
     if (address == 0x715EDF)
     {
         static ColourRandomizer::Pattern cloudColourHigh
-                = {-1, {-1, -1, -1}};
-        if (cloudColourHigh.ID == -1)
-            cloudColourHigh = {1, {random (255), b, a}};
+            = {1, {random (255), g, b}};
         colour = {cloudColourHigh.colours[0], cloudColourHigh.colours[1],
                   cloudColourHigh.colours[2], a};
     }

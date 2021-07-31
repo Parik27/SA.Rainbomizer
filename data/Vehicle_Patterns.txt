@@ -1,4 +1,4 @@
- #Thread	Original Vehicle	Seats	Cars	Bikes	Bicycles	Quadbikes	Planes	Helicopters	Boats	Trains	Trailers	Flags	Alternate Coordinates			Alt Coord Notes
+#Thread	Original Vehicle	Seats	Cars	Bikes	Bicycles	Quadbikes	Planes	Helicopters	Boats	Trains	Trailers	Flags	Alternate Coordinates			Alt Coord Notes
 #													X	Y	Z	
 intro	Copcarla	4	Y	N	N	N	Y	Y	N	Y	N					
 lowr	Savanna	2	Y	Y	Y	Y	Y	Y	Y	Y	N					

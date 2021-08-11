@@ -26,103 +26,81 @@
 #include "config.hh"
 #include "injector/injector.hpp"
 
+#include <map>
+
 HandlingRandomizer *HandlingRandomizer::mInstance = nullptr;
-const int           baseHandlingAddress           = 0xC2B9DC;
+
+const int             NUM_HANDLINGS = 209;
+static tHandlingData *s_Handlings
+    = reinterpret_cast<tHandlingData *> (0xC2B9DC);
 
 /*******************************************************/
-void __fastcall RandomizeHandling (CVehicle *vehicle, void *edx, CPed *ped) 
+tHandlingData *
+GetRandomHandling (CVehicle *vehicle)
 {
-    if (vehicle->m_nPacMansCollected != 100 && !CModelInfo::IsBoatModel(vehicle->m_nModelIndex) 
-        && !CModelInfo::IsHeliModel(vehicle->m_nModelIndex) && 
-        !CModelInfo::IsPlaneModel (vehicle->m_nModelIndex)
+    static std::map<CVehicle *, tHandlingData> data;
+
+    tHandlingData *handling = &data[vehicle];
+    if (vehicle->m_pHandling == handling)
+        return handling;
+
+    memcpy (handling, vehicle->m_pHandling, sizeof (tHandlingData));
+
+#define ADD_RANDOMIZED_FIELD(fieldName)                                        \
+    handling->fieldName = s_Handlings[random (NUM_HANDLINGS)].fieldName
+
+    // ADD_RANDOMIZED_FIELD (index);
+    ADD_RANDOMIZED_FIELD (fMass);
+    ADD_RANDOMIZED_FIELD (field_8);
+    ADD_RANDOMIZED_FIELD (fTurnMass);
+    ADD_RANDOMIZED_FIELD (fDragMult);
+    ADD_RANDOMIZED_FIELD (centreOfMass);
+    ADD_RANDOMIZED_FIELD (nPercentSubmerged);
+    ADD_RANDOMIZED_FIELD (field_21);
+    ADD_RANDOMIZED_FIELD (field_22);
+    ADD_RANDOMIZED_FIELD (field_23);
+    ADD_RANDOMIZED_FIELD (fBuoyancyConstant);
+    ADD_RANDOMIZED_FIELD (fTractionMultiplier);
+    ADD_RANDOMIZED_FIELD (transmissionData);
+    ADD_RANDOMIZED_FIELD (fBrakeDeceleration);
+    ADD_RANDOMIZED_FIELD (fBrakeBias);
+    ADD_RANDOMIZED_FIELD (bABS);
+    ADD_RANDOMIZED_FIELD (field_9D);
+    ADD_RANDOMIZED_FIELD (field_9E);
+    ADD_RANDOMIZED_FIELD (field_9F);
+    ADD_RANDOMIZED_FIELD (fSteeringLock);
+    ADD_RANDOMIZED_FIELD (fTractionLoss);
+    ADD_RANDOMIZED_FIELD (fTractionBias);
+    ADD_RANDOMIZED_FIELD (fSuspensionForceLevel);
+    ADD_RANDOMIZED_FIELD (fSuspensionDampingLevel);
+    ADD_RANDOMIZED_FIELD (fSuspensionHighSpdComDamp);
+    ADD_RANDOMIZED_FIELD (fSuspensionUpperLimit);
+    ADD_RANDOMIZED_FIELD (fSuspensionLowerLimit);
+    ADD_RANDOMIZED_FIELD (fSuspensionBiasBetweenFrontAndRear);
+    ADD_RANDOMIZED_FIELD (fSuspensionAntiDiveMultiplier);
+    ADD_RANDOMIZED_FIELD (fCollisionDamageMultiplier);
+    ADD_RANDOMIZED_FIELD (modelFlags);
+    ADD_RANDOMIZED_FIELD (handlingFlags);
+    ADD_RANDOMIZED_FIELD (fSeatOffsetDistance);
+    ADD_RANDOMIZED_FIELD (nMonetaryValue);
+    ADD_RANDOMIZED_FIELD (frontLights);
+    ADD_RANDOMIZED_FIELD (rearLights);
+    // ADD_RANDOMIZED_FIELD (animGroup);
+    ADD_RANDOMIZED_FIELD (field_DF);
+
+    return handling;
+}
+
+/*******************************************************/
+void __fastcall RandomizeHandling (CVehicle *vehicle, void *edx, CPed *ped)
+{
+    if (!CModelInfo::IsBoatModel (vehicle->m_nModelIndex)
+        && !CModelInfo::IsHeliModel (vehicle->m_nModelIndex)
+        && !CModelInfo::IsPlaneModel (vehicle->m_nModelIndex)
         && !CModelInfo::IsTrainModel (vehicle->m_nModelIndex))
-    {
-        vehicle->m_pHandling->index = injector::ReadMemory<float> (
-                baseHandlingAddress + (0xe0 * random (209)));
-        vehicle->m_pHandling->fMass = injector::ReadMemory<float> 
-            (baseHandlingAddress + 4 + (0xe0 * random(209)));
-        vehicle->m_pHandling->field_8 = injector::ReadMemory<float> (
-            baseHandlingAddress + 8 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fTurnMass = injector::ReadMemory<float> (
-            baseHandlingAddress + 12 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fDragMult = injector::ReadMemory<float> (
-            baseHandlingAddress + 16 + (0xe0 * random (209)));
-        vehicle->m_pHandling->centreOfMass = injector::ReadMemory<RwV3d> (
-            baseHandlingAddress + 20 + (0xe0 * random (209)));
-        vehicle->m_pHandling->nPercentSubmerged = injector::ReadMemory<char> (
-            baseHandlingAddress + 32 + (0xe0 * random (209)));
-        vehicle->m_pHandling->field_21 = injector::ReadMemory<char> (
-            baseHandlingAddress + 33 + (0xe0 * random (209)));
-        vehicle->m_pHandling->field_22 = injector::ReadMemory<char> (
-            baseHandlingAddress + 34 + (0xe0 * random (209)));
-        vehicle->m_pHandling->field_23 = injector::ReadMemory<char> (
-            baseHandlingAddress + 35 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fBuoyancyConstant = injector::ReadMemory<float> (
-            baseHandlingAddress + 36 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fTractionMultiplier = injector::ReadMemory<int> (
-            baseHandlingAddress + 40 + (0xe0 * random (209)));
-        vehicle->m_pHandling->transmissionData = injector::ReadMemory<cTransmission> (
-            baseHandlingAddress + 44 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fBrakeDeceleration = injector::ReadMemory<float> (
-            baseHandlingAddress + 148 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fBrakeBias = injector::ReadMemory<int> (
-            baseHandlingAddress + 152 + (0xe0 * random (209)));
-        vehicle->m_pHandling->bABS = injector::ReadMemory<char> (
-            baseHandlingAddress + 156 + (0xe0 * random (209)));
-        vehicle->m_pHandling->field_9D = injector::ReadMemory<char> (
-            baseHandlingAddress + 157 + (0xe0 * random (209)));
-        vehicle->m_pHandling->field_9E = injector::ReadMemory<char> (
-            baseHandlingAddress + 158 + (0xe0 * random (209)));
-        vehicle->m_pHandling->field_9F = injector::ReadMemory<char> (
-            baseHandlingAddress + 159 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSteeringLock = injector::ReadMemory<float> (
-            baseHandlingAddress + 160 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fTractionLoss = injector::ReadMemory<int> (
-            baseHandlingAddress + 164 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fTractionBias = injector::ReadMemory<int> (
-            baseHandlingAddress + 168 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSuspensionForceLevel = injector::ReadMemory<float> (
-            baseHandlingAddress + 172 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSuspensionDampingLevel = injector::ReadMemory<int> (
-            baseHandlingAddress + 176 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSuspensionHighSpdComDamp
-            = injector::ReadMemory<int> (baseHandlingAddress + 180
-                                           + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSuspensionUpperLimit
-            = injector::ReadMemory<float> (baseHandlingAddress + 184
-                                           + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSuspensionLowerLimit
-            = injector::ReadMemory<float> (baseHandlingAddress + 188
-                                           + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSuspensionBiasBetweenFrontAndRear
-            = injector::ReadMemory<int> (baseHandlingAddress + 192
-                                           + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSuspensionAntiDiveMultiplier
-            = injector::ReadMemory<int> (baseHandlingAddress + 196
-                                           + (0xe0 * random (209)));
-        vehicle->m_pHandling->fCollisionDamageMultiplier
-            = injector::ReadMemory<float> (baseHandlingAddress + 200
-                                           + (0xe0 * random (209)));
-        vehicle->m_pHandling->modelFlags
-            = injector::ReadMemory<unsigned int> (baseHandlingAddress + 204
-                                           + (0xe0 * random (209)));
-        vehicle->m_pHandling->handlingFlags = injector::ReadMemory<int> (
-            baseHandlingAddress + 208 + (0xe0 * random (209)));
-        vehicle->m_pHandling->fSeatOffsetDistance = injector::ReadMemory<int> (
-            baseHandlingAddress + 212 + (0xe0 * random (209)));
-        vehicle->m_pHandling->nMonetaryValue
-            = injector::ReadMemory<int> (baseHandlingAddress + 216
-                                           + (0xe0 * random (209)));
-        vehicle->m_pHandling->frontLights = injector::ReadMemory<char> (
-            baseHandlingAddress + 220 + (0xe0 * random (209)));
-        vehicle->m_pHandling->rearLights = injector::ReadMemory<char> (
-            baseHandlingAddress + 221 + (0xe0 * random (209)));
-        //vehicle->m_pHandling->animGroup = injector::ReadMemory<char> (
-        //    baseHandlingAddress + 222 + (0xe0 * random (209)));
-        vehicle->m_pHandling->field_DF = injector::ReadMemory<char> (
-            baseHandlingAddress + 223 + (0xe0 * random (209)));
-        vehicle->m_nPacMansCollected = 100;
-    }
+        {
+            vehicle->m_pHandling = GetRandomHandling (vehicle);
+        }
     vehicle->SetDriver (ped);
 }
 

@@ -156,6 +156,10 @@ Paramedic = true
 Courier = true
 BikeChallenges = true
 
+# Set to true to restore behaviour from previous versions where planes in Air Raid 
+# crash immediately before reaching the roof.
+SlowPlanesInAirRaid = false
+
 # Forces every script vehicle to be replaced by one of your choice.
 # Set to -1 to not force a vehicle.
 ForcedVehicleId = -1

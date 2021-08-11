@@ -191,8 +191,9 @@ dskool	Copcarsf	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-2050+y=-130+hovercraft
 dskool	Copcarsf	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
 dskool	Taxi	1	Y	Y	Y	Y	Y	Y	N	N	N	hovercraft				
 dskool	Supergt	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
-dskool	Banshee	1	Y	N	N	N	N	N	N	N	N	x=-2050+y=-130+smallcar				
-dskool	Banshee	1	Y	N	N	N	N	N	N	N	N	x=-2050+y=-110+smallcar				
+dskool	Banshee	1	Y	Y	Y	Y	Y	N	N	N	N	x=-2050+y=-130+smallcar+hovercraft				
+dskool	Banshee	1	Y	Y	Y	Y	Y	N	N	N	N	x=-2050+y=-110+smallcar+hovercraft				
+dskool	Banshee	1	Y	Y	Y	Y	Y	N	N	N	Y					
 dskool	Infernus	1	Y	Y	Y	Y	Y	Y	N	N	Y	smallplanes				
 zero1	Rcbaron	1	N	N	N	N	Y	N	N	N	N	nohovercraft				
 zero2	Rcbaron	1	N	N	N	N	C	C	N	N	N	guns	-5	0	0	
@@ -221,6 +222,7 @@ desert5	Petro	1	Y	Y	N	Y	Y	N	Y	Y	Y
 desert5	Stunt	1	Y	N	N	Y	Y	N	N	N	N	nohovercraft				
 casino1	Feltzer	1	Y	N	N	N	N	N	N	N	N					
 casino2	Dumper	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
+casino2	Sanchez	1	N	Y	Y	Y	N	Y	N	N	N	x=639+y=850+z=-43				
 casino2	Manana	1	Y	Y	Y	Y	Y	Y	Y	N	Y	smallplanes				
 casino2	Securica	2	Y	Y	N	Y	Y	N	N	N	N	smallplanes				
 casino3	Admiral	2	Y	Y	N	Y	Y	Y	N	N	N	x=1044+y=2096+z=9+smallplanes				
@@ -249,7 +251,7 @@ heist5	Leviathn	1	N	N	N	N	N	Y	N	N	N
 heist5	Securica	1	Y	N	N	N	N	N	N	N	N					
 heist5	Patriot	1	Y	Y	Y	Y	Y	N	N	N	N	smallplanes				
 heist5	Hunter	1	N	N	N	N	N	Y	N	N	N					
-heist9	Forklift	1	C	Y	Y	Y	N	N	N	N	N	x=2173+y=1585+z=998+smallcar	6	0	1	
+heist9	Forklift	1	C	N	N	N	N	N	N	N	N	x=2173+y=1585+z=998+smallcar	6	0	1	
 heist9	Securica	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	x=345+y=2546+z=15				
 heist9	Securica	4	Y	N	N	N	N	N	N	N	N					
 heist9	Copbike	1	Y	Y	Y	Y	N	N	N	N	N					
@@ -274,7 +276,7 @@ grove1	Infernus	1	Y	Y	Y	Y	Y	Y	N	N	N	x=2003+y=-1132+z=24+smallplanes
 riot1	Greenwoo	2	Y	Y	N	Y	N	N	N	N	N					
 finalea	Greenwoo	2	Y	Y	N	Y	Y	Y	N	N	N	x=2507+y=-1671+z=12+smallplanes				
 finalea	Swatvan	1	N	N	N	N	N	N	N	N	N	x=2374+y=-1323+z=22				
-finalea	Swatvan	2	Y	Y	N	Y	Y	Y	N	N	N	x=2561+y=-1275+z=1031				
+finalea	Swatvan	2	Y	Y	N	Y	Y	N	N	N	N	x=2561+y=-1275+z=1031				
 finalec	Firela	1	Y	Y	Y	Y	Y	Y	N	N	N					
 finalec	Feltzer	2	Y	Y	N	Y	N	Y	N	N	N					
 finalec	Copcarla	2	Y	N	N	N	Y	Y	N	N	N					

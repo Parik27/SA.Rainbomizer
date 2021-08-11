@@ -104,14 +104,15 @@ CutsceneRandomizer::GetRandomModel (std::string model)
     mLastModel = model;
 
     for (auto i : mModels)
+    {
+        if (std::find (std::begin (i), std::end (i), model) != std::end (i))
         {
-            if (std::find (std::begin (i), std::end (i), model) != std::end (i))
-                {
-                    auto replaced = i[random (i.size () - 1)];
-                    mLastModel    = replaced;
-                    break;
-                }
+            auto replaced = i[random (i.size () - 1)];
+            mLastModel    = replaced;
+            break;
         }
+    }
+
     if (!LoadModelForCutscene (mLastModel))
         mLastModel = model;
 

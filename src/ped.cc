@@ -85,12 +85,20 @@ void
 PedRandomizer::RandomizeSpecialModels (int slot, const char *modelName,
                                        int flags)
 {
-    std::string &newModel = GetRandomElement (specialModels);
+    if (!PedRandomizer::isSkinSelect)
+    {
+        std::string &newModel = GetRandomElement (specialModels);
 
-    if (m_Config.ForcedSpecial != "")
-        newModel = m_Config.ForcedSpecial;
+        if (m_Config.ForcedSpecial != "")
+            newModel = m_Config.ForcedSpecial;
 
-    CStreaming::RequestSpecialModel (slot, newModel.c_str (), 0);
+        CStreaming::RequestSpecialModel (slot, newModel.c_str (), 0);
+    }
+    else
+    {
+        PedRandomizer::isSkinSelect = false;
+        CStreaming::RequestSpecialModel (slot, modelName, flags);
+    }
     CStreaming::LoadAllRequestedModels (false);
 }
 
@@ -119,6 +127,15 @@ MakeGangWarsConsistent (int pedType)
     if (pedType >= 7 && pedType <= 16)
         pedType = 7;
     return CallAndReturn<char, 0x443950> (pedType);
+}
+
+/*******************************************************/
+void __fastcall CheckForSkinSelect (CRunningScript *scr, void *edx,
+                                           short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("skin_c"))
+        PedRandomizer::isSkinSelect = true;
 }
 
 /*******************************************************/
@@ -162,7 +179,10 @@ PedRandomizer::Initialise ()
 
     // If Special Models Enabled
     if (m_Config.RandomizeSpecialModels)
+    {
         injector::MakeJMP (0x40B45E, RandomizeSpecialModels);
+        injector::MakeCALL (0x47EDAD, (void *) CheckForSkinSelect);
+    }
     
     if (m_Config.RandomizeGenericModels || m_Config.RandomizeCops || m_Config.RandomizeGangMembers)
     {

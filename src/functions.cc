@@ -376,6 +376,13 @@ CVehicle::SetGearUp ()
 
 /*******************************************************/
 void
+CVehicle::SetDriver (CPed *driver)
+{
+    CallMethod<0x6D16A0> (this, driver);
+}
+
+/*******************************************************/
+void
 CVehicle::AutomobilePlaceOnRoadProperly ()
 {
     CallMethod<0x6AF420> (this);
@@ -411,12 +418,12 @@ CHud::SetMessage (char *str)
     return Call<0x588F60> (str);
 }
 
-// /*******************************************************/
-// int
-// cHandlingDataMgr::LoadHandlingData ()
-// {
-//     return CallMethodAndReturn<int, 0x5BD830> (this);
-// }
+ /*******************************************************/
+ int
+ cHandlingDataMgr::LoadHandlingData ()
+ {
+     return CallMethodAndReturn<int, 0x5BD830> (this);
+ }
 
 /*******************************************************/
 void

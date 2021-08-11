@@ -121,6 +121,8 @@ public:
         bool Courier;
         bool Bike;
 
+        bool OldAirRaid;
+
         int ForcedVehicle;
         bool GenericPatterns;
         bool SkipChecks;

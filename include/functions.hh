@@ -618,13 +618,16 @@ struct CVehicle
     uint8_t              __pad94[752];
     tHandlingData *      m_pHandling;
     tFlyingHandlingData *m_pFlyingHandling;
-    uint8_t              m_nFlags[8];
-    uint8_t              __pad430[48];
+    uint8_t              m_nHandlingFlags[4];
+    uint8_t              __pad390[208];
     CPed *               m_pDriver;
+    uint8_t              __pad464[72];
+    uint8_t              m_nPacMansCollected;
     int                  GetVehicleAppearence ();
     void                 AutomobilePlaceOnRoadProperly ();
     void                 BikePlaceOnRoadProperly ();
     char                 SetGearUp ();
+    void                 SetDriver (CPed *driver);
 };
 
 struct CPickups
@@ -885,6 +888,7 @@ struct tBoatHandlingData
 
 struct cHandlingDataMgr
 {
+    int               LoadHandlingData ();
     float             field_0;
     float             field_4;
     int               field_8;

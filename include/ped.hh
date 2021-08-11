@@ -42,4 +42,5 @@ public:
     static std::vector<std::string> specialModels;
     static bool                     IsSpecialModel (int model);
     static bool                     IsModelValidPedModel (int model);
+    static inline bool isSkinSelect = false;
 };

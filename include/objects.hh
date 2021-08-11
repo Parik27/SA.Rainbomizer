@@ -13,4 +13,6 @@ public:
 
     /// Initialises Hooks/etc.
     void Initialise ();
+
+    //static inline int increaseObject = 163;
 };

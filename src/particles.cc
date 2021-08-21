@@ -19,7 +19,8 @@ FxSystemBP_c *__fastcall RandomizeParticles (FxManager_c *thisManager,
             0x4A9360, thisManager, name);
 
     std::string particle_name = name;
-    if (particle_name == "heli_dust" || particle_name == "prt_cardebris")
+    if (particle_name == "heli_dust" || particle_name == "prt_cardebris"
+        || particle_name == "gunsmoke")
         return originalParticle;
 
     while (particle--)

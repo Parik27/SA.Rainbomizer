@@ -20,11 +20,6 @@ RandomizeRespawnPoint (float x, float y, float z, RwV3d *a4, float *a5)
 
     a4->z = CWorld::FindGroundZedForCoord (a4->x, a4->y);
 
-    float pLevel = 0;
-    Call<0x6EB690> (a4->x, a4->y, a4->z, &pLevel, false, 1); // CWaterLevel::GetWaterLevel
-    if (a4->z < pLevel)
-        a4->z = pLevel;
-
     *a5 = randomFloat (0, 360);
 }
 

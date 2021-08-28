@@ -126,7 +126,8 @@ WeaponRandomizer::InitialiseCache ()
 CVehicle *__fastcall ChangeLockedPlayerWeaponForTurrets (CPed *attachedPed, void *edx, 
     CVehicle *attachedCar, float x, float y, float z, int posType, int angle, int weaponID)
 {
-    if (weaponID != 0)
+    if (weaponID != 0
+        && !(FindPlayerPed () == attachedPed && !WeaponRandomizer::m_Config.RandomizePlayerWeapons))
     {
             weaponID = WeaponRandomizer::GetInstance ()->GetRandomWeapon (
                 attachedPed, weaponID, false);

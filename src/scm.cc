@@ -2511,7 +2511,7 @@ void __fastcall CheckDes3HeliDriver (CRunningScript *scr, void *edx,
                         }
                 }
         }
-    else if (scr->CheckName ("heist2"))
+    else if (scr->CheckName ("heist2") || scr->CheckName("heist3"))
         ScriptVehicleRandomizer::mTempVehHandle = ScriptParams[0];
 }
 
@@ -2583,6 +2583,47 @@ int __fastcall IgnoreWheelReplacement (CVehicle *vehicle, void *edx,
 }
 
 /*******************************************************/
+void __fastcall AddZero1Immunities (CRunningScript *scr, void *edx,
+                                           short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("zero1") && ScriptParams[0] != GetGlobalVar<int>(3) 
+        && !ScriptVehicleRandomizer::GetInstance()->m_Config.OldAirRaid)
+        ScriptParams[4] = 1;
+}
+
+/*******************************************************/
+void __fastcall FixStuckVehicles (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("heist3") && ScriptParams[0] == GetGlobalVar<int>(3))
+    {
+        float angleCheck = ((float *) ScriptParams)[1];
+        if (int (angleCheck) == 223)
+        {
+            Scrpt::CallOpcode (
+                    0xab, "move_car",
+                    ScriptVehicleRandomizer::GetInstance ()->mTempVehHandle,
+                    2109.004f, 2039.756f, 10.8125f);
+        }
+    }
+}
+
+/*******************************************************/
+void __fastcall IncreaseStowawayRadius (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("desert9"))
+    {
+        float xRadius = ((float *) ScriptParams)[2];
+        float yRadius = ((float *) ScriptParams)[3];
+        float zRadius = ((float *) ScriptParams)[4];
+        if (int (xRadius) == 4 && int (yRadius) == 1 && int (zRadius) == 1)
+            ((float *) ScriptParams)[2] = 8.0f;
+    }
+}
+
+/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -2639,6 +2680,7 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x495429, (void *) &FixMaddDoggBoxes},
          {HOOK_CALL, 0x48ABB0, (void *) &AlwaysPickUpPackagesTBone},
          {HOOK_CALL, 0x48A7B8, (void *) &FixHeightInDrugs4Auto},
+         {HOOK_CALL, 0x48A7B8, (void *) &FixHeightInDrugs4Auto},
          {HOOK_CALL, 0x476BCB, (void *) &IgnoreLandingGearCheck},
          {HOOK_CALL, 0x469602, (void *) &IsPlayerInVehicleCheck},
          {HOOK_CALL, 0x48A0F6, (void *) &IsPlayerInVehicleCheck},
@@ -2681,6 +2723,9 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x487A50, (void *) &ActivateZero4SelfDestruct},
          {HOOK_CALL, 0x468137, (void *) &ReplaceMessageText},
          {HOOK_CALL, 0x4985DA, (void *) &IgnoreWheelReplacement},
+         {HOOK_CALL, 0x47F893, (void *) &AddZero1Immunities},
+         {HOOK_CALL, 0x47CB48, (void *) &FixStuckVehicles},
+         {HOOK_CALL, 0x48774C, (void *) &IncreaseStowawayRadius},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     // Hooks function for plane / heli height checks

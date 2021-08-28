@@ -105,7 +105,7 @@ drugs4	Greenwoo	4	Y	N	N	N	N	Y	N	N	N
 drugs4	Enforcer	2	Y	Y	N	Y	Y	Y	Y	Y	N					
 drugs4	Copcarla	2	Y	N	N	N	Y	Y	Y	Y	N					
 drugs4	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y					
-la1fin2	Bravura	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
+la1fin2	Bravura	1	C	Y	Y	Y	C	C	C	N	N	smallplanes	-3	0	0	
 la1fin2	Pony	4	Y	N	N	N	N	Y	N	N	N					
 la1fin2	Sentinel	4	Y	N	N	N	N	Y	N	N	N	x=1582+y=-1043+z=22				
 bcrash1	Washing	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
@@ -184,7 +184,7 @@ steal4	Savanna	2	C	Y	N	Y	C	C	N	N	N	smallplanes	8	-4	0
 steal4	Jester	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
 steal4	Sentinel	4	Y	N	N	N	N	Y	N	N	N					
 steal5	Tampa	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
-steal5	Stratum	1	Y	Y	Y	Y	Y	N	N	N	N	hovercraft				
+steal5	Stratum	1	Y	Y	N	Y	N	N	N	N	N	float				
 dskool	Infernus	1	Y	Y	Y	Y	N	N	N	N	N	x=-2050+y=-130+smallcar				
 dskool	Blistac	1	Y	Y	Y	Y	Y	Y	N	N	N	hovercraft				
 dskool	Copcarsf	1	Y	Y	Y	Y	Y	Y	N	N	N	x=-2050+y=-130+hovercraft				

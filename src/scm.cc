@@ -61,6 +61,7 @@ const int MODEL_NRG      = 522;
 const int MODEL_CEMENT   = 524;
 const int MODEL_FORKLIFT = 530;
 const int MODEL_COMBINE  = 532;
+const int MODEL_FELTZER  = 533;
 const int MODEL_VORTEX   = 539;
 const int MODEL_ANDROM   = 592;
 const int MODEL_BOXBURG  = 609;
@@ -114,6 +115,10 @@ SlowDownAndromedaInStoaway (uint8_t *vehicle, float speed)
         && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5" 
         && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck() != MODEL_VORTEX)
         speed = 0.82;
+
+    if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "finalec"
+        && ScriptVehicleRandomizer::mEOTL3Slow)
+        speed = 0.9;
 
     CVehicleRecording::SetPlaybackSpeed (vehicle, speed);
 }
@@ -342,6 +347,7 @@ ApplyFixesBasedOnModel (int model, int newModel, float x, float y, float z)
         || (model == MODEL_PCJ && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "toreno2")
         || (model == MODEL_COMBINE && ScriptVehicleRandomizer::GetInstance()->mLastThread == "truth1")
         || (model == MODEL_PONY && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "music1")
+        || (model == MODEL_FELTZER && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "finalec")
         || (model == 553 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "heist2")
         || (model == 417 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "des3")
         || (model == 501 && ScriptVehicleRandomizer::GetInstance ()->mLastThread == "zero4" && int (x) > -1000)
@@ -1511,7 +1517,7 @@ void __fastcall Ryder2AttachMagnet (CRunningScript *scr, void *edx, short count)
     }
 }
 
-// Hooks 0175 (set car Z angle)
+// Hooks 0175 (set car Z angle - Car.Angle)
 /*******************************************************/
 void __fastcall QuarryAttachMagnet (CRunningScript *scr, void *edx, short count)
 {
@@ -1531,6 +1537,12 @@ void __fastcall QuarryAttachMagnet (CRunningScript *scr, void *edx, short count)
     {
         float carAngle = ((float *) ScriptParams)[1];
         if (int (carAngle) == 343)
+            ScriptVehicleRandomizer::mTempVehHandle = ScriptParams[0];
+    }
+    else if (scr->CheckName ("finalec"))
+    {
+        float carAngle = ((float *) ScriptParams)[1];
+        if (int (carAngle) == 359)
             ScriptVehicleRandomizer::mTempVehHandle = ScriptParams[0];
     }
 }
@@ -2050,6 +2062,7 @@ SetThingsForMissionStart ()
     quarry = emptyTemplate;
     ScriptVehicleRandomizer::mTempVehHandle = -1;
     ScriptVehicleRandomizer::mDes3Stuck = false;
+    ScriptVehicleRandomizer::mEOTL3Slow     = false;
     int currentMissionId
         = ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning;
 
@@ -2624,6 +2637,48 @@ void __fastcall IncreaseStowawayRadius (CRunningScript *scr, void *edx, short co
 }
 
 /*******************************************************/
+void __fastcall StartEOTL3HeliRotors (CRunningScript *scr, void *edx,
+                                            short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("finalec") && ScriptVehicleRandomizer::mTempVehHandle != -1)
+    {
+        if (ScriptParams[0] == 8000)
+            Scrpt::CallOpcode (0x825, "start_rotors_instantly",
+                ScriptVehicleRandomizer::mTempVehHandle);
+    }
+}
+
+/*******************************************************/
+void __fastcall SlowDownEOTL3FireTruckAtCatch (CRunningScript *scr, void *edx,
+                                        short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("finalec"))
+    {
+        int playerCar
+                = ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ();
+        if (CModelInfo::IsHeliModel(playerCar) || playerCar == 408 || playerCar == 414
+            || playerCar == 418 || playerCar == 423 || playerCar == 428 || playerCar == 431
+            || playerCar == 443 || playerCar == 455 || playerCar == 456 || playerCar == 457
+            || playerCar == 478 || playerCar == 498 || playerCar == 499 || playerCar == 508
+            || playerCar == 524 || playerCar == 578 || playerCar == 588 || playerCar == 609)
+        {
+            ScriptVehicleRandomizer::mEOTL3Slow = true;
+        }
+    }
+}
+
+/*******************************************************/
+void __fastcall SpeedUpEOTL3FireTruckAfterCatch (CRunningScript *scr, void *edx,
+                                               short count)
+{
+    scr->CollectParameters (count);
+    if (scr->CheckName ("finalec") && ScriptParams[1] == 1)
+        ScriptVehicleRandomizer::mEOTL3Slow = false;
+}
+
+/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -2726,6 +2781,9 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x47F893, (void *) &AddZero1Immunities},
          {HOOK_CALL, 0x47CB48, (void *) &FixStuckVehicles},
          {HOOK_CALL, 0x48774C, (void *) &IncreaseStowawayRadius},
+         {HOOK_CALL, 0x46817E, (void *) &StartEOTL3HeliRotors},
+         {HOOK_CALL, 0x484CC0, (void *) &SlowDownEOTL3FireTruckAtCatch},
+         {HOOK_CALL, 0x4953A1, (void *) &SpeedUpEOTL3FireTruckAfterCatch},
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     // Hooks function for plane / heli height checks

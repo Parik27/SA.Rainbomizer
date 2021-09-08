@@ -182,6 +182,7 @@ public:
     static inline int mCourierMissionType    = -1;
     static inline int mTempVehHandle = -1;
     static inline int mDes3Stuck          = false;
+    static inline int mEOTL3Slow             = false;
 
     // Struct for RC heli magnet sections
     struct RCHeliMagnet

@@ -278,7 +278,7 @@ finalea	Greenwoo	2	Y	Y	N	Y	Y	Y	N	N	N	x=2507+y=-1671+z=12+smallplanes
 finalea	Swatvan	1	N	N	N	N	N	N	N	N	N	x=2374+y=-1323+z=22				
 finalea	Swatvan	2	Y	Y	N	Y	Y	N	N	N	N	x=2561+y=-1275+z=1031				
 finalec	Firela	1	Y	Y	Y	Y	Y	Y	N	N	N					
-finalec	Feltzer	2	Y	Y	N	Y	N	Y	N	N	N					
+finalec	Feltzer	2	Y	Y	N	Y	N	C	N	N	N	norc	-3	0	0	
 finalec	Copcarla	2	Y	N	N	N	Y	Y	N	N	N					
 finalec	Sanchez	2	Y	Y	Y	Y	Y	Y	Y	Y	Y					
 finalec	Tornado	2	Y	N	N	N	Y	Y	N	N	N					

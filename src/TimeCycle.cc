@@ -1,4 +1,4 @@
-#include "TimeCycle.hh"
+#include "timecycle.hh"
 #include <cstdlib>
 #include "logger.hh"
 #include "base.hh"

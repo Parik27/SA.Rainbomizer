@@ -446,3 +446,4 @@ ambulan	Ambulan	4	Y	N	N	N	N	Y	N	N	N
 firetru	Firetruk	1	Y	N	N	N	N	N	N	N	N	spray				
 burgjb	Nrg500	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 pimp	Nrg500	2	Y	Y	N	Y	Y	Y	N	N	N	smallplanes				
+copcar	Copbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				

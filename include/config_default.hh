@@ -150,6 +150,7 @@ ChiliadChallenge = true # (All 3 Chiliad Challenge routes)
 # Set to false to disable this behaviour for any of the following side missions.
 TaxiMissions = true
 Firefighting = true
+Vigilante = true
 Burglary = true
 Pimping = true
 Paramedic = true

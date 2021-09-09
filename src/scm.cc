@@ -58,6 +58,7 @@ const int MODEL_BIKE     = 509;
 const int MODEL_MTBIKE   = 510;
 const int MODEL_HYDRA    = 520;
 const int MODEL_NRG      = 522;
+const int MODEL_COPBIKE  = 523;
 const int MODEL_CEMENT   = 524;
 const int MODEL_FORKLIFT = 530;
 const int MODEL_COMBINE  = 532;
@@ -2027,12 +2028,16 @@ ResetEndOfMissionStuff (char enable)
         && ScriptVehicleRandomizer::GetInstance()->mCurrentMissionRunning <= 133)
     {
             Scrpt::CallOpcode (0x1c3, "remove_references_to_vehicle", GlobalVar (9002));
+            Scrpt::CallOpcode (0x1c3, "remove_references_to_vehicle", GlobalVar (9003));
+            Scrpt::CallOpcode (0x1c3, "remove_references_to_vehicle", GlobalVar (9004));
     }
 
     if (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "manson5")
         injector::WriteMemory (waterCarsCheatActive, 0);
     
     ScriptVehicleRandomizer::mTempVehHandle                         = -1;
+    ScriptVehicleRandomizer::mNextVigilanteCarNum                   = 0;
+    ScriptVehicleRandomizer::mVigilanteSlotsTaken                   = false;
     ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning = -1;
     return CallAndReturn<char, 0x6F5DB0> (enable);
 }
@@ -2063,62 +2068,94 @@ SetThingsForMissionStart ()
     ScriptVehicleRandomizer::mTempVehHandle = -1;
     ScriptVehicleRandomizer::mDes3Stuck = false;
     ScriptVehicleRandomizer::mEOTL3Slow     = false;
+    ScriptVehicleRandomizer::mNextVigilanteCarNum = 0;
+    ScriptVehicleRandomizer::mVigilanteSlotsTaken = false;
     int currentMissionId
         = ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning;
 
     if ((currentMissionId == 121 && ScriptVehicleRandomizer::m_Config.Taxi)
         || (currentMissionId == 122 && ScriptVehicleRandomizer::m_Config.Paramedic)
         || (currentMissionId == 123 && ScriptVehicleRandomizer::m_Config.Firefighting)
+        || (currentMissionId == 124 && ScriptVehicleRandomizer::m_Config.Vigilante)
         || (currentMissionId == 125 && ScriptVehicleRandomizer::m_Config.Burglary)
         || (currentMissionId == 127 && ScriptVehicleRandomizer::m_Config.Pimping)
         || (currentMissionId == 131 && ScriptVehicleRandomizer::m_Config.Courier)
         || ((currentMissionId == 132 || currentMissionId == 133) && ScriptVehicleRandomizer::m_Config.Bike))
     {
-        CPhysical *player = (CPhysical *) FindPlayerEntity (-1);
-        CVector moveSpeed = player->m_vecMoveSpeed;
-        CVector turnSpeed = player->m_vecTurnSpeed;
-        CVector location = FindPlayerCoors ();
-        if (FindPlayerVehicle ())
-            {
-                Scrpt::CallOpcode (0x3c0, "store_car_char_is_in", GlobalVar (3),
-                                   GlobalVar (9002));
-                Scrpt::CallOpcode (0x174, "get_car_heading", GlobalVar(9002), GlobalVar (72));
-                Scrpt::CallOpcode (0x792, "disembark_actor", GlobalVar (3));
-                Scrpt::CallOpcode (0xa6, "delete_car", GlobalVar (9002));
-            }
-        
-        int carType = -1;
-        int courierType = ScriptVehicleRandomizer::GetInstance ()->mCourierMissionType;
-        if (currentMissionId == 133 && ScriptSpace[726] == 0)
-            carType = MODEL_BIKE;
-        else if (currentMissionId == 131 && courierType == 0)
-            carType = MODEL_BMX;
-        else if (currentMissionId == 131 && courierType == 1)
-            carType = MODEL_FREEWAY;
-        else if (currentMissionId == 131 && courierType == 2)
-            carType = MODEL_FAGGIO;
-        else if (currentMissionId == 121)
-            carType = MODEL_TAXI;
-        else if (currentMissionId == 122)
-            carType = MODEL_AMBULAN;
-        else if (currentMissionId == 123)
-            carType = MODEL_FIRETRU;
-        else 
-            carType = MODEL_NRG;
-
-        Scrpt::CallOpcode (0xa5, "create_car", carType, location.x,
-                           location.y, location.z, GlobalVar (9002));
-        
-        Scrpt::CallOpcode (0x036A, "put_actor_in_car", GlobalVar (3),
-                           GlobalVar (9002));
-        Scrpt::CallOpcode (0x175, "set_car_heading", GlobalVar (9002), GlobalVar (72));
-
-        player      = (CPhysical *) FindPlayerEntity (-1);
-        player->m_vecMoveSpeed = moveSpeed;
-        player->m_vecTurnSpeed = turnSpeed;
-        ScriptVehicleRandomizer::GetInstance ()->mCourierMissionType = -1;
+        ChangePlayerVehicle (currentMissionId);
     }
     return CallAndReturn<char, 0x5619D0> ();
+}
+
+// Handles randomizing player vehicle for starting vehicle sub-missions
+/*******************************************************/
+void
+ChangePlayerVehicle (int mission)
+{
+    CPhysical *player    = (CPhysical *) FindPlayerEntity (-1);
+    CVector    moveSpeed = player->m_vecMoveSpeed;
+    CVector    turnSpeed = player->m_vecTurnSpeed;
+    CVector    location  = FindPlayerCoors ();
+    if (FindPlayerVehicle ())
+        {
+            Scrpt::CallOpcode (0x3c0, "store_car_char_is_in", GlobalVar (3),
+                               GlobalVar (9005));
+            Scrpt::CallOpcode (0x174, "get_car_heading", GlobalVar (9005),
+                               GlobalVar (72));
+            Scrpt::CallOpcode (0x792, "disembark_actor", GlobalVar (3));
+            Scrpt::CallOpcode (0xa6, "delete_car", GlobalVar (9005));
+        }
+
+    int carType = -1;
+    int courierType
+        = ScriptVehicleRandomizer::GetInstance ()->mCourierMissionType;
+    if (mission == 133 && ScriptSpace[726] == 0)
+        carType = MODEL_BIKE;
+    else if (mission == 131 && courierType == 0)
+        carType = MODEL_BMX;
+    else if (mission == 131 && courierType == 1)
+        carType = MODEL_FREEWAY;
+    else if (mission == 131 && courierType == 2)
+        carType = MODEL_FAGGIO;
+    else if (mission == 121)
+        carType = MODEL_TAXI;
+    else if (mission == 122)
+        carType = MODEL_AMBULAN;
+    else if (mission == 123)
+        carType = MODEL_FIRETRU;
+    else if (mission == 124)
+        carType = MODEL_COPBIKE;
+    else
+        carType = MODEL_NRG;
+
+    int carStore = 9002;
+    if (mission == 124)
+        carStore += ScriptVehicleRandomizer::mNextVigilanteCarNum;
+
+    if (ScriptVehicleRandomizer::mVigilanteSlotsTaken)
+        Scrpt::CallOpcode (0x1c3, "remove_references_to_vehicle", GlobalVar (carStore));
+
+    Scrpt::CallOpcode (0xa5, "create_car", carType, location.x, location.y,
+                       location.z, GlobalVar (carStore));
+
+    Scrpt::CallOpcode (0x036A, "put_actor_in_car", GlobalVar (3),
+                       GlobalVar (carStore));
+    Scrpt::CallOpcode (0x175, "set_car_heading", GlobalVar (carStore),
+                       GlobalVar (72));
+
+    if (mission == 124)
+        if (ScriptVehicleRandomizer::mNextVigilanteCarNum == 2)
+        {
+            ScriptVehicleRandomizer::mNextVigilanteCarNum = 0;
+            ScriptVehicleRandomizer::mVigilanteSlotsTaken = true;
+        }
+        else
+            ScriptVehicleRandomizer::mNextVigilanteCarNum++;
+
+    player                 = (CPhysical *) FindPlayerEntity (-1);
+    player->m_vecMoveSpeed = moveSpeed;
+    player->m_vecTurnSpeed = turnSpeed;
+    ScriptVehicleRandomizer::GetInstance ()->mCourierMissionType = -1;
 }
 
 /*******************************************************/
@@ -2679,6 +2716,32 @@ void __fastcall SpeedUpEOTL3FireTruckAfterCatch (CRunningScript *scr, void *edx,
 }
 
 /*******************************************************/
+void __fastcall OverrideVigilanteCheck (CRunningScript *scr, void *edx, char flag) 
+{
+    if (scr->CheckName("copcar"))
+    {
+        if (FindPlayerVehicle())
+        {
+            int validVehicle = false;
+
+            Scrpt::CallOpcode (0x3c0, "store_car_char_is_in", GlobalVar (3),
+                                   GlobalVar (9005));
+            if (GetGlobalVar<int> (9002) == GetGlobalVar<int> (9005)
+                    || GetGlobalVar<int> (9003) == GetGlobalVar<int> (9005)
+                    || GetGlobalVar<int> (9004) == GetGlobalVar<int> (9005))
+            {
+                validVehicle = true;
+                flag = true;
+            }
+
+            if ((flag && !validVehicle) || (FindPlayerVehicle ()->m_nModelIndex == 425 && !validVehicle))
+                ChangePlayerVehicle (124);
+        }
+    }
+    scr->UpdateCompareFlag (flag);
+}
+
+/*******************************************************/
 void
 ScriptVehicleRandomizer::Initialise ()
 {
@@ -2700,6 +2763,7 @@ ScriptVehicleRandomizer::Initialise ()
 
         std::pair("TaxiMissions", &m_Config.Taxi),
         std::pair ("Firefighting", &m_Config.Firefighting), 
+        std::pair ("Vigilante", &m_Config.Vigilante),
         std::pair ("Burglary", &m_Config.Burglary), 
         std::pair ("Pimping", &m_Config.Pimping), 
         std::pair ("Paramedic", &m_Config.Paramedic), 
@@ -2824,6 +2888,11 @@ ScriptVehicleRandomizer::Initialise ()
     if (m_Config.SkipSweetsGirlCheck)
     {
         RegisterHooks ({{HOOK_CALL, 0x48B10F, (void *) &IgnoreSweetGirlCarCheck}});
+    }
+
+    if (m_Config.Vigilante)
+    {
+        RegisterHooks ({{HOOK_CALL, 0x48DAA4, (void *) &OverrideVigilanteCheck}});
     }
 
     if (!ConfigManager::ReadConfig ("MissionRandomizer"))

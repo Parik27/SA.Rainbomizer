@@ -54,6 +54,7 @@ void __fastcall FixJBCarHealth (CRunningScript *scr, void *edx, short vehicle);
 void __fastcall FixEOTLPosition (CMatrix *matrix, void *edx, CMatrix *attach,
                                  char link);
 void __fastcall FixGTAMadman (CRunningScript *scr, void *edx, int opcode);
+void ChangePlayerVehicle (int mission);
 
 enum flags
 {
@@ -115,6 +116,7 @@ public:
         // Vehicle Side Mission Randomization
         bool Taxi;
         bool Firefighting;
+        bool Vigilante;
         bool Burglary;
         bool Pimping;
         bool Paramedic;
@@ -181,8 +183,11 @@ public:
     static inline int mCurrentMissionRunning = -1;
     static inline int mCourierMissionType    = -1;
     static inline int mTempVehHandle = -1;
-    static inline int mDes3Stuck          = false;
-    static inline int mEOTL3Slow             = false;
+
+    static inline bool mDes3Stuck          = false;
+    static inline bool mEOTL3Slow             = false;
+    static inline int  mNextVigilanteCarNum   = 0;
+    static inline bool mVigilanteSlotsTaken   = false;
 
     // Struct for RC heli magnet sections
     struct RCHeliMagnet

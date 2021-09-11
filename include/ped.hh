@@ -32,7 +32,7 @@ public:
         bool RandomizeSpecialModels;
         bool IncludeNSFWModels;
 
-        int ForcedPed;
+        int         ForcedPed;
         std::string ForcedSpecial;
     } m_Config;
 
@@ -42,5 +42,5 @@ public:
     static std::vector<std::string> specialModels;
     static bool                     IsSpecialModel (int model);
     static bool                     IsModelValidPedModel (int model);
-    static inline bool isSkinSelect = false;
+    static inline bool              isSkinSelect = false;
 };

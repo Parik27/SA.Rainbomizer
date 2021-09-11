@@ -49,7 +49,6 @@ class ColourRandomizer
     static void DestroyInstance ();
 
 public:
-
     static inline struct Config
     {
         bool RandomizeCarCols;

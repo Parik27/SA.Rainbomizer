@@ -60,7 +60,8 @@ HookManager::Initialise ()
 std::string
 GetRainbomizerFileName (std::string name, std::string subdirs)
 {
-    std::string baseDir = GetGameDirRelativePathA (("rainbomizer/" + subdirs).c_str ());
+    std::string baseDir
+        = GetGameDirRelativePathA (("rainbomizer/" + subdirs).c_str ());
     std::filesystem::create_directories (baseDir);
     return baseDir + name;
 }
@@ -86,7 +87,8 @@ VerifyGameVersion ()
 FILE *
 OpenRainbomizerFile (std::string name, std::string mode, std::string subdirs)
 {
-    return fopen (GetRainbomizerFileName (name, subdirs).c_str (), mode.c_str ());
+    return fopen (GetRainbomizerFileName (name, subdirs).c_str (),
+                  mode.c_str ());
 }
 
 /*******************************************************/

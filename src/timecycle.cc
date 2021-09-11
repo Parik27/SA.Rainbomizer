@@ -23,15 +23,15 @@ void
 ChangeForceWeather (short weather)
 {
     if (weather == lastForcedWeather)
-    {
-        weather = lastNewWeather;
-    }
+        {
+            weather = lastNewWeather;
+        }
     else
-    {
-        lastForcedWeather = weather;
-        lastNewWeather = random (19);
-        weather           = lastNewWeather;
-    }
+        {
+            lastForcedWeather = weather;
+            lastNewWeather    = random (19);
+            weather           = lastNewWeather;
+        }
     injector::WriteMemory (0xC81318, weather); // ForcedWeatherType
     injector::WriteMemory (0xC81320, weather); // OldWeatherType
     injector::WriteMemory (0xC8131C, weather); // NewWeatherType
@@ -80,22 +80,22 @@ ShuffleWeatherRegions (CVector *p1)
 }
 
 /*******************************************************/
-void ChangeTimeCycleValues
-(char *input, char *format, int *Amb_R, int *Amb_G, int *Amb_B, int *Amb_Obj_R,
-    int *Amb_Obj_G, int *Amb_Obj_B, int *Dir_R, int *Dir_G, int *Dir_B,
-    int *SkyTop_R, int *SkyTop_G, int *SkyTop_B, int *SkyBot_R, int *SkyBot_G,
-    int *SkyBot_B, int *SunCore_R, int *SunCore_G, int *SunCore_B,
-    int *SunCorona_R, int *SunCorona_G, int *SunCorona_B, float *SunSz,
-    float *SprSz, float *SprBght, int *Shdw, int *LightShd, int *PoleShd,
-    float *FarClp, float *FogSt, float *LightOnGround, int *LowCloudsR,
-    int *LowCloudsG, int *LowCloudsB, int *BottomCloudR, int *BottomCloudG,
-    int *BottomCloudB, float *WaterR, float *WaterG, float *WaterB,
-    float *WaterA, float *Alpha1, float *RGB1R, float *RGB1G, float *RGB1B,
-    float *Alpha2, float *RGB2R, float *RGB2G, float *RGB2B, float *CloudAlpha1,
-    int *CloudAlpha2, int *CloudAlpha3,
-    float *Illumination)
+void
+ChangeTimeCycleValues (
+    char *input, char *format, int *Amb_R, int *Amb_G, int *Amb_B,
+    int *Amb_Obj_R, int *Amb_Obj_G, int *Amb_Obj_B, int *Dir_R, int *Dir_G,
+    int *Dir_B, int *SkyTop_R, int *SkyTop_G, int *SkyTop_B, int *SkyBot_R,
+    int *SkyBot_G, int *SkyBot_B, int *SunCore_R, int *SunCore_G,
+    int *SunCore_B, int *SunCorona_R, int *SunCorona_G, int *SunCorona_B,
+    float *SunSz, float *SprSz, float *SprBght, int *Shdw, int *LightShd,
+    int *PoleShd, float *FarClp, float *FogSt, float *LightOnGround,
+    int *LowCloudsR, int *LowCloudsG, int *LowCloudsB, int *BottomCloudR,
+    int *BottomCloudG, int *BottomCloudB, float *WaterR, float *WaterG,
+    float *WaterB, float *WaterA, float *Alpha1, float *RGB1R, float *RGB1G,
+    float *RGB1B, float *Alpha2, float *RGB2R, float *RGB2G, float *RGB2B,
+    float *CloudAlpha1, int *CloudAlpha2, int *CloudAlpha3, float *Illumination)
 {
-    *Amb_R = random (100);
+    *Amb_R         = random (100);
     *Amb_G         = random (100);
     *Amb_B         = random (100);
     *Amb_Obj_R     = random (50, 255);
@@ -117,7 +117,7 @@ void ChangeTimeCycleValues
     *SunCorona_G   = random (255);
     *SunCorona_B   = random (255);
     *SunSz         = randomFloat (0.0f, 0.1f);
-    *SprSz = randomFloat (0.0f, 0.1f);
+    *SprSz         = randomFloat (0.0f, 0.1f);
     *SprBght       = randomFloat (0.0f, 0.1f);
     *Shdw          = random (255);
     *LightShd      = random (255);
@@ -153,31 +153,35 @@ void ChangeTimeCycleValues
 void
 TimeCycleRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("TimeCycleRandomizer",
-        std::pair("RandomizeTimeCycle", &m_Config.RandomizeTimeCycle),
-        std::pair("ChangeOnFade", &m_Config.ChangeOnFade),
-        std::pair("RandomizeWeather", &m_Config.RandomizeWeather)))
+    if (!ConfigManager::ReadConfig (
+            "TimeCycleRandomizer",
+            std::pair ("RandomizeTimeCycle", &m_Config.RandomizeTimeCycle),
+            std::pair ("ChangeOnFade", &m_Config.ChangeOnFade),
+            std::pair ("RandomizeWeather", &m_Config.RandomizeWeather)))
         return;
 
     if (m_Config.RandomizeWeather)
-    {
-        RegisterHooks ({{HOOK_JUMP, 0x72A4F0, (void *) &ChangeForceWeather},
-                        {HOOK_JUMP, 0x72A640, (void *) &ShuffleWeatherRegions}});
-        FadesManager::AddFadeCallback (Call<0x72A4F0>);
-        
-        FadesManager::AddFadeCallback ([] {
-            std::shuffle (weatherRegions.begin (),
-                          weatherRegions.end (), std::default_random_engine(time(NULL)));});
-        FadesManager::AddFadeCallback (
-            [] { lastNewWeather = random (19); });
-    }
+        {
+            RegisterHooks (
+                {{HOOK_JUMP, 0x72A4F0, (void *) &ChangeForceWeather},
+                 {HOOK_JUMP, 0x72A640, (void *) &ShuffleWeatherRegions}});
+            FadesManager::AddFadeCallback (Call<0x72A4F0>);
+
+            FadesManager::AddFadeCallback ([] {
+                std::shuffle (weatherRegions.begin (), weatherRegions.end (),
+                              std::default_random_engine (time (NULL)));
+            });
+            FadesManager::AddFadeCallback (
+                [] { lastNewWeather = random (19); });
+        }
 
     if (m_Config.RandomizeTimeCycle)
-    {
-        RegisterHooks ({{HOOK_CALL, 0x5BBCE2, (void *) &ChangeTimeCycleValues}});
-        if (m_Config.ChangeOnFade)
-            FadesManager::AddFadeCallback (Call<0x5BBAC0>);
-    }
+        {
+            RegisterHooks (
+                {{HOOK_CALL, 0x5BBCE2, (void *) &ChangeTimeCycleValues}});
+            if (m_Config.ChangeOnFade)
+                FadesManager::AddFadeCallback (Call<0x5BBAC0>);
+        }
 
     Logger::GetLogger ()->LogMessage ("Intialised TimeCycleRandomizer");
 }

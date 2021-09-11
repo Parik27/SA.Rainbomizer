@@ -74,12 +74,11 @@ ConfigManager::ConfigManager (const std::string &file)
     m_pConfig = ParseDefaultConfig ();
     try
         {
-            m_pConfig = cpptoml::parse_file (
-                GetRainbomizerFileName (file));
+            m_pConfig = cpptoml::parse_file (GetRainbomizerFileName (file));
         }
     catch (const std::exception &e)
         {
-            Logger::GetLogger()->LogMessage (e.what ());
+            Logger::GetLogger ()->LogMessage (e.what ());
 
             if (!DoesFileExist (file))
                 WriteDefaultConfig (file);
@@ -114,7 +113,7 @@ ConfigManager::GetIsEnabled (const std::string &name)
     ReadValue ("Randomizers", name, enabled);
     ReadValue (name, "Enabled", enabled);
 
-    //Logger::GetLogger ()->LogMessage (name + ": "
+    // Logger::GetLogger ()->LogMessage (name + ": "
     //                                  + std::to_string (enabled));
 
     return enabled;

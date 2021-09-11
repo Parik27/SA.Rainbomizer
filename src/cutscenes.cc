@@ -14,7 +14,7 @@ CutsceneRandomizer *CutsceneRandomizer::mInstance = nullptr;
 
 static std::string model = "";
 
-    std::unordered_map<std::string, float> cutsceneOffsetCorrections = {
+std::unordered_map<std::string, float> cutsceneOffsetCorrections = {
     {"BCESA4W", -1.00166f},  {"BCESAR5", -1.00166f},  {"BCESA5W", -0.967539f},
     {"BCESAR4", -0.967539f}, {"BCESAR2", -0.656397f}, {"BCRAS1", -1.006541f},
     {"BCRAS2", -1.006541f},  {"BHILL1", -0.99485f},   {"CAS_2", -0.99485f},
@@ -104,14 +104,14 @@ CutsceneRandomizer::GetRandomModel (std::string model)
     mLastModel = model;
 
     for (auto i : mModels)
-    {
-        if (std::find (std::begin (i), std::end (i), model) != std::end (i))
         {
-            auto replaced = i[random (i.size () - 1)];
-            mLastModel    = replaced;
-            break;
+            if (std::find (std::begin (i), std::end (i), model) != std::end (i))
+                {
+                    auto replaced = i[random (i.size () - 1)];
+                    mLastModel    = replaced;
+                    break;
+                }
         }
-    }
 
     if (!LoadModelForCutscene (mLastModel))
         mLastModel = model;
@@ -121,29 +121,47 @@ CutsceneRandomizer::GetRandomModel (std::string model)
 
 /*******************************************************/
 void
-SelectCutsceneOffset (char *name)
+SelectCutsceneOffset (const char *name)
 {
-    auto    cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
+    auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
+
     COffset offset;
     offset.z = -100.0f;
     while (offset.z < -70.0f)
-    {
-        offset.x = randomFloat (-3000, 3000);
-        offset.y = randomFloat (-3000, 3000);
+        {
+            offset.x = randomFloat (-3000, 3000);
+            offset.y = randomFloat (-3000, 3000);
 
-        Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", offset.x, offset.y);
-        Scrpt::CallOpcode (0x3CB, "set_render_origin", offset.x, offset.y, 20);
-        Scrpt::CallOpcode (0x15f, "set_pos", offset.x, offset.y, 20, 0, 0, 0);
-        Scrpt::CallOpcode (0x4D7, "freeze_player", GlobalVar (3), 1);
+            Scrpt::CallOpcode (0x4E4, "refresh_game_renderer", offset.x,
+                               offset.y);
+            Scrpt::CallOpcode (0x3CB, "set_render_origin", offset.x, offset.y,
+                               20);
+            Scrpt::CallOpcode (0x15f, "set_pos", offset.x, offset.y, 20, 0, 0,
+                               0);
+            Scrpt::CallOpcode (0x4D7, "freeze_player", GlobalVar (3), 1);
 
-        offset.z = CWorld::FindGroundZedForCoord (offset.x, offset.y);
-    }
+            offset.z = CWorld::FindGroundZedForCoord (offset.x, offset.y);
+        }
 
     offset.z -= cutsceneOffsetCorrections[name];
 
     cutsceneRandomizer->offset = offset;
+}
 
-    HookManager::CallOriginal<injector::cstd<void (char *)>, 0x480714> (name);
+/*******************************************************/
+void
+LoadCutsceneHook (const char *name)
+{
+    auto cutsceneRandomizer = CutsceneRandomizer::GetInstance ();
+
+    if (cutsceneRandomizer->m_Config.RandomizeCutsceneToPlay)
+        name = GetRandomElement (cutsceneOffsetCorrections).first.c_str ();
+
+    if (cutsceneRandomizer->m_Config.RandomizeLocation)
+        SelectCutsceneOffset (name);
+
+    HookManager::CallOriginal<injector::cstd<void (const char *)>, 0x480714> (
+        name);
 }
 
 /*******************************************************/
@@ -183,10 +201,13 @@ RestoreCutsceneInterior ()
 void
 CutsceneRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("CutsceneRandomizer",
+    if (!ConfigManager::ReadConfig (
+            "CutsceneRandomizer",
             std::pair ("RandomizeModels", &m_Config.RandomizeModels),
             std::pair ("UseOnlyNormalCutsceneModels", &m_Config.NoBrokenJaws),
-            std::pair ("RandomizeLocations", &m_Config.RandomizeLocation)))
+            std::pair ("RandomizeLocations", &m_Config.RandomizeLocation),
+            std::pair ("RandomizeCutsceneToPlay",
+                       &m_Config.RandomizeCutsceneToPlay)))
         return;
 
     std::string fileName;
@@ -195,7 +216,7 @@ CutsceneRandomizer::Initialise ()
     else
         fileName = "Cutscene_Models.txt";
 
-    FILE * modelFile = OpenRainbomizerFile (fileName, "r", "data/");
+    FILE *modelFile = OpenRainbomizerFile (fileName, "r", "data/");
     if (modelFile && m_Config.RandomizeModels)
         {
             char line[512] = {0};
@@ -226,10 +247,12 @@ CutsceneRandomizer::Initialise ()
         {
             RegisterHooks (
                 {{HOOK_CALL, 0x5B0A1F, (void *) &RandomizeCutsceneOffset},
-                 {HOOK_CALL, 0x480761, (void *) &RestoreCutsceneInterior},
-                 {HOOK_CALL, 0x480714, (void *) &SelectCutsceneOffset}});
+                 {HOOK_CALL, 0x480761, (void *) &RestoreCutsceneInterior}});
             injector::MakeNOP (0x5B09D2, 5);
         }
+
+    if (m_Config.RandomizeLocation || m_Config.RandomizeCutsceneToPlay)
+        RegisterHooks ({{HOOK_CALL, 0x480714, (void *) &LoadCutsceneHook}});
 
     Logger::GetLogger ()->LogMessage ("Intialised CutsceneRandomizer");
 }

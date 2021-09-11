@@ -82,23 +82,22 @@ enum eDoorCheckError
 
 class ScriptVehicleRandomizer
 {
-    static ScriptVehicleRandomizer *mInstance;
+    static ScriptVehicleRandomizer *                mInstance;
     static inline std::vector<ScriptVehiclePattern> mPatterns;
 
     ScriptVehicleRandomizer (){};
     static void DestroyInstance ();
 
-    bool        mPosFixEnabled          = false;
-    int         mVehicleDrivingOverride = -1;
-    int         mOriginalTestTime       = 0;
-    bool        mInFlyingCar            = false;
+    bool mPosFixEnabled          = false;
+    int  mVehicleDrivingOverride = -1;
+    int  mOriginalTestTime       = 0;
+    bool mInFlyingCar            = false;
 
     eDoorCheckError DoesVehicleHaveEnoughDoors (int modelA, int modelB);
 
     void CachePatterns ();
 
 public:
-
     static inline struct Config
     {
         bool MoreSchoolTestTime;
@@ -125,7 +124,7 @@ public:
 
         bool OldAirRaid;
 
-        int ForcedVehicle;
+        int  ForcedVehicle;
         bool GenericPatterns;
         bool SkipChecks;
 
@@ -133,7 +132,7 @@ public:
 
     static inline std::array<std::vector<int>, 7> carTypes;
 
-    uint8_t mSeatsCache[212];
+    uint8_t     mSeatsCache[212];
     std::string mLastThread = "";
 
     static inline std::vector<std::string> recognisedScripts
@@ -174,20 +173,19 @@ public:
            "crane3",  "carprk1", "impnd",   "valet",   "photo",   "prisonr",
            "camera",  "debt",    "hotdogv"};
 
-    static inline std::map<int, std::string> oddMissions{{121, "taxiodd"}, {122, "ambulan"},
-                                           {123, "firetru"}, {124, "copcar"},
-                                           {125, "burgjb"},  {127, "pimp"},
-                                           {131, "bcour"},   {132, "mtbiker"},
-                                           {133, "stunt"}};
+    static inline std::map<int, std::string> oddMissions{
+        {121, "taxiodd"}, {122, "ambulan"}, {123, "firetru"},
+        {124, "copcar"},  {125, "burgjb"},  {127, "pimp"},
+        {131, "bcour"},   {132, "mtbiker"}, {133, "stunt"}};
 
     static inline int mCurrentMissionRunning = -1;
     static inline int mCourierMissionType    = -1;
-    static inline int mTempVehHandle = -1;
+    static inline int mTempVehHandle         = -1;
 
-    static inline bool mDes3Stuck          = false;
-    static inline bool mEOTL3Slow             = false;
-    static inline int  mNextVigilanteCarNum   = 0;
-    static inline bool mVigilanteSlotsTaken   = false;
+    static inline bool mDes3Stuck           = false;
+    static inline bool mEOTL3Slow           = false;
+    static inline int  mNextVigilanteCarNum = 0;
+    static inline bool mVigilanteSlotsTaken = false;
 
     // Struct for RC heli magnet sections
     struct RCHeliMagnet

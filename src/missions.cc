@@ -23,10 +23,10 @@
 
 MissionRandomizer *MissionRandomizer::mInstance = nullptr;
 
-const int START_MISSIONS     = 11;
-const int END_MISSIONS       = 112;
-const int UNLOCKED_CITY_STAT = 181;
-static int       missionNumberOfLastMissionStarted = -1;
+const int  START_MISSIONS                    = 11;
+const int  END_MISSIONS                      = 112;
+const int  UNLOCKED_CITY_STAT                = 181;
+static int missionNumberOfLastMissionStarted = -1;
 static int newMissionReward                  = -1;
 
 int exceptions[] = {
@@ -625,7 +625,7 @@ InitAtNewGame ()
 void
 MissionRandomizer::ResetSaveData ()
 {
-    this->mRandomizedScript = nullptr;
+    this->mRandomizedScript           = nullptr;
     missionNumberOfLastMissionStarted = -1;
 
     mSaveInfo.randomSeed = m_Config.MissionSeedHash;
@@ -719,29 +719,29 @@ MissionRandomizer::InstallCheat (void *func, uint32_t hash)
 /*******************************************************/
 template <int address>
 void
-OverrideHospitalEndPosition(float x, float y, float z, RwV3d *a4, float *a5)
+OverrideHospitalEndPosition (float x, float y, float z, RwV3d *a4, float *a5)
 {
     if (missionNumberOfLastMissionStarted != -1)
-    {
-            if (missionStartPos.count(missionNumberOfLastMissionStarted))
-            {
+        {
+            if (missionStartPos.count (missionNumberOfLastMissionStarted))
+                {
                     Position thisMissionStartPos = missionStartPos.at (
                         missionNumberOfLastMissionStarted);
-                    a4->x = thisMissionStartPos.x;
-                    a4->y = thisMissionStartPos.y;
-                    a4->z = thisMissionStartPos.z;
+                    a4->x                             = thisMissionStartPos.x;
+                    a4->y                             = thisMissionStartPos.y;
+                    a4->z                             = thisMissionStartPos.z;
                     missionNumberOfLastMissionStarted = -1;
-            }
+                }
             HookManager::CallOriginal<
                 injector::cstd<void (float, float, float, RwV3d *, float *)>,
                 address> (a4->x, a4->y, a4->z, a4, a5);
-    }
+        }
     else
-    {
+        {
             HookManager::CallOriginal<
                 injector::cstd<void (float, float, float, RwV3d *, float *)>,
                 address> (x, y, z, a4, a5);
-    }
+        }
 }
 
 /*******************************************************/
@@ -771,7 +771,8 @@ MissionRandomizer::VerifyMainSCM ()
 }
 
 /*******************************************************/
-void __fastcall RandomizeMissionRewardDisplay (CRunningScript *scr, void *edx, short count)
+void __fastcall RandomizeMissionRewardDisplay (CRunningScript *scr, void *edx,
+                                               short count)
 {
     scr->CollectParameters (count);
     int origMissionId
@@ -780,41 +781,41 @@ void __fastcall RandomizeMissionRewardDisplay (CRunningScript *scr, void *edx, s
         = MissionRandomizer::GetInstance ()->mRandomizedMissionNumber;
 
     if (origMissionId != randomMissionId && ScriptParams[0] == 0)
-    {
+        {
             switch (origMissionId)
                 {
                 case 19: newMissionReward = random (1000); break;
                 case 43: newMissionReward = 5000; break;
                 case 69: newMissionReward = random (9000); break;
                 case 75: newMissionReward = random (5000); break;
-                }  
+                }
 
             if (newMissionReward != -1)
                 ScriptParams[0] = newMissionReward;
-    }
+        }
 }
 
 /*******************************************************/
 void __fastcall RandomizeMissionReward (CRunningScript *scr, void *edx,
-                                               short count)
+                                        short count)
 {
     scr->CollectParameters (count);
     if (MissionRandomizer::GetInstance ()->mOriginalMissionNumber
             != MissionRandomizer::GetInstance ()->mRandomizedMissionNumber
         && ScriptParams[0] == 0 && newMissionReward != -1)
-    {
-        ScriptParams[1] = newMissionReward;
-        newMissionReward = -1;
-    }
+        {
+            ScriptParams[1]  = newMissionReward;
+            newMissionReward = -1;
+        }
 }
 
 /*******************************************************/
 void __fastcall CheckForChaosMissionPass (CRunningScript *scr, void *edx,
-                                            char flag)
+                                          char flag)
 {
-    if (flag && MissionRandomizer::GetInstance ()->mRandomizedScript && 
-        !scr->CheckName("zero1") && !scr->CheckName("zero2") && 
-        !scr->CheckName ("zero4") && !scr->CheckName ("driv3")
+    if (flag && MissionRandomizer::GetInstance ()->mRandomizedScript
+        && !scr->CheckName ("zero1") && !scr->CheckName ("zero2")
+        && !scr->CheckName ("zero4") && !scr->CheckName ("driv3")
         && !scr->CheckName ("garag1"))
         {
             MissionRandomizer::GetInstance ()->SetScriptByPass ();
@@ -826,7 +827,7 @@ void __fastcall CheckForChaosMissionPass (CRunningScript *scr, void *edx,
 
 /*******************************************************/
 void __fastcall CheckIfKeyPressOpcode (CRunningScript *scr, void *edx,
-                                        short count)
+                                       short count)
 {
     scr->CollectParameters (count);
     MissionRandomizer::GetInstance ()->mKeyPressOpcode = true;
@@ -834,43 +835,42 @@ void __fastcall CheckIfKeyPressOpcode (CRunningScript *scr, void *edx,
 
 /*******************************************************/
 void __fastcall CheckForChaosMissionPass2 (CRunningScript *scr, void *edx,
-                                          char flag)
+                                           char flag)
 {
     if (!MissionRandomizer::GetInstance ()->mKeyPressOpcode)
         scr->UpdateCompareFlag (flag);
     else
-    {
-        MissionRandomizer::GetInstance ()->mKeyPressOpcode = false;
-        if (flag && MissionRandomizer::GetInstance ()->mRandomizedScript 
-            && !scr->CheckName ("zero1") && !scr->CheckName ("zero2") && 
-            !scr->CheckName ("zero4") && !scr->CheckName ("driv3") && 
-            !scr->CheckName("garag1"))
-            {
-                MissionRandomizer::GetInstance ()->SetScriptByPass ();
-                scr->UpdateCompareFlag (0);
-            }
-        else
-            scr->UpdateCompareFlag (flag);
-    }
+        {
+            MissionRandomizer::GetInstance ()->mKeyPressOpcode = false;
+            if (flag && MissionRandomizer::GetInstance ()->mRandomizedScript
+                && !scr->CheckName ("zero1") && !scr->CheckName ("zero2")
+                && !scr->CheckName ("zero4") && !scr->CheckName ("driv3")
+                && !scr->CheckName ("garag1"))
+                {
+                    MissionRandomizer::GetInstance ()->SetScriptByPass ();
+                    scr->UpdateCompareFlag (0);
+                }
+            else
+                scr->UpdateCompareFlag (flag);
+        }
 }
 
 /*******************************************************/
-void __fastcall CheckForFalsePass (CRunningScript *scr, void *edx,
-                                                 short count)
+void __fastcall CheckForFalsePass (CRunningScript *scr, void *edx, short count)
 {
     scr->CollectParameters (count);
     int origMissionId
         = MissionRandomizer::GetInstance ()->mOriginalMissionNumber;
     int randomMissionId
         = MissionRandomizer::GetInstance ()->mRandomizedMissionNumber;
-    if ((randomMissionId == 67 && origMissionId != 67 && 
-        ScriptParams[0] == ScriptSpace[2790]) || 
-        (randomMissionId == 70 && origMissionId != 70 
+    if ((randomMissionId == 67 && origMissionId != 67
+         && ScriptParams[0] == ScriptSpace[2790])
+        || (randomMissionId == 70 && origMissionId != 70
             && ScriptParams[0] == ScriptSpace[2794]))
-    {
-        ScriptSpace[544] -= 1;
-        MissionRandomizer::GetInstance ()->SetScriptByPass ();
-    }
+        {
+            ScriptSpace[544] -= 1;
+            MissionRandomizer::GetInstance ()->SetScriptByPass ();
+        }
 }
 
 /*******************************************************/
@@ -878,11 +878,14 @@ void
 MissionRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig (
-            "MissionRandomizer", std::pair ("ForcedMissionID", &m_Config.ForcedMissionID),
+            "MissionRandomizer",
+            std::pair ("ForcedMissionID", &m_Config.ForcedMissionID),
             std::pair ("RandomizeOnce", &m_Config.RandomizeOnce),
             std::pair ("RandomizeOnceSeed", &m_Config.RandomizeOnceSeed),
-            std::pair ("ForcedRandomizeOnceSeed", &m_Config.ForcedRandomizeOnceSeed),
-            std::pair ("ConserveMomentumThroughTeleports", &m_Config.PreserveMomentum),
+            std::pair ("ForcedRandomizeOnceSeed",
+                       &m_Config.ForcedRandomizeOnceSeed),
+            std::pair ("ConserveMomentumThroughTeleports",
+                       &m_Config.PreserveMomentum),
             std::pair ("DisableMainScmCheck", &m_Config.DisableMainSCMCheck)))
         return;
 
@@ -921,10 +924,10 @@ MissionRandomizer::Initialise ()
          {HOOK_CALL, 0x46D652, (void *) &CheckForChaosMissionPass2},
          {HOOK_CALL, 0x47C233, (void *) &CheckForFalsePass}});
 
-    RegisterDelayedHooks (
-        {{HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
-         {HOOK_CALL, 0x53BE76, (void *) &InitAtNewGame},
-        });
+    RegisterDelayedHooks ({
+        {HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
+        {HOOK_CALL, 0x53BE76, (void *) &InitAtNewGame},
+    });
 
     RegisterDelayedFunction ([] { injector::MakeNOP (0x469fb5, 2); });
 

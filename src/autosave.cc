@@ -41,9 +41,7 @@ int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
 
             // Save in a vehicle
             int *playerFlags   = FindPlayerPed (0)->flags;
-            auto vehicleCoords = FindPlayerEntity ()->GetPosition ();
-
-            int originalFlags = playerFlags[0];
+            int  originalFlags = playerFlags[0];
 
             if (playerFlags[0] & 0x100)
                 AutoSave::GetInstance ()->mSaveVehicleCoords = true;
@@ -51,7 +49,8 @@ int __fastcall HandleAutosave (CRunningScript *scr, void *edx)
             playerFlags[0] &= ~0x100;
 
             // Save
-            CGenericGameStorage::MakeValidSaveFileName (GeneralSettings::m_Config.AutoSaveSlot - 1);
+            CGenericGameStorage::MakeValidSaveFileName (
+                GeneralSettings::m_Config.AutoSaveSlot - 1);
             CGenericGameStorage::GenericSave ();
 
             AutoSave::GetInstance ()->SetShouldSave (false);
@@ -117,7 +116,7 @@ AutoSave::DrawMessage (const char *text)
     CFont::SetDropShadowPosition (0);
     CFont::SetWrapx (mDisplayDrawPosX + CalculateScreenOffsetX (500));
     CFont::SetAlphaFade (255);
-    CFont::SetBackgroundColor (GetRainbowColour());
+    CFont::SetBackgroundColor (GetRainbowColour ());
     CFont::SetColor ({00, 0, 0, 255});
     CFont::PrintString (this->mDisplayDrawPosX, this->mDisplayDrawPosY,
                         (char *) text);

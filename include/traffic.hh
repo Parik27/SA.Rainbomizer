@@ -39,8 +39,10 @@ void __fastcall FixFreightTrainCrash (CAEVehicleAudioEntity *audio, void *edx,
                                       cVehicleParams *vehicle_params);
 void __fastcall PlaceOnRoadFix (CVehicle *vehicle, void *edx);
 int ChoosePoliceVehicleBasedOnModel (int model);
-template <int address> void *__fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx, int model,
-                                     char createdBy, char setupSuspensionLines);
+template <int address>
+void *__fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx, int model,
+                                      char createdBy,
+                                      char setupSuspensionLines);
 
 /// Randomizes cars that spawn in traffic including the police cars
 class TrafficRandomizer
@@ -58,7 +60,7 @@ class TrafficRandomizer
 public:
     std::deque<int> mMostRecentSpawnedVehicles;
     std::deque<int> mMostRecentLoadedVehicles;
-    int mForcedCar = 0;
+    int             mForcedCar = 0;
 
     static inline struct Config
     {

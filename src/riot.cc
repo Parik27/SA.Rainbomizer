@@ -9,11 +9,11 @@
 
 RiotRandomizer *RiotRandomizer::mInstance = nullptr;
 
-static bool greenLightCheat = false;
-static char            lightResult               = 0;
-static int  randomTimeInterval = 0;
-static float             currentTimeSinceLightChange = 0.0f;
-static float           timeOfLastChange            = 0.0f;
+static bool  greenLightCheat             = false;
+static char  lightResult                 = 0;
+static int   randomTimeInterval          = 0;
+static float currentTimeSinceLightChange = 0.0f;
+static float timeOfLastChange            = 0.0f;
 
 /*******************************************************/
 char
@@ -32,23 +32,24 @@ TimeToSwitchLight ()
     if (greenLightCheat)
         return lightResult;
 
-    if ((int)currentTimeSinceLightChange >= randomTimeInterval)
-    {
-        lightResult                 = random (0, 2);
-        randomTimeInterval = random (100, 6000);
-        timeOfLastChange = clock ();
-    }
-    
-    currentTimeSinceLightChange = clock() - timeOfLastChange;
+    if ((int) currentTimeSinceLightChange >= randomTimeInterval)
+        {
+            lightResult        = random (0, 2);
+            randomTimeInterval = random (100, 6000);
+            timeOfLastChange   = clock ();
+        }
+
+    currentTimeSinceLightChange = clock () - timeOfLastChange;
 
     return lightResult;
 }
 
 /*******************************************************/
-CZone *CheckNewZone (CVector *point, char checkType)
+CZone *
+CheckNewZone (CVector *point, char checkType)
 {
-    CZone *currentZone = CallAndReturn<CZone *, 0x572360> (point, checkType);
-    CVector playerPos = FindPlayerCoors ();
+    CZone * currentZone = CallAndReturn<CZone *, 0x572360> (point, checkType);
+    CVector playerPos   = FindPlayerCoors ();
     if ((int) playerPos.x != (int) point->x
         && (int) playerPos.y != (int) point->y
         && (int) playerPos.z != (int) point->z)
@@ -56,45 +57,46 @@ CZone *CheckNewZone (CVector *point, char checkType)
 
     if (std::string (currentZone->m_szTextKey)
         != std::string (RiotRandomizer::previousZone))
-    {
-        if (ConfigManager::ReadConfig ("RiotRandomizer") && RiotRandomizer::m_Config.RandomizeRiots)
         {
-            // Memory address storing if end-game riots are enabled
-            int gbLARiots = 0xB72958;
+            if (ConfigManager::ReadConfig ("RiotRandomizer")
+                && RiotRandomizer::m_Config.RandomizeRiots)
+                {
+                    // Memory address storing if end-game riots are enabled
+                    int gbLARiots = 0xB72958;
 
-            // Memory address storing if riot cheat is enabled
-            // Checked before randomizing riot and written to in order to enable it
-            int riotCheatActive = 0x969130 + 69;
-            
-            // Check if riots already enabled separate from randomizer
-            // Doesn't take effect in these cases for simplicity
-            if (!injector::ReadMemory<bool> (gbLARiots)
-                && !injector::ReadMemory<bool> (riotCheatActive))
-                RiotRandomizer::riotModeRandomized = false;
-            
-            if (!injector::ReadMemory<bool> (gbLARiots)
-                && !injector::ReadMemory<bool> (riotCheatActive)
-                && !RiotRandomizer::riotModeRandomized 
-                && random(1000) > 985)
-            {
-                RiotRandomizer::riotModeRandomized = true;
-                injector::WriteMemory (riotCheatActive, 1);
-            }
-            else if (!injector::ReadMemory<bool> (gbLARiots)
-                && RiotRandomizer::riotModeRandomized 
-                && random(1000) > 600)
-            {
-                RiotRandomizer::riotModeRandomized = false;
-                injector::WriteMemory (riotCheatActive, 0);
-            }
+                    // Memory address storing if riot cheat is enabled
+                    // Checked before randomizing riot and written to in order
+                    // to enable it
+                    int riotCheatActive = 0x969130 + 69;
+
+                    // Check if riots already enabled separate from randomizer
+                    // Doesn't take effect in these cases for simplicity
+                    if (!injector::ReadMemory<bool> (gbLARiots)
+                        && !injector::ReadMemory<bool> (riotCheatActive))
+                        RiotRandomizer::riotModeRandomized = false;
+
+                    if (!injector::ReadMemory<bool> (gbLARiots)
+                        && !injector::ReadMemory<bool> (riotCheatActive)
+                        && !RiotRandomizer::riotModeRandomized
+                        && random (1000) > 985)
+                        {
+                            RiotRandomizer::riotModeRandomized = true;
+                            injector::WriteMemory (riotCheatActive, 1);
+                        }
+                    else if (!injector::ReadMemory<bool> (gbLARiots)
+                             && RiotRandomizer::riotModeRandomized
+                             && random (1000) > 600)
+                        {
+                            RiotRandomizer::riotModeRandomized = false;
+                            injector::WriteMemory (riotCheatActive, 0);
+                        }
+                }
         }
-    }
-    
+
     for (int i = 0; i < 8; i++)
-    {
-        RiotRandomizer::previousZone[i]
-            = currentZone->m_szTextKey[i];
-    }
+        {
+            RiotRandomizer::previousZone[i] = currentZone->m_szTextKey[i];
+        }
     return currentZone;
 }
 
@@ -102,21 +104,23 @@ CZone *CheckNewZone (CVector *point, char checkType)
 void
 RiotRandomizer::Initialise ()
 {
-    RegisterHooks ({{HOOK_CALL, 0x572407, (void *) &CheckNewZone}}); 
+    RegisterHooks ({{HOOK_CALL, 0x572407, (void *) &CheckNewZone}});
 
-    if (!ConfigManager::ReadConfig ("RiotRandomizer",
-        std::pair ("RandomizeRiots", &m_Config.RandomizeRiots),
-        std::pair ("RandomizeTrafficLights", &m_Config.RandomizeTrafficLights)))
+    if (!ConfigManager::ReadConfig (
+            "RiotRandomizer",
+            std::pair ("RandomizeRiots", &m_Config.RandomizeRiots),
+            std::pair ("RandomizeTrafficLights",
+                       &m_Config.RandomizeTrafficLights)))
         return;
 
     if (m_Config.RandomizeTrafficLights)
-    {
+        {
             for (int address : {0x49DB6D, 0x49DB5F, 0x49D6EC, 0x49D862,
                                 0x49D9E3, 0x49D6D4, 0x49D84A, 0x49D9CD})
                 {
                     injector::MakeCALL (address, (void *) &TimeToSwitchLight);
                 }
-    }
+        }
 
     Logger::GetLogger ()->LogMessage ("Intialised RiotRandomizer");
 }

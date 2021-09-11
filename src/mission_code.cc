@@ -148,7 +148,7 @@ LosDesperadosFix (unsigned char *data)
 void
 KeyToHerHeartFix (unsigned char *data)
 {
-    millieProgress = ScriptSpace[364];
+    millieProgress   = ScriptSpace[364];
     ScriptSpace[364] = 20;
 }
 
@@ -207,8 +207,8 @@ MissionRandomizer::ApplyMissionFailFixes ()
         }
     switch (this->mRandomizedMissionNumber)
         {
-            // Key To Her Heart
-            case 97: ScriptSpace[364] = millieProgress; break;
+        // Key To Her Heart
+        case 97: ScriptSpace[364] = millieProgress; break;
         }
 }
 
@@ -271,8 +271,8 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
             break;
 
         // Customs Fast Track
-        case 69: 
-            data += 25736; 
+        case 69:
+            data += 25736;
             data = Scrpt::CreateOpcode (0x2, "jump", data, -30732);
             data = Scrpt::CreateOpcode (0x51, "return", data);
             break;
@@ -300,20 +300,16 @@ MissionRandomizer::ApplyMissionSpecificFixes (uint8_t *data)
         case 13:
             Scrpt::CallOpcode (0x555, "remove_weapon", GlobalVar (3), 41);
             break;
-        
+
         // Customs Fast Track - Fade in
-        case 69: 
-            Scrpt::CallOpcode (0x16A, "do_fade", 500, 1); 
-            break;
+        case 69: Scrpt::CallOpcode (0x16A, "do_fade", 500, 1); break;
 
         // Zeroing In - Remove player from car
-        case 67: 
-            Scrpt::CallOpcode (0x792, "disembark_actor", GlobalVar (3)); 
+        case 67:
+            Scrpt::CallOpcode (0x792, "disembark_actor", GlobalVar (3));
             break;
 
-       // Key To Her Heart - Reset Millie progress
-        case 97: 
-            ScriptSpace[364] = millieProgress; 
-            break;
+            // Key To Her Heart - Reset Millie progress
+        case 97: ScriptSpace[364] = millieProgress; break;
         }
 }

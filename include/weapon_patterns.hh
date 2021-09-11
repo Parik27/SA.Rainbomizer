@@ -19,7 +19,7 @@ static std::vector<std::vector<int>> weapon_slots
        {35, 36, 37, 38},         // Heavy Weapons Slot 7
        {16, 17, 18, 39},         // Projectiles Slot 8
        {41, 42, 43},             // Spray / Camera Slot 9
-       {10, 11, 12, 13, 14, 15},     // Gift Slot 10
+       {10, 11, 12, 13, 14, 15}, // Gift Slot 10
        {44, 45, 46},             // Wearable Slots 11
        {40}};                    // Detonator Slot 12
 
@@ -67,26 +67,27 @@ class WeaponPattern
 
     std::string m_szThread = "";
 
-    bool  m_bPickup = false;
-    bool m_bCached = false;
+    bool                  m_bPickup = false;
+    bool                  m_bCached = false;
     std::vector<uint32_t> m_aCache;
+
 public:
-    std::unordered_map<std::string, int> weaponIDs = {
-        {"fist", 0},        {"brassknuckle", 1}, {"golfclub", 2},
-        {"nitestick", 3},   {"knifecur", 4},     {"bat", 5},
-        {"shovel", 6},      {"poolcue", 7},      {"katana", 8},
-        {"chnsaw", 9},      {"gun_dildo1", 10},  {"gun_dildo2", 11},
-        {"gun_vibe1", 12},  {"gun_vibe2", 13},   {"flowera", 14},
-        {"gun_cane", 15},   {"grenade", 16},     {"teargas", 17},
-        {"molotov", 18},    {"colt45", 22},      {"silenced", 23},
-        {"desert_eagle", 24}, {"chromegun", 25}, {"sawnoff", 26},
-        {"shotgspa", 27},   {"micro_uzi", 28},   {"mp5lng", 29},
-        {"ak47", 30},       {"m4", 31},          {"tec9", 32},
-        {"cuntgun", 33},    {"sniper", 34},      {"rocketla", 35},
-        {"heatseek", 36},   {"flame", 37},       {"minigun", 38},
-        {"satchel", 39},    {"bomb", 40},        {"spraycan", 41},
-        {"fire_ex", 42},    {"camera", 43},      {"nvgoggles", 44},
-        {"irgoggles", 45},  {"gun_para", 46}};
+    std::unordered_map<std::string, int> weaponIDs
+        = {{"fist", 0},          {"brassknuckle", 1}, {"golfclub", 2},
+           {"nitestick", 3},     {"knifecur", 4},     {"bat", 5},
+           {"shovel", 6},        {"poolcue", 7},      {"katana", 8},
+           {"chnsaw", 9},        {"gun_dildo1", 10},  {"gun_dildo2", 11},
+           {"gun_vibe1", 12},    {"gun_vibe2", 13},   {"flowera", 14},
+           {"gun_cane", 15},     {"grenade", 16},     {"teargas", 17},
+           {"molotov", 18},      {"colt45", 22},      {"silenced", 23},
+           {"desert_eagle", 24}, {"chromegun", 25},   {"sawnoff", 26},
+           {"shotgspa", 27},     {"micro_uzi", 28},   {"mp5lng", 29},
+           {"ak47", 30},         {"m4", 31},          {"tec9", 32},
+           {"cuntgun", 33},      {"sniper", 34},      {"rocketla", 35},
+           {"heatseek", 36},     {"flame", 37},       {"minigun", 38},
+           {"satchel", 39},      {"bomb", 40},        {"spraycan", 41},
+           {"fire_ex", 42},      {"camera", 43},      {"nvgoggles", 44},
+           {"irgoggles", 45},    {"gun_para", 46}};
 
     /*******************************************************/
     void
@@ -98,13 +99,13 @@ public:
     void
     SetOriginalWeapon (char *weapon)
     {
-        m_bCached          = false;
+        m_bCached         = false;
         m_nOriginalWeapon = weaponIDs[weapon];
     }
     void
     SetPedType (int ped)
     {
-        m_bCached = false;
+        m_bCached  = false;
         m_nPedType = ped;
     }
     uint32_t
@@ -161,5 +162,9 @@ public:
 
     bool MatchWeapon (int weaponID, int ped, bool pickup);
 
-    WeaponPattern () : mFlags{false} {}
+    WeaponPattern ()
+        : mFlags{false, false, false, false, false, false,
+                 false, false, false, false, false}
+    {
+    }
 };

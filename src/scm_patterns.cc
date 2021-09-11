@@ -36,53 +36,68 @@ CacheSeats ()
             auto err = StreamingManager::AttemptToLoadVehicle (i + 400);
             if (err != ERR_FAILED)
                 {
-                    ScriptVehicleRandomizer::
-                        GetInstance()->mSeatsCache[i]
-                        = CModelInfo:: GetMaximumNumberOfPassengersFromNumberOfDoors (i + 400);
+                    ScriptVehicleRandomizer::GetInstance ()->mSeatsCache[i]
+                        = CModelInfo::
+                            GetMaximumNumberOfPassengersFromNumberOfDoors (
+                                i + 400);
 
                     eVehicleClass vehicleType = GetVehicleType (i + 400);
                     switch (vehicleType)
-                    {
-                        case VEHICLE_AUTOMOBILE: 
+                        {
+                        case VEHICLE_AUTOMOBILE:
                         case VEHICLE_MTRUCK:
-                            ScriptVehicleRandomizer::carTypes[int(CarType::CAR)].push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes[int (
+                                                                  CarType::CAR)]
+                                .push_back (i + 400);
                             break;
 
                         case VEHICLE_BIKE:
                         case VEHICLE_BMX:
                         case VEHICLE_QUAD:
-                            ScriptVehicleRandomizer::carTypes[int(CarType::BIKE)].push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes
+                                [int (CarType::BIKE)]
+                                    .push_back (i + 400);
                             break;
 
                         case VEHICLE_PLANE:
                         case VEHICLE_FPLANE:
                             if ((i + 400) != 539)
-                                ScriptVehicleRandomizer::carTypes[int (CarType::PLANE)].push_back (i + 400);
+                                ScriptVehicleRandomizer::carTypes
+                                    [int (CarType::PLANE)]
+                                        .push_back (i + 400);
                             break;
 
                         case VEHICLE_HELI:
                         case VEHICLE_FHELI:
-                            ScriptVehicleRandomizer::carTypes[int (CarType::HELI)].push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes
+                                [int (CarType::HELI)]
+                                    .push_back (i + 400);
                             break;
 
                         case VEHICLE_BOAT:
-                            ScriptVehicleRandomizer::carTypes[int (CarType::BOAT)].push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes
+                                [int (CarType::BOAT)]
+                                    .push_back (i + 400);
                             break;
 
                         case VEHICLE_TRAIN:
-                            ScriptVehicleRandomizer::carTypes[int (CarType::TRAIN)].push_back (i + 400);
+                            ScriptVehicleRandomizer::carTypes
+                                [int (CarType::TRAIN)]
+                                    .push_back (i + 400);
                             break;
 
                         case VEHICLE_TRAILER:
-                            ScriptVehicleRandomizer::carTypes[int (CarType::TRAILER)].push_back (i + 400);
-                    }
+                            ScriptVehicleRandomizer::carTypes
+                                [int (CarType::TRAILER)]
+                                    .push_back (i + 400);
+                        }
 
                     if (err != ERR_ALREADY_LOADED)
                         CStreaming::RemoveModel (i + 400);
                     continue;
                 }
 
-            ScriptVehicleRandomizer::GetInstance()->mSeatsCache[i]
+            ScriptVehicleRandomizer::GetInstance ()->mSeatsCache[i]
                 = 3; // fallback (safest)
             Logger::GetLogger ()->LogMessage ("Unable to cache seats for model "
                                               + std::to_string (i));
@@ -93,24 +108,24 @@ CacheSeats ()
 eVehicleClass
 GetVehicleType (int vehID)
 {
-    if (CModelInfo::IsBikeModel(vehID))
+    if (CModelInfo::IsBikeModel (vehID))
         return VEHICLE_BIKE;
-    else if (CModelInfo::IsBmxModel(vehID))
+    else if (CModelInfo::IsBmxModel (vehID))
         return VEHICLE_BMX;
-    else if (CModelInfo::IsBoatModel(vehID))
+    else if (CModelInfo::IsBoatModel (vehID))
         return VEHICLE_BOAT;
-    else if (CModelInfo::IsTrainModel(vehID))
+    else if (CModelInfo::IsTrainModel (vehID))
         return VEHICLE_TRAIN;
-    else if (CModelInfo::IsTrailerModel(vehID))
+    else if (CModelInfo::IsTrailerModel (vehID))
         return VEHICLE_TRAILER;
-    else if (CModelInfo::IsQuadBikeModel(vehID))
+    else if (CModelInfo::IsQuadBikeModel (vehID))
         return VEHICLE_QUAD;
-    else if (CModelInfo::IsMonsterTruckModel(vehID))
+    else if (CModelInfo::IsMonsterTruckModel (vehID))
         return VEHICLE_MTRUCK;
     else if (CModelInfo::IsPlaneModel (vehID)
-             || CModelInfo::IsFakePlaneModel(vehID))
+             || CModelInfo::IsFakePlaneModel (vehID))
         return VEHICLE_PLANE;
-    else if (CModelInfo::IsHeliModel(vehID))
+    else if (CModelInfo::IsHeliModel (vehID))
         return VEHICLE_HELI;
     else
         return VEHICLE_AUTOMOBILE;
@@ -121,7 +136,7 @@ bool
 ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
 {
     int numSeats
-        = ScriptVehicleRandomizer::GetInstance()->mSeatsCache[vehID - 400];
+        = ScriptVehicleRandomizer::GetInstance ()->mSeatsCache[vehID - 400];
 
     // Seat check
     if (numSeats < m_nSeatCheck)
@@ -131,24 +146,29 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
         && vehID != 447 && vehID != 464 && vehID != 476 && vehID != 520)
         return false;
 
-    if (mFlags.RC && !CModelInfo::IsRCModel(vehID) && (CModelInfo::IsCarModel(vehID) 
-        || CModelInfo::IsHeliModel(vehID) || CModelInfo::IsPlaneModel(vehID) 
-        || CModelInfo::IsMonsterTruckModel(vehID)))
+    if (mFlags.RC && !CModelInfo::IsRCModel (vehID)
+        && (CModelInfo::IsCarModel (vehID) || CModelInfo::IsHeliModel (vehID)
+            || CModelInfo::IsPlaneModel (vehID)
+            || CModelInfo::IsMonsterTruckModel (vehID)))
         return false;
-    else if (mFlags.NoRC && CModelInfo::IsRCModel (vehID)) 
+    else if (mFlags.NoRC && CModelInfo::IsRCModel (vehID))
         return false;
 
-    if ((mFlags.Smallplanes && CModelInfo::IsPlaneModel(vehID)) && 
-        (vehID == 460 || vehID == 464 || vehID == 519 || vehID == 553 
+    if ((mFlags.Smallplanes && CModelInfo::IsPlaneModel (vehID))
+        && (vehID == 460 || vehID == 464 || vehID == 519 || vehID == 553
             || vehID == 577 || vehID == 592))
         return false;
 
     if ((mFlags.VTOL && CModelInfo::IsPlaneModel (vehID)) && vehID != 520)
         return false;
 
-    if (mFlags.Float && (vehID == 406 || vehID == 444 || vehID == 556 || vehID == 557 
-        || vehID == 573 || (CModelInfo::IsPlaneModel(vehID) && vehID != 539 && vehID != 460) 
-        || (CModelInfo::IsHeliModel(vehID) && vehID != 447 && vehID != 417)))
+    if (mFlags.Float
+        && (vehID == 406 || vehID == 444 || vehID == 556 || vehID == 557
+            || vehID == 573
+            || (CModelInfo::IsPlaneModel (vehID) && vehID != 539
+                && vehID != 460)
+            || (CModelInfo::IsHeliModel (vehID) && vehID != 447
+                && vehID != 417)))
         return false;
 
     if (mFlags.Hovercraft && CModelInfo::IsPlaneModel (vehID) && vehID != 539)
@@ -156,12 +176,13 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
     else if (mFlags.NoHovercraft && vehID == 539)
         return false;
 
-    if (mFlags.CanAttach
-        && vehID != 435 && vehID != 450 && vehID != 584 && vehID != 591 
-        && vehID != 403 && vehID != 514 && vehID != 515)
+    if (mFlags.CanAttach && vehID != 435 && vehID != 450 && vehID != 584
+        && vehID != 591 && vehID != 403 && vehID != 514 && vehID != 515)
         return false;
 
-    if (mFlags.SmallCar && (CModelInfo::IsCarModel (vehID) || CModelInfo::IsMonsterTruckModel(vehID))
+    if (mFlags.SmallCar
+        && (CModelInfo::IsCarModel (vehID)
+            || CModelInfo::IsMonsterTruckModel (vehID))
         && (vehID == 403 || vehID == 406 || vehID == 408 || vehID == 414
             || vehID == 431 || vehID == 432 || vehID == 433 || vehID == 437
             || vehID == 443 || vehID == 444 || vehID == 455 || vehID == 456
@@ -188,13 +209,13 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
             || vehID == 476 || vehID == 520))
         return false;
 
-    if ((GetThreadName () == "zero2" || GetThreadName () == "zero5")  
+    if ((GetThreadName () == "zero2" || GetThreadName () == "zero5")
         && GetOriginalVehicle () == 464 && vehID == 520)
         return false;
 
     // Type check (it has to be both not moved and allowed)
-    if (!mAllowedTypes.GetValue (GetVehicleType(vehID))
-        && !mMovedTypes.GetValue (GetVehicleType(vehID)))
+    if (!mAllowedTypes.GetValue (GetVehicleType (vehID))
+        && !mMovedTypes.GetValue (GetVehicleType (vehID)))
         return false;
 
     return true;
@@ -224,7 +245,7 @@ ScriptVehiclePattern::GetRandom (Vector3 &pos)
 
     int newVehID = GetRandomElement (m_aCache);
 
-    if (mMovedTypes.GetValue (GetVehicleType(newVehID)))
+    if (mMovedTypes.GetValue (GetVehicleType (newVehID)))
         pos += GetMovedCoordinates ();
 
     return newVehID;
@@ -232,9 +253,10 @@ ScriptVehiclePattern::GetRandom (Vector3 &pos)
 
 /*******************************************************/
 bool
-ScriptVehiclePattern::MatchVehicle (int vehID, std::string thread, const Vector3 &coords)
+ScriptVehiclePattern::MatchVehicle (int vehID, std::string thread,
+                                    const Vector3 &coords)
 {
-    if (vehID != GetOriginalVehicle () || thread != GetThreadName())
+    if (vehID != GetOriginalVehicle () || thread != GetThreadName ())
         return false;
 
     // Coordinates check

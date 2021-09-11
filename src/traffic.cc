@@ -75,15 +75,16 @@ void __fastcall PlaceOnRoadFix (CVehicle *vehicle, void *edx)
 void
 TrafficRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("TrafficRandomizer",
-            std::pair("ForcedVehicleID", &m_Config.ForcedVehicleID),
-            std::pair("EnableTrains", &m_Config.Trains),
-            std::pair("EnableBoats", &m_Config.Boats),
-            std::pair("EnableAircrafts", &m_Config.Aircraft),
-            std::pair("EnableCars", &m_Config.Cars),
-            std::pair("EnableBikes", &m_Config.Bikes),
-            std::pair("EnableTrailers", &m_Config.Trailers),
-            std::pair("DefaultModel", &m_Config.DefaultModel)))
+    if (!ConfigManager::ReadConfig (
+            "TrafficRandomizer",
+            std::pair ("ForcedVehicleID", &m_Config.ForcedVehicleID),
+            std::pair ("EnableTrains", &m_Config.Trains),
+            std::pair ("EnableBoats", &m_Config.Boats),
+            std::pair ("EnableAircrafts", &m_Config.Aircraft),
+            std::pair ("EnableCars", &m_Config.Cars),
+            std::pair ("EnableBikes", &m_Config.Bikes),
+            std::pair ("EnableTrailers", &m_Config.Trailers),
+            std::pair ("DefaultModel", &m_Config.DefaultModel)))
         return;
 
     if (m_Config.ForcedVehicleID >= 400 && m_Config.ForcedVehicleID <= 611)
@@ -91,17 +92,22 @@ TrafficRandomizer::Initialise ()
 
     this->MakeRCsEnterable ();
 
-    RegisterHooks ({{HOOK_JUMP, 0x421980, (void *) &RandomizePoliceCars},
-                    {HOOK_CALL, 0x431EE5, (void *) &FixEmptyPoliceCars},
-                    {HOOK_CALL, 0x43022A, (void *) &RandomizeTrafficCars},
-                    {HOOK_CALL, 0x613B7F, (void *) &RandomizeCarPeds},
-                    {HOOK_JUMP, 0x421900, (void *) &RandomizeCarToLoad},
-                    {HOOK_CALL, 0x42C620, (void *) &FixEmptyPoliceCars},
-                    {HOOK_CALL, 0x501F3B, (void *) &FixFreightTrainCrash},
-                    {HOOK_CALL, 0x61282F, (void *) &FixCopCrash},
-                    {HOOK_CALL, 0x462217, (void *) &RandomizeRoadblocks<0x462217>}, // Actual Roadblocks
-                    {HOOK_CALL, 0x4998F0, (void *) &RandomizeRoadblocks<0x4998F0>}, // Scripted Cop Car Spawns
-                    {HOOK_CALL, 0x42B909, (void *) &RandomizeRoadblocks<0x42B909>}}); // Emergency Vehicles + Gang War Cars
+    RegisterHooks (
+        {{HOOK_JUMP, 0x421980, (void *) &RandomizePoliceCars},
+         {HOOK_CALL, 0x431EE5, (void *) &FixEmptyPoliceCars},
+         {HOOK_CALL, 0x43022A, (void *) &RandomizeTrafficCars},
+         {HOOK_CALL, 0x613B7F, (void *) &RandomizeCarPeds},
+         {HOOK_JUMP, 0x421900, (void *) &RandomizeCarToLoad},
+         {HOOK_CALL, 0x42C620, (void *) &FixEmptyPoliceCars},
+         {HOOK_CALL, 0x501F3B, (void *) &FixFreightTrainCrash},
+         {HOOK_CALL, 0x61282F, (void *) &FixCopCrash},
+         {HOOK_CALL, 0x462217,
+          (void *) &RandomizeRoadblocks<0x462217>}, // Actual Roadblocks
+         {HOOK_CALL, 0x4998F0,
+          (void *) &RandomizeRoadblocks<0x4998F0>}, // Scripted Cop Car Spawns
+         {HOOK_CALL, 0x42B909,
+          (void *) &RandomizeRoadblocks<0x42B909>}}); // Emergency Vehicles +
+                                                      // Gang War Cars
 
     this->Install6AF420_Hook ();
 
@@ -115,19 +121,19 @@ TrafficRandomizer::Initialise ()
 
 /*******************************************************/
 template <int address>
-void* __fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx,
-                                               int model, char createdBy, char setupSuspensionLines)
+void *__fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx, int model,
+                                      char createdBy, char setupSuspensionLines)
 {
     auto trafficRandomizer = TrafficRandomizer::GetInstance ();
 
     if (model == 416 || model == 407)
-    {
-        CallMethod<0x6B0A90> (vehicle, model, createdBy,
+        {
+            CallMethod<0x6B0A90> (vehicle, model, createdBy,
                                   setupSuspensionLines);
-        return vehicle;
-    }
+            return vehicle;
+        }
 
-    int  random_id         = StreamingManager::GetRandomLoadedVehicle ();
+    int random_id = StreamingManager::GetRandomLoadedVehicle ();
     if (trafficRandomizer->mForcedCar)
         random_id = trafficRandomizer->mForcedCar;
 
@@ -141,7 +147,8 @@ void* __fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx,
                 trafficRandomizer->mMostRecentSpawnedVehicles.pop_front ();
         }
 
-    if (CModelInfo::IsBoatModel (random_id) || CModelInfo::IsTrainModel(random_id))
+    if (CModelInfo::IsBoatModel (random_id)
+        || CModelInfo::IsTrainModel (random_id))
         CallMethod<0x6F2940> (vehicle, random_id, createdBy);
 
     if (CModelInfo::IsPlaneModel (random_id))
@@ -166,7 +173,8 @@ void* __fastcall RandomizeRoadblocks (CVehicle *vehicle, void *edx,
         CallMethod<0x6C8D60> (vehicle, random_id, createdBy);
 
     if (CModelInfo::IsCarModel (random_id))
-        CallMethod<0x6B0A90> (vehicle, random_id, createdBy, setupSuspensionLines);
+        CallMethod<0x6B0A90> (vehicle, random_id, createdBy,
+                              setupSuspensionLines);
 
     return vehicle;
 }
@@ -416,7 +424,8 @@ RandomizeCarPeds (int type, int model, float *pos, bool unk)
         return CPopulation::AddPed (type, model, pos, unk);
 
     // spawn CJ because why not :P
-    return CPopulation::AddPed (type, TrafficRandomizer::m_Config.DefaultModel, pos, unk);
+    return CPopulation::AddPed (type, TrafficRandomizer::m_Config.DefaultModel,
+                                pos, unk);
 }
 
 /*******************************************************/

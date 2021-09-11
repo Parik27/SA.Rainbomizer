@@ -43,14 +43,13 @@ class SoundRandomizer
     static void DestroyInstance ();
 
 public:
-
     static inline struct Config
     {
         bool RandomizeMissionLines;
         bool MatchSubtitles;
         bool RandomizePedSpeech;
         bool RandomizeGenericSfx;
-        int ForcedAudioLine;
+        int  ForcedAudioLine;
     } m_Config;
 
     /// Returns the static instance for SoundRandomizer.

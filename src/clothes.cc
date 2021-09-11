@@ -37,23 +37,24 @@ ClothesRandomizer::RandomizePlayerModel ()
         {
             model = 298;
             if (m_Config.ForcedSpecial == "")
-            {
-                std::string randomSpecialModel
-                        = GetRandomElement (PedRandomizer::specialModels);
-                
-                if (m_Config.RandomizePlayerOnce
-                 && !m_RandomizeOnceInfo.Initialised)
                 {
-                        m_RandomizeOnceInfo.SpecialModel = randomSpecialModel;
-                        m_Config.ForcedSpecial           = randomSpecialModel;
-                }
+                    std::string randomSpecialModel
+                        = GetRandomElement (PedRandomizer::specialModels);
 
-                CStreaming::RequestSpecialModel (
+                    if (m_Config.RandomizePlayerOnce
+                        && !m_RandomizeOnceInfo.Initialised)
+                        {
+                            m_RandomizeOnceInfo.SpecialModel
+                                = randomSpecialModel;
+                            m_Config.ForcedSpecial = randomSpecialModel;
+                        }
+
+                    CStreaming::RequestSpecialModel (
                         model, randomSpecialModel.c_str (), 0);
-            }
+                }
             else
                 CStreaming::RequestSpecialModel (
-                    model, m_Config.ForcedSpecial.c_str(), 0);
+                    model, m_Config.ForcedSpecial.c_str (), 0);
         }
     else
         CStreaming::RequestModel (model, 0);
@@ -67,8 +68,8 @@ ClothesRandomizer::RandomizePlayerModel ()
                 m_RandomizeOnceInfo.ChosenModel = m_Config.ForcedModel;
             else
                 m_RandomizeOnceInfo.ChosenModel = model;
-            
-            m_Config.ForcedModel = m_RandomizeOnceInfo.ChosenModel;
+
+            m_Config.ForcedModel            = m_RandomizeOnceInfo.ChosenModel;
             m_RandomizeOnceInfo.Initialised = true;
         }
 
@@ -95,7 +96,7 @@ ClothesRandomizer::RandomizePlayerClothes ()
                 m_RandomizeOnceInfo.RandomClothes.push_back (cloth);
             else if (m_Config.RandomizePlayerOnce
                      && m_RandomizeOnceInfo.Initialised)
-                cloth = m_RandomizeOnceInfo.RandomClothes.at(i);
+                cloth = m_RandomizeOnceInfo.RandomClothes.at (i);
 
             Scrpt::CallOpcode (0x784, "set_player_model_tex_crc", GlobalVar (2),
                                cloth.second, cloth.first, i);
@@ -103,10 +104,10 @@ ClothesRandomizer::RandomizePlayerClothes ()
         }
 
     if (m_Config.RandomizePlayerOnce && !m_RandomizeOnceInfo.Initialised)
-    {
-        m_RandomizeOnceInfo.isClothes   = true;
-        m_RandomizeOnceInfo.Initialised = true;
-    }
+        {
+            m_RandomizeOnceInfo.isClothes   = true;
+            m_RandomizeOnceInfo.Initialised = true;
+        }
 
     Scrpt::CallOpcode (0x070D, "rebuild_player", GlobalVar (2));
     CStreaming::LoadAllRequestedModels (false);
@@ -120,16 +121,17 @@ ClothesRandomizer::HandleClothesChange ()
         return;
 
     if (m_Config.RandomizePlayerOnce && m_RandomizeOnceInfo.Initialised)
-    {
-        if (m_RandomizeOnceInfo.isClothes)
-            RandomizePlayerClothes ();
-        else
-            RandomizePlayerModel ();
-    }
+        {
+            if (m_RandomizeOnceInfo.isClothes)
+                RandomizePlayerClothes ();
+            else
+                RandomizePlayerModel ();
+        }
     else if (m_Config.RandomizePlayerClothing && m_Config.RandomizePlayerModel
              && !m_RandomizeOnceInfo.Initialised)
         {
-            if (random (100) >= m_Config.OddsOfNewModel && m_Config.ForcedModel < 0)
+            if (random (100) >= m_Config.OddsOfNewModel
+                && m_Config.ForcedModel < 0)
                 RandomizePlayerClothes ();
             else
                 RandomizePlayerModel ();
@@ -209,14 +211,16 @@ ClothesRandomizer::GetRandomCRCForComponent (int componentId)
 void
 ClothesRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("PlayerRandomizer", 
-        std::pair("RandomizePlayerModel", &m_Config.RandomizePlayerModel),
-        std::pair("RandomizePlayerClothing", &m_Config.RandomizePlayerClothing),
-        std::pair("OddsOfNewModel", &m_Config.OddsOfNewModel),
-        std::pair("IncludeNSFWModels", &m_Config.IncludeNSFWModels),
-        std::pair ("RandomizePlayerOnce", &m_Config.RandomizePlayerOnce),
-        std::pair("ForcedModel", &m_Config.ForcedModel),
-        std::pair("ForcedSpecialModel", &m_Config.ForcedSpecial)))
+    if (!ConfigManager::ReadConfig (
+            "PlayerRandomizer",
+            std::pair ("RandomizePlayerModel", &m_Config.RandomizePlayerModel),
+            std::pair ("RandomizePlayerClothing",
+                       &m_Config.RandomizePlayerClothing),
+            std::pair ("OddsOfNewModel", &m_Config.OddsOfNewModel),
+            std::pair ("IncludeNSFWModels", &m_Config.IncludeNSFWModels),
+            std::pair ("RandomizePlayerOnce", &m_Config.RandomizePlayerOnce),
+            std::pair ("ForcedModel", &m_Config.ForcedModel),
+            std::pair ("ForcedSpecialModel", &m_Config.ForcedSpecial)))
         return;
 
     if (m_Config.OddsOfNewModel < 0 || m_Config.OddsOfNewModel > 100)
@@ -227,7 +231,6 @@ ClothesRandomizer::Initialise ()
     FadesManager::AddFadeCallback (HandleClothesChange);
     injector::MakeCALL (0x5A834D, FixChangingClothes);
     injector::MakeCALL (0x5A82AF, FixChangingClothes);
-
 
     for (int addr : {0x64561B, 0x64C3FE, 0x64E7EE, 0x64EA43, 0x64EB0F, 0x64FD1E,
                      0x64FD57, 0x64FE54})

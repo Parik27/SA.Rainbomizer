@@ -40,8 +40,10 @@ void
 WantedLevelRandomizer::Initialise ()
 {
     if (!ConfigManager::ReadConfig ("WantedLevelRandomizer",
-            std::pair("RandomizeMissionWantedLevels", &m_Config.RandomizeMission),
-            std::pair("RandomizeChaosPoints", &m_Config.RandomizeChaos)))
+                                    std::pair ("RandomizeMissionWantedLevels",
+                                               &m_Config.RandomizeMission),
+                                    std::pair ("RandomizeChaosPoints",
+                                               &m_Config.RandomizeChaos)))
         return;
 
     for (auto ref :

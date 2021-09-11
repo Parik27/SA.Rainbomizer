@@ -150,10 +150,10 @@ struct CCamera
 
 struct CTrain
 {
-    char field_0x00[0x5d0];
-    CTrain  *m_pPrevCarriage;
+    char    field_0x00[0x5d0];
+    CTrain *m_pPrevCarriage;
     CTrain *m_pNextCarriage;
-    char __pad1[0xd4];
+    char    __pad1[0xd4];
 };
 
 struct CCarGenerator
@@ -184,21 +184,21 @@ struct CHud
 struct CCoronas
 {
     static void RegisterCorona (int ID, CEntity *attachTo, char red, char green,
-                         char blue, char alpha, CVector const &posn,
-                         float radius, float farClip, int coronaType,
-                         int flareType, bool enableReflection,
-                         bool checkObstacles, int _param_not_used, float angle,
-                         bool longDistance, float nearClip, char fadeState,
-                         float fadeSpeed, bool onlyFromBelow,
-                         bool reflectionDelay);
+                                char blue, char alpha, CVector const &posn,
+                                float radius, float farClip, int coronaType,
+                                int flareType, bool enableReflection,
+                                bool checkObstacles, int _param_not_used,
+                                float angle, bool longDistance, float nearClip,
+                                char fadeState, float fadeSpeed,
+                                bool onlyFromBelow, bool reflectionDelay);
     static void RegisterCorona (int ID, CEntity *attachTo, char red, char green,
                                 char blue, char alpha, CVector const &posn,
-                                float radius, float farClip, RwTexture* texture,
+                                float radius, float farClip, RwTexture *texture,
                                 int flareType, bool enableReflection,
-                                bool checkObstacles, int _param_not_used, float angle,
-                                bool longDistance, float nearClip, char fadeState,
-                                float fadeSpeed, bool onlyFromBelow,
-                                bool reflectionDelay);
+                                bool checkObstacles, int _param_not_used,
+                                float angle, bool longDistance, float nearClip,
+                                char fadeState, float fadeSpeed,
+                                bool onlyFromBelow, bool reflectionDelay);
 };
 
 struct CSprite
@@ -207,21 +207,25 @@ struct CSprite
                                     float halfh, char r, char g, char b, char a,
                                     float rhw, char intensity, char udir,
                                     char vdir);
-    static void RenderOneXLUSprite_Triangle (float arg1, float arg2, int arg3, int arg4, 
-                                            int arg5, int arg6, float arg7, char r, char g, 
-                                            char b, char a, float arg12, char arg13);
-    static void RenderOneXLUSprite_Rotate_Aspect (float x, float y, float z, float halfw, 
-                                                 float halfh, char r, char g, char b, char a, 
-                                                 float rhw, float arg11, char intensity);
-    static void RenderBufferedOneXLUSprite (float x, float y, float z, float w, float h,
-                                            char r, char g, char b, char a, 
-                                            float recipNearZ, char arg11);
-    static void RenderBufferedOneXLUSprite_Rotate_Aspect (float x, float y, float z, float w,
-                                            float h, char r, char g, char b, char a, 
-                                            float recipNearZ, float angle, char arg12);
-    static void RenderBufferedOneXLUSprite_Rotate_Dimension (float x, float y, float z, float w, 
-                                                            float h, char r, char g, char b, char a, 
-                                                            float recipNearZ, float angle, char arg12);
+    static void RenderOneXLUSprite_Triangle (float arg1, float arg2, int arg3,
+                                             int arg4, int arg5, int arg6,
+                                             float arg7, char r, char g, char b,
+                                             char a, float arg12, char arg13);
+    static void RenderOneXLUSprite_Rotate_Aspect (float x, float y, float z,
+                                                  float halfw, float halfh,
+                                                  char r, char g, char b,
+                                                  char a, float rhw,
+                                                  float arg11, char intensity);
+    static void RenderBufferedOneXLUSprite (float x, float y, float z, float w,
+                                            float h, char r, char g, char b,
+                                            char a, float recipNearZ,
+                                            char arg11);
+    static void RenderBufferedOneXLUSprite_Rotate_Aspect (
+        float x, float y, float z, float w, float h, char r, char g, char b,
+        char a, float recipNearZ, float angle, char arg12);
+    static void RenderBufferedOneXLUSprite_Rotate_Dimension (
+        float x, float y, float z, float w, float h, char r, char g, char b,
+        char a, float recipNearZ, float angle, char arg12);
 };
 
 struct CMessages
@@ -449,10 +453,10 @@ struct CText
     CData     tDataMain;
     CKeyArray tKeyMission;
     CData     tDataMission;
-    char               field_20;
-    char               haveTabl;
-    char               cderrorInitialized;
-    char               missionLoaded;
+    char      field_20;
+    char      haveTabl;
+    char      cderrorInitialized;
+    char      missionLoaded;
 
     void  Load (char a2);
     char *Get (char *key);
@@ -646,11 +650,11 @@ public:
     float            m_fDrawDistance;
     struct RwObject *m_pRwObject;
 
-    virtual void Destructor ();
-    virtual void AsAtomicModelInfoPtr ();
-    virtual void AsDamageAtomicModelInfoPtr ();
-    virtual void AsLodAtomicModelInfoPtr ();
-    virtual uint8_t  GetModelType ();
+    virtual void    Destructor ();
+    virtual void    AsAtomicModelInfoPtr ();
+    virtual void    AsDamageAtomicModelInfoPtr ();
+    virtual void    AsLodAtomicModelInfoPtr ();
+    virtual uint8_t GetModelType ();
 };
 
 struct CClumpModelInfo : public CBaseModelInfo
@@ -952,14 +956,14 @@ struct CRect
 
 struct CMenuManager
 {
-    char field_0x00[0x3c];
+    char  field_0x00[0x3c];
     float m_dwBrightness;
 };
 
 struct CPlayerInfo
 {
     CPed *m_pPed;
-    char field_0x00[0x18c];
+    char  field_0x00[0x18c];
 };
 
 struct CObject : public CEntity
@@ -968,30 +972,30 @@ struct CObject : public CEntity
 
 struct CPickup
 {
-    float m_fRevenueValue;
-    CObject * m_pObject;
-    int   m_dwAmmo;
-    int   m_dwRegenerationTime;
-    char  m_vPos[6];
-    short m_nMoneyPerDay;
-    short m_wModelId;
-    short m_wReferenceIndex;
-    char  m_PickupType;
-    char  m_nFlags;
-    char  _pad[2];
+    float    m_fRevenueValue;
+    CObject *m_pObject;
+    int      m_dwAmmo;
+    int      m_dwRegenerationTime;
+    char     m_vPos[6];
+    short    m_nMoneyPerDay;
+    short    m_wModelId;
+    short    m_wReferenceIndex;
+    char     m_PickupType;
+    char     m_nFlags;
+    char     _pad[2];
 };
 
 struct CZone
 {
-    char name[8];
-    char m_szTextKey[8];
+    char  name[8];
+    char  m_szTextKey[8];
     short x1;
-    short  y1;
-    short  z1;
-    short  x2;
-    short  y2;
-    short  z2;
-    char __pad[4];
+    short y1;
+    short z1;
+    short x2;
+    short y2;
+    short z2;
+    char  __pad[4];
 };
 
 struct RsGlobalType
@@ -1105,43 +1109,43 @@ struct CGame
 
 struct CTimeCycleCurrent
 {
-    float  m_fAmbientRed;
-    float  m_fAmbientGreen;
-    float  m_fAmbientBlue;
-    float  m_fAmbientRed_Obj;
-    float  m_fAmbientGreen_Obj;
-    float  m_fAmbientBlue_Obj;
-    float  m_fDirectionalRed;
-    float  m_fDirectionalGreen;
-    float  m_fDirectionalBlue;
-    short  m_wSkyTopRed;
+    float m_fAmbientRed;
+    float m_fAmbientGreen;
+    float m_fAmbientBlue;
+    float m_fAmbientRed_Obj;
+    float m_fAmbientGreen_Obj;
+    float m_fAmbientBlue_Obj;
+    float m_fDirectionalRed;
+    float m_fDirectionalGreen;
+    float m_fDirectionalBlue;
+    short m_wSkyTopRed;
     short m_wSkyTopGreen;
-    short  m_wSkyTopBlue;
-    short  m_wSkyBottomRed;
-    short  m_wSkyBottomGreen;
-    short  m_wSkyBottomBlue;
-    short  m_wSunCoreRed;
-    short  m_wSunCoreGreen;
-    short  m_wSunCoreBlue;
-    short  m_wSunCoronaRed;
-    short  m_wSunCoronaGreen;
-    short  m_wSunCoronaBlue;
+    short m_wSkyTopBlue;
+    short m_wSkyBottomRed;
+    short m_wSkyBottomGreen;
+    short m_wSkyBottomBlue;
+    short m_wSunCoreRed;
+    short m_wSunCoreGreen;
+    short m_wSunCoreBlue;
+    short m_wSunCoronaRed;
+    short m_wSunCoronaGreen;
+    short m_wSunCoronaBlue;
     float m_fSunSize;
     float m_fSpriteSize;
     float m_fSpriteBrightness;
-    short  m_wShadowStrength;
-    short  m_wLightShadowStrength;
-    short  m_wPoleShadowStrength;
+    short m_wShadowStrength;
+    short m_wLightShadowStrength;
+    short m_wPoleShadowStrength;
     char  _padding0[2];
     float m_fFarClip;
     float m_fFogSt;
     float m_fLightOnGround;
-    short  m_wLowCloudsRed;
-    short  m_wLowCloudsGreen;
-    short  m_wLowCloudsBlue;
-    short  m_wBottomCloudsRed;
-    short  m_wBottomCloudsGreen;
-    short  m_wBottomCloudsBlue;
+    short m_wLowCloudsRed;
+    short m_wLowCloudsGreen;
+    short m_wLowCloudsBlue;
+    short m_wBottomCloudsRed;
+    short m_wBottomCloudsGreen;
+    short m_wBottomCloudsBlue;
     float m_fWaterRed;
     float m_fWaterGreen;
     float m_fWaterBlue;
@@ -1155,7 +1159,7 @@ struct CTimeCycleCurrent
     float m_fRGB2_B;
     float m_fAlpha2;
     float m_fCloudAlpha1;
-    long m_dwCloudAlpha2;
+    long  m_dwCloudAlpha2;
     short m_wCloudAlpha3;
     char  _padding1[2];
     float m_fIllumination;
@@ -1174,11 +1178,11 @@ struct CAnimBlock
 
 struct CAnimBlendAssocGroup
 {
-    CAnimBlock* pAnimBlock;
-    void* ppAssociations;
-    uint32_t iNumAnimations;
-    uint32_t iIDOffset;
-    uint32_t groupId;
+    CAnimBlock *pAnimBlock;
+    void *      ppAssociations;
+    uint32_t    iNumAnimations;
+    uint32_t    iIDOffset;
+    uint32_t    groupId;
 
     inline static CAnimBlendAssocGroup *&ms_aAnimAssocGroups
         = *(CAnimBlendAssocGroup **) 0xB4EA34;
@@ -1190,23 +1194,24 @@ struct CAnimBlendAssocGroup
 
 struct CAnimationStyleDescriptor
 {
-    char     groupName[16];
-    char     blockName[16];
-    uint32_t field_20;
-    uint32_t animsCount;
-    char **  animNames;
-    uint32_t animDesc;
-    static unsigned char& bMissionPackGame;
-    static int Init3 (void *fileName);
+    char                  groupName[16];
+    char                  blockName[16];
+    uint32_t              field_20;
+    uint32_t              animsCount;
+    char **               animNames;
+    uint32_t              animDesc;
+    static unsigned char &bMissionPackGame;
+    static int            Init3 (void *fileName);
 };
 
 void GivePlayerRemoteControlledCar (float x, float y, float z, float angle,
                                     short model);
 
-CMatrix *RwFrameGetLTM (void *frame);
+CMatrix *              RwFrameGetLTM (void *frame);
 CAnimBlendAssociation *RpAnimBlendClumpExtractAssociations (RpClump *clump);
-void     RpAnimBlendClumpGiveAssociations (RpClump *clump, CAnimBlendAssociation *association);
-RpLight* RpLightSetColor (RpLight *light, RwRGBAReal *colour);
+void                   RpAnimBlendClumpGiveAssociations (RpClump *              clump,
+                                                         CAnimBlendAssociation *association);
+RpLight *              RpLightSetColor (RpLight *light, RwRGBAReal *colour);
 
 int    random (int max);
 int    random (int min, int max);
@@ -1225,7 +1230,7 @@ GetRandomElement (T &container)
 
 template <typename T>
 auto &
-GetRandomElement (T* container, uint32_t size)
+GetRandomElement (T *container, uint32_t size)
 {
     return container[random (size - 1)];
 }

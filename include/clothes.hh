@@ -19,7 +19,7 @@ class ClothesRandomizer
     static void FixChangingClothes (int modelId, uint32_t *newClothes,
                                     uint32_t *oldClothes, bool CutscenePlayer);
 
-	static int __fastcall FixAnimCrash (uint32_t *anim, void *edx, int arg0,
+    static int __fastcall FixAnimCrash (uint32_t *anim, void *edx, int arg0,
                                         int animGroup);
 
     static void RandomizePlayerClothes ();
@@ -40,7 +40,7 @@ public:
         bool IncludeNSFWModels;
         bool RandomizePlayerOnce;
 
-        int ForcedModel;
+        int         ForcedModel;
         std::string ForcedSpecial;
     } m_Config;
 
@@ -50,10 +50,13 @@ public:
     {
         bool Initialised = false;
 
-        bool isClothes;
+        bool                             isClothes;
         std::vector<std::pair<int, int>> RandomClothes;
-        int  ChosenModel;
-        std::string SpecialModel;
+        int                              ChosenModel;
+        std::string                      SpecialModel;
+
+        RandomizeOnceData (){};
+
     } m_RandomizeOnceInfo;
 
     /// Initialises Hooks/etc.

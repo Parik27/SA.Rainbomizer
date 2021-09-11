@@ -35,7 +35,6 @@ class CheatRandomizer
     static void DestroyInstance ();
 
 public:
-
     static inline struct Config
     {
         bool EasterEgg;

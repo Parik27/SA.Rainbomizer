@@ -58,7 +58,8 @@ int __fastcall RandomizeGiveWeapon (CPed *thisPed, void *edx, int weapon,
 
     int original_slot = -1;
     if (weapon != 0
-        && !(FindPlayerPed () == thisPed && !WeaponRandomizer::m_Config.RandomizePlayerWeapons))
+        && !(FindPlayerPed () == thisPed
+             && !WeaponRandomizer::m_Config.RandomizePlayerWeapons))
         {
             int target_slot = GetWeaponInfo (weapon, 1)[5];
 
@@ -123,12 +124,14 @@ WeaponRandomizer::InitialiseCache ()
 }
 
 /*******************************************************/
-CVehicle *__fastcall ChangeLockedPlayerWeaponForTurrets (CPed *attachedPed, void *edx, 
-    CVehicle *attachedCar, float x, float y, float z, int posType, int angle, int weaponID)
+CVehicle *__fastcall ChangeLockedPlayerWeaponForTurrets (
+    CPed *attachedPed, void *edx, CVehicle *attachedCar, float x, float y,
+    float z, int posType, int angle, int weaponID)
 {
     if (weaponID != 0
-        && !(FindPlayerPed () == attachedPed && !WeaponRandomizer::m_Config.RandomizePlayerWeapons))
-    {
+        && !(FindPlayerPed () == attachedPed
+             && !WeaponRandomizer::m_Config.RandomizePlayerWeapons))
+        {
             weaponID = WeaponRandomizer::GetInstance ()->GetRandomWeapon (
                 attachedPed, weaponID, false);
 
@@ -138,79 +141,82 @@ CVehicle *__fastcall ChangeLockedPlayerWeaponForTurrets (CPed *attachedPed, void
             if (GetWeaponInfo (weaponID, 1)[4] != -1)
                 StreamingManager::AttemptToLoadVehicle (
                     GetWeaponInfo (weaponID, 1)[4]);
-    }
+        }
 
-    return CallMethodAndReturn<CVehicle *, 0x5E7CB0> (attachedPed, attachedCar, x, y,
-                                                z, posType, angle, weaponID);
+    return CallMethodAndReturn<CVehicle *, 0x5E7CB0> (attachedPed, attachedCar,
+                                                      x, y, z, posType, angle,
+                                                      weaponID);
 }
 
 /*******************************************************/
 void __fastcall OverrideWeaponCheck (CRunningScript *scr, void *edx,
-                                           short count)
+                                     short count)
 {
     scr->CollectParameters (count);
     if (ScriptParams[0] == ScriptSpace[3] && ScriptParams[1] > 0
         && ScriptParams[1] < 44 && WeaponRandomizer::playerWeaponID != -1)
         ScriptParams[1] = WeaponRandomizer::playerWeaponID;
     else if (scr->CheckName ("dealer"))
-    {
-        ScriptParams[1] = WeaponRandomizer::dealerWeaponID;
-    }
+        {
+            ScriptParams[1] = WeaponRandomizer::dealerWeaponID;
+        }
 }
 
 /*******************************************************/
-void __fastcall IgnoreWeaponAmmoCheck (CRunningScript *scr, void *edx, short count)
+void __fastcall IgnoreWeaponAmmoCheck (CRunningScript *scr, void *edx,
+                                       short count)
 {
     scr->CollectParameters (count);
     if (ScriptParams[0] == ScriptSpace[3]
         && WeaponRandomizer::playerWeaponID != -1)
-    {
-        ScriptParams[1] = WeaponRandomizer::playerWeaponID;
-    }
+        {
+            ScriptParams[1] = WeaponRandomizer::playerWeaponID;
+        }
 }
 
 /*******************************************************/
 void __fastcall AllowMoreExplosionTypes (CRunningScript *scr, void *edx,
-                                       short count)
+                                         short count)
 {
     scr->CollectParameters (count);
     ScriptParams[0] = -1;
     if (scr->CheckName ("cat4"))
-    {
-        float corner1X = ((float *) ScriptParams)[1];
-        float corner1Y = ((float *) ScriptParams)[2];
-        float corner1Z = ((float *) ScriptParams)[3];
-        float corner2X = ((float *) ScriptParams)[4];
-        float corner2Z = ((float *) ScriptParams)[6];
-        if (int (corner1X) == 823 && int (corner1Y) == 8 && int (corner1Z) == 1000)
         {
-            ((float *) ScriptParams)[1] = 822.0f;
-            ((float *) ScriptParams)[2] = 8.0f;
-            ((float *) ScriptParams)[4] = 829.0f;
+            float &corner1X = ((float *) ScriptParams)[1];
+            float &corner1Y = ((float *) ScriptParams)[2];
+            float &corner1Z = ((float *) ScriptParams)[3];
+            float &corner2X = ((float *) ScriptParams)[4];
+            float &corner2Z = ((float *) ScriptParams)[6];
+            if (int (corner1X) == 823 && int (corner1Y) == 8
+                && int (corner1Z) == 1000)
+                {
+                    corner1X = 822.0f;
+                    corner1Y = 8.0f;
+                    corner2X = 829.0f;
+                }
+            else if (int (corner1X) == 819 && int (corner1Y) == 8
+                     && int (corner1Z) == 1003)
+                {
+                    corner1Z = 1001.0f;
+                    corner2Z = 1008.0f;
+                }
         }
-        else if (int (corner1X) == 819 && int (corner1Y) == 8
-                 && int (corner1Z) == 1003)
-        {
-            ((float *) ScriptParams)[3] = 1001.0f;
-            ((float *) ScriptParams)[6] = 1008.0f;
-        }
-    }
 }
 
 /*******************************************************/
 void __fastcall ChangeLockedPlayerWeapon (CRunningScript *scr, void *edx,
-                                         short count)
+                                          short count)
 {
     scr->CollectParameters (count);
     if (ScriptParams[0] == ScriptSpace[3] && ScriptParams[1] != 0
         && WeaponRandomizer::playerWeaponID != -1)
         ScriptParams[1] = WeaponRandomizer::playerWeaponID;
     else if (ScriptParams[0] != ScriptSpace[3])
-    {
-        CPed *ped = reinterpret_cast<CPed *> (
+        {
+            CPed *ped = reinterpret_cast<CPed *> (
                 ms_pPedPool->m_pObjects + 0x7C4 * (ScriptParams[0] >> 8));
             ped->SetCurrentWeapon (GetWeaponInfo (ScriptParams[1], 1)[5]);
-    }
+        }
 
     if (CRunningScripts::CheckForRunningScript ("heist9")
         && ScriptParams[1] == 22)
@@ -220,7 +226,7 @@ void __fastcall ChangeLockedPlayerWeapon (CRunningScript *scr, void *edx,
 
 /*******************************************************/
 void __fastcall ChangeGiveAmmoWeapon (CRunningScript *scr, void *edx,
-                                          short count)
+                                      short count)
 {
     scr->CollectParameters (count);
     if (ScriptParams[0] == ScriptSpace[3]
@@ -230,7 +236,7 @@ void __fastcall ChangeGiveAmmoWeapon (CRunningScript *scr, void *edx,
 
 /*******************************************************/
 void __fastcall OverrideWeaponRemoval (CRunningScript *scr, void *edx,
-                                      short count)
+                                       short count)
 {
     scr->CollectParameters (count);
     if (ScriptParams[0] == ScriptSpace[3]
@@ -240,11 +246,11 @@ void __fastcall OverrideWeaponRemoval (CRunningScript *scr, void *edx,
 
 /*******************************************************/
 void __fastcall OverrideEntityHitByWeapon (CRunningScript *scr, void *edx,
-                                       short count)
+                                           short count)
 {
     scr->CollectParameters (count);
     if (WeaponRandomizer::playerWeaponID != -1 && ScriptParams[1] > 0
-        && ScriptParams[1] < 44 && scr->CheckName("zero1"))
+        && ScriptParams[1] < 44 && scr->CheckName ("zero1"))
         ScriptParams[1] = 57;
 }
 
@@ -252,58 +258,58 @@ void __fastcall OverrideEntityHitByWeapon (CRunningScript *scr, void *edx,
 void
 ResetPlayerWeaponID ()
 {
-    WeaponRandomizer::playerWeaponID = -1;
-    WeaponRandomizer::forceWeapon    = false;
+    WeaponRandomizer::playerWeaponID         = -1;
+    WeaponRandomizer::forceWeapon            = false;
     WeaponRandomizer::firstPartFinaleCActive = false;
-    Call<0x6F6B60>(); // ReleaseMissionTrains, always called on mission cleanup
+    Call<0x6F6B60> (); // ReleaseMissionTrains, always called on mission cleanup
 }
 
 /*******************************************************/
 void __fastcall ResetPlayerWeaponIDShrange (CRunningScript *scr, void *edx,
-                                           short count)
+                                            short count)
 {
     scr->CollectParameters (count);
     if (scr->CheckName ("shrange") && ScriptSpace[8070] < 1)
-    {
-        WeaponRandomizer::playerWeaponID = -1;
-    }
+        {
+            WeaponRandomizer::playerWeaponID = -1;
+        }
 }
 
 /*******************************************************/
 void __fastcall HandleShrangeWeaponReset (CRunningScript *scr, void *edx,
-                                            short count)
+                                          short count)
 {
     scr->CollectParameters (count);
     if (scr->CheckName ("shrange") && ScriptParams[0] == 0)
-    {
-        WeaponRandomizer::shPistol.ammo = ScriptSpace[8131];
-        WeaponRandomizer::shPistol.weaponID = ScriptSpace[8135];
-        WeaponRandomizer::shPistol.modelID     = ScriptSpace[8139];
+        {
+            WeaponRandomizer::shPistol.ammo     = ScriptSpace[8131];
+            WeaponRandomizer::shPistol.weaponID = ScriptSpace[8135];
+            WeaponRandomizer::shPistol.modelID  = ScriptSpace[8139];
 
-        WeaponRandomizer::shShotgun.ammo     = ScriptSpace[8132];
-        WeaponRandomizer::shShotgun.weaponID = ScriptSpace[8136];
-        WeaponRandomizer::shShotgun.modelID  = ScriptSpace[8140];
+            WeaponRandomizer::shShotgun.ammo     = ScriptSpace[8132];
+            WeaponRandomizer::shShotgun.weaponID = ScriptSpace[8136];
+            WeaponRandomizer::shShotgun.modelID  = ScriptSpace[8140];
 
-        WeaponRandomizer::shUzi.ammo     = ScriptSpace[8133];
-        WeaponRandomizer::shUzi.weaponID   = ScriptSpace[8137];
-        WeaponRandomizer::shUzi.modelID  = ScriptSpace[8141];
+            WeaponRandomizer::shUzi.ammo     = ScriptSpace[8133];
+            WeaponRandomizer::shUzi.weaponID = ScriptSpace[8137];
+            WeaponRandomizer::shUzi.modelID  = ScriptSpace[8141];
 
-        WeaponRandomizer::shAK.ammo     = ScriptSpace[8134];
-        WeaponRandomizer::shAK.weaponID    = ScriptSpace[8138];
-        WeaponRandomizer::shAK.modelID  = ScriptSpace[8142];
+            WeaponRandomizer::shAK.ammo     = ScriptSpace[8134];
+            WeaponRandomizer::shAK.weaponID = ScriptSpace[8138];
+            WeaponRandomizer::shAK.modelID  = ScriptSpace[8142];
 
-        ScriptSpace[8135] = 43;
-        ScriptSpace[8136] = 44;
-        ScriptSpace[8137] = 45;
-        ScriptSpace[8138] = 46;
-    }
+            ScriptSpace[8135] = 43;
+            ScriptSpace[8136] = 44;
+            ScriptSpace[8137] = 45;
+            ScriptSpace[8138] = 46;
+        }
 }
 
 /*******************************************************/
 int *
 SetWeaponUsableInJetpack (int weaponId, char skill)
 {
-    int *weaponInfo = GetWeaponInfo(weaponId, skill);
+    int *weaponInfo = GetWeaponInfo (weaponId, skill);
     if (weaponId >= 22 && weaponId <= 32)
         weaponInfo[6] = 7833;
     return weaponInfo;
@@ -313,29 +319,29 @@ SetWeaponUsableInJetpack (int weaponId, char skill)
 int
 ResetPlayerWeaponIDOnStart ()
 {
-    WeaponRandomizer::playerWeaponID = -1;
-    WeaponRandomizer::forceWeapon    = false;
+    WeaponRandomizer::playerWeaponID         = -1;
+    WeaponRandomizer::forceWeapon            = false;
     WeaponRandomizer::firstPartFinaleCActive = false;
     return CallAndReturn<int, 0x464BB0> ();
 }
 
 /*******************************************************/
 void __fastcall CheckIfPlayerDriveBy (CRunningScript *scr, void *edx,
-                                            short count)
+                                      short count)
 {
     scr->CollectParameters (count);
     if (ScriptParams[0] == ScriptSpace[3])
-    {
-        WeaponRandomizer::forceWeapon = true;
-        if (scr->CheckName ("finalec")
-            && !WeaponRandomizer::firstPartFinaleCActive)
         {
-            Scrpt::CallOpcode (0x2A3, "enable_widescreen", 1);
-            Scrpt::CallOpcode (0x2A3, "enable_widescreen", 0);
-            Scrpt::CallOpcode (0x15a, "restore_camera");
-            WeaponRandomizer::firstPartFinaleCActive = true;
+            WeaponRandomizer::forceWeapon = true;
+            if (scr->CheckName ("finalec")
+                && !WeaponRandomizer::firstPartFinaleCActive)
+                {
+                    Scrpt::CallOpcode (0x2A3, "enable_widescreen", 1);
+                    Scrpt::CallOpcode (0x2A3, "enable_widescreen", 0);
+                    Scrpt::CallOpcode (0x15a, "restore_camera");
+                    WeaponRandomizer::firstPartFinaleCActive = true;
+                }
         }
-    }
 }
 
 /*******************************************************/
@@ -354,89 +360,94 @@ ForceWeapon ()
     if (!ScriptSpace[409])
         WeaponRandomizer::forceWeapon = false;
     if (WeaponRandomizer::forceWeapon && WeaponRandomizer::playerWeaponID != -1)
-        FindPlayerPed ()->SetCurrentWeapon (GetWeaponInfo(WeaponRandomizer::playerWeaponID, 1)[5]);
+        FindPlayerPed ()->SetCurrentWeapon (
+            GetWeaponInfo (WeaponRandomizer::playerWeaponID, 1)[5]);
     Call<0x52CF10> ();
 }
 
 /*******************************************************/
-void __fastcall RemoveExtraJBAmmo(CRunningScript* scr, void* edx, short count)
+void __fastcall RemoveExtraJBAmmo (CRunningScript *scr, void *edx, short count)
 {
-    scr->CollectParameters(count);
+    scr->CollectParameters (count);
     if (ScriptParams[1] == 2000)
-        Scrpt::CallOpcode(0x555, "remove_weapon", GlobalVar(3), WeaponRandomizer::playerWeaponID);
+        Scrpt::CallOpcode (0x555, "remove_weapon", GlobalVar (3),
+                           WeaponRandomizer::playerWeaponID);
 }
 
 /*******************************************************/
 void
-WeaponRandomizer::Initialise()
+WeaponRandomizer::Initialise ()
 {
-    if (ConfigManager::ReadConfig("WeaponRandomizer")
-        || ConfigManager::ReadConfig("PickupsRandomizer"))
-    {
-        injector::MakeCALL(0x48AE9E, (void*)&OverrideWeaponCheck);
-        injector::MakeCALL(0x489AFA, (void*)&IgnoreWeaponAmmoCheck);
-        injector::MakeCALL(0x48D677, (void*)&OverrideWeaponRemoval);
-        injector::MakeCALL(0x482B8D, (void*)&AllowMoreExplosionTypes);
-        injector::MakeCALL(0x4685AD, (void*)&ResetPlayerWeaponID);
-        injector::MakeCALL(0x489A70, (void*)&ResetPlayerWeaponIDOnStart);
-        injector::MakeCALL(0x4680F2, (void*)&ResetPlayerWeaponIDShrange);
-        injector::MakeCALL(0x476092, (void*)&HandleShrangeWeaponReset);
-    }
+    if (ConfigManager::ReadConfig ("WeaponRandomizer")
+        || ConfigManager::ReadConfig ("PickupsRandomizer"))
+        {
+            injector::MakeCALL (0x48AE9E, (void *) &OverrideWeaponCheck);
+            injector::MakeCALL (0x489AFA, (void *) &IgnoreWeaponAmmoCheck);
+            injector::MakeCALL (0x48D677, (void *) &OverrideWeaponRemoval);
+            injector::MakeCALL (0x482B8D, (void *) &AllowMoreExplosionTypes);
+            injector::MakeCALL (0x4685AD, (void *) &ResetPlayerWeaponID);
+            injector::MakeCALL (0x489A70, (void *) &ResetPlayerWeaponIDOnStart);
+            injector::MakeCALL (0x4680F2, (void *) &ResetPlayerWeaponIDShrange);
+            injector::MakeCALL (0x476092, (void *) &HandleShrangeWeaponReset);
+        }
 
-    if (!ConfigManager::ReadConfig("WeaponRandomizer",
-        std::pair("RandomizePlayerWeapons", &m_Config.RandomizePlayerWeapons),
-        std::pair("SkipChecks", &m_Config.SkipChecks)))
+    if (!ConfigManager::ReadConfig (
+            "WeaponRandomizer",
+            std::pair ("RandomizePlayerWeapons",
+                       &m_Config.RandomizePlayerWeapons),
+            std::pair ("SkipChecks", &m_Config.SkipChecks)))
         return;
 
     // CPed::GiveWeapon
     for (int address :
-    {0x0438647, 0x043865E, 0x0438675, 0x043868C, 0x04386A3, 0x04386BD,
-        0x04386D4, 0x04386EB, 0x0438705, 0x043871F, 0x0438748, 0x043875F,
-        0x0438776, 0x043878D, 0x04387A4, 0x04387BE, 0x04387D5, 0x04387EC,
-        0x0438806, 0x0438820, 0x043891B, 0x0438932, 0x0438949, 0x0438960,
-        0x043897A, 0x0438994, 0x04389AB, 0x04389C5, 0x04389DF, 0x0438A08,
-        0x0438A1F, 0x0438A36, 0x0438A4D, 0x0438A67, 0x0438A81, 0x0438A98,
-        0x0438AB2, 0x0438ACC, 0x0438BAF, 0x0438BC6, 0x0438BDD, 0x0438BF4,
-        0x0438C0B, 0x0438C25, 0x0438C3F, 0x0438C68, 0x0438C7F, 0x0438C96,
-        0x0438CAD, 0x0438CC4, 0x0438CDE, 0x0438CF8, 0x04395D8, 0x0439F30,
-        0x043D577, 0x043D8ED, 0x0442936, 0x0444ECE, 0x0448682, 0x047D335,
-        0x048D8C7, 0x049C1CF, 0x049C248, 0x056EC5E, 0x05B009C, 0x05DDCC0,
-        0x061390C, 0x062B3BC, 0x062B5C9, 0x068B8DF, 0x068E355, 0x068E39D,
-        0x068E3F2, 0x068E418, 0x069082D, 0x06D19E6, 0x06D1A24})
-    {
-        injector::MakeCALL(address, (void*)&RandomizeGiveWeapon);
-    }
+         {0x0438647, 0x043865E, 0x0438675, 0x043868C, 0x04386A3, 0x04386BD,
+          0x04386D4, 0x04386EB, 0x0438705, 0x043871F, 0x0438748, 0x043875F,
+          0x0438776, 0x043878D, 0x04387A4, 0x04387BE, 0x04387D5, 0x04387EC,
+          0x0438806, 0x0438820, 0x043891B, 0x0438932, 0x0438949, 0x0438960,
+          0x043897A, 0x0438994, 0x04389AB, 0x04389C5, 0x04389DF, 0x0438A08,
+          0x0438A1F, 0x0438A36, 0x0438A4D, 0x0438A67, 0x0438A81, 0x0438A98,
+          0x0438AB2, 0x0438ACC, 0x0438BAF, 0x0438BC6, 0x0438BDD, 0x0438BF4,
+          0x0438C0B, 0x0438C25, 0x0438C3F, 0x0438C68, 0x0438C7F, 0x0438C96,
+          0x0438CAD, 0x0438CC4, 0x0438CDE, 0x0438CF8, 0x04395D8, 0x0439F30,
+          0x043D577, 0x043D8ED, 0x0442936, 0x0444ECE, 0x0448682, 0x047D335,
+          0x048D8C7, 0x049C1CF, 0x049C248, 0x056EC5E, 0x05B009C, 0x05DDCC0,
+          0x061390C, 0x062B3BC, 0x062B5C9, 0x068B8DF, 0x068E355, 0x068E39D,
+          0x068E3F2, 0x068E418, 0x069082D, 0x06D19E6, 0x06D1A24})
+        {
+            injector::MakeCALL (address, (void *) &RandomizeGiveWeapon);
+        }
 
     // CPed::AttachPedToEntity
-    for (int address :
-    {0x041C34E, 0x046FB17, 0x048A84D, 0x048C523, 0x0496A77,
-        0x05E7E93, 0x0665A64, 0x0673844, 0x06F3D67})
-    {
-        injector::MakeCALL(address, (void*)&ChangeLockedPlayerWeaponForTurrets);
-    }
+    for (int address : {0x041C34E, 0x046FB17, 0x048A84D, 0x048C523, 0x0496A77,
+                        0x05E7E93, 0x0665A64, 0x0673844, 0x06F3D67})
+        {
+            injector::MakeCALL (address,
+                                (void *) &ChangeLockedPlayerWeaponForTurrets);
+        }
 
     // CPed::GiveWeapon with Player exception
-    injector::MakeCALL(0x5E899A, (void*)&RandomizeGiveWeaponDelayed);
-    injector::MakeNOP(0x5E62D8, 4);
+    injector::MakeCALL (0x5E899A, (void *) &RandomizeGiveWeaponDelayed);
+    injector::MakeNOP (0x5E62D8, 4);
 
     if (!m_Config.SkipChecks)
-        injector::MakeCALL(0x53BCA6, (void*)&InitialiseCacheForWeaponRandomization);
+        injector::MakeCALL (0x53BCA6,
+                            (void *) &InitialiseCacheForWeaponRandomization);
 
-    injector::MakeCALL(0x47D4AC, (void*)&ChangeLockedPlayerWeapon);
-    injector::MakeCALL(0x469AAC, (void*)&ChangeGiveAmmoWeapon);
-    injector::MakeCALL(0x47CDCB, (void*)&ChangeGiveAmmoWeapon);
-    injector::MakeCALL(0x480E18, (void*)&OverrideEntityHitByWeapon);
-    injector::MakeCALL(0x480E8E, (void*)&OverrideEntityHitByWeapon);
-    injector::MakeCALL(0x46D3AB, (void*)&CheckIfPlayerDriveBy);
-    injector::MakeCALL(0x53BFBD, (void*)&ForceWeapon);
-    injector::MakeCALL(0x47E9E4, (void*)&RemoveExtraJBAmmo);
+    injector::MakeCALL (0x47D4AC, (void *) &ChangeLockedPlayerWeapon);
+    injector::MakeCALL (0x469AAC, (void *) &ChangeGiveAmmoWeapon);
+    injector::MakeCALL (0x47CDCB, (void *) &ChangeGiveAmmoWeapon);
+    injector::MakeCALL (0x480E18, (void *) &OverrideEntityHitByWeapon);
+    injector::MakeCALL (0x480E8E, (void *) &OverrideEntityHitByWeapon);
+    injector::MakeCALL (0x46D3AB, (void *) &CheckIfPlayerDriveBy);
+    injector::MakeCALL (0x53BFBD, (void *) &ForceWeapon);
+    injector::MakeCALL (0x47E9E4, (void *) &RemoveExtraJBAmmo);
 
-    Logger::GetLogger()->LogMessage("Intialised WeaponRandomizer");
+    Logger::GetLogger ()->LogMessage ("Intialised WeaponRandomizer");
 }
 
 /*******************************************************/
 void
-WeaponRandomizer::DestroyInstance()
+WeaponRandomizer::DestroyInstance ()
 {
     if (WeaponRandomizer::mInstance)
         delete WeaponRandomizer::mInstance;
@@ -444,7 +455,7 @@ WeaponRandomizer::DestroyInstance()
 
 /*******************************************************/
 int
-WeaponRandomizer::GetRandomWeapon(CPed* ped, int weapon, bool isPickup)
+WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool isPickup)
 {
     std::vector<int> buggy_weapons;
 
@@ -452,30 +463,31 @@ WeaponRandomizer::GetRandomWeapon(CPed* ped, int weapon, bool isPickup)
         return weapon;
 
     if (isPickup && PickupsRandomizer::m_Config.ReplaceWithWeaponsOnly)
-    {
-        buggy_weapons = { 19, 20, 21, 47, 48, 49 };
-    }
+        {
+            buggy_weapons = {19, 20, 21, 47, 48, 49};
+        }
     else if (isPickup && !PickupsRandomizer::m_Config.ReplaceWithWeaponsOnly)
-    {
-        buggy_weapons = { 19 };
-    }
+        {
+            buggy_weapons = {19};
+        }
     else
-    {
-        if (ped->m_nPedType == ePedType::PED_TYPE_PLAYER1)
         {
-            buggy_weapons = {19, 20, 21, 40, 47, 48, 49};
+            if (ped->m_nPedType == ePedType::PED_TYPE_PLAYER1)
+                {
+                    buggy_weapons = {19, 20, 21, 40, 47, 48, 49};
+                }
+            else
+                {
+                    buggy_weapons = {19, 20, 21, 14, 40, 39, 47, 48, 49};
+                }
         }
-        else
-        {
-            buggy_weapons = {19, 20, 21, 14, 40, 39, 47, 48, 49};
-        }
-    }
 
     // Code handling shooting range stuff cause it's weird
     std::string shootingRange = "shrange";
-    if (!isPickup && CRunningScripts::CheckForRunningScript(shootingRange.c_str()) 
+    if (!isPickup
+        && CRunningScripts::CheckForRunningScript (shootingRange.c_str ())
         && ped->m_nPedType == ePedType::PED_TYPE_PLAYER1)
-    {
+        {
             if (weapon == 43)
                 return shPistol.weaponID;
             else if (weapon == 44)
@@ -486,40 +498,41 @@ WeaponRandomizer::GetRandomWeapon(CPed* ped, int weapon, bool isPickup)
                 return shAK.weaponID;
 
             if (ScriptSpace[8070] < 1)
-            {
+                {
                     while ((weapon = random (1, 49),
                             std::find (buggy_weapons.begin (),
                                        buggy_weapons.end (), weapon)
                                 != buggy_weapons.end ()))
                         ;
                     return weapon;
-            }
-    }
+                }
+        }
 
     for (auto &pattern : mWeaponPatterns)
-    {
-        int pedType = -1;
-        if (!isPickup && ped != nullptr)
-            pedType = ped->m_nPedType;
-        if (pattern.MatchWeapon (weapon, pedType, isPickup))
         {
-            int newWeaponID = pattern.GetRandom ();
-            if ((pedType == 0 || pedType == -1) && newWeaponID < 44)
+            int pedType = -1;
+            if (!isPickup && ped != nullptr)
+                pedType = ped->m_nPedType;
+            if (pattern.MatchWeapon (weapon, pedType, isPickup))
                 {
-                    if (!CRunningScripts::CheckForRunningScript ("heist9")
-                        || (weapon != 29 && weapon != 4))
+                    int newWeaponID = pattern.GetRandom ();
+                    if ((pedType == 0 || pedType == -1) && newWeaponID < 44)
                         {
-                            playerWeaponID = newWeaponID;
+                            if (!CRunningScripts::CheckForRunningScript (
+                                    "heist9")
+                                || (weapon != 29 && weapon != 4))
+                                {
+                                    playerWeaponID = newWeaponID;
+                                }
                         }
+                    return newWeaponID;
                 }
-            return newWeaponID;
         }
-    }
 
     while ((weapon = random (1, 49),
-        std::find (buggy_weapons.begin (),
-            buggy_weapons.end (), weapon)
-        != buggy_weapons.end ()));
+            std::find (buggy_weapons.begin (), buggy_weapons.end (), weapon)
+                != buggy_weapons.end ()))
+        ;
 
     if (!isPickup && ped != nullptr)
         if (ped->m_nPedType == 17)

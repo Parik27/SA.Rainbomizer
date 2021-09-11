@@ -271,7 +271,8 @@ CCarCtrl::CreateCarForScript (int modelId, float X, float Y, float Z, char a5)
 
 /*******************************************************/
 void
-GivePlayerRemoteControlledCar (float x, float y, float z, float angle, short model)
+GivePlayerRemoteControlledCar (float x, float y, float z, float angle,
+                               short model)
 {
     Call<0x45AB10> (x, y, z, angle, model);
 }
@@ -418,12 +419,12 @@ CHud::SetMessage (char *str)
     return Call<0x588F60> (str);
 }
 
- /*******************************************************/
- int
- cHandlingDataMgr::LoadHandlingData ()
- {
-     return CallMethodAndReturn<int, 0x5BD830> (this);
- }
+/*******************************************************/
+int
+cHandlingDataMgr::LoadHandlingData ()
+{
+    return CallMethodAndReturn<int, 0x5BD830> (this);
+}
 
 /*******************************************************/
 void
@@ -491,14 +492,15 @@ CPad::DoCheats ()
 
 /*******************************************************/
 CAnimBlendAssociation *
-RpAnimBlendClumpExtractAssociations (RpClump* clump)
+RpAnimBlendClumpExtractAssociations (RpClump *clump)
 {
     return CallAndReturn<CAnimBlendAssociation *, 0x4D6BE0> (clump);
 }
 
 /*******************************************************/
 void
-RpAnimBlendClumpGiveAssociations (RpClump* clump, CAnimBlendAssociation* association)
+RpAnimBlendClumpGiveAssociations (RpClump *              clump,
+                                  CAnimBlendAssociation *association)
 {
     Call<0x4D6C30> (clump, association);
 }
@@ -803,10 +805,12 @@ CFont::SetAlphaFade (float alpha)
 }
 
 /*******************************************************/
-RpLight*
+RpLight *
 RpLightSetColor (RpLight *light, RwRGBAReal *colour)
 {
-    return ((RpLight* (__cdecl *) (RpLight *, RwRGBAReal *)) 0x751A90) (light, colour);
+    return (
+        (RpLight * (__cdecl *) (RpLight *, RwRGBAReal *) ) 0x751A90) (light,
+                                                                      colour);
 }
 
 /*******************************************************/
@@ -839,11 +843,12 @@ CIplStore::FindIplSlot (char *name)
 
 /*******************************************************/
 CTimeCycleCurrent *
-CTimeCycleCurrent::GetInfo (CTimeCycleCurrent *timecyc, int weatherID, int timeID)
+CTimeCycleCurrent::GetInfo (CTimeCycleCurrent *timecyc, int weatherID,
+                            int timeID)
 {
     return ((CTimeCycleCurrent
-      * (__fastcall *) (CTimeCycleCurrent *, int,
-                        int) ) 0x55F4B0) (timecyc, weatherID, timeID);
+             * (__fastcall *) (CTimeCycleCurrent *, int,
+                               int) ) 0x55F4B0) (timecyc, weatherID, timeID);
 }
 
 /*******************************************************/
@@ -870,7 +875,7 @@ CCoronas::RegisterCorona (int ID, CEntity *attachTo, char red, char green,
 void
 CCoronas::RegisterCorona (int ID, CEntity *attachTo, char red, char green,
                           char blue, char alpha, CVector const &posn,
-                          float radius, float farClip, RwTexture* texture,
+                          float radius, float farClip, RwTexture *texture,
                           int flareType, bool enableReflection,
                           bool checkObstacles, int _param_not_used, float angle,
                           bool longDistance, float nearClip, char fadeState,
@@ -878,80 +883,88 @@ CCoronas::RegisterCorona (int ID, CEntity *attachTo, char red, char green,
                           bool reflectionDelay)
 {
     ((void (__cdecl *) (int, CEntity *, char, char, char, char, CVector const &,
-                        float, float, RwTexture*, int, bool, bool, int, float, bool, 
-                        float, char, float, bool, bool)) 0x6FC180) (
-        ID, attachTo, red, green, blue, alpha, posn, radius, farClip,
-        texture, flareType, enableReflection, checkObstacles,
-        _param_not_used, angle, longDistance, nearClip, fadeState, fadeSpeed,
-        onlyFromBelow, reflectionDelay);
-}
-
-/*******************************************************/
-void CSprite::RenderOneXLUSprite(float x, float y, float z, float halfw,
-                                float halfh, char r, char g, char b, char a,
-                                float rhw, char intensity, char udir,
-                                char vdir)
-{
-    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
-                        char, float, char, char, char)) 0x70D000) (
-        x, y, z, halfw, halfh, r, g, b, a, rhw, intensity, udir, vdir);
-}
-
-/*******************************************************/
-void CSprite::RenderOneXLUSprite_Triangle (float arg1, float arg2, int arg3,
-                                         int arg4, int arg5, int arg6,
-                                         float arg7, char r, char g, char b,
-                                         char a, float arg12, char arg13)
-{
-    ((void (__cdecl *) (float, float, int, int, int, int, float, char, char, 
-        char, char, float, char)) 0x70D320) (arg1, arg2, arg3, arg4, arg5, arg6,
-                                          arg7, r, g,
-                                          b, a, arg12, arg13);
-}
-
-/*******************************************************/
-void CSprite::RenderOneXLUSprite_Rotate_Aspect (float x, float y, float z,
-                                              float halfw, float halfh, char r,
-                                              char g, char b, char a, float rhw,
-                                              float arg11, char intensity)
-{
-    ((void (__cdecl *) (float, float, float, float, float, char, char, char, char, float, float,
-                        char)) 0x70D490) (x, y, z, halfw, halfh, r, 
-                            g, b, a, rhw, arg11, intensity);
-}
-
-/*******************************************************/
-void CSprite::RenderBufferedOneXLUSprite (float x, float y, float z, float w,
-                                        float h, char r, char g, char b, char a,
-                                        float recipNearZ, char arg11)
-{
-    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
-                        char, float, char)) 0x70E4A0) (x, y, z, w, h, r,
-                                                       g, b, a, recipNearZ, arg11);
-}
-
-/*******************************************************/
-void CSprite::RenderBufferedOneXLUSprite_Rotate_Aspect (float x, float y, float z,
-                                                      float w, float h, char r,
-                                                      char g, char b, char a,
-                                                      float recipNearZ,
-                                                      float angle, char arg12)
-{
-    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
-                        char, float, float, char)) 0x70E780) (x, y, z, w, h, r, g, b,
-                                                       a, recipNearZ, angle, arg12);
+                        float, float, RwTexture *, int, bool, bool, int, float,
+                        bool, float, char, float, bool, bool)) 0x6FC180) (
+        ID, attachTo, red, green, blue, alpha, posn, radius, farClip, texture,
+        flareType, enableReflection, checkObstacles, _param_not_used, angle,
+        longDistance, nearClip, fadeState, fadeSpeed, onlyFromBelow,
+        reflectionDelay);
 }
 
 /*******************************************************/
 void
-CSprite::RenderBufferedOneXLUSprite_Rotate_Dimension (float x, float y, float z,
+CSprite::RenderOneXLUSprite (float x, float y, float z, float halfw,
+                             float halfh, char r, char g, char b, char a,
+                             float rhw, char intensity, char udir, char vdir)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
+                        char, float, char, char,
+                        char)) 0x70D000) (x, y, z, halfw, halfh, r, g, b, a,
+                                          rhw, intensity, udir, vdir);
+}
+
+/*******************************************************/
+void
+CSprite::RenderOneXLUSprite_Triangle (float arg1, float arg2, int arg3,
+                                      int arg4, int arg5, int arg6, float arg7,
+                                      char r, char g, char b, char a,
+                                      float arg12, char arg13)
+{
+    ((void (__cdecl *) (float, float, int, int, int, int, float, char, char,
+                        char, char, float,
+                        char)) 0x70D320) (arg1, arg2, arg3, arg4, arg5, arg6,
+                                          arg7, r, g, b, a, arg12, arg13);
+}
+
+/*******************************************************/
+void
+CSprite::RenderOneXLUSprite_Rotate_Aspect (float x, float y, float z,
+                                           float halfw, float halfh, char r,
+                                           char g, char b, char a, float rhw,
+                                           float arg11, char intensity)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
+                        char, float, float,
+                        char)) 0x70D490) (x, y, z, halfw, halfh, r, g, b, a,
+                                          rhw, arg11, intensity);
+}
+
+/*******************************************************/
+void
+CSprite::RenderBufferedOneXLUSprite (float x, float y, float z, float w,
+                                     float h, char r, char g, char b, char a,
+                                     float recipNearZ, char arg11)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
+                        char, float, char)) 0x70E4A0) (x, y, z, w, h, r, g, b,
+                                                       a, recipNearZ, arg11);
+}
+
+/*******************************************************/
+void
+CSprite::RenderBufferedOneXLUSprite_Rotate_Aspect (float x, float y, float z,
                                                    float w, float h, char r,
                                                    char g, char b, char a,
                                                    float recipNearZ,
                                                    float angle, char arg12)
 {
     ((void (__cdecl *) (float, float, float, float, float, char, char, char,
-                        char, float, float, char)) 0x70EAB0) (x, y, z, w, h, r, g, b, a, recipNearZ,
+                        char, float, float,
+                        char)) 0x70E780) (x, y, z, w, h, r, g, b, a, recipNearZ,
+                                          angle, arg12);
+}
+
+/*******************************************************/
+void
+CSprite::RenderBufferedOneXLUSprite_Rotate_Dimension (float x, float y, float z,
+                                                      float w, float h, char r,
+                                                      char g, char b, char a,
+                                                      float recipNearZ,
+                                                      float angle, char arg12)
+{
+    ((void (__cdecl *) (float, float, float, float, float, char, char, char,
+                        char, float, float,
+                        char)) 0x70EAB0) (x, y, z, w, h, r, g, b, a, recipNearZ,
                                           angle, arg12);
 }
 

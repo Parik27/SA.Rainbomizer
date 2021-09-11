@@ -10,7 +10,7 @@ int *GetWeaponInfo (int weaponId, char skill);
 
 class WeaponRandomizer
 {
-    static WeaponRandomizer *mInstance;
+    static WeaponRandomizer *                mInstance;
     static inline std::vector<WeaponPattern> mWeaponPatterns;
 
     WeaponRandomizer (){};
@@ -26,7 +26,7 @@ public:
         bool SkipChecks;
     } m_Config;
 
-    int GetRandomWeapon (CPed *ped, int weapon, bool isPickup);
+    int  GetRandomWeapon (CPed *ped, int weapon, bool isPickup);
     void CachePatterns ();
 
     struct WeaponInfo
@@ -36,9 +36,9 @@ public:
         int modelID;
     };
 
-    static inline int playerWeaponID = -1;
-    static inline int  dealerWeaponID = random (22, 38);
-    static inline bool forceWeapon    = false;
+    static inline int  playerWeaponID         = -1;
+    static inline int  dealerWeaponID         = random (22, 38);
+    static inline bool forceWeapon            = false;
     static inline bool firstPartFinaleCActive = false;
 
     static inline WeaponInfo shPistol;

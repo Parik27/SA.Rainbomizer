@@ -464,9 +464,24 @@ inline void MakeRelativeOffset(memory_pointer_tr at, memory_pointer_tr dest, siz
 {
     switch(sizeof_addr)
     {
-        case 1: WriteMemory<int8_t> (at, static_cast<int8_t> (GetRelativeOffset(dest, at+sizeof_addr)), vp);
-        case 2: WriteMemory<int16_t>(at, static_cast<int16_t>(GetRelativeOffset(dest, at+sizeof_addr)), vp);
-        case 4: WriteMemory<int32_t>(at, static_cast<int32_t>(GetRelativeOffset(dest, at+sizeof_addr)), vp);
+    case 1:
+        WriteMemory<int8_t> (at,
+                             static_cast<int8_t> (
+                                 GetRelativeOffset (dest, at + sizeof_addr)),
+                             vp);
+        break;
+    case 2:
+        WriteMemory<int16_t> (at,
+                              static_cast<int16_t> (
+                                  GetRelativeOffset (dest, at + sizeof_addr)),
+                              vp);
+        break;
+    case 4:
+        WriteMemory<int32_t> (at,
+                              static_cast<int32_t> (
+                                  GetRelativeOffset (dest, at + sizeof_addr)),
+                              vp);
+        break;
     }
 }
 

@@ -37,7 +37,8 @@ PedRandomizer::GetRandomModelIndex (uint32_t originalIdx)
     if (!m_Config.RandomizeCops && originalIdx >= 280 && originalIdx <= 288)
         return originalIdx;
 
-    if (m_Config.RandomizeCops && !m_Config.RandomizeGenericModels && !m_Config.RandomizeGangMembers 
+    if (m_Config.RandomizeCops && !m_Config.RandomizeGenericModels
+        && !m_Config.RandomizeGangMembers
         && (originalIdx < 280 || originalIdx > 288))
         return originalIdx;
 
@@ -45,12 +46,14 @@ PedRandomizer::GetRandomModelIndex (uint32_t originalIdx)
         && originalIdx <= 127)
         return originalIdx;
 
-    if (m_Config.RandomizeGangMembers && !m_Config.RandomizeGenericModels && !m_Config.RandomizeCops
-        && (originalIdx < 102 || originalIdx > 127))
+    if (m_Config.RandomizeGangMembers && !m_Config.RandomizeGenericModels
+        && !m_Config.RandomizeCops && (originalIdx < 102 || originalIdx > 127))
         return originalIdx;
 
-    if (m_Config.RandomizeGangMembers && !m_Config.RandomizeGenericModels && m_Config.RandomizeCops 
-        && ((!(originalIdx >= 102) && !(originalIdx <= 127)) || (!(originalIdx >= 280) && !(originalIdx <= 288))))
+    if (m_Config.RandomizeGangMembers && !m_Config.RandomizeGenericModels
+        && m_Config.RandomizeCops
+        && ((!(originalIdx >= 102) && !(originalIdx <= 127))
+            || (!(originalIdx >= 280) && !(originalIdx <= 288))))
         return originalIdx;
 
     int newModel = originalIdx;
@@ -72,10 +75,10 @@ PedRandomizer::GetRandomModelIndex (uint32_t originalIdx)
 /*******************************************************/
 void __fastcall PedRandomizer::RandomizePedModelIndex (CEntity *entity, void *,
                                                        uint32_t index)
-{   
+{
     if (entity != FindPlayerPed ())
         index = GetRandomModelIndex (index);
-   
+
     HookManager::CallOriginal<injector::thiscall<void (CEntity *, uint32_t)>,
                               0x5E4890> (entity, index);
 }
@@ -86,19 +89,19 @@ PedRandomizer::RandomizeSpecialModels (int slot, const char *modelName,
                                        int flags)
 {
     if (!PedRandomizer::isSkinSelect)
-    {
-        std::string &newModel = GetRandomElement (specialModels);
+        {
+            std::string &newModel = GetRandomElement (specialModels);
 
-        if (m_Config.ForcedSpecial != "")
-            newModel = m_Config.ForcedSpecial;
+            if (m_Config.ForcedSpecial != "")
+                newModel = m_Config.ForcedSpecial;
 
-        CStreaming::RequestSpecialModel (slot, newModel.c_str (), 0);
-    }
+            CStreaming::RequestSpecialModel (slot, newModel.c_str (), 0);
+        }
     else
-    {
-        PedRandomizer::isSkinSelect = false;
-        CStreaming::RequestSpecialModel (slot, modelName, flags);
-    }
+        {
+            PedRandomizer::isSkinSelect = false;
+            CStreaming::RequestSpecialModel (slot, modelName, flags);
+        }
     CStreaming::LoadAllRequestedModels (false);
 }
 
@@ -130,8 +133,7 @@ MakeGangWarsConsistent (int pedType)
 }
 
 /*******************************************************/
-void __fastcall CheckForSkinSelect (CRunningScript *scr, void *edx,
-                                           short count)
+void __fastcall CheckForSkinSelect (CRunningScript *scr, void *edx, short count)
 {
     scr->CollectParameters (count);
     if (scr->CheckName ("skin_c"))
@@ -143,54 +145,61 @@ void
 PedRandomizer::Initialise ()
 {
     if (ConfigManager::ReadConfig ("PedRandomizer",
-        std::pair ("IncludeNSFWModels", &m_Config.IncludeNSFWModels))
-        || ConfigManager::ReadConfig ("PlayerRandomizer", 
-            std::pair ("IncludeNSFWModels", &m_Config.IncludeNSFWModels)))
-    {
-        for (auto &model :
-                 {"TRUTH",   "MACCER", "TENPEN",  "PULASKI", "HERN",
-                  "DWAYNE",  "SMOKE",  "SWEET",   "RYDER",   "FORELLI",
-                  "ROSE",    "PAUL",   "CESAR",   "OGLOC",   "WUZIMU",
-                  "TORINO",  "JIZZY",  "MADDOGG", "CAT",     "CLAUDE",
-                  "RYDER2",  "RYDER3", "EMMET",   "ANDRE",   "KENDL",
-                  "JETHRO",  "ZERO",   "TBONE",   "SINDACO", "JANITOR",
-                  "BBTHIN",  "SMOKEV", "GUNGRL2", "NURGRL2",
-                  "CROGRL2", "BB",     "SUZIE",   "PSYCHO"})
-                specialModels.push_back (model);
-
-        // If NSFW enabled
-        if (m_Config.IncludeNSFWModels)
+                                   std::pair ("IncludeNSFWModels",
+                                              &m_Config.IncludeNSFWModels))
+        || ConfigManager::ReadConfig ("PlayerRandomizer",
+                                      std::pair ("IncludeNSFWModels",
+                                                 &m_Config.IncludeNSFWModels)))
         {
-            for (auto &model : {"GANGRL1", "MECGRL1", "GUNGRL1", "COPGRL1",
-                                    "NURGRL1", "CROGRL1", "GANGRL2", "COPGRL2"})
+            for (auto &model :
+                 {"TRUTH",  "MACCER", "TENPEN",  "PULASKI", "HERN",
+                  "DWAYNE", "SMOKE",  "SWEET",   "RYDER",   "FORELLI",
+                  "ROSE",   "PAUL",   "CESAR",   "OGLOC",   "WUZIMU",
+                  "TORINO", "JIZZY",  "MADDOGG", "CAT",     "CLAUDE",
+                  "RYDER2", "RYDER3", "EMMET",   "ANDRE",   "KENDL",
+                  "JETHRO", "ZERO",   "TBONE",   "SINDACO", "JANITOR",
+                  "BBTHIN", "SMOKEV", "GUNGRL2", "NURGRL2", "CROGRL2",
+                  "BB",     "SUZIE",  "PSYCHO"})
                 specialModels.push_back (model);
-        }
-    }
 
-    if (!ConfigManager::ReadConfig ("PedRandomizer", 
-        std::pair("RandomizeGenericModels", &m_Config.RandomizeGenericModels), 
-        std::pair("RandomizeCops", &m_Config.RandomizeCops),
-        std::pair("RandomizeGangMembers", &m_Config.RandomizeGangMembers),
-        std::pair("RandomizeSpecialModels", &m_Config.RandomizeSpecialModels), 
-        std::pair("IncludeNSFWModels", &m_Config.IncludeNSFWModels),
-        std::pair("ForcedPedModel", &m_Config.ForcedPed),
-        std::pair("ForcedSpecialModel", &m_Config.ForcedSpecial)))
+            // If NSFW enabled
+            if (m_Config.IncludeNSFWModels)
+                {
+                    for (auto &model :
+                         {"GANGRL1", "MECGRL1", "GUNGRL1", "COPGRL1", "NURGRL1",
+                          "CROGRL1", "GANGRL2", "COPGRL2"})
+                        specialModels.push_back (model);
+                }
+        }
+
+    if (!ConfigManager::ReadConfig (
+            "PedRandomizer",
+            std::pair ("RandomizeGenericModels",
+                       &m_Config.RandomizeGenericModels),
+            std::pair ("RandomizeCops", &m_Config.RandomizeCops),
+            std::pair ("RandomizeGangMembers", &m_Config.RandomizeGangMembers),
+            std::pair ("RandomizeSpecialModels",
+                       &m_Config.RandomizeSpecialModels),
+            std::pair ("IncludeNSFWModels", &m_Config.IncludeNSFWModels),
+            std::pair ("ForcedPedModel", &m_Config.ForcedPed),
+            std::pair ("ForcedSpecialModel", &m_Config.ForcedSpecial)))
         return;
 
     // If Special Models Enabled
     if (m_Config.RandomizeSpecialModels)
-    {
-        injector::MakeJMP (0x40B45E, RandomizeSpecialModels);
-        injector::MakeCALL (0x47EDAD, (void *) CheckForSkinSelect);
-    }
-    
-    if (m_Config.RandomizeGenericModels || m_Config.RandomizeCops || m_Config.RandomizeGangMembers)
-    {
-        injector::MakeJMP (0x60FFD0, ChooseRandomPedToLoad);
+        {
+            injector::MakeJMP (0x40B45E, RandomizeSpecialModels);
+            injector::MakeCALL (0x47EDAD, (void *) CheckForSkinSelect);
+        }
 
-        RegisterHooks (
+    if (m_Config.RandomizeGenericModels || m_Config.RandomizeCops
+        || m_Config.RandomizeGangMembers)
+        {
+            injector::MakeJMP (0x60FFD0, ChooseRandomPedToLoad);
+
+            RegisterHooks (
                 {{HOOK_CALL, 0x5E4890, (void *) RandomizePedModelIndex}});
-    }
+        }
 
     if (m_Config.RandomizeGangMembers)
         injector::MakeCALL (0x43DEE9, (void *) MakeGangWarsConsistent);

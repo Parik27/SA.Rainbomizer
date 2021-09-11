@@ -286,6 +286,7 @@ RandomizeModels = true
 UseOnlyNormalCutsceneModels = false
 
 RandomizeLocations = true
+RandomizeCutsceneToPlay = true
 
 #######################################################
 [SoundRandomizer]

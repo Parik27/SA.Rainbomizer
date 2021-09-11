@@ -8,7 +8,7 @@
 #include "functions.hh"
 #include "logger.hh"
 
-void    CacheSeats ();
+void CacheSeats ();
 
 // Determines the type of vehicle of current ID (car, bike, boat, plane, etc)
 eVehicleClass GetVehicleType (int vehID);
@@ -65,8 +65,8 @@ class ScriptVehiclePattern
     std::vector<uint32_t> m_aCache;
 
 public:
-
-        std::unordered_map<std::string, int> vehIDs = {{"landstal", 400}, {"bravura", 401},  {"buffalo", 402},
+    std::unordered_map<std::string, int> vehIDs
+        = {{"landstal", 400}, {"bravura", 401},  {"buffalo", 402},
            {"linerun", 403},  {"peren", 404},    {"sentinel", 405},
            {"dumper", 406},   {"firetruk", 407}, {"trash", 408},
            {"stretch", 409},  {"manana", 410},   {"infernus", 411},
@@ -139,7 +139,7 @@ public:
            {"farmtr1", 610},  {"utiltr1", 611}
 
     };
-    
+
     /*******************************************************/
     void
     SetSeatsCheck (uint32_t seats)
@@ -161,7 +161,7 @@ public:
     }
 
     void
-    SetOriginalVehicle (char* veh)
+    SetOriginalVehicle (char *veh)
     {
         m_bCached          = false;
         m_nOriginalVehicle = vehIDs[veh]; // steamhappy
@@ -170,7 +170,7 @@ public:
     void
     SetThreadName (char threadName[64])
     {
-        m_bCached = false;
+        m_bCached  = false;
         m_szThread = threadName;
     }
 
@@ -217,5 +217,9 @@ public:
 
     bool MatchVehicle (int vehID, std::string thread, const Vector3 &coords);
 
-    ScriptVehiclePattern () : mFlags{false} {}
+    ScriptVehiclePattern ()
+        : mFlags{false, false, false, false, false, false, false, false,
+                 false, false, false, false, false, false, false}
+    {
+    }
 };

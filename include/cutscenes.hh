@@ -31,6 +31,7 @@ public:
         bool RandomizeModels;
         bool NoBrokenJaws;
         bool RandomizeLocation;
+        bool RandomizeCutsceneToPlay;
     } m_Config;
 
     /// Returns the static instance for CutsceneRandomizer.

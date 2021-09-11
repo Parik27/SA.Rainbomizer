@@ -184,7 +184,7 @@ CountOccurrencesInString (const std::string &str, const std::string &substr)
 }
 
 /*******************************************************/
-const std::size_t
+std::size_t
 GetNthOccurrenceOfString (const std::string &str, const std::string &substr,
                           int n)
 {

@@ -16,7 +16,7 @@ GeneralSettings::Initialise ()
             std::pair ("Unprotect", &m_Config.Unprotect),
             std::pair ("AutosaveSlot", &m_Config.AutoSaveSlot),
             std::pair ("ModifyCredits", &m_Config.ModifyCredits)))
-    return;
+        return;
 
     Logger::GetLogger ()->LogMessage ("Initialising Rainbomizer...");
 }

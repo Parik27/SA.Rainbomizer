@@ -8,7 +8,7 @@
 #include "fades.hh"
 
 BlipRandomizer *BlipRandomizer::mInstance = nullptr;
-static int             northIcon                 = random (2, 63);
+static int      northIcon                 = random (2, 63);
 
 /*******************************************************/
 void
@@ -50,7 +50,8 @@ void
 RandomizeNorthIcon (int iconID, float x, float y, uint8_t alpha)
 {
     iconID = northIcon;
-    injector::cstd<void (int, float, float, uint8_t)>::call (0x585FF0, iconID, x, y, alpha);
+    injector::cstd<void (int, float, float, uint8_t)>::call (0x585FF0, iconID,
+                                                             x, y, alpha);
 }
 
 /*******************************************************/
@@ -64,20 +65,20 @@ DisplayBlipsInInteriors (int a1, char a2)
 void
 BlipRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("BlipRandomizer")) 
+    if (!ConfigManager::ReadConfig ("BlipRandomizer"))
         return;
 
     Logger::GetLogger ()->LogMessage ("Intialised BlipRandomizer");
-    RegisterHooks ({{HOOK_CALL, 0x5D1948, (void *) RandomizeBlipsOnStart},
-                    {HOOK_CALL, 0x582DEE, (void *) FixLegendCrash},
-                    {HOOK_CALL, 0x588188, (void *) RandomizeNorthIcon}, 
-                    {HOOK_JUMP, 0x583B40, (void *) DisplayBlipsInInteriors}, 
-        });
+    RegisterHooks ({
+        {HOOK_CALL, 0x5D1948, (void *) RandomizeBlipsOnStart},
+        {HOOK_CALL, 0x582DEE, (void *) FixLegendCrash},
+        {HOOK_CALL, 0x588188, (void *) RandomizeNorthIcon},
+        {HOOK_JUMP, 0x583B40, (void *) DisplayBlipsInInteriors},
+    });
     for (auto i : {0x444403, 0x47F7FE, 0x48BCA8, 0x48DBE1, 0x5775DD})
         injector::MakeCALL (i, (void *) RandomizeBlipSprite);
 
-    FadesManager::AddFadeCallback (
-        [] { northIcon = random (2, 63); });
+    FadesManager::AddFadeCallback ([] { northIcon = random (2, 63); });
 }
 
 /*******************************************************/

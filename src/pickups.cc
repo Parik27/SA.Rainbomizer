@@ -10,12 +10,13 @@
 #include <vector>
 #include "util/scrpt.hh"
 
-// MODIFY PICKUPS TO SHUFFLE USING CPickups:aPickups ARRAY. COORDS CAN ONLY BE COMPARED / CHANGED THROUGH THE COBJECT POINTERS
+// MODIFY PICKUPS TO SHUFFLE USING CPickups:aPickups ARRAY. COORDS CAN ONLY BE
+// COMPARED / CHANGED THROUGH THE COBJECT POINTERS
 
 PickupsRandomizer *PickupsRandomizer::mInstance = nullptr;
 
-static std::unordered_map<int, int> weaponToModel = {
-       {331, 1},  {333, 2},  {334, 3},  {335, 4},  {336, 5},  {337, 6},
+static std::unordered_map<int, int> weaponToModel
+    = {{331, 1},  {333, 2},  {334, 3},  {335, 4},  {336, 5},  {337, 6},
        {338, 7},  {339, 8},  {341, 9},  {321, 10}, {322, 11}, {323, 12},
        {324, 13}, {325, 14}, {326, 15}, {342, 16}, {343, 17}, {344, 18},
        {346, 22}, {347, 23}, {348, 24}, {349, 25}, {350, 26}, {351, 27},
@@ -26,7 +27,7 @@ static std::unordered_map<int, int> weaponToModel = {
 
 struct Pickup
 {
-    int ID;
+    int     ID;
     CPickup pickup;
 };
 
@@ -79,10 +80,10 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
                  char isEmpty, char *message)
 {
     if (PickupsRandomizer::m_Config.ReplaceWithWeaponsOnly)
-    {
-        if (weaponToModel.find (modelId) != weaponToModel.end ())
-            modelId = SelectRandomPickup (modelId, false);
-    }
+        {
+            if (weaponToModel.find (modelId) != weaponToModel.end ())
+                modelId = SelectRandomPickup (modelId, false);
+        }
     else
         modelId = SelectRandomPickup (modelId, false);
 
@@ -94,18 +95,18 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
 int
 InitialiseCacheForPickupRandomization (void *fileName)
 {
-    WeaponRandomizer::GetInstance()->CachePatterns ();
+    WeaponRandomizer::GetInstance ()->CachePatterns ();
     return CGame::Init2 (fileName);
 }
 
 /*******************************************************/
 int
-RandomizeWeaponPickup (float x, float y, float z, unsigned int weaponType, 
-    char pickupType, int ammo, char isEmpty, char *message)
+RandomizeWeaponPickup (float x, float y, float z, unsigned int weaponType,
+                       char pickupType, int ammo, char isEmpty, char *message)
 {
     weaponType = SelectRandomPickup (weaponType, true);
-    return CPickups::GenerateNewOne (x, y, z, weaponType, pickupType, ammo,
-                                     0, isEmpty, message);
+    return CPickups::GenerateNewOne (x, y, z, weaponType, pickupType, ammo, 0,
+                                     isEmpty, message);
 }
 
 /*******************************************************/
@@ -113,34 +114,37 @@ bool
 GiveMoneyForBriefcase (unsigned short model, int plrIndex)
 {
     if (model == 1210)
-    {
-        if (FindPlayerPed ())
         {
-            PlayPickupSound (7);
-            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2),
-                               random (1, 500));
+            if (FindPlayerPed ())
+                {
+                    PlayPickupSound (7);
+                    Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2),
+                                       random (1, 500));
+                }
         }
-    }
     else if (model == 1550)
-    {
-        if (FindPlayerPed ())
         {
-            PlayPickupSound (7);
-            Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2),
-                                   random (1000, 10000));
+            if (FindPlayerPed ())
+                {
+                    PlayPickupSound (7);
+                    Scrpt::CallOpcode (0x109, "add_score", GlobalVar (2),
+                                       random (1000, 10000));
+                }
         }
-    }
-    return CallAndReturn <bool, 0x4564F0>(model, plrIndex); //GivePlayerGoodiesWithPickupMI
+    return CallAndReturn<bool, 0x4564F0> (
+        model, plrIndex); // GivePlayerGoodiesWithPickupMI
 }
 
 /*******************************************************/
 void
 PickupsRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("PickupsRandomizer",
+    if (!ConfigManager::ReadConfig (
+            "PickupsRandomizer",
             std::pair ("RandomizePedWeaponDrops", &m_Config.RandomizeDeadPed),
-            std::pair ("ReplaceWithWeaponsOnly", &m_Config.ReplaceWithWeaponsOnly),
-            std::pair("MoneyFromRandomPickups", &m_Config.MoneyFromPickups),
+            std::pair ("ReplaceWithWeaponsOnly",
+                       &m_Config.ReplaceWithWeaponsOnly),
+            std::pair ("MoneyFromRandomPickups", &m_Config.MoneyFromPickups),
             std::pair ("SkipChecks", &m_Config.SkipChecks)))
         return;
 
@@ -153,17 +157,18 @@ PickupsRandomizer::Initialise ()
 
     if (m_Config.RandomizeDeadPed)
         injector::MakeCALL (0x4592F7, &RandomizeWeaponPickup);
-    
+
     injector::MakeCALL (0x5921B5, &RandomizeWeaponPickup);
 
     if (m_Config.MoneyFromPickups)
-    {
-        for (int address : {0x43989F, 0x457DF2, 0x457F91})
-            injector::MakeCALL (address, &GiveMoneyForBriefcase);
-    }
+        {
+            for (int address : {0x43989F, 0x457DF2, 0x457F91})
+                injector::MakeCALL (address, &GiveMoneyForBriefcase);
+        }
 
     if (!m_Config.SkipChecks)
-        injector::MakeCALL (0x53BCA6, (void *) &InitialiseCacheForPickupRandomization);
+        injector::MakeCALL (0x53BCA6,
+                            (void *) &InitialiseCacheForPickupRandomization);
 
     Logger::GetLogger ()->LogMessage ("Intialised PickupsRandomizer");
 }

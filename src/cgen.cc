@@ -34,9 +34,11 @@ ParkedCarRandomizer *ParkedCarRandomizer::mInstance = nullptr;
 void
 ParkedCarRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("ParkedCarRandomizer", 
+    if (!ConfigManager::ReadConfig (
+            "ParkedCarRandomizer",
             std::pair ("RandomizeFixedSpawns", &m_Config.RandomizeFixedSpawns),
-            std::pair ("RandomizeRandomSpawns", &m_Config.RandomizeRandomSpawns),
+            std::pair ("RandomizeRandomSpawns",
+                       &m_Config.RandomizeRandomSpawns),
             std::pair ("RandomizeToSameType", &m_Config.UseSameType)))
         return;
 
@@ -72,15 +74,14 @@ ParkedCarRandomizer::GetInstance ()
 /*******************************************************/
 int
 GetRandomCarOfType (int originalCar)
-{ 
+{
     for (auto &i : ScriptVehicleRandomizer::carTypes)
-    {
-        if (std::find (i.begin (), i.end (), originalCar)
-            != i.end ())
+        {
+            if (std::find (i.begin (), i.end (), originalCar) != i.end ())
                 {
                     return GetRandomElement (i);
                 }
-    }
+        }
     return random (400, 611);
 }
 
@@ -90,8 +91,8 @@ GetRandomCarOfType (int originalCar)
 /*******************************************************/
 void __fastcall RandomizeFixedSpawn (CCarGenerator *gen)
 {
-    auto oldModel   = gen->m_nModelId;
-    
+    auto oldModel = gen->m_nModelId;
+
     if (!ParkedCarRandomizer::m_Config.UseSameType)
         gen->m_nModelId = random (400, 611);
     else

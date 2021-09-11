@@ -48,7 +48,7 @@
 #include "dyom.hh"
 #include "animations.hh"
 #include "ped.hh"
-#include "TimeCycle.hh"
+#include "timecycle.hh"
 #include "riot.hh"
 #include "generalsettings.hh"
 

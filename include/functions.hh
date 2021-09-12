@@ -768,6 +768,21 @@ struct RwV3d
     float z;
 };
 
+struct RtQuat
+{
+    RwV3d imag;
+    float real;
+};
+
+struct CFileObjectInstance
+{
+    RwV3d  position;
+    RtQuat rotation;
+    int    modelId;
+    int    interiorId;
+    int    lod;
+};
+
 struct CTransmissionGear
 {
     int   m_fMaxVelocity;

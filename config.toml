@@ -42,6 +42,7 @@ CutsceneRandomizer = true
 SoundRandomizer = true
 LanguageRandomizer = true
 LicensePlateRandomizer = true
+MapRandomizer = true
 RiotRandomizer = true
 PoliceHeliRandomizer = true
 BlipRandomizer = true

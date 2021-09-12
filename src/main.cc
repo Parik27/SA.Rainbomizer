@@ -50,6 +50,7 @@
 #include "ped.hh"
 #include "timecycle.hh"
 #include "riot.hh"
+#include "map.hh"
 #include "generalsettings.hh"
 
 ///////////////////////////////////////////////
@@ -112,6 +113,7 @@ public:
         AnimationRandomizer::GetInstance ()->Initialise ();
         GxtRandomizer::GetInstance ()->Initialise ();
         PedRandomizer::GetInstance ()->Initialise ();
+        MapRandomizer::GetInstance ()->Initialise ();
 
         CreditsExtender::Initialise ();
 

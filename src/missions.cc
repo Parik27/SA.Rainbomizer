@@ -630,7 +630,7 @@ MissionRandomizer::ResetSaveData ()
 
     mSaveInfo.randomSeed = m_Config.MissionSeedHash;
     if (m_Config.RandomizeOnce && m_Config.MissionSeedHash == 0)
-        mSaveInfo.randomSeed = random (INT_MAX);
+        mSaveInfo.randomSeed = random (UINT_MAX);
 
     memset (mSaveInfo.missionStatus.data, 1,
             sizeof (mSaveInfo.missionStatus.data));

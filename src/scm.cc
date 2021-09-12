@@ -1180,6 +1180,7 @@ void __fastcall FixMaddDogg (CRunningScript *scr, void *edx, short count)
 
             SetMaddDoggOffset (vehicle, (float *) &ScriptParams[3], 0.5);
         }
+    // Highjack - expand Cesar jump point
     else if (scr->CheckName ("toreno2")
              && !CModelInfo::IsBikeModel (
                  ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ())
@@ -1193,6 +1194,7 @@ void __fastcall FixMaddDogg (CRunningScript *scr, void *edx, short count)
                     ((float *) ScriptParams)[2] -= 4.0f;
                 }
         }
+    // New Model Army - increase radius for picking up objects
     else if (scr->CheckName ("zero4")
              && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
                     != 501
@@ -1328,6 +1330,7 @@ void __fastcall FixHeightInDrugs4Auto (CRunningScript *scr, void *edx,
                                        short count)
 {
     scr->CollectParameters (count);
+    // Reuniting the Families - Change attach point of CJ / bike cops based on vehicle
     if (scr->CheckName ("drugs4")
         && ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
                != MODEL_GREENWOO)
@@ -1340,6 +1343,7 @@ void __fastcall FixHeightInDrugs4Auto (CRunningScript *scr, void *edx,
                      || ((float *) ScriptParams)[3] < -3.5f)
                 SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0.01);
         }
+    // Green Goo - Change attach point of army guys based on train
     else if (scr->CheckName ("des10")
              && ScriptVehicleRandomizer::m_Config.RandomizeTrains)
         {
@@ -1350,6 +1354,7 @@ void __fastcall FixHeightInDrugs4Auto (CRunningScript *scr, void *edx,
                 && lastTrainNewType != 12 && lastTrainNewType != 13)
                 SetMaddDoggOffset (vehicle, (float *) &ScriptParams[4], 0);
         }
+    // Catalyst - change attach point of Ryder when catching boxes based on vehicle
     else if (scr->CheckName ("ryder3"))
         {
             if (ScriptParams[0] != GetGlobalVar<int> (3))
@@ -1394,6 +1399,7 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx,
                                          short count)
 {
     scr->CollectParameters (count);
+    // Moves trigger for Barrel Roll / Loop-The-Loop coronas further back
     if (scr->CheckName ("desert5")
         && ConfigManager::ReadConfig ("ScriptVehicleRandomizer")
         && ScriptVehicleRandomizer::m_Config.MoreSchoolTestTime)
@@ -1403,6 +1409,7 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx,
             if (int (coordCompareX) == 377 && int (coordCompareZ) == 80)
                 ((float *) ScriptParams)[1] += 300.0f;
         }
+    // Expands garage + placing box triggers for large cars
     else if (scr->CheckName ("guns1")
              && ConfigManager::ReadConfig ("ScriptVehicleRandomizer")
              && (ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ()
@@ -1435,6 +1442,7 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx,
                     ((float *) ScriptParams)[6] += 1.0f;
                 }
         }
+    // Allows player to jump out of a flying car in Dam and Blast upon reaching marker
     else if (scr->CheckName ("heist2")
              && ConfigManager::ReadConfig ("ScriptVehicleRandomizer")
              && (CModelInfo::IsCarModel (ScriptVehicleRandomizer::GetInstance ()
@@ -1463,6 +1471,8 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx,
                         }
                 }
         }
+    // Teleports player for phone call unlocking Four Dragons
+    // This plays the cutscene immediately so it cannot softlock any random missions
     else if (scr->CheckName ("litcas")
              && ConfigManager::ReadConfig ("MissionRandomizer"))
         {
@@ -1477,6 +1487,8 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx,
                                                 {newPos.x, newPos.y, newPos.z},
                                                 1, 1);
         }
+    // Adds 3 second delay between EOTL parts.
+    // Gives time for badly scripted missions (Catalina cough) to fully clean up.
     else if (scr->CheckName ("riot")
              && ConfigManager::ReadConfig ("MissionRandomizer"))
         {
@@ -1488,8 +1500,6 @@ void __fastcall MoveFlyingSchoolTrigger (CRunningScript *scr, void *edx,
                     if (GetGlobalVar<int> (151) == 5)
                         {
                             int currentTime = clock () - startTime;
-                            Logger::GetLogger ()->LogMessage (
-                                "CurrentTime: " + std::to_string (currentTime));
                             if (currentTime > 3000)
                                 {
                                     if (GetGlobalVar<int> (629) == 3)
@@ -1819,6 +1829,7 @@ void __fastcall Ryder2IsCutsceneActive (CRunningScript *scr, void *edx,
                                         short count)
 {
     scr->CollectParameters (count);
+    // Marks box object as used once placed in the van
     if (scr->CheckName ("ryder2")
         && ConfigManager::ReadConfig ("ScriptVehicleRandomizer"))
         {
@@ -1829,6 +1840,7 @@ void __fastcall Ryder2IsCutsceneActive (CRunningScript *scr, void *edx,
                     ryder2.objectAttached                    = -1;
                 }
         }
+    // Enables / disables cars on water in Cut Throat Business when needed
     else if (scr->CheckName ("manson5")
              && ConfigManager::ReadConfig ("ScriptVehicleRandomizer"))
         {
@@ -1848,6 +1860,8 @@ void __fastcall Ryder2IsCutsceneActive (CRunningScript *scr, void *edx,
                                        ScriptVehicleRandomizer::mTempVehHandle);
                 }
         }
+    // Teleports player back to their original position after teleporting 
+    // for Four Dragons cutscene.
     else if (scr->CheckName ("litcas")
              && ConfigManager::ReadConfig ("MissionRandomizer"))
         {
@@ -2508,6 +2522,7 @@ void __fastcall IgnoreTrainCarriages (CRunningScript *scr, void *edx,
         }
 }
 
+// Manually removes reporter from train if it is a non-passenger train
 /*******************************************************/
 void __fastcall FixSnailTrailTrain (CRunningScript *scr, void *edx, short count)
 {
@@ -2938,7 +2953,10 @@ ScriptVehicleRandomizer::Initialise ()
     RegisterHooks (
         {{HOOK_CALL, 0x467B01, (void *) &RandomizeCarForScript},
          {HOOK_CALL, 0x48AAB8, (void *) &RandomizeRCVehicleForScript},
+
+         // Change speed of vehicle recordings
          {HOOK_CALL, 0x498AA8, (void *) &SlowDownAndromedaInStoaway},
+
          {HOOK_CALL, 0x47F070, (void *) &RevertVehFixes},
          {HOOK_CALL, 0x5DFE79, (void *) &FixEOTLPosition},
          {HOOK_CALL, 0x469612, (void *) &FixCarChecks},
@@ -2951,14 +2969,27 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x4985DA, (void *) &VehicleUpdateFix},
          {HOOK_CALL, 0x49128C, (void *) &FixGTAMadman},
          {HOOK_CALL, 0x475BBC, (void *) &FixGearUp},
+
+         // Move locations of triggers offset from a vehicle
          {HOOK_CALL, 0x489835, (void *) &FixMaddDogg},
+
+         // Move locations of objects attached to vehicle
          {HOOK_CALL, 0x495429, (void *) &FixMaddDoggBoxes},
+
+         // T-Bone Mendez - can pick up packages from cars
          {HOOK_CALL, 0x48ABB0, (void *) &AlwaysPickUpPackagesTBone},
+
+         // Change locations of actors attached to vehicles
          {HOOK_CALL, 0x48A7B8, (void *) &FixHeightInDrugs4Auto},
-         {HOOK_CALL, 0x48A7B8, (void *) &FixHeightInDrugs4Auto},
+
+         // Skip Pilot School landing gear requirement for vehicles without gear
          {HOOK_CALL, 0x476BCB, (void *) &IgnoreLandingGearCheck},
+
+         // When player in vehicle, car fly / / activate RC Heli magnet
          {HOOK_CALL, 0x469602, (void *) &IsPlayerInVehicleCheck},
          {HOOK_CALL, 0x48A0F6, (void *) &IsPlayerInVehicleCheck},
+
+         // Additional flying car hooks for weird missions
          {HOOK_CALL, 0x48551A, (void *) &FlyingCarsForVB},
          {HOOK_CALL, 0x46C1AB, (void *) &FlyingCarsForFlightSchool},
          {HOOK_CALL, 0x48C02F, (void *) &WaterCarsForBoatSchool},
@@ -2966,51 +2997,106 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x468E9A, (void *) &InitialiseExtraText},
          {HOOK_CALL, 0x618E97, (void *) &InitialiseExtraText},
          {HOOK_CALL, 0x5BA167, (void *) &InitialiseExtraText},
+
+         // Makes SAM sites attack cars when using flying cars
          {HOOK_CALL, 0x48B33B, (void *) &ActivateSAMForFlyingCars},
          {HOOK_CALL, 0x5A0846, (void *) &ActivateSAMForFlyingCars},
          {HOOK_CALL, 0x5A085E, (void *) &ActivateSAMForFlyingCars},
+
+         // Allows vehicles other than forklift to raise door in Breaking the Bank
          {HOOK_CALL, 0x47884F, (void *) &FixRaiseDoorHeist9},
          {HOOK_CALL, 0x47CAAD, (void *) &FixRaiseDoorHeist9PosCheck},
+
+         // Allows hooking any vehicles for Tanker Commander / Highjack / Trucking
          {HOOK_CALL, 0x46C2A3, (void *) &TrailerAttachmentCheck},
          {HOOK_CALL, 0x4720BF, (void *) &HasTrailerForceAttached},
+
+         // Fixes cars going inside the floor after Cesar jumps in Highjack
          {HOOK_CALL, 0x49557F, (void *) &FixToreno2},
+
+         // Hooks for heli magnet sections in Quarry / Robbing Uncle Sam
+         // Mostly responsible for creating magnet object and tracking boxes / barrels you pick up
          {HOOK_CALL, 0x47CC68, (void *) &QuarryAttachMagnet},
          {HOOK_CALL, 0x487D29, (void *) &Quarry2StoreBarrelHandles},
          {HOOK_CALL, 0x485067, (void *) &Quarry6StoreBarrelHandles},
          {HOOK_CALL, 0x47F90C, (void *) &Ryder2AttachMagnet},
          {HOOK_CALL, 0x47CCF2, (void *) &Ryder2StoreBoxHandles},
          {HOOK_CALL, 0x469773, (void *) &Ryder2IncreaseRadius},
-         {HOOK_CALL, 0x4685A8, (void *) &ResetEndOfMissionStuff},
          {HOOK_CALL, 0x4831FC, (void *) &Ryder2CheckBoxForDamage},
          {HOOK_CALL, 0x48322F, (void *) &Ryder2CheckBoxForDamage2},
          {HOOK_CALL, 0x4698C6, (void *) &Ryder2WasBoxDestroyedSomehow},
          {HOOK_CALL, 0x483584, (void *) &Quarry2RemoveSafeBarrel},
          {HOOK_CALL, 0x48563A, (void *) &Ryder2ReplaceHelp},
+
+         // Resets variables and removes references on mission end
+         {HOOK_CALL, 0x4685A8, (void *) &ResetEndOfMissionStuff},
+         
+         // Resets variables on mission start + checks for vehicle sub-mission
          {HOOK_CALL, 0x489955, (void *) &SetThingsForMissionStart},
+
+         // Fixes misplaced buoys in Boat School
          {HOOK_CALL, 0x482C6B, (void *) &FixBoatSchoolObjectPlacements},
+
+         // Adds failsafe to cutscenes of entering garage for large vehicles (e.g. Dumper)
          {HOOK_CALL, 0x49220E, (void *) &FixStuckAtDohertyGarage},
+
+         // Allows non-taxis to do the Taxi sub-mission
          {HOOK_CALL, 0x4912E8, (void *) &OverrideTaxiCheck},
+
+         // Moves vehicles in T-Bone Mendez / Local Liquor Store so they aren't
+         // constantly stuck in each other (so as to add more variety)
          {HOOK_CALL, 0x467DB9, (void *) &MoveLargeCarsApart},
+
+         // Reduces weight of car in Up Up and Away so it can be more easily carried
          {HOOK_CALL, 0x48954E, (void *) &ReduceCarWeight},
+
+         // Checks for heli you protect in Interdiction being destroyed
+         // Prevents the player from dying if they happen to be in the vehicle when it is
          {HOOK_CALL, 0x467B1E, (void *) &DetectVehicleDestruction},
+
+         // Stops heli you protect in Interdiction from driving off the cliff if
+         // it becomes a car
          {HOOK_CALL, 0x469B71, (void *) &CheckDes3HeliDriver},
+
+         // Hooks for self-destruct feature in New Model Army
+         // Stores player's vehicle, adds code to blow it up, and adds message
          {HOOK_CALL, 0x46D549, (void *) &GetCurrentPlayerRCVeh},
          {HOOK_CALL, 0x487A50, (void *) &ActivateZero4SelfDestruct},
          {HOOK_CALL, 0x468137, (void *) &ReplaceMessageText},
+
+         // Prevents van in Life's A Beach being given custom wheels if it becomes a heli
+         // This could make it unenterable if so
          {HOOK_CALL, 0x4985DA, (void *) &IgnoreWheelReplacement},
+
+         // Makes Zero immune to collisions in Air Raid so planes don't crush him
          {HOOK_CALL, 0x47F893, (void *) &AddZero1Immunities},
+
+         // Fixes some cars getting stuck in the floor in Key To Her Heart
          {HOOK_CALL, 0x47CB48, (void *) &FixStuckVehicles},
+
+         // Increases radius of trigger to enter Stowaway plane for larger vehicles
          {HOOK_CALL, 0x48774C, (void *) &IncreaseStowawayRadius},
+
+         // Instantly starts rotors if you get a heli in EOTL3 so you can catch the truck
          {HOOK_CALL, 0x46817E, (void *) &StartEOTL3HeliRotors},
+
+         // Hooks to track when the sequence of catching Sweet begins / completes.
+         // This is used to slow the vehicle recording down at that point so
+         // slow vehicles are able to catch him.
          {HOOK_CALL, 0x484CC0, (void *) &SlowDownEOTL3FireTruckAtCatch},
          {HOOK_CALL, 0x4953A1, (void *) &SpeedUpEOTL3FireTruckAfterCatch},
+
+         // For every vehicle spawned, saves the thread it came from to a variable.
          {HOOK_CALL, 0x467AB7, (void *) &::UpdateLastThread}});
 
     // Hooks function for plane / heli height checks
+    // Used in New Model Army so you can use regular helis
     for (int address : {0x6D8A2F, 0x6D97B9, 0x6D97B9, 0x6D9813, 0x6D9E33,
                         0x6D9E56, 0x6CC234, 0x6CC234, 0x6CC2A0})
         injector::MakeCALL (address, (void *) &IgnoreHeightLimit);
 
+    // Numerous hooks for increasing times for the four schools so slow vehicles can do the tests
+    // Also moves corona in Barrel Roll / Loop-The-Loop to give more room for slow vehicles
     if (m_Config.MoreSchoolTestTime)
         RegisterHooks (
             {{HOOK_CALL, 0x48CFA9, (void *) &ProcessModifiedSchoolTimes},
@@ -3024,6 +3110,9 @@ ScriptVehicleRandomizer::Initialise ()
              {HOOK_CALL, 0x497ED7, (void *) &MoveFlyingSchoolCorona},
              {HOOK_CALL, 0x47CFE0, (void *) &MoveFlyingSchoolBlip}});
 
+    // Randomizes train into one of small length or less to the original
+    // If train is smaller, anything that would have applied to a now non-existent
+    // carriage moves to the next available existing one.
     if (m_Config.RandomizeTrains)
         RegisterHooks (
             {{HOOK_CALL, 0x497F89, (void *) &RandomizeTrainForScript},

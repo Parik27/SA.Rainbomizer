@@ -60,6 +60,7 @@ class WeaponPattern
         bool DualWield : 1;
         bool CanDriveby : 1;
         bool ProjectileCheck : 1;
+        bool NoFPSAiming : 1;
     } mFlags;
 
     uint32_t m_nPedType        = 0;

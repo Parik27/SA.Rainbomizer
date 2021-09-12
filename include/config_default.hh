@@ -387,6 +387,10 @@ EnableEasterEgg = true
 # License Plate Randomizer
 # Randomizes the license plates of vehicles to random words from the game script.
 
+# Map Randomizer
+# Randomizes map objects existing within the base game world. 
+# Currently, this only randomizes tags between other tags.
+
 # Riot Randomizer
 # Activates a chance for the game's riot mode to activate briefly as you play the game.
 # Traffic Lights can also be randomized as part of this so that the 

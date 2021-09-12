@@ -126,6 +126,12 @@ WeaponPattern::DoesWeaponMatchPattern (int weaponID)
             || weaponID == 39))
         return false;
 
+    // Excludes weapons that go into first person aiming on use
+    if (mFlags.NoFPSAiming
+        && (weaponID == 34 || weaponID == 35 || weaponID == 36
+            || weaponID == 43))
+        return false;
+
     // Type check (it has to be allowed)
     if (!mAllowedTypes.GetValue (weaponID))
         return false;
@@ -210,6 +216,8 @@ WeaponPattern::ReadFlag (const std::string &flag)
         mFlags.DualWield = true;
     else if (flag == "candriveby")
         mFlags.CanDriveby = true;
+    else if (flag == "nofps")
+        mFlags.NoFPSAiming = true;
     else if (flag == "projectilecheck")
         mFlags.ProjectileCheck = true;
 }

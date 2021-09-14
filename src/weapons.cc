@@ -217,11 +217,6 @@ void __fastcall ChangeLockedPlayerWeapon (CRunningScript *scr, void *edx,
                 ms_pPedPool->m_pObjects + 0x7C4 * (ScriptParams[0] >> 8));
             ped->SetCurrentWeapon (GetWeaponInfo (ScriptParams[1], 1)[5]);
         }
-
-    if (CRunningScripts::CheckForRunningScript ("heist9")
-        && ScriptParams[1] == 22)
-        Scrpt::CallOpcode (0x1b2, "give_weapon_and_ammo", GlobalVar (3), 44,
-                           300);
 }
 
 /*******************************************************/
@@ -298,10 +293,10 @@ void __fastcall HandleShrangeWeaponReset (CRunningScript *scr, void *edx,
             WeaponRandomizer::shAK.weaponID = ScriptSpace[8138];
             WeaponRandomizer::shAK.modelID  = ScriptSpace[8142];
 
-            ScriptSpace[8135] = 43;
-            ScriptSpace[8136] = 44;
-            ScriptSpace[8137] = 45;
-            ScriptSpace[8138] = 46;
+            ScriptSpace[8135] = 42;
+            ScriptSpace[8136] = 43;
+            ScriptSpace[8137] = 44;
+            ScriptSpace[8138] = 45;
         }
 }
 
@@ -375,6 +370,18 @@ void __fastcall RemoveExtraJBAmmo (CRunningScript *scr, void *edx, short count)
 }
 
 /*******************************************************/
+void __fastcall GiveHeist9Goggles (CRunningScript *scr, void *edx, short count)
+{
+    scr->CollectParameters (count);
+    float x = ((float *) ScriptParams)[1];
+    float y = ((float *) ScriptParams)[1];
+    float z = ((float *) ScriptParams)[1];
+    if (scr->CheckName ("heist9") && int (x) == 2149 && int (1605) && int (1005))
+        Scrpt::CallOpcode (0x1b2, "give_weapon_and_ammo", GlobalVar (3), 44,
+                           300);
+}
+
+/*******************************************************/
 void
 WeaponRandomizer::Initialise ()
 {
@@ -441,6 +448,7 @@ WeaponRandomizer::Initialise ()
     injector::MakeCALL (0x46D3AB, (void *) &CheckIfPlayerDriveBy);
     injector::MakeCALL (0x53BFBD, (void *) &ForceWeapon);
     injector::MakeCALL (0x47E9E4, (void *) &RemoveExtraJBAmmo);
+    injector::MakeCALL (0x475373, (void *) &GiveHeist9Goggles);
 
     Logger::GetLogger ()->LogMessage ("Intialised WeaponRandomizer");
 }
@@ -488,13 +496,13 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool isPickup)
         && CRunningScripts::CheckForRunningScript (shootingRange.c_str ())
         && ped->m_nPedType == ePedType::PED_TYPE_PLAYER1)
         {
-            if (weapon == 43)
+            if (weapon == 42)
                 return shPistol.weaponID;
-            else if (weapon == 44)
+            else if (weapon == 43)
                 return shShotgun.weaponID;
-            else if (weapon == 45)
+            else if (weapon == 44)
                 return shUzi.weaponID;
-            else if (weapon == 46)
+            else if (weapon == 45)
                 return shAK.weaponID;
 
             if (ScriptSpace[8070] < 1)

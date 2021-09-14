@@ -31,7 +31,7 @@ public:
 
     struct WeaponInfo
     {
-        int weaponID;
+        int weaponID = 0;
         int ammo;
         int modelID;
     };

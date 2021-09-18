@@ -16,6 +16,7 @@ public:
         bool RandomizeTimeCycle;
         bool ChangeOnFade;
         bool RandomizeWeather;
+        int RandomTimecycleOdds;
     } m_Config;
 
     /// Initialises Hooks/etc.

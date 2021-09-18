@@ -109,6 +109,8 @@ CrazyMode = false # Changes images and menu background (WARNING: VERY hard on ey
 RandomizeTimeCycle = true
 ChangeOnFade = true # (Generates a new random timecycle set every fade, otherwise is the same from game start)
 
+RandomTimecycleOdds = 35
+
 # Randomizes weather cycle at regular intervals.
 RandomizeWeather = true
 

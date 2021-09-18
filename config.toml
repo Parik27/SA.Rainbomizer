@@ -229,6 +229,9 @@ ReplaceWithWeaponsOnly = false # Randomizes only weapon-type pickups with other 
 # Randomize money to be given by certain random pickups
 MoneyFromRandomPickups = true
 
+# Randomize horseshoes/snapshots/oysters
+RandomizeCollectables = true
+
 SkipChecks = false # Checks related to weapons required for certain missions
 		   # You might not be able to complete some missions
 		   # if this is true.

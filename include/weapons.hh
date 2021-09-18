@@ -34,6 +34,8 @@ public:
         int weaponID = 0;
         int ammo;
         int modelID;
+
+        WeaponInfo () {}
     };
 
     static inline int  playerWeaponID         = -1;

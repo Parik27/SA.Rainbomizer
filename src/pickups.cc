@@ -1,4 +1,5 @@
 #include "pickups.hh"
+#include <cstdint>
 #include <cstdlib>
 #include "logger.hh"
 #include "base.hh"
@@ -9,9 +10,13 @@
 #include <algorithm>
 #include <vector>
 #include "util/scrpt.hh"
+#include "hooks.hh"
+
+using namespace Rainbomizer;
 
 // MODIFY PICKUPS TO SHUFFLE USING CPickups:aPickups ARRAY. COORDS CAN ONLY BE
 // COMPARED / CHANGED THROUGH THE COBJECT POINTERS
+// ??? Why is this (^) here ???
 
 PickupsRandomizer *PickupsRandomizer::mInstance = nullptr;
 
@@ -24,12 +29,6 @@ static std::unordered_map<int, int> weaponToModel
        {358, 34}, {359, 35}, {360, 36}, {361, 37}, {362, 38}, {363, 39},
        {364, 40}, {365, 41}, {366, 42}, {367, 43}, {368, 44}, {369, 45},
        {371, 46}};
-
-struct Pickup
-{
-    int     ID;
-    CPickup pickup;
-};
 
 /*******************************************************/
 void
@@ -74,10 +73,56 @@ SelectRandomPickup (unsigned int modelId, bool isDeadPed)
 }
 
 /*******************************************************/
+void
+ShuffleAllCollectables ()
+{
+    static uint16_t &miCjOyster     = *reinterpret_cast<uint16_t *> (0x8CD750);
+    static uint16_t &miCjHorseShoe  = *reinterpret_cast<uint16_t *> (0x8CD754);
+    static uint16_t &miCameraPickup = *reinterpret_cast<uint16_t *> (0x8CD5D8);
+
+    std::vector<CPickup *> collectablePickups;
+
+    const int NUM_PICKUPS = 0x26C;
+    for (int i = 0; i < NUM_PICKUPS; i++)
+        {
+            auto &pickup = aPickups[i];
+
+            if (pickup.m_wModelId == miCjOyster
+                || pickup.m_wModelId == miCjHorseShoe)
+                collectablePickups.push_back (&pickup);
+
+            // Don't randomize camera pickups over height limit.
+            if (pickup.m_wModelId == miCameraPickup)
+                if (pickup.m_vPos.GetZ () < 95.0f)
+                    collectablePickups.push_back (&pickup);
+        }
+
+    for (auto pickupA : collectablePickups)
+        {
+            auto pickupB = GetRandomElement (collectablePickups);
+            std::swap (pickupA->m_vPos, pickupB->m_vPos);
+        }
+}
+
+/*******************************************************/
 int
-RandomizePickup (float x, float y, float z, unsigned int modelId,
-                 char pickupType, int ammo, unsigned int moneyPerDay,
-                 char isEmpty, char *message)
+RandomizeCollectable (FunctionCb<int> CPickups_GenerateNewOne, float x, float y,
+                      float z, unsigned int modelId, char pickupType, int ammo,
+                      unsigned int moneyPerDay, char isEmpty, char *message)
+{
+    int ret = CPickups_GenerateNewOne (x, y, z, modelId, pickupType, ammo,
+                                       moneyPerDay, isEmpty, message);
+
+    ShuffleAllCollectables ();
+
+    return ret;
+}
+
+/*******************************************************/
+int
+RandomizePickup (FunctionCb<int> CPickups_GenerateNewOne, float x, float y,
+                 float z, unsigned int modelId, char pickupType, int ammo,
+                 unsigned int moneyPerDay, char isEmpty, char *message)
 {
     if (PickupsRandomizer::m_Config.ReplaceWithWeaponsOnly)
         {
@@ -87,8 +132,8 @@ RandomizePickup (float x, float y, float z, unsigned int modelId,
     else
         modelId = SelectRandomPickup (modelId, false);
 
-    return CPickups::GenerateNewOne (x, y, z, modelId, pickupType, ammo,
-                                     moneyPerDay, isEmpty, message);
+    return CPickups_GenerateNewOne (x, y, z, modelId, pickupType, ammo,
+                                    moneyPerDay, isEmpty, message);
 }
 
 /*******************************************************/
@@ -144,31 +189,31 @@ PickupsRandomizer::Initialise ()
             std::pair ("RandomizePedWeaponDrops", &m_Config.RandomizeDeadPed),
             std::pair ("ReplaceWithWeaponsOnly",
                        &m_Config.ReplaceWithWeaponsOnly),
+            std::pair ("RandomizeCollectables", &m_Config.RandomizeCollectables),
             std::pair ("MoneyFromRandomPickups", &m_Config.MoneyFromPickups),
             std::pair ("SkipChecks", &m_Config.SkipChecks)))
         return;
 
-    for (int address :
-         {0x00445098, 0x00445AFD, 0x00458A58, 0x00477983, 0x0047E636, 0x480658,
-          0x00481744, 0x0048B243, 0x48CEB9, 0x00592103, 0x005B49C6, 0x0067B6DE})
-        {
-            injector::MakeCALL (address, (void *) &RandomizePickup);
-        }
+    HooksManager::Add<RandomizePickup, 0x00445098, 0x00445AFD, 0x00458A58,
+                      0x0047E636, 0x480658, 0x00481744, 0x0048B243, 0x48CEB9,
+                      0x00592103, 0x005B49C6, 0x0067B6DE> ();
+
+    if (m_Config.RandomizeCollectables)
+        HooksManager::Add<RandomizeCollectable, 0x477983> ();
 
     if (m_Config.RandomizeDeadPed)
-        injector::MakeCALL (0x4592F7, &RandomizeWeaponPickup);
+        injector::MakeCALL (0x4592F7, RandomizeWeaponPickup);
 
-    injector::MakeCALL (0x5921B5, &RandomizeWeaponPickup);
+    injector::MakeCALL (0x5921B5, RandomizeWeaponPickup);
 
     if (m_Config.MoneyFromPickups)
         {
             for (int address : {0x43989F, 0x457DF2, 0x457F91})
-                injector::MakeCALL (address, &GiveMoneyForBriefcase);
+                injector::MakeCALL (address, GiveMoneyForBriefcase);
         }
 
     if (!m_Config.SkipChecks)
-        injector::MakeCALL (0x53BCA6,
-                            (void *) &InitialiseCacheForPickupRandomization);
+        injector::MakeCALL (0x53BCA6, InitialiseCacheForPickupRandomization);
 
     Logger::GetLogger ()->LogMessage ("Intialised PickupsRandomizer");
 }

@@ -985,19 +985,74 @@ struct CObject : public CEntity
 {
 };
 
+#pragma pack(push, 1)
+class CCompressedVector
+{
+private:
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+
+public:
+    float
+    GetX ()
+    {
+        return x / 8.0f;
+    }
+
+    float
+    GetY ()
+    {
+        return y / 8.0f;
+    }
+
+    float
+    GetZ ()
+    {
+        return z / 8.0f;
+    }
+
+    void
+    SetX (float x)
+    {
+        this->x = x * 8.0f;
+    }
+
+    void
+    SetY (float y)
+    {
+        this->y = y * 8.0f;
+    }
+
+    void
+    SetZ (float z)
+    {
+        this->z = z * 8.0f;
+    }
+
+    CCompressedVector () = default;
+    CCompressedVector (float x, float y, float z)
+    {
+        SetX (x);
+        SetY (y);
+        SetZ (z);
+    }
+};
+#pragma pack(pop)
+
 struct CPickup
 {
-    float    m_fRevenueValue;
-    CObject *m_pObject;
-    int      m_dwAmmo;
-    int      m_dwRegenerationTime;
-    char     m_vPos[6];
-    short    m_nMoneyPerDay;
-    short    m_wModelId;
-    short    m_wReferenceIndex;
-    char     m_PickupType;
-    char     m_nFlags;
-    char     _pad[2];
+    float             m_fRevenueValue;
+    CObject *         m_pObject;
+    int               m_dwAmmo;
+    int               m_dwRegenerationTime;
+    CCompressedVector m_vPos;
+    short             m_nMoneyPerDay;
+    short             m_wModelId;
+    short             m_wReferenceIndex;
+    char              m_PickupType;
+    char              m_nFlags;
+    char              _pad[2];
 };
 
 struct CZone

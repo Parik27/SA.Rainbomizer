@@ -19,6 +19,7 @@ public:
         bool RandomizeDeadPed;
         bool ReplaceWithWeaponsOnly;
         bool MoneyFromPickups;
+        bool RandomizeCollectables;
 
         bool SkipChecks;
     } m_Config;

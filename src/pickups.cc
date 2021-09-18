@@ -194,12 +194,12 @@ PickupsRandomizer::Initialise ()
             std::pair ("SkipChecks", &m_Config.SkipChecks)))
         return;
 
-    HooksManager::Add<RandomizePickup, 0x00445098, 0x00445AFD, 0x00458A58,
+    HooksManager::Add<&RandomizePickup, 0x00445098, 0x00445AFD, 0x00458A58,
                       0x0047E636, 0x480658, 0x00481744, 0x0048B243, 0x48CEB9,
                       0x00592103, 0x005B49C6, 0x0067B6DE> ();
 
     if (m_Config.RandomizeCollectables)
-        HooksManager::Add<RandomizeCollectable, 0x477983> ();
+        HooksManager::Add<&RandomizeCollectable, 0x477983> ();
 
     if (m_Config.RandomizeDeadPed)
         injector::MakeCALL (0x4592F7, RandomizeWeaponPickup);

@@ -36,6 +36,7 @@ class table;
 /*******************************************************/
 class ConfigManager
 {
+    std::shared_ptr<cpptoml::table> m_pDefaultConfig;
     std::shared_ptr<cpptoml::table> m_pConfig;
 
     ConfigManager (){};

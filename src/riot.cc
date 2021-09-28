@@ -78,7 +78,8 @@ CheckNewZone (CVector *point, char checkType)
                     if (!injector::ReadMemory<bool> (gbLARiots)
                         && !injector::ReadMemory<bool> (riotCheatActive)
                         && !RiotRandomizer::riotModeRandomized
-                        && random (1000) > 985)
+                        && random (1000) > 985
+                        && !ScriptSpace[1870])
                         {
                             RiotRandomizer::riotModeRandomized = true;
                             injector::WriteMemory (riotCheatActive, 1);

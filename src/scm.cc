@@ -521,7 +521,16 @@ RandomizeCarForScript (int model, float x, float y, float z, bool createdBy)
 
     // Load the new vehicle. Fallback to the original if needed
     if (StreamingManager::AttemptToLoadVehicle (newModel) == ERR_FAILED)
+    {
+        Logger::GetLogger ()->LogMessage (
+                "Failed to load new vehicle, using fallback");
+        if (ScriptVehicleRandomizer::mFallbackVeh > 0)
+        {
+            model = ScriptVehicleRandomizer::mFallbackVeh;
+            ScriptVehicleRandomizer::mFallbackVeh = -1;
+        }
         newModel = model;
+    }
 
     uint8_t *vehicle = (uint8_t *) CCarCtrl::CreateCarForScript (newModel, x, y,
                                                                  z, createdBy);
@@ -2177,6 +2186,7 @@ ResetEndOfMissionStuff (char enable)
         injector::WriteMemory (waterCarsCheatActive, 0);
 
     ScriptVehicleRandomizer::mTempVehHandle                         = -1;
+    ScriptVehicleRandomizer::mFallbackVeh                           = -1;
     ScriptVehicleRandomizer::mNextVigilanteCarNum                   = 0;
     ScriptVehicleRandomizer::mVigilanteSlotsTaken                   = false;
     ScriptVehicleRandomizer::GetInstance ()->mCurrentMissionRunning = -1;
@@ -2209,6 +2219,7 @@ SetThingsForMissionStart ()
     ryder2                                        = emptyTemplate;
     quarry                                        = emptyTemplate;
     ScriptVehicleRandomizer::mTempVehHandle       = -1;
+    ScriptVehicleRandomizer::mFallbackVeh         = -1;
     ScriptVehicleRandomizer::mDes3Stuck           = false;
     ScriptVehicleRandomizer::mEOTL3Slow           = false;
     ScriptVehicleRandomizer::mNextVigilanteCarNum = 0;
@@ -2250,6 +2261,11 @@ ChangePlayerVehicle (int mission)
         {
             Scrpt::CallOpcode (0x3c0, "store_car_char_is_in", GlobalVar (3),
                                GlobalVar (9005));
+
+            CVehicle *originalVeh = (CVehicle *) (ms_pVehiclePool->m_pObjects
+                                + 0xA18 * (ScriptSpace[9005] >> 8));
+            ScriptVehicleRandomizer::mFallbackVeh = originalVeh->m_nModelIndex;
+
             Scrpt::CallOpcode (0x174, "get_car_heading", GlobalVar (9005),
                                GlobalVar (72));
             Scrpt::CallOpcode (0x792, "disembark_actor", GlobalVar (3));

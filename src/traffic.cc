@@ -359,6 +359,14 @@ TrafficRandomizer::IsVehicleAllowed (int model)
     if (CModelInfo::IsTrailerModel (model) && !m_Config.Trailers)
         return false;
 
+    // Stop spawning non-usable Valet vehicles if script running and player on Valet Parking
+    if (ScriptSpace[1870] && (CModelInfo::IsTrailerModel (model)
+                || CModelInfo::IsTrainModel (model)
+                || CModelInfo::IsBoatModel (model)
+                || CModelInfo::IsHeliModel (model)
+                || CModelInfo::IsPlaneModel (model)))
+        return false;
+
     return true;
 }
 

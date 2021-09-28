@@ -187,6 +187,8 @@ public:
     static inline int  mNextVigilanteCarNum = 0;
     static inline bool mVigilanteSlotsTaken = false;
 
+    static inline int mFallbackVeh = -1;
+
     // Struct for RC heli magnet sections
     struct RCHeliMagnet
     {

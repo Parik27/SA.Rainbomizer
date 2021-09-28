@@ -62,7 +62,7 @@ std::unordered_map<std::string, float> cutsceneOffsetCorrections = {
     {"SWEET3B", -1.01588f},  {"SWEET6B", -1.2257f},   {"SWEET7A", -0.98118f},
     {"SYND_3A", -0.951688f}, {"TRUTH_1", -0.999017f}, {"TRUTH_2", -1.008189f},
     {"WOOZI1A", -0.994995f}, {"WOOZI1B", -6.213995f}, {"ZERO_1", -0.993956f},
-    {"ZERO_2", -0.996642f},  {"ZERO_4", -0.996642F}};
+    {"ZERO_2", -0.996642f},  {"ZERO_4", -0.996642F},  {"PROLOG1", 0.0000000f}};
 
 /*******************************************************/
 char *

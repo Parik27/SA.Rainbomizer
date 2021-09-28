@@ -14,10 +14,6 @@
 
 using namespace Rainbomizer;
 
-// MODIFY PICKUPS TO SHUFFLE USING CPickups:aPickups ARRAY. COORDS CAN ONLY BE
-// COMPARED / CHANGED THROUGH THE COBJECT POINTERS
-// ??? Why is this (^) here ???
-
 PickupsRandomizer *PickupsRandomizer::mInstance = nullptr;
 
 static std::unordered_map<int, int> weaponToModel

@@ -68,6 +68,61 @@ SelectRandomPickup (unsigned int modelId, bool isDeadPed)
     return modelId;
 }
 
+enum ePickupType {
+    PICKUP_NONE = 0,
+    PICKUP_IN_SHOP = 1,
+    PICKUP_ON_STREET = 2,
+    PICKUP_ONCE = 3,
+    PICKUP_ONCE_TIMEOUT = 4,
+    PICKUP_ONCE_TIMEOUT_SLOW = 5,
+    PICKUP_COLLECTABLE1 = 6,
+    PICKUP_IN_SHOP_OUT_OF_STOCK = 7,
+    PICKUP_MONEY = 8,
+    PICKUP_MINE_INACTIVE = 9,
+    PICKUP_MINE_ARMED = 10,
+    PICKUP_NAUTICAL_MINE_INACTIVE = 11,
+    PICKUP_NAUTICAL_MINE_ARMED = 12,
+    PICKUP_FLOATINGPACKAGE = 13,
+    PICKUP_FLOATINGPACKAGE_FLOATING = 14,
+    PICKUP_ON_STREET_SLOW = 15,
+    PICKUP_ASSET_REVENUE = 16,
+    PICKUP_PROPERTY_LOCKED = 17,
+    PICKUP_PROPERTY_FORSALE = 18,
+    PICKUP_MONEY_DOESNTDISAPPEAR = 19,
+    PICKUP_SNAPSHOT = 20,
+    PICKUP_2P = 21,
+    PICKUP_ONCE_FOR_MISSION = 22
+};
+
+/*******************************************************/
+bool
+ShouldRandomize (char pickupType, int model)
+{
+    if (model == 1277)
+        return false;
+    
+    switch (pickupType)
+        {
+        case PICKUP_ON_STREET:
+        case PICKUP_ONCE:
+        case PICKUP_COLLECTABLE1:
+        case PICKUP_ON_STREET_SLOW:
+        case PICKUP_ASSET_REVENUE:
+        case PICKUP_PROPERTY_FORSALE:
+        case PICKUP_SNAPSHOT:
+            return true;
+        }
+
+    return false;
+}
+
+/*******************************************************/
+bool
+Equal (CCompressedVector vec, float x, float y, float z)
+{
+    return int(vec.GetX ()) == int(x) && int(vec.GetY ()) == int(y) && int(vec.GetZ ()) == z;                
+}
+
 /*******************************************************/
 void
 ShuffleAllCollectables ()
@@ -83,6 +138,13 @@ ShuffleAllCollectables ()
         {
             auto &pickup = aPickups[i];
 
+            if (ShouldRandomize (pickup.m_PickupType, pickup.m_wModelId) &&
+                pickup.m_vPos.GetZ () < 95.0f && !Equal (pickup.m_vPos, -2120.0, 96.39, 39.0) &&
+                !Equal (pickup.m_vPos, -2094.0, -488.0, 36.0))
+                collectablePickups.push_back (&pickup);
+
+            continue;
+            
             if (pickup.m_wModelId == miCjOyster
                 || pickup.m_wModelId == miCjHorseShoe)
                 collectablePickups.push_back (&pickup);
@@ -128,8 +190,13 @@ RandomizePickup (FunctionCb<int> CPickups_GenerateNewOne, float x, float y,
     else
         modelId = SelectRandomPickup (modelId, false);
 
-    return CPickups_GenerateNewOne (x, y, z, modelId, pickupType, ammo,
+    int ret = CPickups_GenerateNewOne (x, y, z, modelId, pickupType, ammo,
                                     moneyPerDay, isEmpty, message);
+
+    if (ShouldRandomize (pickupType, modelId))
+        ShuffleAllCollectables();
+
+    return ret;
 }
 
 /*******************************************************/

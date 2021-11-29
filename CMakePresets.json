@@ -1,0 +1,51 @@
+{
+	"version": 2,
+	"configurePresets": [
+		{
+			"name": "release",
+			"displayName": "Release",
+			"generator": "NMake Makefiles",
+			"binaryDir": "${sourceDir}/build/${presetName}",
+			"architecture": {
+				"value": "Win32",
+				"strategy": "external"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			},
+			"vendor": {
+				"microsoft.com/VisualStudioSettings/CMake/1.0": {
+					"hostOS": [ "Windows" ]
+				}
+			}
+		},
+		{
+			"name": "debug",
+			"displayName": "Debug",
+			"generator": "NMake Makefiles",
+			"binaryDir": "${sourceDir}/build/${presetName}",
+			"architecture": {
+				"value": "Win32",
+				"strategy": "external"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			},
+			"vendor": {
+				"microsoft.com/VisualStudioSettings/CMake/1.0": {
+					"hostOS": [ "Windows" ]
+				}
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "release",
+			"configurePreset": "release"
+		},
+		{
+			"name": "debug",
+			"configurePreset": "debug"
+		}
+	]
+}

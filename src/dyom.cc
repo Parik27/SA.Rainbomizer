@@ -65,7 +65,8 @@ AdjustCodeForDYOM (FILE *file, void *buf, size_t len)
 void
 DyomRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("DYOMRandomizer"))
+    if (!ConfigManager::ReadConfig ("DYOMRandomizer", 
+        std::pair("UseEnglishOnlyFilter", &m_Config.EnglishOnly)))
         return;
 
     if (!ConfigManager::ReadConfig ("MissionRandomizer"))
@@ -231,6 +232,8 @@ DyomRandomizer::ParseMission (HANDLE session, const std::string &url)
                          output);
     FILE *file = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "wb");
     fwrite (output.data (), 1, output.size (), file);
+    FILE *file2 = fopen ((CFileMgr::ms_dirName + "\\DYOM8.dat"s).c_str (), "wb");
+    fwrite (output.data (), 1, output.size (), file2);
 
     return true;
 }
@@ -247,12 +250,17 @@ DyomRandomizer::DownloadRandomMission ()
 
             HANDLE session = OpenSession (handle);
 
-            std::string list = random (100) > 38 ? "list" : "list_d";
+            std::string list;
+            
+            if (m_Config.EnglishOnly)
+                list = "list?english=1&";
+            else
+                list = random (100) > 38 ? "list?" : "list_d?";
 
             int total_pages = GetTotalNumberOfDYOMMissionPages (session, list);
             while (!ParseMission (
                 session,
-                GetRandomEntryFromPage (session, list + "?page="
+                GetRandomEntryFromPage (session, list + "page="
                                                      + std::to_string (random (
                                                          total_pages)))))
                 ;

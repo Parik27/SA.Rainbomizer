@@ -796,7 +796,11 @@ void *__fastcall PopBootFix (uint8_t *vehicle, void *edx)
 /*******************************************************/
 int __fastcall VehicleUpdateFix (uint8_t *vehicle, void *edx, int model)
 {
-    if (!CheckForCAutomobile (vehicle))
+    if (!CheckForCAutomobile (vehicle)
+            || (ScriptVehicleRandomizer::GetInstance ()->mLastThread == "music1"
+                   && CModelInfo::IsHeliModel (
+                       ScriptVehicleRandomizer::GetInstance ()
+                           ->GetNewCarForCheck ())))
         return model;
 
     return CallMethodAndReturn<int, 0x6E3290> (vehicle, model);
@@ -2799,18 +2803,6 @@ ReplaceMessageText (char *str, int time, short flag, char bAddToPreviousBrief)
 }
 
 /*******************************************************/
-int __fastcall IgnoreWheelReplacement (CVehicle *vehicle, void *edx,
-                                       int modelId)
-{
-    if (!(ScriptVehicleRandomizer::GetInstance ()->mLastThread == "music1"
-          && CModelInfo::IsHeliModel (
-              ScriptVehicleRandomizer::GetInstance ()->GetNewCarForCheck ())))
-        {
-            return CallMethodAndReturn<int, 0x6E3290> (vehicle, modelId);
-        }
-}
-
-/*******************************************************/
 void __fastcall AddZero1Immunities (CRunningScript *scr, void *edx, short count)
 {
     scr->CollectParameters (count);
@@ -3079,10 +3071,6 @@ ScriptVehicleRandomizer::Initialise ()
          {HOOK_CALL, 0x46D549, (void *) &GetCurrentPlayerRCVeh},
          {HOOK_CALL, 0x487A50, (void *) &ActivateZero4SelfDestruct},
          {HOOK_CALL, 0x468137, (void *) &ReplaceMessageText},
-
-         // Prevents van in Life's A Beach being given custom wheels if it becomes a heli
-         // This could make it unenterable if so
-         {HOOK_CALL, 0x4985DA, (void *) &IgnoreWheelReplacement},
 
          // Makes Zero immune to collisions in Air Raid so planes don't crush him
          {HOOK_CALL, 0x47F893, (void *) &AddZero1Immunities},

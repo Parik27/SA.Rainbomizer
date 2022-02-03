@@ -151,9 +151,9 @@ struct TimecycleSample
         Amb_R         = random (100);
         Amb_G         = random (100);
         Amb_B         = random (100);
-        Amb_Obj_R     = random (50, 255);
-        Amb_Obj_G     = random (50, 255);
-        Amb_Obj_B     = random (50, 255);
+        //Amb_Obj_R     = random (50, 255);
+        //Amb_Obj_G     = random (50, 255);
+        //Amb_Obj_B     = random (50, 255);
         Dir_R         = 255;
         Dir_G         = 255;
         Dir_B         = 255;

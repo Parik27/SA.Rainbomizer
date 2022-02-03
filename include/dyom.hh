@@ -17,6 +17,11 @@ class DyomRandomizer
     void DownloadRandomMission ();
 
 public:
+    static inline struct Config
+    {
+        bool EnglishOnly;
+    } m_Config;
+
     CRunningScript *mDyomScript = nullptr;
 
     void HandleDyomScript (CRunningScript *scr);

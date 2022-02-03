@@ -78,7 +78,7 @@ ChangeCarColsOnFade = true # (Re-randomizes car colours on every fade)
 
 RandomizeMarkers = true # (Mission Markers and Arrows)
 RandomizeText = true # (HUD elements and menu text)
-RandomizeWeaponSprites = true # (Weapon icons visible in the top right of the HUD)
+RandomizeWeaponSprites = false # (Weapon icons visible in the top right of the HUD)
 
 # Set to true to use older style of text colour randomization from previous versions
 # This means elements such as subtitles, the in-game time, etc, are not randomized.
@@ -168,14 +168,8 @@ SlowPlanesInAirRaid = false
 # Set to -1 to not force a vehicle.
 ForcedVehicleId = -1
 
-# Uses a generic set of rules for randomizing vehicles that doesn't require patterns.
-# By default, the Rainbomizer will randomize any vehicle with any other vehicle.
-# The main game has patterns to only allow vehicles that are possible for all scenarios.
-# Setting this to true will randomize vehicles in such a way that they match their original type and number of seats.
-# This results in less variation but guaranteed compatability with other mods and changes.
-# Can also be used if you want to keep vehicles from being too crazy.
-# By default the mod should use this setting automatically for unrecognised scripts,
-# however if it fails to do so and you want to combine the Rainbomizer with something else, set to true.
+# Uses a generic set of rules for randomizing vehicles that doesn't require patterns 
+# for mod compatibility and/or simplicity.
 UseGenericPatterns = false
 
 # Gives you any vehicle for every mission and ignores all VehiclePatterns.txt patterns
@@ -337,6 +331,12 @@ RandomizeMissionWantedLevels = true
 # You could, for example, get 3 stars for stealing a cop bike, but lose 1 star for killing
 # a cop.
 RandomizeChaosPoints = false
+
+#######################################################
+[DYOMRandomizer]
+
+# Picks missions only from those designated as English by the DYOM website.
+UseEnglishOnlyFilter = false
 
 #######################################################
 [CheatRandomizer]

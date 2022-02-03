@@ -25,7 +25,13 @@ void __fastcall RandomizeMissionWantedLevel (CRunningScript *scr, void *edx,
 {
     scr->CollectParameters (count);
     if (ScriptParams[1] != 0)
-        ScriptParams[1] = random (1, 6);
+    {
+        bool greater = (bool) random (1);
+        if (!greater)
+            ScriptParams[1] = random (1, ScriptParams[1]);
+        else
+            ScriptParams[1] = random (ScriptParams[1], 6);
+    }
 }
 
 /*******************************************************/

@@ -271,36 +271,6 @@ void __fastcall ResetPlayerWeaponIDShrange (CRunningScript *scr, void *edx,
 }
 
 /*******************************************************/
-void __fastcall HandleShrangeWeaponReset (CRunningScript *scr, void *edx,
-                                          short count)
-{
-    scr->CollectParameters (count);
-    if (scr->CheckName ("shrange") && ScriptParams[0] == 0)
-        {
-            WeaponRandomizer::shPistol.ammo     = ScriptSpace[8131];
-            WeaponRandomizer::shPistol.weaponID = ScriptSpace[8135];
-            WeaponRandomizer::shPistol.modelID  = ScriptSpace[8139];
-
-            WeaponRandomizer::shShotgun.ammo     = ScriptSpace[8132];
-            WeaponRandomizer::shShotgun.weaponID = ScriptSpace[8136];
-            WeaponRandomizer::shShotgun.modelID  = ScriptSpace[8140];
-
-            WeaponRandomizer::shUzi.ammo     = ScriptSpace[8133];
-            WeaponRandomizer::shUzi.weaponID = ScriptSpace[8137];
-            WeaponRandomizer::shUzi.modelID  = ScriptSpace[8141];
-
-            WeaponRandomizer::shAK.ammo     = ScriptSpace[8134];
-            WeaponRandomizer::shAK.weaponID = ScriptSpace[8138];
-            WeaponRandomizer::shAK.modelID  = ScriptSpace[8142];
-
-            ScriptSpace[8135] = 42;
-            ScriptSpace[8136] = 43;
-            ScriptSpace[8137] = 44;
-            ScriptSpace[8138] = 45;
-        }
-}
-
-/*******************************************************/
 int *
 SetWeaponUsableInJetpack (int weaponId, char skill)
 {
@@ -395,7 +365,6 @@ WeaponRandomizer::Initialise ()
             injector::MakeCALL (0x4685AD, (void *) &ResetPlayerWeaponID);
             injector::MakeCALL (0x489A70, (void *) &ResetPlayerWeaponIDOnStart);
             injector::MakeCALL (0x4680F2, (void *) &ResetPlayerWeaponIDShrange);
-            injector::MakeCALL (0x476092, (void *) &HandleShrangeWeaponReset);
         }
 
     if (!ConfigManager::ReadConfig (
@@ -487,32 +456,6 @@ WeaponRandomizer::GetRandomWeapon (CPed *ped, int weapon, bool isPickup)
             else
                 {
                     buggy_weapons = {19, 20, 21, 14, 40, 39, 47, 48, 49};
-                }
-        }
-
-    // Code handling shooting range stuff cause it's weird
-    std::string shootingRange = "shrange";
-    if (!isPickup
-        && CRunningScripts::CheckForRunningScript (shootingRange.c_str ())
-        && ped->m_nPedType == ePedType::PED_TYPE_PLAYER1)
-        {
-            if (weapon == 42)
-                return shPistol.weaponID;
-            else if (weapon == 43)
-                return shShotgun.weaponID;
-            else if (weapon == 44)
-                return shUzi.weaponID;
-            else if (weapon == 45)
-                return shAK.weaponID;
-
-            if (ScriptSpace[8070] < 1)
-                {
-                    while ((weapon = random (1, 49),
-                            std::find (buggy_weapons.begin (),
-                                       buggy_weapons.end (), weapon)
-                                != buggy_weapons.end ()))
-                        ;
-                    return weapon;
                 }
         }
 

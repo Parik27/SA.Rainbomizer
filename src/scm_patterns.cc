@@ -156,7 +156,7 @@ ScriptVehiclePattern::DoesVehicleMatchPattern (int vehID)
 
     if ((mFlags.Smallplanes && CModelInfo::IsPlaneModel (vehID))
         && (vehID == 460 || vehID == 464 || vehID == 519 || vehID == 553
-            || vehID == 577 || vehID == 592))
+            || vehID == 577 || vehID == 592 || vehID == 511))
         return false;
 
     if ((mFlags.VTOL && CModelInfo::IsPlaneModel (vehID)) && vehID != 520)

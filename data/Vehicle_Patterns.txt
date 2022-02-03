@@ -244,7 +244,7 @@ heist1	Washing	2	Y	Y	N	Y	N	N	N	N	N
 heist3	Club	1	Y	Y	Y	Y	N	N	N	N	N					
 heist2	Nevada	1	Y	N	N	Y	Y	Y	N	N	N	norc+nohovercraft				
 heist4	Polmav	1	Y	N	N	N	Y	Y	Y	Y	Y					
-heist4	Packer	1	Y	Y	Y	Y	Y	Y	Y	Y	Y	notank				
+heist4	Packer	1	Y	Y	Y	Y	Y	Y	N	N	N	notank+smallplanes				
 heist4	Copbike	1	Y	Y	Y	Y	Y	Y	N	N	N	smallplanes				
 heist4	Freeway	1	Y	Y	Y	Y	Y	Y	Y	N	N	smallplanes				
 heist5	Leviathn	1	N	N	N	N	N	Y	N	N	N					

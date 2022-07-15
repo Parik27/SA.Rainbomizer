@@ -8,6 +8,7 @@
 #include "config.hh"
 #include <cstring>
 #include "missions.hh"
+#include <regex>
 
 using namespace std::literals;
 
@@ -246,8 +247,10 @@ DyomRandomizer::ParseMission (HANDLE session, const std::string &url)
                          output);
     FILE *file = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "wb");
     fwrite (output.data (), 1, output.size (), file);
+    fclose (file);
     FILE *file2 = fopen ((CFileMgr::ms_dirName + "\\DYOM8.dat"s).c_str (), "wb");
     fwrite (output.data (), 1, output.size (), file2);
+    fclose (file2);
 
     return true;
 }
@@ -256,79 +259,115 @@ DyomRandomizer::ParseMission (HANDLE session, const std::string &url)
 bool
 DyomRandomizer::TranslateMission (HANDLE session)
 {
-    byte bytes[40000];
-    byte  rof[40000];
+    byte input[40000];
+    byte  output[40000];
     FILE *file = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "rb");
-    std::size_t read = fread (bytes, 1, 40000, file);
+    std::size_t read = fread (input, 1, 40000, file);
     fclose (file);
+    if (read < 1 || input[0] == 0x00) //corrupted
+        return false;
     //copy first 4 bytes to the resulting array
-    memcpy (rof, bytes, 4);
+    memcpy (output, input, 4);
+    std::size_t o_pos = 4;
     //get mission name string
-    std::string name = "";
-    int   i = 4;
-    while (bytes[i] != NULL)
+    std::string text = "";
+    int   i_pos = 4;
+    while (input[i_pos] != 0x00)
         {
-            name+=(char)bytes[i];
-            i++;
+            text+=(char)input[i_pos];
+            i_pos++;
         }
-    int cut1 = i;
-    //skip next 4 fields
-    int counter = 0;
-    while (true)
-        {
-            if (bytes[i] == NULL)
-                counter++;
-            i++;
-            if (counter >= 4)
-                break;
-        }
-    //depending on the version objectives texts offset a little bit different to the header
-    int offset;
-    if (bytes[i + 1] == NULL)
-        offset = i + 0x194F;
-    else
-        offset = i + 0x195F;
+    std::size_t cut_pos = i_pos;
     //translate the mission name and write it to the resulting array
-    std::string translation = TranslateText (session, name);
-    std::size_t ins         = translation.size ();
-    memcpy (rof + 4, translation.data (), translation.size());
-    //write everything inbetween mission name and objectives texts to the resulting array
-    std::size_t ins2 = offset - cut1;
-    memcpy (rof + 4 + ins, bytes+cut1, offset-cut1);
-    //translate and write objectives to the resulting array (100 max)
-    counter = 0;
-    name    = "";
+    std::string translation = TranslateText (session, text);
+    memcpy (output + o_pos, translation.data (), translation.size ());
+    o_pos += translation.size ();
+    //write author name as-is
+    i_pos++;
+    while (input[i_pos] != 0x00)
+        {
+            i_pos++;
+        }
+    i_pos++;
+    memcpy (output + o_pos, input+cut_pos, i_pos-cut_pos);
+    o_pos += i_pos - cut_pos;
+    //translate 3 intro text fields
+    int counter = 0;
+    text        = "";
     while (true)
         {
-            if (bytes[offset] != NULL)
-                name += (char) bytes[offset];
+            if (input[i_pos] != 0x00)
+                text += (char) input[i_pos];
             else
                 {
-                    if (name.length () > 1)
+                    if (text.length () > 1)
                         {
-                            translation = TranslateText (session, name);
+                            translation = TranslateText (session, text);
                         }
                     else
                         {
-                            translation = name;
-                    }
-                    memcpy (rof + 4 + ins + ins2, translation.data (),
-                            translation.size ());
-                    ins2 += translation.size () + 1;
-                    rof[4 + ins + ins2 - 1] = 0x00;
-                    name                    = "";
+                            translation = text;
+                        }
+                    memcpy (output + o_pos, translation.c_str (),
+                            translation.size ()+1);
+                    o_pos += translation.size () + 1;
+                    text                    = "";
                     counter++;
                 }
-            offset++;
+            i_pos++;
+            if (counter >= 3)
+                break;
+        }
+    cut_pos = i_pos;
+    //depending on the version objectives texts offset a little bit different to the header
+    if (input[i_pos + 1] == NULL)
+        i_pos += 0x194F;
+    else
+        i_pos += 0x195F;
+    //write everything inbetween mission name and objectives texts to the resulting array
+    memcpy (output + o_pos, input+cut_pos, i_pos-cut_pos);
+    o_pos += i_pos - cut_pos;
+    //translate and write objectives to the resulting array (100 max)
+    counter = 0;
+    text    = "";
+    while (true)
+        {
+            if (input[i_pos] != 0x00)
+                text += (char) input[i_pos];
+            else
+                {
+                    if (text.length () > 1)
+                        {
+                            translation = TranslateText (session, text);
+                        }
+                    else
+                        {
+                            translation = text;
+                    }
+                    memcpy (output + o_pos, translation.c_str (),
+                            translation.size ()+1);
+                    o_pos += translation.size () + 1;
+                    text                    = "";
+                    counter++;
+                }
+            i_pos++;
             if (counter >= 100)
                 break;
         }
     //write the rest of the file to the resulting array
-    memcpy (rof + 4 + ins + ins2, bytes + offset, read - offset);
+    memcpy (output + o_pos, input + i_pos, read - i_pos);
+    //rename original file
+    std::remove ((CFileMgr::ms_dirName + "\\DYOM9_orig.dat"s).c_str ());
+    std::rename ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (),
+                 (CFileMgr::ms_dirName + "\\DYOM9_orig.dat"s).c_str ());
     //finally write the file with translated mission
-    FILE *file2 = fopen ((CFileMgr::ms_dirName + "\\DYOM7.dat"s).c_str (), "wb");
-    fwrite (rof, 1, 4 + ins + ins2 + read - offset, file2);
+    FILE *file2 = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "wb");
+    fwrite (output, 1, o_pos + read - i_pos, file2);
     fclose (file2);
+    FILE *file3
+        = fopen ((CFileMgr::ms_dirName + "\\DYOM8.dat"s).c_str (), "wb");
+    fwrite (output, 1, o_pos + read - i_pos, file3);
+    fclose (file3);
     return true;
 }
 
@@ -344,17 +383,16 @@ DyomRandomizer::TranslateText (HANDLE session, const std::string &text)
     std::size_t pos2 = GetNthOccurrenceOfString (response, "</div>", 7);
     std::string translation = response.substr (pos + 19, pos2 - pos - 19);
     //fix quotation marks
-    while (true)
+    translation = std::regex_replace (translation,
+                                      std::regex ("&#39;"), "'");
+    //translator tends to break tags with spaces, attempt to fix
+    translation = std::regex_replace(translation,std::regex("(\~)\s*([a-zA-Z])\s*(\~)"),"$1$2$3");
+    //trim everything above 99 symbols (crashes overwise)
+    if (translation.length () > 99)
         {
-            std::size_t quot = translation.find ("&#39;");
-            if (quot != translation.npos)
-                {
-                    translation = translation.replace (quot, 5, "'");
-                }
-            else
-                break;
+            translation = translation.substr (0, 99);
     }
-    //remove color codes broken by translator (crashes overwise)
+    // remove remaining broken tags (crashes overwise)
     pos = 0;
     while (true)
         {
@@ -364,19 +402,14 @@ DyomRandomizer::TranslateText (HANDLE session, const std::string &text)
                     if (translation.substr (tild + 2, 1).compare ("~") != 0)
                         {
                             translation = translation.replace (tild, 1, "");
-                            pos++;
+                            pos         = tild;
                         }
                     else
-                        pos = pos + 3;
+                        pos = tild + 3;
                 }
             else
                 break;
         }
-    //trim everything above 99 symbols (crashes overwise)
-    if (translation.length () > 99)
-        {
-            translation = translation.substr (0, 99);
-    }
     return translation;
 }
 

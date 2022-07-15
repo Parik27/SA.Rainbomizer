@@ -69,6 +69,11 @@ DyomRandomizer::Initialise ()
         std::pair("UseEnglishOnlyFilter", &m_Config.EnglishOnly)))
         return;
 
+    if (!ConfigManager::ReadConfig ("DYOMRandomizer",
+                                    std::pair ("AutoTranslateToEnglish",
+                                               &m_Config.Translate)))
+        return;
+
     if (!ConfigManager::ReadConfig ("MissionRandomizer"))
         {
             RegisterDelayedHooks (
@@ -139,6 +144,15 @@ HANDLE
 OpenSession (HINTERNET internet)
 {
     return InternetConnect (internet, "dyom.gtagames.nl",
+                            INTERNET_DEFAULT_HTTPS_PORT, NULL, NULL,
+                            INTERNET_SERVICE_HTTP, 0, 0);
+}
+
+/*******************************************************/
+HANDLE
+OpenSessionTranslator (HINTERNET internet)
+{
+    return InternetConnect (internet, "translate.google.com",
                             INTERNET_DEFAULT_HTTPS_PORT, NULL, NULL,
                             INTERNET_SERVICE_HTTP, 0, 0);
 }
@@ -239,6 +253,134 @@ DyomRandomizer::ParseMission (HANDLE session, const std::string &url)
 }
 
 /*******************************************************/
+bool
+DyomRandomizer::TranslateMission (HANDLE session)
+{
+    byte bytes[40000];
+    byte  rof[40000];
+    FILE *file = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "rb");
+    std::size_t read = fread (bytes, 1, 40000, file);
+    fclose (file);
+    //copy first 4 bytes to the resulting array
+    memcpy (rof, bytes, 4);
+    //get mission name string
+    std::string name = "";
+    int   i = 4;
+    while (bytes[i] != NULL)
+        {
+            name+=(char)bytes[i];
+            i++;
+        }
+    int cut1 = i;
+    //skip next 4 fields
+    int counter = 0;
+    while (true)
+        {
+            if (bytes[i] == NULL)
+                counter++;
+            i++;
+            if (counter >= 4)
+                break;
+        }
+    //depending on the version objectives texts offset a little bit different to the header
+    int offset;
+    if (bytes[i + 1] == NULL)
+        offset = i + 0x194F;
+    else
+        offset = i + 0x195F;
+    //translate the mission name and write it to the resulting array
+    std::string translation = TranslateText (session, name);
+    std::size_t ins         = translation.size ();
+    memcpy (rof + 4, translation.data (), translation.size());
+    //write everything inbetween mission name and objectives texts to the resulting array
+    std::size_t ins2 = offset - cut1;
+    memcpy (rof + 4 + ins, bytes+cut1, offset-cut1);
+    //translate and write objectives to the resulting array (100 max)
+    counter = 0;
+    name    = "";
+    while (true)
+        {
+            if (bytes[offset] != NULL)
+                name += (char) bytes[offset];
+            else
+                {
+                    if (name.length () > 1)
+                        {
+                            translation = TranslateText (session, name);
+                        }
+                    else
+                        {
+                            translation = name;
+                    }
+                    memcpy (rof + 4 + ins + ins2, translation.data (),
+                            translation.size ());
+                    ins2 += translation.size () + 1;
+                    rof[4 + ins + ins2 - 1] = 0x00;
+                    name                    = "";
+                    counter++;
+                }
+            offset++;
+            if (counter >= 100)
+                break;
+        }
+    //write the rest of the file to the resulting array
+    memcpy (rof + 4 + ins + ins2, bytes + offset, read - offset);
+    //finally write the file with translated mission
+    FILE *file2 = fopen ((CFileMgr::ms_dirName + "\\DYOM7.dat"s).c_str (), "wb");
+    fwrite (rof, 1, 4 + ins + ins2 + read - offset, file2);
+    fclose (file2);
+    return true;
+}
+
+/*******************************************************/
+std::string
+DyomRandomizer::TranslateText (HANDLE session, const std::string &text)
+{
+    std::string response = ReadStringFromRequest (
+        MakeRequest (session, "m?sl=auto&tl=en&q=" + text));
+    std::size_t pos = response.find ("\"result-container\"");
+    if (pos == response.npos)
+        return text;
+    std::size_t pos2 = GetNthOccurrenceOfString (response, "</div>", 7);
+    std::string translation = response.substr (pos + 19, pos2 - pos - 19);
+    //fix quotation marks
+    while (true)
+        {
+            std::size_t quot = translation.find ("&#39;");
+            if (quot != translation.npos)
+                {
+                    translation = translation.replace (quot, 5, "'");
+                }
+            else
+                break;
+    }
+    //remove color codes broken by translator (crashes overwise)
+    pos = 0;
+    while (true)
+        {
+            std::size_t tild = translation.find ("~", pos);
+            if (tild != translation.npos)
+                {
+                    if (translation.substr (tild + 2, 1).compare ("~") != 0)
+                        {
+                            translation = translation.replace (tild, 1, "");
+                            pos++;
+                        }
+                    else
+                        pos = pos + 3;
+                }
+            else
+                break;
+        }
+    //trim everything above 99 symbols (crashes overwise)
+    if (translation.length () > 99)
+        {
+            translation = translation.substr (0, 99);
+    }
+    return translation;
+}
+
+/*******************************************************/
 void
 DyomRandomizer::DownloadRandomMission ()
 {
@@ -251,7 +393,7 @@ DyomRandomizer::DownloadRandomMission ()
             HANDLE session = OpenSession (handle);
 
             std::string list;
-            
+
             if (m_Config.EnglishOnly)
                 list = "list?english=1&";
             else
@@ -267,6 +409,19 @@ DyomRandomizer::DownloadRandomMission ()
 
             CloseHandle (session);
             CloseHandle (handle);
+
+            if (m_Config.Translate)
+                {
+                    HINTERNET handle2
+                        = InternetOpen ("123robot",
+                                        INTERNET_OPEN_TYPE_PRECONFIG, NULL,
+                                        NULL, 0);
+
+                    HANDLE session2 = OpenSessionTranslator (handle2);
+                    TranslateMission (session2);
+                    CloseHandle (session2);
+                    CloseHandle (handle2);
+                }
         }
 }
 

@@ -259,19 +259,41 @@ DyomRandomizer::ParseMission (HANDLE session, const std::string &url)
 bool
 DyomRandomizer::TranslateMission (HANDLE session)
 {
+    //v1.1 - (int)2 - 6 header fields - doesn't have objective text
+    //v2.0 v2.1 - (int)3 - 6 header fields - 0x4A7 - objective texts
+    //v3.0 v4.0 v4.1 (int)4 - 6 header fields - 0xCCF - objective texts
+    //v5.0 - (int)5 - 6 header fields - 0x194F - objective texts
+    //v7.0.0 and onward - (int)6 - 7 header fields - 0x194F - objective texts
+    //published mission is negative
+
     byte input[40000];
     byte  output[40000];
     FILE *file = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "rb");
     std::size_t read = fread (input, 1, 40000, file);
     fclose (file);
-    if (read < 1 || input[0] == 0x00) //corrupted
+    if (read < 1) //corrupted
         return false;
-    //copy first 4 bytes to the resulting array
+    //copy first 4 bytes (version) to the resulting array and variable
     memcpy (output, input, 4);
+    INT8       version;
+    std::size_t offset;
+    memcpy (&version, input, 1);
+    if (version < 0)
+        version *= -1;
+    if (version < 2 || version > 6) // unsupported version
+        return false;
+    switch (version)
+        {
+        case 3: offset = 0x4A7; break;
+        case 4: offset = 0xCCF; break;
+        case 5:
+        case 6:
+        default: offset = 0x194F; break;
+    }
     std::size_t o_pos = 4;
     //get mission name string
     std::string text = "";
-    int   i_pos = 4;
+    std::size_t i_pos = 4;
     while (input[i_pos] != 0x00)
         {
             text+=(char)input[i_pos];
@@ -318,41 +340,62 @@ DyomRandomizer::TranslateMission (HANDLE session)
             if (counter >= 3)
                 break;
         }
-    cut_pos = i_pos;
-    //depending on the version objectives texts offset a little bit different to the header
-    if (input[i_pos + 1] == NULL)
-        i_pos += 0x194F;
-    else
-        i_pos += 0x195F;
-    //write everything inbetween mission name and objectives texts to the resulting array
-    memcpy (output + o_pos, input+cut_pos, i_pos-cut_pos);
-    o_pos += i_pos - cut_pos;
-    //translate and write objectives to the resulting array (100 max)
-    counter = 0;
-    text    = "";
-    while (true)
+    if (version != 2)
         {
-            if (input[i_pos] != 0x00)
-                text += (char) input[i_pos];
-            else
+            cut_pos = i_pos;
+            if (version == 6) // skip through soundcode field
                 {
-                    if (text.length () > 1)
+                    while (true)
                         {
-                            translation = TranslateText (session, text);
+                            if (input[i_pos] != 0x00)
+                                i_pos++;
+                            else
+                                {
+                                    i_pos++;
+                                    break;
+                                }
                         }
+                    memcpy (output + o_pos, input + cut_pos, i_pos - cut_pos);
+                    o_pos += i_pos - cut_pos;
+                    cut_pos = i_pos;
+                }
+            // get objectives count
+            UINT8 obj_count;
+            memcpy (&obj_count, input + cut_pos, 1);
+            // depending on the version objectives texts offset a little bit
+            // different to the header
+            i_pos += offset;
+            // write everything inbetween mission name and objectives texts to
+            // the resulting array
+            memcpy (output + o_pos, input + cut_pos, i_pos - cut_pos);
+            o_pos += i_pos - cut_pos;
+            // translate and write objectives to the resulting array (100 max)
+            counter = 0;
+            text    = "";
+            while (true)
+                {
+                    if (input[i_pos] != 0x00)
+                        text += (char) input[i_pos];
                     else
                         {
-                            translation = text;
-                    }
-                    memcpy (output + o_pos, translation.c_str (),
-                            translation.size ()+1);
-                    o_pos += translation.size () + 1;
-                    text                    = "";
-                    counter++;
+                            if (text.length () > 1)
+                                {
+                                    translation = TranslateText (session, text);
+                                }
+                            else
+                                {
+                                    translation = text;
+                                }
+                            memcpy (output + o_pos, translation.c_str (),
+                                    translation.size () + 1);
+                            o_pos += translation.size () + 1;
+                            text = "";
+                            counter++;
+                        }
+                    i_pos++;
+                    if (counter >= obj_count)
+                        break;
                 }
-            i_pos++;
-            if (counter >= 100)
-                break;
         }
     //write the rest of the file to the resulting array
     memcpy (output + o_pos, input + i_pos, read - i_pos);

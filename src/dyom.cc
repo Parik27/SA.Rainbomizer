@@ -359,9 +359,6 @@ DyomRandomizer::TranslateMission (HANDLE session)
                     o_pos += i_pos - cut_pos;
                     cut_pos = i_pos;
                 }
-            // get objectives count
-            UINT8 obj_count;
-            memcpy (&obj_count, input + cut_pos, 1);
             // depending on the version objectives texts offset a little bit
             // different to the header
             i_pos += offset;
@@ -393,7 +390,7 @@ DyomRandomizer::TranslateMission (HANDLE session)
                             counter++;
                         }
                     i_pos++;
-                    if (counter >= obj_count)
+                    if (counter >= 100)
                         break;
                 }
         }

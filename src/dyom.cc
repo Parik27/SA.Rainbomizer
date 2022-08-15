@@ -260,10 +260,10 @@ bool
 DyomRandomizer::TranslateMission (HANDLE session)
 {
     //v1.1 - (int)2 - 6 header fields - doesn't have objective text
-    //v2.0 v2.1 - (int)3 - 6 header fields - 0x4A7 - objective texts
-    //v3.0 v4.0 v4.1 (int)4 - 6 header fields - 0xCCF - objective texts
-    //v5.0 - (int)5 - 6 header fields - 0x194F - objective texts
-    //v7.0.0 and onward - (int)6 - 7 header fields - 0x194F - objective texts
+    //v2.0 v2.1 - (int)3 - 6 header fields - 0x4A7 - 20 objective texts max
+    //v3.0 v4.0 v4.1 (int)4 - 6 header fields - 0xCCF - 50 objective texts max
+    //v5.0 - (int)5 - 6 header fields - 0x194F - 100 objective texts max
+    //v7.0.0 and onward - (int)6 - 7 header fields - 0x194F - 100 objective texts max
     //published mission is negative
 
     byte input[40000];
@@ -277,6 +277,7 @@ DyomRandomizer::TranslateMission (HANDLE session)
     memcpy (output, input, 4);
     INT8       version;
     std::size_t offset;
+    UINT8       max_objectives;
     memcpy (&version, input, 1);
     if (version < 0)
         version *= -1;
@@ -284,11 +285,20 @@ DyomRandomizer::TranslateMission (HANDLE session)
         return false;
     switch (version)
         {
-        case 3: offset = 0x4A7; break;
-        case 4: offset = 0xCCF; break;
+        case 3:
+            offset         = 0x4A7;
+            max_objectives = 20;
+            break;
+        case 4:
+            offset = 0xCCF;
+            max_objectives = 50;
+            break;
         case 5:
         case 6:
-        default: offset = 0x194F; break;
+        default:
+            offset         = 0x194F;
+            max_objectives = 100;
+            break;
     }
     std::size_t o_pos = 4;
     //get mission name string
@@ -390,7 +400,7 @@ DyomRandomizer::TranslateMission (HANDLE session)
                             counter++;
                         }
                     i_pos++;
-                    if (counter >= 100)
+                    if (counter >= max_objectives)
                         break;
                 }
         }

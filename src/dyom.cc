@@ -417,23 +417,23 @@ DyomRandomizer::TranslateText (HANDLE session, const std::string &text)
 {
     std::string response = ReadStringFromRequest (
         MakeRequest (session, "m?sl=auto&tl=en&q=" + text));
-    std::size_t pos = response.find ("\"result-container\"");
-    if (pos == response.npos)
+    std::regex rtext ("result-container\">(.*?)<");
+    std::cmatch cm;
+    if (!std::regex_search (response.c_str(), cm, rtext))
         return text;
-    std::size_t pos2 = GetNthOccurrenceOfString (response, "</div>", 7);
-    std::string translation = response.substr (pos + 19, pos2 - pos - 19);
+    std::string translation = cm[1];
     //fix quotation marks
     translation = std::regex_replace (translation,
                                       std::regex ("&#39;"), "'");
     //translator tends to break tags with spaces, attempt to fix
     translation = std::regex_replace(translation,std::regex("(~)\\s*([a-zA-Z])\\s*(~)"),"$1$2$3");
-    //trim everything above 99 symbols (crashes overwise)
+    //trim everything above 99 symbols (crashes otherwise)
     if (translation.length () > 99)
         {
             translation = translation.substr (0, 99);
     }
-    // remove remaining broken tags (crashes overwise)
-    pos = 0;
+    // remove remaining broken tags (crashes otherwise)
+    std::size_t pos = 0;
     while (true)
         {
             std::size_t tild = translation.find ("~", pos);

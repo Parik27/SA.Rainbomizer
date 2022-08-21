@@ -31,25 +31,13 @@
 #include <string>
 #include "fades.hh"
 
+#include "util/HSL.hh"
+
 ColourRandomizer *ColourRandomizer::mInstance = nullptr;
 
 // Store RGB colours and light IDs to ensure each one stays consistent without
 // flickering.
-static std::vector<ColourRandomizer::Pattern> colourPatterns;
 static ColourRandomizer::Pattern              weaponHUDSprite;
-
-ColourRandomizer::Pattern
-GetColour (ColourRandomizer::Pattern pattern)
-{
-    for (int i = 0; i < colourPatterns.size (); i++)
-        {
-            if (colourPatterns[i].ID == pattern.ID)
-                {
-                    return colourPatterns[i];
-                }
-        }
-    return {-1, {-1, -1, -1}};
-}
 
 /*******************************************************/
 void
@@ -129,68 +117,74 @@ RandomizeFadeColour ()
     injector::WriteMemory<CRGBA> (0xC3EFA8, GetRainbowColour ());
 }
 
-/*******************************************************/
-CRGBA
-GetRainbowColour (int offset)
+void
+RandomizeColour (CRGBA &out, float seed = 0.0f)
 {
+    if (out.r == 255 && out.g == 255 && out.b == 255)
+        return;
+
+    if (out.r == 0 && out.g == 0 && out.b == 0)
+        return;
+    
     static bool hueCycle = ColourRandomizer::m_Config.RainbowHueCycle;
+    double time = 1000.0 * clock () / CLOCKS_PER_SEC;
+    
+    using namespace Rainbomizer;
 
-    int        colour[3];
-    static int offsetForStatic = random (0, 10000);
-    double     time
-        = (!hueCycle) ? offsetForStatic : 1000.0 * clock () / CLOCKS_PER_SEC;
+    HSL colour (CARGB (255, out.r, out.g, out.b));
 
-    HSVtoRGB (int (time / 10 + offset) % 360, 0.7, 0.7, colour);
+    float offset = fabs (ColourRandomizer::HudRandomizerSeed
+                         + (out.rgba & 0x00FFFFFF) + seed);
 
-    return {colour[0], colour[1], colour[2]};
+    auto genFloat = [offset] (float min, float max) {
+        return min + fmod(offset, max-min);
+    };
+
+    colour.h = hueCycle ? fmod (time / 10, 360.0f) : genFloat (0.0f, 360.0f);
+    colour.s = genFloat (0.5, 1);
+    colour.l = genFloat (std::max (0.0f, -1 * (powf (colour.l - 1, 2)) + 0.75f),
+                         std::min (1.0f, colour.l + 0.25f));
+
+    CARGB newColour = colour.ToARGB ();
+
+    out.r = newColour.r;
+    out.g = newColour.g;
+    out.b = newColour.b;
 }
 
-int
-HashColour (const CRGBA &colour)
+void
+RandomizeColour (int id, CRGBA& out, float lightness = 0.5)
 {
-    return (((colour.r + ColourRandomizer::HudRandomizerSeed) % 255) * 255
-            + ((colour.g + ColourRandomizer::HudRandomizerSeed) % 255))
-               * 255
-           + ((colour.b + ColourRandomizer::HudRandomizerSeed) % 255);
+    static std::unordered_map<int, CRGBA> origColours;
+    if (!origColours.count (id))
+        {
+            origColours[id]
+                = CRGBA (random(255), random(255), random(255), out.a);
+        }
+
+    out = origColours[id];
+    RandomizeColour (out);
+}
+
+CRGBA GetRainbowColour (int offset)
+{
+    CRGBA col(200,200,200,255);
+    col.rgba = offset;
+
+    RandomizeColour (col);
+    return col;
 }
 
 /*******************************************************/
 CRGBA *__fastcall RandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
                                     uint8_t g, uint8_t b, uint8_t a)
 {
-    static bool hueCycle  = ColourRandomizer::m_Config.RainbowHueCycle;
-    static bool crazyMode = ColourRandomizer::m_Config.CrazyMode;
-
-    static int offset = random (0, 10000);
-    float      time = (!hueCycle) ? offset : 1000.0 * clock () / CLOCKS_PER_SEC;
-
-    int colour[3];
-    int hash = HashColour ({r, g, b, a});
-    HSVtoRGB ((int) (time / 10 + hash) % 360, 0.7, 0.7, colour);
-
-    bool randomizeColour = false;
-
-    if (ColourRandomizer::m_Config.OldColourRandomization && r != g && g != b)
-        randomizeColour = true;
-    else if (!ColourRandomizer::m_Config.OldColourRandomization
-             && ((r != 255 && g != 255 && b != 255)
-                 && (r != 0 && g != 0 && b != 0)))
-        randomizeColour = true;
-
-    if (randomizeColour || crazyMode)
-        {
-            thisCol->r = colour[0];
-            thisCol->g = colour[1];
-            thisCol->b = colour[2];
-            thisCol->a = a;
-        }
-    else
-        {
-            thisCol->r = r;
-            thisCol->g = g;
-            thisCol->b = b;
-            thisCol->a = a;
-        }
+    thisCol->r = r;
+    thisCol->g = g;
+    thisCol->b = b;
+    thisCol->a = a;
+    
+    RandomizeColour (*thisCol);
     return thisCol;
 }
 
@@ -210,8 +204,7 @@ CRGBA *__fastcall SkipRandomizeColours (CRGBA *thisCol, void *edx, uint8_t r,
 void __fastcall RandomizeMarkers (C3dMarker *marker)
 {
     auto colour      = marker->colour;
-    marker->colour   = GetRainbowColour (HashColour (colour));
-    marker->colour.a = colour.a;
+    RandomizeColour (marker->colour);
 
     HookManager::CallOriginal<injector::thiscall<void (C3dMarker *)>,
                               0x7250B1> (marker);
@@ -230,26 +223,9 @@ RandomizeCoronaColours (int ID, CEntity *attachTo, char red, char green,
                         float fadeSpeed, bool onlyFromBelow,
                         bool reflectionDelay)
 {
-    CRGBA colour = {red, green, blue, alpha};
-    if (!ColourRandomizer::m_Config.ConsistentLights)
-        {
-            ColourRandomizer::Pattern currentID
-                = {ID, {colour.r, colour.g, colour.b}};
-            if (GetColour (currentID).ID == -1)
-                {
-                    currentID.colours[0] = random (255);
-                    currentID.colours[1] = random (255);
-                    currentID.colours[2] = random (255);
-                    colourPatterns.push_back (currentID);
-                }
-            else
-                {
-                    colour.r = GetColour (currentID).colours[0];
-                    colour.g = GetColour (currentID).colours[1];
-                    colour.b = GetColour (currentID).colours[2];
-                }
-        }
-    colour = GetRainbowColour (HashColour (colour));
+    CRGBA colour = {122, 122, 122, alpha};
+    RandomizeColour (ID, colour);
+    
     CCoronas::RegisterCorona (ID, attachTo, colour.r, colour.g, colour.b, alpha,
                               posn, radius, farClip, coronaType, flaretype,
                               enableReflection, checkObstacles, _param_not_used,
@@ -268,25 +244,7 @@ RandomizeLightColours (int ID, CEntity *attachTo, char red, char green,
                        bool onlyFromBelow, bool reflectionDelay)
 {
     CRGBA colour = {red, green, blue, alpha};
-    if (!ColourRandomizer::m_Config.ConsistentLights)
-        {
-            ColourRandomizer::Pattern currentID
-                = {ID, {colour.r, colour.g, colour.b}};
-            if (GetColour (currentID).ID == -1)
-                {
-                    currentID.colours[0] = random (255);
-                    currentID.colours[1] = random (255);
-                    currentID.colours[2] = random (255);
-                    colourPatterns.push_back (currentID);
-                }
-            else
-                {
-                    colour.r = GetColour (currentID).colours[0];
-                    colour.g = GetColour (currentID).colours[1];
-                    colour.b = GetColour (currentID).colours[2];
-                }
-        }
-    colour = GetRainbowColour (HashColour (colour));
+    RandomizeColour (ID, colour);
     CCoronas::RegisterCorona (ID, attachTo, colour.r, colour.g, colour.b, alpha,
                               posn, radius, farClip, texture, flaretype,
                               enableReflection, checkObstacles, _param_not_used,
@@ -294,15 +252,23 @@ RandomizeLightColours (int ID, CEntity *attachTo, char red, char green,
                               fadeSpeed, onlyFromBelow, reflectionDelay);
 }
 
+enum WeaponSpriteType
+    {
+        SPRITE_WEAPON_HUD,
+        SPRITE_FPS_CROSSHAIR,
+        SPRITE_CHECKPOINT,
+        SPRITE_CLOUD_RELATED
+    };
+
 /*******************************************************/
-template <int address>
+template <WeaponSpriteType type>
 void
 RandomizeWeaponSpriteColours (float x, float y, float z, float halfw,
                               float halfh, char r, char g, char b, char a,
                               float rhw, char intensity, char udir, char vdir)
 {
     CRGBA colour = {r, g, b, a};
-    if (address == 0x58D8FD)
+    if (type == SPRITE_WEAPON_HUD)
         {
             colour.r = weaponHUDSprite.colours[0];
             colour.g = weaponHUDSprite.colours[1];
@@ -311,12 +277,14 @@ RandomizeWeaponSpriteColours (float x, float y, float z, float halfw,
     else
         {
             static ColourRandomizer::Pattern weaponSpriteColours
-                = {1, {random (255), random (255), b}};
+                = {1, {200, 200, 200}};
+
             colour = {weaponSpriteColours.colours[0],
                       weaponSpriteColours.colours[1],
                       weaponSpriteColours.colours[2], a};
         }
-    colour = GetRainbowColour (HashColour (colour));
+    
+    RandomizeColour (colour);
     CSprite::RenderOneXLUSprite (x, y, z, halfw, halfh, colour.r, colour.g,
                                  colour.b, a, rhw, intensity, udir, vdir);
 }
@@ -336,7 +304,7 @@ RandomizeWeatherEffectColours (float x, float y, float z, float w, float h,
             colour = {cloudColourHigh.colours[0], cloudColourHigh.colours[1],
                       cloudColourHigh.colours[2], a};
         }
-    colour = GetRainbowColour (HashColour (colour));
+    RandomizeColour (colour);
     CSprite::RenderBufferedOneXLUSprite (x, y, z, w, h, colour.r, colour.g,
                                          colour.b, a, recipNearZ, arg11);
 }
@@ -349,13 +317,10 @@ RandomizeFogColours (float x, float y, float z, float w, float h, char r,
                      char arg12)
 {
     CRGBA        colour  = {r, g, b, a};
-    static CRGBA fogType = {r, g, b, -1};
-    if (fogType.a == -1)
-        {
-            fogType = {random (255), g, b, a};
-        }
+    static CRGBA fogType = {random (255), g, b, a};
+    
     colour = fogType;
-    colour = GetRainbowColour (HashColour (colour));
+    RandomizeColour (colour);
     CSprite::RenderBufferedOneXLUSprite_Rotate_Aspect (x, y, z, w, h, colour.r,
                                                        colour.g, colour.b, a,
                                                        recipNearZ, angle,
@@ -370,11 +335,10 @@ RandomizeCloudColours (float x, float y, float z, float w, float h, char r,
                        char arg12)
 {
     CRGBA        colour             = {r, g, b, a};
-    static CRGBA cloudColourDistant = {-1, -1, -1, -1};
-    if (cloudColourDistant.a == -1)
-        cloudColourDistant = {r, g, b, a};
+    static CRGBA cloudColourDistant = {r, g, b, a};
+
     colour = cloudColourDistant;
-    colour = GetRainbowColour (HashColour (colour));
+    RandomizeColour (colour);
     CSprite::RenderBufferedOneXLUSprite_Rotate_Dimension (x, y, z, w, h,
                                                           colour.r, colour.g,
                                                           colour.b, a,
@@ -388,7 +352,7 @@ RandomizeRpLights (RpLight *light, RwRGBAReal *colour)
 {
     CRGBA colourNew = {(int) (colour->r * 255.0f), (int) (colour->g * 255.0f),
                        (int) (colour->b * 255.0f), (int) (colour->a * 255.0f)};
-    colourNew       = GetRainbowColour (HashColour (colourNew));
+    RandomizeColour (colourNew);
     colour->r       = colourNew.r / 255.0f;
     colour->g       = colourNew.g / 255.0f;
     colour->b       = colourNew.b / 255.0f;
@@ -407,7 +371,8 @@ CRGBA *__fastcall AddColourExceptions (CRGBA *thisCol, void *edx, uint8_t r,
             colour.g = weaponHUDSprite.colours[1];
             colour.b = weaponHUDSprite.colours[2];
         }
-    colour     = GetRainbowColour (HashColour (colour));
+    
+    RandomizeColour (colour);
     thisCol->r = colour.r;
     thisCol->g = colour.g;
     thisCol->b = colour.b;
@@ -453,7 +418,7 @@ ColourRandomizer::Initialise ()
         return;
 
     ColourRandomizer::HudRandomizerSeed = random (INT_MAX);
-    weaponHUDSprite = {1, {random (255), random (255), random (255)}};
+    weaponHUDSprite = {1, {230, 230, 230}};
 
     if (m_Config.RandomizeCarCols)
         {
@@ -483,7 +448,7 @@ ColourRandomizer::Initialise ()
                 {
                     injector::MakeCALL (0x58D8FD,
                                         (void *) &RandomizeWeaponSpriteColours<
-                                            0x58D8FD>); // Weapon Icon
+                                            SPRITE_WEAPON_HUD>); // Weapon Icon
                     injector::MakeCALL (
                         0x58D978,
                         (void *) &AddColourExceptions<0x58D978>); // Fist Sprite
@@ -491,27 +456,26 @@ ColourRandomizer::Initialise ()
 
             injector::MakeCALL (
                 0x586850,
-                (void *) &AddColourExceptions<0x586850>); // Gang Territories
+                AddColourExceptions<0x586850>); // Gang Territories
 
             for (int address :
                  {0x444F5F, 0x44535A, 0x445840, 0x47C698, 0x60CB72, 0x73878A})
                 {
-                    injector::MakeCALL (address,
-                                        (void *) &RandomizeBlipColourID);
+                    injector::MakeCALL (address, RandomizeBlipColourID);
                 }
 
             injector::MakeCALL (0x58E95B,
-                                (void *) &RandomizeWeaponSpriteColours<
-                                    0x58E95B>); // FPS Crosshair 1
+                                RandomizeWeaponSpriteColours<
+                                    SPRITE_FPS_CROSSHAIR>); // FPS Crosshair 1
             injector::MakeCALL (0x58E9CA,
-                                (void *) &RandomizeWeaponSpriteColours<
-                                    0x58E9CA>); // FPS Crosshair 2
+                                RandomizeWeaponSpriteColours<
+                                    SPRITE_FPS_CROSSHAIR>); // FPS Crosshair 2
             injector::MakeCALL (0x58EA39,
-                                (void *) &RandomizeWeaponSpriteColours<
-                                    0x58EA39>); // FPS Crosshair 3
+                                RandomizeWeaponSpriteColours<
+                                    SPRITE_FPS_CROSSHAIR>); // FPS Crosshair 3
             injector::MakeCALL (0x58EAA8,
-                                (void *) &RandomizeWeaponSpriteColours<
-                                    0x58EAA8>); // FPS Crosshair 4
+                                RandomizeWeaponSpriteColours<
+                                    SPRITE_FPS_CROSSHAIR>); // FPS Crosshair 4
         }
 
     if (m_Config.RandomizeMarkers)
@@ -519,7 +483,7 @@ ColourRandomizer::Initialise ()
             RegisterHooks (
                 {{HOOK_CALL, 0x7250B1, (void *) &RandomizeMarkers},
                  {HOOK_CALL, 0x725D70,
-                  (void *) &RandomizeWeaponSpriteColours<0x725D70>}}); // Checkpoint
+                  (void *) &RandomizeWeaponSpriteColours<SPRITE_CHECKPOINT>}}); // Checkpoint
                                                                        // Arrow
         }
 
@@ -531,15 +495,13 @@ ColourRandomizer::Initialise ()
                   0x6DDF28, 0x6E0D01, 0x6E0DF7, 0x6E1A2D, 0x6E219F, 0x6E2297,
                   0x6E253E, 0x6E2633, 0x7175C3, 0x7176BA, 0x7177B1, 0x73AAA2})
                 {
-                    injector::MakeCALL (address,
-                                        (void *) &RandomizeCoronaColours);
+                    injector::MakeCALL (address, RandomizeCoronaColours);
                 }
 
             for (int address :
                  {0x5363A8, 0x536511, 0x6FC6B1, 0x6FC73D, 0x6FCA80, 0x6FD02E})
                 {
-                    injector::MakeCALL (address,
-                                        (void *) &RandomizeLightColours);
+                    injector::MakeCALL (address, RandomizeLightColours);
                 }
         }
 
@@ -547,8 +509,7 @@ ColourRandomizer::Initialise ()
         {
             for (int address : {0x53B7E0, 0x53B893, 0x53B99C, 0x53BAA5})
                 {
-                    injector::MakeCALL (address,
-                                        (void *) &RandomizeCoronaColours);
+                    injector::MakeCALL (address, RandomizeCoronaColours);
                 }
         }
 
@@ -558,31 +519,29 @@ ColourRandomizer::Initialise ()
             // &RandomizeWeatherEffectColours<0x6FB9A6>); // Wet Roads
             injector::MakeCALL (
                 0x713F0F,
-                (void *) &RandomizeWeatherEffectColours<0x713F0F>); // Stars
+                RandomizeWeatherEffectColours<0x713F0F>); // Stars
         }
 
     if (m_Config.RandomizeRainbows)
         {
             injector::MakeCALL (
                 0x714371,
-                (void *) &RandomizeWeatherEffectColours<0x714371>); // Rainbows
+                RandomizeWeatherEffectColours<0x714371>); // Rainbows
         }
 
     if (m_Config.RandomizeClouds)
         {
-            injector::MakeCALL (0x715EDF,
-                                (void *) &RandomizeWeatherEffectColours<
-                                    0x715EDF>); // High Clouds
-            injector::MakeCALL (0x700817,
-                                (void *) &RandomizeFogColours<0x700817>);
-            injector::MakeCALL (0x700B6B,
-                                (void *) &RandomizeFogColours<0x700B6B>);
+            injector::MakeCALL (
+                0x715EDF,
+                RandomizeWeatherEffectColours<0x715EDF>); // High Clouds
+            injector::MakeCALL (0x700817, RandomizeFogColours<0x700817>);
+            injector::MakeCALL (0x700B6B, RandomizeFogColours<0x700B6B>);
             injector::MakeCALL (
                 0x714216,
-                (void *) &RandomizeCloudColours<0x714216>); // Distant Clouds
+                RandomizeCloudColours<0x714216>); // Distant Clouds
             injector::MakeCALL (0x714011,
-                                (void *) &RandomizeWeaponSpriteColours<
-                                    0x714011>); // Cloud-related
+                                RandomizeWeaponSpriteColours<
+                                    SPRITE_CLOUD_RELATED>); // Cloud-related
         }
 
     // Basically the equivalent of discount TimeCycle Randomizer, might add as

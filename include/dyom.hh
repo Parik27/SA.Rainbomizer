@@ -24,6 +24,7 @@ public:
 
     CRunningScript *mDyomScript = nullptr;
 
+    void HandleAutoplay (CRunningScript* scr);
     void HandleDyomScript (CRunningScript *scr);
 
     static bool mEnabled;

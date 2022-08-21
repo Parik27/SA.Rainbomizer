@@ -928,10 +928,20 @@ enum eFontAlignment
 
 struct CRGBA
 {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
+    union
+    {
+        struct
+        {
+            unsigned char r;
+            unsigned char g;
+            unsigned char b;
+            unsigned char a;
+        };
+        uint32_t rgba;
+    };
+
+    CRGBA () : r (255), g (255), b (255), a (255) {}
+
     CRGBA (int r, int g, int b, int a = 255)
     {
         this->r = r;

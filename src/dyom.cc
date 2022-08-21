@@ -4,10 +4,12 @@
 #include "functions.hh"
 #include "base.hh"
 #include "injector/calling.hpp"
+#include <ctime>
 #include <wininet.h>
 #include "config.hh"
 #include <cstring>
 #include "missions.hh"
+#include "util/scrpt.hh"
 #include <regex>
 
 using namespace std::literals;
@@ -94,37 +96,28 @@ DyomRandomizer::Initialise ()
 bool
 ReadRequestResponse (HANDLE request, std::vector<uint8_t> &out)
 {
-    DWORD dwSize;
+    DWORD dwSize = 16000;
     DWORD dwDownloaded;
+
+    auto lpszData = new TCHAR[dwSize + 1];
 
     for (;;)
         {
-
-            if (!InternetQueryDataAvailable (request, &dwSize, 0, 0))
-                {
-                    Logger::GetLogger ()->LogMessage (
-                        "InternetQueryDataAvailable failed "
-                        + std::to_string (GetLastError ()));
-
-                    return false;
-                }
-            auto lpszData = new TCHAR[dwSize + 1];
             if (!InternetReadFile (request, lpszData, dwSize, &dwDownloaded))
                 {
                     Logger::GetLogger ()->LogMessage (
                         "InternetReadFile failed "
                         + std::to_string (GetLastError ()));
-
-                    delete[] lpszData;
                     break;
                 }
 
-            out.insert (out.end (), lpszData, lpszData + dwSize);
-
             if (dwDownloaded == 0)
                 break;
+
+            out.insert (out.end (), lpszData, lpszData + dwDownloaded);
         }
 
+    delete[] lpszData;
     InternetCloseHandle (request);
     return true;
 }
@@ -245,9 +238,11 @@ DyomRandomizer::ParseMission (HANDLE session, const std::string &url)
     std::vector<uint8_t> output;
     ReadRequestResponse (MakeRequest (session, "download/" + url.substr (5)),
                          output);
+
     FILE *file = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "wb");
     fwrite (output.data (), 1, output.size (), file);
     fclose (file);
+
     FILE *file2 = fopen ((CFileMgr::ms_dirName + "\\DYOM8.dat"s).c_str (), "wb");
     fwrite (output.data (), 1, output.size (), file2);
     fclose (file2);
@@ -510,6 +505,94 @@ DyomRandomizer::DownloadRandomMission ()
 
 /*******************************************************/
 void
+DyomRandomizer::HandleAutoplay (CRunningScript *scr)
+{
+    static int previousOffset = 0;
+    int currentOffset = scr->m_pCurrentIP - (unsigned char *) ScriptSpace;
+
+    enum eState
+    {
+        STATE_INACTIVE,
+        STATE_FADE_OUT,
+        STATE_FADING,
+        STATE_MISSION_DOWNLOAD,
+        STATE_MISSION_PLAY,
+        STATE_PASSFAIL_CHECK
+    } static state
+        = STATE_INACTIVE;
+
+    static clock_t fadeOutStart = 0;
+    static bool    downloadNew  = true;
+
+    // Check to ensure that current script is the dyom script.
+    if (currentOffset == previousOffset)
+        return;
+
+    switch (state)
+        {
+            case STATE_INACTIVE: {
+                if (currentOffset == 91111 && GetAsyncKeyState (VK_F4))
+                    state = STATE_FADE_OUT;
+                break;
+            }
+
+            case STATE_FADE_OUT: {
+                Scrpt::CallOpcode (0x16A, "do_fade", 250, 0);
+                fadeOutStart = clock ();
+                state        = STATE_FADING;
+
+                break;
+            }
+
+            case STATE_FADING: {
+                if (clock () - fadeOutStart > 250)
+                    state = STATE_MISSION_DOWNLOAD;
+                break;
+            }
+
+            case STATE_MISSION_DOWNLOAD: {
+                char *scriptName = (char *) &ScriptSpace[10918];
+
+                ScriptSpace[10922] = 0;
+
+                strcpy (scriptName, downloadNew ? "DYOM9.dat" : "DYOM8.dat");
+                scr->m_pCurrentIP = (unsigned char *) ScriptSpace + 95061;
+
+                state = STATE_MISSION_PLAY;
+
+                break;
+            }
+
+            case STATE_MISSION_PLAY: {
+                if (currentOffset == 91111)
+                    {
+                        scr->m_pCurrentIP
+                            = (unsigned char *) ScriptSpace + 91647;
+                        state = STATE_PASSFAIL_CHECK;
+                    }
+                break;
+            }
+
+            case STATE_PASSFAIL_CHECK: {
+                if (currentOffset == 91092)
+                    {
+                        state       = STATE_INACTIVE;
+                        downloadNew = true;
+                    }
+                if (currentOffset == 91111)
+                    {
+                        state       = STATE_FADE_OUT;
+                        downloadNew = ScriptSpace[16141];
+                        if (!downloadNew)
+                            state = STATE_MISSION_PLAY;
+                    }
+                break;
+            }
+        }
+}
+
+/*******************************************************/
+void
 DyomRandomizer::HandleDyomScript (CRunningScript *scr)
 {
     if (!CGame::bMissionPackGame)
@@ -523,6 +606,8 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
 
     if (currentOffset != previousOffset)
         {
+            ScriptSpace[10915] = 0;
+
             if (currentOffset == 103522)
                 {
                     if ((char *) &ScriptSpace[10918] == "DYOM9.dat"s)
@@ -542,6 +627,8 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
                         }
                 }
         }
+
+    HandleAutoplay (scr);
 }
 
 /*******************************************************/

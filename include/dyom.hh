@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <string>
+#include <vector>
 
 struct CRunningScript;
 
@@ -18,11 +19,14 @@ class DyomRandomizer
     int  GetTotalNumberOfDYOMMissionPages (HANDLE session, std::string list);
     void DownloadRandomMission ();
 
+    std::vector<std::string> mTranslationChain;
+
 public:
     static inline struct Config
     {
         bool EnglishOnly;
         bool Translate;
+        std::string TranslationChain;
     } m_Config;
 
     CRunningScript *mDyomScript = nullptr;

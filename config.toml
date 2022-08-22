@@ -337,7 +337,10 @@ RandomizeChaosPoints = false
 
 # Picks missions only from those designated as English by the DYOM website.
 UseEnglishOnlyFilter = false
+# Runs all mission text through Google Translate according to the translation chain defined below
 AutoTranslateToEnglish = false
+# Translation languages chain. E.g. if you want to run all text through Polish->Hungarian->French->English you would put "pl;hu;fr;en". For all supported languages and their codes check https://cloud.google.com/translate/docs/languages
+TranslationChain = "en"
 
 #######################################################
 [CheatRandomizer]

@@ -4,6 +4,9 @@
 
 #include <algorithm>
 #include <chrono>
+#include <sstream>
+#include <iomanip>
+#include <config.hh>
 
 static inline void
 ltrim (std::string &s)
@@ -30,6 +33,45 @@ trim (std::string &s)
 {
     ltrim (s);
     rtrim (s);
+}
+
+/*******************************************************/
+std::string
+EncodeURL (const std::string &s)
+{
+    const std::string safe_characters
+        = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+    std::ostringstream oss;
+    for (auto c : s)
+        {
+            if (safe_characters.find (c) != std::string::npos)
+                oss << c;
+            else
+                oss << '%' << std::setfill ('0') << std::setw (2)
+                    << std::uppercase << std::hex << (0xff & c);
+        }
+    return oss.str ();
+}
+
+/*******************************************************/
+DyomTranslator::DyomTranslator ()
+{
+    internet.Open ("translate.google.com");
+    ConfigManager::ReadConfig ("DYOMRandomizer",
+                               std::pair ("TranslationChain",
+                                          &m_Config.TranslationChain));
+    if (m_Config.TranslationChain.empty ())
+        mTranslationChain.push_back ("en");
+    else
+        {
+
+            std::istringstream iss (m_Config.TranslationChain);
+
+            for (std::string token; std::getline (iss, token, ';');)
+                {
+                    mTranslationChain.push_back (std::move (token));
+                }
+        }
 }
 
 /*******************************************************/
@@ -134,15 +176,22 @@ DyomTranslator::TranslateDyomFile (DYOM::DYOMFileStructure &file)
 std::string
 DyomTranslator::TranslateText (const std::string &text)
 {
-    std::string response
-        = internet.Get ("m?sl=auto&tl=en&q=" + text).GetString ();
-
+    std::string translation = text;
     std::regex  rtext ("result-container\">(.*?)<");
-    std::cmatch cm;
-    if (!std::regex_search (response.c_str (), cm, rtext))
-        return text;
-
-    std::string translation = cm[1];
+    for (std::size_t i = 0; i < mTranslationChain.size (); i++)
+        {
+            std::string request = "m?sl=auto&tl=";
+            request += mTranslationChain[i];
+            request += "&q=";
+            //languages with multibyte characters will break everything unless we encode here
+            request += EncodeURL (translation);
+            std::string response = 
+                internet.Get (request.c_str ()).GetString();
+            std::cmatch cm;
+            if (!std::regex_search (response.c_str (), cm, rtext))
+                return translation;
+            translation = cm[1];
+        }
 
     // translator tends to break tags with spaces, attempt to fix
     translation

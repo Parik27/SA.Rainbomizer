@@ -1,6 +1,8 @@
 #pragma once
+#include <vector>
 #include <windows.h>
 #include <string>
+#include "util/dyom/Internet.hh"
 
 struct CRunningScript;
 
@@ -11,19 +13,31 @@ class DyomRandomizer
     DyomRandomizer (){};
     static void DestroyInstance ();
 
-    bool        ParseMission (HANDLE session, const std::string &url);
-    std::string GetRandomEntryFromPage (HANDLE session, std::string page);
-    int  GetTotalNumberOfDYOMMissionPages (HANDLE session, std::string list);
-    void DownloadRandomMission ();
+    InternetUtils internet;
+
+    void        SaveMission (const std::vector<uint8_t> &data);
+    bool        ParseMission (const std::string &url);
+    
+    std::string GetRandomEntryFromPage (std::string page);
+    int         GetTotalNumberOfDYOMMissionPages (std::string list);
+    void        DownloadRandomMission ();
+
+    int         prevObjectiveForSubtitles = -1;
+    bool        enableExternalSubtitles = false;
+    std::string storedObjectives[100];
+    std::string originalName;
 
 public:
     static inline struct Config
     {
         bool EnglishOnly;
+        bool AutoTranslateToEnglish;
+        bool RandomSpawn;
     } m_Config;
 
     CRunningScript *mDyomScript = nullptr;
 
+    void HandleExternalSubtitles ();
     void HandleAutoplay (CRunningScript* scr);
     void HandleDyomScript (CRunningScript *scr);
 

@@ -338,6 +338,9 @@ RandomizeChaosPoints = false
 # Picks missions only from those designated as English by the DYOM website.
 UseEnglishOnlyFilter = false
 
+AutoTranslateToEnglish = true
+RandomSpawn = true
+
 #######################################################
 [CheatRandomizer]
 

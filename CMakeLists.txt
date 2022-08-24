@@ -4,11 +4,6 @@ project(rainbomizer)
 
 # C++20
 if (MSVC_VERSION GREATER_EQUAL "1900")
-  include(CheckCXXCompilerFlag)
-  CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
-  if (_cpp_latest_flag_supported)
-    add_compile_options("/std:c++latest")
-  endif()
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
   # Because CMAKE_MSVC_RUNTIME_LIBRARY doesn't work for whatever reason
   set(CompilerFlags
@@ -28,7 +23,7 @@ set (CMAKE_CXX_STANDARD 17)
 
 # Sources
 include_directories(include)
-file(GLOB SOURCES src/*.cc src/util/*.cc)
+file(GLOB SOURCES src/*.cc src/util/*.cc src/util/dyom/*.cc)
 
 add_library("rainbomizer" SHARED ${SOURCES})
 

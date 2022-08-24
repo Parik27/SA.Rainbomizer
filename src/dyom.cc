@@ -1,3 +1,4 @@
+#include "base.hh"
 #include "dyom.hh"
 #include <cstdlib>
 #include "logger.hh"
@@ -5,15 +6,20 @@
 #include "base.hh"
 #include "injector/calling.hpp"
 #include <ctime>
+#include <fstream>
 #include <wininet.h>
 #include "config.hh"
 #include <cstring>
 #include "missions.hh"
+#include "util/dyom/DYOMFileFormat.hh"
 #include "util/scrpt.hh"
+#include "util/dyom/Translation.hh"
+#include "util/dyom/StubSession.hh"
 
 using namespace std::literals;
 
 DyomRandomizer *DyomRandomizer::mInstance = nullptr;
+DyomStubSession sm_Session;
 
 /*******************************************************/
 CRunningScript *
@@ -56,9 +62,22 @@ AdjustCodeForDYOM (FILE *file, void *buf, size_t len)
             uint8_t *slots
                 = reinterpret_cast<uint8_t *> ((char *) buf + 0x18D90);
             *slots = 9;
-
-            char *column_name = (char *) buf + 0x18E11;
+            
             strcpy ((char *) buf + 0x18E11, "FILE9");
+
+            if (DyomRandomizer::m_Config.RandomSpawn)
+                {
+                    float x = randomFloat (-3000.0, 3000.0);
+                    float y = randomFloat (-3000.0, 3000.0);
+
+                    injector::WriteMemory (uintptr_t (buf) + 75332, x);
+                    injector::WriteMemory (uintptr_t (buf) + 75337, y);
+                    injector::WriteMemory (uintptr_t (buf) + 75344, x);
+                    injector::WriteMemory (uintptr_t (buf) + 75349, y);
+                    injector::WriteMemory (uintptr_t (buf) + 75363, x);
+                    injector::WriteMemory (uintptr_t (buf) + 75368, y);
+                    injector::WriteMemory (uintptr_t (buf) + 75373, -100.0f);
+                }
         }
     return ret;
 }
@@ -67,8 +86,12 @@ AdjustCodeForDYOM (FILE *file, void *buf, size_t len)
 void
 DyomRandomizer::Initialise ()
 {
-    if (!ConfigManager::ReadConfig ("DYOMRandomizer", 
-        std::pair("UseEnglishOnlyFilter", &m_Config.EnglishOnly)))
+    if (!ConfigManager::ReadConfig (
+            "DYOMRandomizer",
+            std::pair ("UseEnglishOnlyFilter", &m_Config.EnglishOnly),
+            std::pair ("RandomSpawn", &m_Config.RandomSpawn),
+            std::pair ("AutoTranslateToEnglish",
+                       &m_Config.AutoTranslateToEnglish)))
         return;
 
     if (!ConfigManager::ReadConfig ("MissionRandomizer"))
@@ -87,72 +110,10 @@ DyomRandomizer::Initialise ()
 }
 
 /*******************************************************/
-bool
-ReadRequestResponse (HANDLE request, std::vector<uint8_t> &out)
-{
-    DWORD dwSize = 16000;
-    DWORD dwDownloaded;
-
-    auto lpszData = new TCHAR[dwSize + 1];
-
-    for (;;)
-        {
-            if (!InternetReadFile (request, lpszData, dwSize, &dwDownloaded))
-                {
-                    Logger::GetLogger ()->LogMessage (
-                        "InternetReadFile failed "
-                        + std::to_string (GetLastError ()));
-                    break;
-                }
-
-            if (dwDownloaded == 0)
-                break;
-
-            out.insert (out.end (), lpszData, lpszData + dwDownloaded);
-        }
-
-    delete[] lpszData;
-    InternetCloseHandle (request);
-    return true;
-}
-
-/*******************************************************/
-HANDLE
-MakeRequest (HANDLE session, const std::string &file)
-{
-    HANDLE request = HttpOpenRequest (session, "GET", file.c_str (), NULL, NULL,
-                                      NULL, INTERNET_FLAG_SECURE, 0);
-    HttpSendRequest (request, NULL, 0, NULL, 0);
-
-    return request;
-}
-
-/*******************************************************/
-HANDLE
-OpenSession (HINTERNET internet)
-{
-    return InternetConnect (internet, "dyom.gtagames.nl",
-                            INTERNET_DEFAULT_HTTPS_PORT, NULL, NULL,
-                            INTERNET_SERVICE_HTTP, 0, 0);
-}
-
-/*******************************************************/
-std::string
-ReadStringFromRequest (HANDLE request)
-{
-    std::vector<uint8_t> output;
-    ReadRequestResponse (request, output);
-
-    return std::string (output.begin (), output.end ()).c_str ();
-}
-
-/*******************************************************/
 int
-DyomRandomizer::GetTotalNumberOfDYOMMissionPages (HANDLE      session,
-                                                  std::string list)
+DyomRandomizer::GetTotalNumberOfDYOMMissionPages (std::string list)
 {
-    HANDLE      request = MakeRequest (session, list.c_str ());
-    std::string lists   = ReadStringFromRequest (request);
+    std::string lists = internet.Get (list.c_str ()).GetString ();
 
     auto start = lists.find ("... <span class=pagelink>");
     start      = lists.find ("\' >", start) + 3;
@@ -198,10 +159,9 @@ GetNthOccurrenceOfString (const std::string &str, const std::string &substr,
 
 /*******************************************************/
 std::string
-DyomRandomizer::GetRandomEntryFromPage (HANDLE session, std::string page)
+DyomRandomizer::GetRandomEntryFromPage (std::string page)
 {
-    std::string entries
-        = ReadStringFromRequest (MakeRequest (session, page.c_str ()));
+    std::string entries = internet.Get (page.c_str ()).GetString ();
 
     int entries_count = CountOccurrencesInString (entries, "<a href='show/");
     std::size_t start = GetNthOccurrenceOfString (entries, "<a href='show/",
@@ -214,24 +174,87 @@ DyomRandomizer::GetRandomEntryFromPage (HANDLE session, std::string page)
 
 /*******************************************************/
 bool
-DyomRandomizer::ParseMission (HANDLE session, const std::string &url)
+IsDyomFileValid (std::vector<uint8_t> &data)
 {
-    std::string mission = ReadStringFromRequest (MakeRequest (session, url));
+    if (data.size () < 32)
+        return false;
+
+    int version = *reinterpret_cast<int *> (data.data ());
+    if (abs (version) > 6)
+        return false;
+
+    return true;
+}
+
+/*******************************************************/
+void
+DyomRandomizer::HandleExternalSubtitles ()
+{
+    if (!enableExternalSubtitles)
+        return;
+    
+    if (prevObjectiveForSubtitles != ScriptSpace[9903])
+        {
+            sm_Session.ReportObjective (storedObjectives[ScriptSpace[9903]]);
+            prevObjectiveForSubtitles = ScriptSpace[9903];
+        }
+}
+
+/*******************************************************/
+void
+DyomRandomizer::SaveMission (const std::vector<uint8_t> &data)
+{
+    DYOM::DYOMFileStructure dyomFile;
+    DyomTranslator          translator;
+
+    dyomFile.Read (data);
+
+    // Translation
+    if (m_Config.AutoTranslateToEnglish)
+        {
+            originalName = dyomFile.g_HEADERSTRINGS[0];
+            for (int i = 0; i < 100; i++)
+                storedObjectives[i] = dyomFile.g_TEXTOBJECTIVES[i];
+
+            translator.TranslateDyomFile (dyomFile);
+
+            if (translator.GetDidTranslate ())
+                {
+                    prevObjectiveForSubtitles = -1;
+                    enableExternalSubtitles   = true;
+                    sm_Session.ReportObjective (originalName);
+                    dyomFile.g_HEADERSTRINGS[0]
+                        = "[TRANSLATED]" + dyomFile.g_HEADERSTRINGS[0];
+                }
+            else
+                enableExternalSubtitles = false;
+        }
+
+    dyomFile.Save (CFileMgr::ms_dirName + "\\DYOM9.dat"s);
+    dyomFile.Save (CFileMgr::ms_dirName + "\\DYOM8.dat"s);
+}
+
+/*******************************************************/
+bool
+DyomRandomizer::ParseMission (const std::string &url)
+{
+    std::string mission = internet.Get (url).GetString ();
+
     if (mission.find ("<a title='download for slot 1'  href='") == mission.npos)
         return false;
 
     std::vector<uint8_t> output;
-    ReadRequestResponse (MakeRequest (session, "download/" + url.substr (5)),
-                         output);
+    internet.Get ("download/" + url.substr (5)).GetResponse (output);
 
-    FILE *file = fopen ((CFileMgr::ms_dirName + "\\DYOM9.dat"s).c_str (), "wb");
-    fwrite (output.data (), 1, output.size (), file);
-    fclose (file);
+    if (!IsDyomFileValid (output))
+        {
+            Logger::GetLogger ()->LogMessage (
+                "Dyom File downloaded failed verification: " + url);
+            return false;
+        }
 
-    FILE *file2 = fopen ((CFileMgr::ms_dirName + "\\DYOM8.dat"s).c_str (), "wb");
-    fwrite (output.data (), 1, output.size (), file2);
-    fclose (file2);
-
+    SaveMission (output);
+    
     return true;
 }
 
@@ -241,29 +264,27 @@ DyomRandomizer::DownloadRandomMission ()
 {
     if (InternetAttemptConnect (0) == ERROR_SUCCESS)
         {
-            HINTERNET handle
-                = InternetOpen ("123robot", INTERNET_OPEN_TYPE_PRECONFIG, NULL,
-                                NULL, 0);
-
-            HANDLE session = OpenSession (handle);
-
+            internet.Open ("dyom.gtagames.nl");
             std::string list;
-            
+
             if (m_Config.EnglishOnly)
                 list = "list?english=1&";
             else
                 list = random (100) > 38 ? "list?" : "list_d?";
 
-            int total_pages = GetTotalNumberOfDYOMMissionPages (session, list);
-            while (!ParseMission (
-                session,
-                GetRandomEntryFromPage (session, list + "page="
-                                                     + std::to_string (random (
-                                                         total_pages)))))
-                ;
+            int total_pages = GetTotalNumberOfDYOMMissionPages (list);
 
-            CloseHandle (session);
-            CloseHandle (handle);
+            //#define FORCED_MISSION "show/71368"
+
+#ifdef FORCED_MISSION
+            ParseMission (FORCED_MISSION);
+#else
+            while (!ParseMission (GetRandomEntryFromPage (
+                list + "page=" + std::to_string (random (total_pages)))))
+                ;
+#endif
+
+            internet.Close ();
         }
 }
 
@@ -292,19 +313,42 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
     if (currentOffset == previousOffset)
         return;
 
+    sm_Session.ProcessTimer ();
+
+    // Check for new game
+    if (currentOffset == 91092)
+        {
+            state       = STATE_INACTIVE;
+            downloadNew = true;
+        }
+
     switch (state)
         {
             case STATE_INACTIVE: {
+
+                // Autoplay for dyom sessions that request it
+                if (currentOffset == 103522
+                    && sm_Session.StartsAutomatically ())
+                    {
+                        state = STATE_MISSION_PLAY;
+                        if ((char *) &ScriptSpace[10918] == "DYOM9.dat"s)
+                            sm_Session.ReportStartSkip ();
+                        else
+                            sm_Session.ReportRetry ();
+                    }
+
                 if (currentOffset == 91111 && GetAsyncKeyState (VK_F4))
                     state = STATE_FADE_OUT;
                 break;
             }
 
             case STATE_FADE_OUT: {
-                Scrpt::CallOpcode (0x16A, "do_fade", 250, 0);
-                fadeOutStart = clock ();
-                state        = STATE_FADING;
-
+                if (currentOffset == 91111)
+                    {
+                        Scrpt::CallOpcode (0x16A, "do_fade", 250, 0);
+                        fadeOutStart = clock ();
+                        state        = STATE_FADING;
+                    }
                 break;
             }
 
@@ -332,23 +376,34 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
                     {
                         scr->m_pCurrentIP
                             = (unsigned char *) ScriptSpace + 91647;
-                        state = STATE_PASSFAIL_CHECK;
+                        ScriptSpace[16141] = 0;
+                        state              = STATE_PASSFAIL_CHECK;
                     }
                 break;
             }
 
             case STATE_PASSFAIL_CHECK: {
-                if (currentOffset == 91092)
+                // Mission Pass (no offset check to make it instant)
+                if (ScriptSpace[16141])
                     {
-                        state       = STATE_INACTIVE;
+                        state       = STATE_FADE_OUT;
                         downloadNew = true;
+
+                        // Additional check to make sure that the mission has
+                        // objectives.
+                        if (ScriptSpace[10916] > 0)
+                            sm_Session.ReportMissionPass ();
                     }
+
+                // Mission Fail (+ pass check just to be safe)
                 if (currentOffset == 91111)
                     {
                         state       = STATE_FADE_OUT;
                         downloadNew = ScriptSpace[16141];
                         if (!downloadNew)
                             state = STATE_MISSION_PLAY;
+                        else
+                            sm_Session.ReportMissionPass ();
                     }
                 break;
             }
@@ -393,6 +448,7 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
         }
 
     HandleAutoplay (scr);
+    HandleExternalSubtitles ();
 }
 
 /*******************************************************/

@@ -85,5 +85,16 @@ public:
         return request;
     }
 
-    
+    /*******************************************************/
+    Request
+    Post (const std::string &url, const std::string &headers,
+          const std::string &data)
+    {
+        HANDLE request = HttpOpenRequest (session, "POST", url.c_str (), NULL,
+                                          NULL, NULL, INTERNET_FLAG_SECURE, 0);
+        HttpSendRequest (request, headers.c_str (), headers.length (),
+                         (char *) data.c_str (), data.length ());
+
+        return request;
+    }
 };

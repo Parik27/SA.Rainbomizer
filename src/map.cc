@@ -7,14 +7,14 @@
 
 MapRandomizer *MapRandomizer::mInstance = nullptr;
 
-    std::unordered_map<int, char *> tags
+    std::unordered_map<int, const char *> tags
     = {{1490, "tag_01"},     {1524, "tag_front"},  {1525, "tag_kilo"},
        {1526, "tag_rifa"},   {1527, "tag_rollin"}, {1528, "tag_seville"},
        {1529, "tag_temple"}, {1530, "tag_vagos"},  {1531, "tag_azteca"}};
 
 /*******************************************************/
 CEntity *
-RandomizeObjectInstance (CFileObjectInstance *inst, char *modelName)
+RandomizeObjectInstance (CFileObjectInstance *inst, const char *modelName)
 {
     if ((inst->modelId >= 1524 && inst->modelId <= 1531)
         || inst->modelId == 1490)

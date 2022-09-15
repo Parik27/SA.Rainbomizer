@@ -344,6 +344,8 @@ RandomSpawn = true
 # Languages in translation chain separated by a semicolon, e.g. "pl;el;zh-CN;en" means Polish->Greek->Simplified Chinese->English, see https://cloud.google.com/translate/docs/languages for supported languages and their codes
 TranslationChain = "en"
 
+EnableTextToSpeech = false
+
 #######################################################
 [CheatRandomizer]
 

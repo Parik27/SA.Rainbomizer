@@ -30,15 +30,19 @@ class DyomRandomizer
 public:
     static inline struct Config
     {
-        bool EnglishOnly;
-        bool AutoTranslateToEnglish;
-        bool RandomSpawn;
+        bool        EnglishOnly;
+        bool        AutoTranslateToEnglish;
+        bool        EnableTextToSpeech;
+        bool        RandomSpawn;
+        std::string TranslationChain;
     } m_Config;
 
     CRunningScript *mDyomScript = nullptr;
 
     void HandleExternalSubtitles ();
     void HandleAutoplay (CRunningScript* scr);
+
+    void HandleScript (CRunningScript *scr);
     void HandleDyomScript (CRunningScript *scr);
 
     static bool mEnabled;

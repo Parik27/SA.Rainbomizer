@@ -14,40 +14,70 @@
 #include "util/dyom/DYOMFileFormat.hh"
 #include "util/scrpt.hh"
 #include "util/dyom/Translation.hh"
+#include "util/dyom/TTS.hh"
+
 #include "util/dyom/StubSession.hh"
 
 using namespace std::literals;
 
 DyomRandomizer *DyomRandomizer::mInstance = nullptr;
-DyomStubSession sm_Session;
+
+static DyomStubSession sm_Session;
+static DyomRandomizerTTS sm_TTS;
+
+uint32_t
+GetBase (unsigned char *pc)
+{
+    return pc - (unsigned char *) ScriptSpace;
+}
 
 /*******************************************************/
-CRunningScript *
-StoreRandomizedDYOMScript (uint8_t *startIp)
+void __fastcall
+DyomHandleOnScriptOpCodeProcess (CRunningScript* scr)
 {
     auto dyomRandomizer = DyomRandomizer::GetInstance ();
 
-    auto out = HookManager::CallOriginalAndReturn<
-        injector::cstd<CRunningScript *(uint8_t *)>, 0x46683B> (nullptr,
-                                                                startIp);
-    if (ScriptParams[0] == 91092)
-        dyomRandomizer->mDyomScript = out;
+    if (DyomRandomizer::mEnabled)
+        dyomRandomizer->HandleScript (scr);
 
-    DyomRandomizer::mEnabled = true;
-    return out;
+    HookManager::CallOriginalAndReturn<injector::cstd<void ()>, 0x469FB0> (
+        [] { (*((int *) 0xA447F4))++; });
 }
 
 /*******************************************************/
 void
-DyomHandleOnScriptOpCodeProcess ()
+DyomRandomizer::HandleScript(CRunningScript *scr)
 {
-    auto dyomRandomizer = DyomRandomizer::GetInstance ();
+    if (scr->CheckName ("dyom"))
+        {
+            // When DYOM displays a subtitle
+            if (scr->m_pCurrentIP - scr->m_pBaseIP == 205032 - 199212
+                || scr->m_pCurrentIP - scr->m_pBaseIP == 205106 - 199212)
+                {
+                    if (!ScriptSpace[16149]
+                        && m_Config.EnableTextToSpeech)
+                        sm_TTS.PlayObjectiveSound ();
 
-    if (DyomRandomizer::mEnabled && dyomRandomizer->mDyomScript)
-        dyomRandomizer->HandleDyomScript (dyomRandomizer->mDyomScript);
+                    HandleExternalSubtitles ();
+                }
 
-    HookManager::CallOriginalAndReturn<injector::cstd<void ()>, 0x469FB0> (
-        [] { (*((int *) 0xA447F4))++; });
+            // When DYOM checks if cutscene should move to the next scene
+            if (scr->m_pCurrentIP - scr->m_pBaseIP == 211864 - 199212)
+                {
+                    if (sm_TTS.IsBusy())
+                        scr->m_pCurrentIP = scr->m_pBaseIP + 211820 - 199212;
+                }
+
+            // At the start (reset TTS and fix radar bug)
+            if (scr->m_pCurrentIP - scr->m_pBaseIP == 11)
+                {
+                    sm_TTS.Reset ();
+                    Scrpt::CallOpcode (0x0581, "display_radar", 1);
+                }
+        }
+
+    if ((scr->CheckName ("dyommenu") || GetBase (scr->m_pCurrentIP) == 91092))
+        HandleDyomScript (scr);
 }
 
 /*******************************************************/
@@ -59,10 +89,12 @@ AdjustCodeForDYOM (FILE *file, void *buf, size_t len)
     char *signature = (char *) buf + 0x18CE0;
     if (std::string (signature, 4) == "DYOM")
         {
+            DyomRandomizer::mEnabled = true;
+
             uint8_t *slots
                 = reinterpret_cast<uint8_t *> ((char *) buf + 0x18D90);
             *slots = 9;
-            
+
             strcpy ((char *) buf + 0x18E11, "FILE9");
 
             if (DyomRandomizer::m_Config.RandomSpawn)
@@ -90,6 +122,8 @@ DyomRandomizer::Initialise ()
             "DYOMRandomizer",
             std::pair ("UseEnglishOnlyFilter", &m_Config.EnglishOnly),
             std::pair ("RandomSpawn", &m_Config.RandomSpawn),
+            std::pair ("TranslationChain", &m_Config.TranslationChain),
+            std::pair ("EnableTextToSpeech", &m_Config.EnableTextToSpeech),
             std::pair ("AutoTranslateToEnglish",
                        &m_Config.AutoTranslateToEnglish)))
         return;
@@ -97,14 +131,14 @@ DyomRandomizer::Initialise ()
     if (!ConfigManager::ReadConfig ("MissionRandomizer"))
         {
             RegisterDelayedHooks (
-                {{HOOK_CALL, 0x469FB0,
+                {{HOOK_CALL, 0x469FB2,
                   (void *) &DyomHandleOnScriptOpCodeProcess}});
 
-            RegisterDelayedFunction ([] { injector::MakeNOP (0x469fb5, 2); });
+            RegisterDelayedFunction (
+                [] { injector::WriteMemory<uint16_t> (0x469fb0, 0xce8b); });
         }
 
-    RegisterHooks ({{HOOK_CALL, 0x46683B, (void *) &StoreRandomizedDYOMScript},
-                    {HOOK_CALL, 0x468E7F, (void *) AdjustCodeForDYOM}});
+    RegisterHooks ({{HOOK_CALL, 0x468E7F, (void *) AdjustCodeForDYOM}});
 
     Logger::GetLogger ()->LogMessage ("Intialised DyomRandomizer");
 }
@@ -190,9 +224,6 @@ IsDyomFileValid (std::vector<uint8_t> &data)
 void
 DyomRandomizer::HandleExternalSubtitles ()
 {
-    if (!enableExternalSubtitles)
-        return;
-    
     if (prevObjectiveForSubtitles != ScriptSpace[9903])
         {
             sm_Session.ReportObjective (storedObjectives[ScriptSpace[9903]]);
@@ -205,7 +236,7 @@ void
 DyomRandomizer::SaveMission (const std::vector<uint8_t> &data)
 {
     DYOM::DYOMFileStructure dyomFile;
-    DyomTranslator          translator;
+    DyomTranslator          translator (m_Config.TranslationChain);
 
     dyomFile.Read (data);
 
@@ -225,6 +256,8 @@ DyomRandomizer::SaveMission (const std::vector<uint8_t> &data)
                     sm_Session.ReportObjective (originalName);
                     dyomFile.g_HEADERSTRINGS[0]
                         = "[TRANSLATED]" + dyomFile.g_HEADERSTRINGS[0];
+                    dyomFile.g_HEADERSTRINGS[0]
+                        = dyomFile.g_HEADERSTRINGS[0].substr (0, 99);
                 }
             else
                 enableExternalSubtitles = false;
@@ -253,6 +286,7 @@ DyomRandomizer::ParseMission (const std::string &url)
             return false;
         }
 
+    Logger::GetLogger ()->LogMessage (url);
     SaveMission (output);
     
     return true;
@@ -274,7 +308,7 @@ DyomRandomizer::DownloadRandomMission ()
 
             int total_pages = GetTotalNumberOfDYOMMissionPages (list);
 
-            //#define FORCED_MISSION "show/71368"
+            //#define FORCED_MISSION "show/14681"
 
 #ifdef FORCED_MISSION
             ParseMission (FORCED_MISSION);
@@ -416,6 +450,7 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
 {
     if (!CGame::bMissionPackGame)
         {
+            mEnabled    = false;
             mDyomScript = nullptr;
             return;
         }
@@ -432,6 +467,7 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
                     if ((char *) &ScriptSpace[10918] == "DYOM9.dat"s)
                         DownloadRandomMission ();
                 }
+
             if (currentOffset == 101718 || currentOffset == 101738)
                 {
                     if (ScriptSpace[11439] == 9)
@@ -445,10 +481,17 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
                                     = (unsigned char *) ScriptSpace + 101718;
                         }
                 }
+
+            // Fast reloads (wait calls after mission end)
+            if ((currentOffset == 91909 || currentOffset == 91921
+                 || currentOffset == 91944)
+                && !ScriptSpace[16141])
+                {
+                    scr->m_pCurrentIP += 5;
+                }
         }
 
     HandleAutoplay (scr);
-    HandleExternalSubtitles ();
 }
 
 /*******************************************************/

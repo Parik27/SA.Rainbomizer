@@ -1,5 +1,6 @@
 #include "util/dyom/Translation.hh"
 
+#include "base.hh"
 #include "logger.hh"
 
 #include <algorithm>
@@ -54,23 +55,18 @@ EncodeURL (const std::string &s)
 }
 
 /*******************************************************/
-DyomTranslator::DyomTranslator ()
+DyomTranslator::DyomTranslator (const std::string &translationChain)
 {
     internet.Open ("translate.google.com");
-    ConfigManager::ReadConfig ("DYOMRandomizer",
-                               std::pair ("TranslationChain",
-                                          &m_Config.TranslationChain));
-    if (m_Config.TranslationChain.empty ())
+
+    if (translationChain.empty ())
         mTranslationChain.push_back ("en");
     else
         {
-
-            std::istringstream iss (m_Config.TranslationChain);
+            std::istringstream iss (translationChain);
 
             for (std::string token; std::getline (iss, token, ';');)
-                {
-                    mTranslationChain.push_back (std::move (token));
-                }
+                mTranslationChain.push_back (std::move (token));
         }
 }
 
@@ -82,6 +78,12 @@ DyomTranslator::EnqueueTranslation (std::string &text)
         DoTranslate ();
 
     translationQueue += " ~" + std::to_string (queueCounter) + "~";
+    if (text == "_")
+        return;
+
+    if (text.back () == '\n')
+        text.pop_back ();
+
     translationQueue += text;
 
     translationOut.push_back (&text);
@@ -108,7 +110,8 @@ DyomTranslator::DoTranslate ()
             auto start = translated.find (delim) + delim.size ();
             auto end   = translated.find (delimEnd);
 
-            if (start != translated.npos)
+            if (start != translated.npos
+                && (end != translated.npos || i == queueCounter - 1))
                 {
                     auto &out = *translationOut[i];
 
@@ -116,7 +119,7 @@ DyomTranslator::DoTranslate ()
                     FixupGxtTokens (out);
                     out = out.substr (0, 99);
                     trim (out);
-                    Logger::GetLogger()->LogMessage(out);
+                    Logger::GetLogger ()->LogMessage (out);
                 }
         }
 
@@ -177,28 +180,37 @@ std::string
 DyomTranslator::TranslateText (const std::string &text)
 {
     std::string translation = text;
-    std::regex  rtext ("result-container\">(.*?)<");
-    for (std::size_t i = 0; i < mTranslationChain.size (); i++)
+    std::regex  rtext ("result-container\">([\\S\\s]*?)<");
+    
+    for (const auto &lang : mTranslationChain)
         {
             std::string request = "m?sl=auto&tl=";
-            request += mTranslationChain[i];
+            request += lang;
             request += "&q=";
-            //languages with multibyte characters will break everything unless we encode here
+            // languages with multibyte characters will break everything unless
+            // we encode here
             request += EncodeURL (translation);
-            std::string response = 
-                internet.Get (request.c_str ()).GetString();
+
+            std::string response = internet.Get (request.c_str ()).GetString ();
             std::cmatch cm;
             if (!std::regex_search (response.c_str (), cm, rtext))
-                return translation;
+                {
+                    MessageBox (NULL, "TRANSLATION FAILED!!", NULL,
+                                MB_ICONHAND);
+                    FILE *f = GetRainbomizerDataFile ("test.html", "w");
+                    fwrite (response.data (), 1, response.size (), f);
+                    fclose (f);
+                    return text;
+                }
+
             translation = cm[1];
         }
 
     // translator tends to break tags with spaces, attempt to fix
+    DecodeSpecialChars (translation);
     translation
         = std::regex_replace (translation,
                               std::regex ("~\\s*([a-zA-Z0-9]+)\\s*~"), "~$1~");
-    DecodeSpecialChars (translation);
-
     return translation;
 }
 
@@ -214,6 +226,12 @@ DyomTranslator::DecodeSpecialChars (std::string &text)
     SPECIAL_CHAR ("&lt;", "<");
     SPECIAL_CHAR ("&gt;", ">");
     SPECIAL_CHAR ("&amp;", "&");
+    SPECIAL_CHAR ("\xe2\x80\x99", "'"); //UTF-8 quotation mark
+
+    // Remove any other non-ascii characters
+    text.erase (std::remove_if (text.begin (), text.end (),
+                                [] (char ch) { return ch < 0; }),
+                text.end ());
 }
 
 /*******************************************************/

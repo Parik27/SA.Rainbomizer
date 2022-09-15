@@ -22,9 +22,9 @@ class DyomTranslator
     std::vector<std::string *> translationOut;
 
     void ProcessDidTranslate (std::string translated);
-    
+
 public:
-    DyomTranslator ();
+    DyomTranslator (const std::string &translationChain = "");
     ~DyomTranslator () { internet.Close (); }
 
     void FixupGxtTokens (std::string &text);
@@ -43,9 +43,5 @@ public:
         return didTranslate;
     }
 
-    static inline struct Config
-    {
-        std::string TranslationChain;
-    } m_Config;
     std::vector<std::string> mTranslationChain;
 };

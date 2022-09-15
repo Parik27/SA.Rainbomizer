@@ -28,8 +28,9 @@ file(GLOB SOURCES src/*.cc src/util/*.cc src/util/dyom/*.cc)
 add_library("rainbomizer" SHARED ${SOURCES})
 
 # Properties
+target_link_directories("rainbomizer" PUBLIC lib/)
 set_target_properties("rainbomizer" PROPERTIES SUFFIX ".asi")
-target_link_libraries("rainbomizer" PUBLIC dbghelp wininet)
+target_link_libraries("rainbomizer" PUBLIC dbghelp wininet bass)
 target_compile_definitions("rainbomizer" PUBLIC NOMINMAX)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

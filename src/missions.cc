@@ -432,8 +432,7 @@ MissionRandomizer::GetCorrectedMissionStatusIndex (int index)
 }
 
 /*******************************************************/
-void
-JumpOnMissionEnd ()
+void __fastcall JumpOnMissionEnd (CRunningScript *scr)
 {
     auto missionRandomizer = MissionRandomizer::GetInstance ();
     auto dyomRandomizer    = DyomRandomizer::GetInstance ();
@@ -443,8 +442,8 @@ JumpOnMissionEnd ()
         missionRandomizer->MoveScriptToOriginalOffset (
             missionRandomizer->mRandomizedScript);
 
-    if (DyomRandomizer::mEnabled && dyomRandomizer->mDyomScript)
-        dyomRandomizer->HandleDyomScript (dyomRandomizer->mDyomScript);
+    if (DyomRandomizer::mEnabled)
+        dyomRandomizer->HandleScript (scr);
 
     HookManager::CallOriginalAndReturn<injector::cstd<void ()>, 0x469FB0> (
         [] { (*((int *) 0xA447F4))++; });
@@ -925,11 +924,12 @@ MissionRandomizer::Initialise ()
          {HOOK_CALL, 0x47C233, (void *) &CheckForFalsePass}});
 
     RegisterDelayedHooks ({
-        {HOOK_CALL, 0x469FB0, (void *) &JumpOnMissionEnd},
+        {HOOK_CALL, 0x469FB2, (void *) &JumpOnMissionEnd},
         {HOOK_CALL, 0x53BE76, (void *) &InitAtNewGame},
     });
 
-    RegisterDelayedFunction ([] { injector::MakeNOP (0x469fb5, 2); });
+    RegisterDelayedFunction (
+                [] { injector::WriteMemory<uint16_t> (0x469fb0, 0xce8b); });
 
     this->ResetSaveData ();
     this->InitShuffledMissionOrder ();

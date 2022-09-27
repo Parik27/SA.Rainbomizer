@@ -78,6 +78,14 @@ DyomRandomizer::HandleScript(CRunningScript *scr)
 
     if ((scr->CheckName ("dyommenu") || GetBase (scr->m_pCurrentIP) == 91092))
         HandleDyomScript (scr);
+
+    // This script is responsible for creating markers in the editor mode and
+    // it's weirdly coded so it creates markers that it doesn't delete during
+    // autoplay, so we stop this script from ever creating markers to fix that
+    // :)
+    if (inhibitEditorScript && scr->CheckName ("noname")
+        && GetBase (scr->m_pCurrentIP) == 184146)
+        scr->m_pCurrentIP = (unsigned char *) ScriptSpace + 184105;
 }
 
 /*******************************************************/
@@ -110,6 +118,12 @@ AdjustCodeForDYOM (FILE *file, void *buf, size_t len)
                     injector::WriteMemory (uintptr_t (buf) + 75368, y);
                     injector::WriteMemory (uintptr_t (buf) + 75373, -100.0f);
                 }
+
+#ifdef DYOM_ENABLE_PARMANENT_FAST_LOADS
+            injector::WriteMemory<uint16_t> (uintptr_t (buf) + 91909 + 3, 100);
+            injector::WriteMemory<uint16_t> (uintptr_t (buf) + 91921 + 3, 100);
+            injector::WriteMemory<uint16_t> (uintptr_t (buf) + 91944 + 3, 100);
+#endif
         }
     return ret;
 }
@@ -247,6 +261,7 @@ DyomRandomizer::SaveMission (const std::vector<uint8_t> &data)
             for (int i = 0; i < 100; i++)
                 storedObjectives[i] = dyomFile.g_TEXTOBJECTIVES[i];
 
+            sm_Session.BackupObjectiveTexts (storedObjectives);
             translator.TranslateDyomFile (dyomFile);
 
             if (translator.GetDidTranslate ())
@@ -288,7 +303,7 @@ DyomRandomizer::ParseMission (const std::string &url)
 
     Logger::GetLogger ()->LogMessage (url);
     SaveMission (output);
-    
+
     return true;
 }
 
@@ -356,10 +371,11 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
             downloadNew = true;
         }
 
+    inhibitEditorScript = state != STATE_INACTIVE;
+
     switch (state)
         {
             case STATE_INACTIVE: {
-
                 // Autoplay for dyom sessions that request it
                 if (currentOffset == 103522
                     && sm_Session.StartsAutomatically ())
@@ -368,7 +384,11 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
                         if ((char *) &ScriptSpace[10918] == "DYOM9.dat"s)
                             sm_Session.ReportStartSkip ();
                         else
-                            sm_Session.ReportRetry ();
+                            {
+                                sm_Session.RestoreObjectiveTexts (
+                                    storedObjectives);
+                                sm_Session.ReportRetry ();
+                            }
                     }
 
                 if (currentOffset == 91111 && GetAsyncKeyState (VK_F4))
@@ -395,7 +415,7 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
             case STATE_MISSION_DOWNLOAD: {
                 char *scriptName = (char *) &ScriptSpace[10918];
 
-                ScriptSpace[10922] = 0;
+                ScriptSpace[10922] = 0; // $DUNNO_HELPS_LOAD_READONLY_MISSIONS
 
                 strcpy (scriptName, downloadNew ? "DYOM9.dat" : "DYOM8.dat");
                 scr->m_pCurrentIP = (unsigned char *) ScriptSpace + 95061;
@@ -410,7 +430,8 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
                     {
                         scr->m_pCurrentIP
                             = (unsigned char *) ScriptSpace + 91647;
-                        ScriptSpace[16141] = 0;
+                        ScriptSpace[16141] = 0; // $READONLY
+                        ScriptSpace[10911] = 1; // $IN_MENU
                         state              = STATE_PASSFAIL_CHECK;
                     }
                 break;

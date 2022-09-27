@@ -15,5 +15,7 @@ public:
     int GetTimeLeft () { return 0; }
     bool IsRestoringFromCrash () { return false; }
     void ReportObjective (const std::string &str) { }
+    void BackupObjectiveTexts (std::string objectives[100]) {}
+    void RestoreObjectiveTexts (std::string objectives[100]) {}
 };
 // clang-format on

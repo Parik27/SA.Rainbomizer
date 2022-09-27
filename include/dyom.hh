@@ -27,6 +27,8 @@ class DyomRandomizer
     std::string storedObjectives[100];
     std::string originalName;
 
+    bool inhibitEditorScript = false;
+
 public:
     static inline struct Config
     {

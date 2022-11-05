@@ -18,5 +18,6 @@ public:
     void ReportObjective (const std::string &str) { }
     void BackupObjectiveTexts (std::string objectives[100]) {}
     void RestoreObjectiveTexts (std::string objectives[100]) {}
+    void ReportMissionStart (const std::string &html, const std::string &url) {}
 };
 // clang-format on

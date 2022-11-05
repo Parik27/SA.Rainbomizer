@@ -6,6 +6,7 @@ class DyomStubSession
 
 public:
     bool StartsAutomatically () { return false; }
+    bool EndsAutomatically () { return false; }
     void ReportMissionPass () { }
     void ReportMissionSkip () { }
     void ReportStartSkip () { }

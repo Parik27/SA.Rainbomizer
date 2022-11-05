@@ -7,6 +7,41 @@
 #include <sstream>
 #include <iomanip>
 #include <regex>
+#include "bass_fx.h"
+#include "logger.hh"
+
+#include <iostream>
+#include <array>
+#include <regex>
+
+/*******************************************************/
+std::string
+DyomRandomizerTTS::GuessObjectiveSpeaker (const char *text)
+{
+    /* List of regex's to figure out the speaker from objective text.
+       Supports stuff like:
+
+       1. ~g~CJ~w~ haha
+       2. (CJ) haha
+       3. emak) haha
+       4. CJ = haha
+
+       and might match some random stuff as well
+    */
+
+    std::array  res{std::regex ("^\\W*(?:(?:~.~\\W*)|(?:[\\([]\\W*))(.+?"
+                                 ")(?:[:)(\\] ]|(?:~.~))"),
+                   std::regex ("^\\W*(\\w+?)\\W*[:)(\\]=]")};
+    std::cmatch cm;
+
+    for (auto &re : res)
+        {
+            if (std::regex_search (text, cm, re))
+                return cm[1];
+        }
+
+    return "";
+}
 
 /*******************************************************/
 void
@@ -15,17 +50,23 @@ DyomRandomizerTTS::EnqueueObjective (int objective, bool play)
     auto objectiveTexts = (const char*) ScriptSpace[9883];
 
     std::string objText = objectiveTexts + objective * 100;
+
     objText = std::regex_replace (objText, std::regex ("~.+?~"), "");
     objText = std::regex_replace (objText, std::regex ("_"), "");
     objText = std::regex_replace (objText, std::regex ("\\s+"), " ");
 
-    printf("Final objective text after replacing: %s\n", objText.c_str());
+    std::string speaker
+        = GuessObjectiveSpeaker (objectiveTexts + objective * 100);
 
-    if (objText.size() < 3)
+    printf ("Final objective text after replacing: %s: %s\n",
+            speaker.length () == 0 ? "Narrator" : speaker.c_str (),
+            objText.c_str ());
+
+    if (objText.size () < 3)
         return;
 
     std::lock_guard lock (queueMutex);
-    queue.push_back ({objText, objective, play});
+    queue.push_back ({objText, speaker, objective, play});
 }
 
 static std::string
@@ -47,25 +88,35 @@ EncodeURL (const std::string &s)
 
 /*******************************************************/
 std::string
-DyomRandomizerTTS::GetSoundURL (const std::string &text)
+DyomRandomizerTTS::GetRandomVoice ()
 {
-    static constexpr const char *voices[]
-        = {"Brian",     "Amy",      "Emma",     "Geraint", "Russell",
-           "Nicole",    "Joey",     "Justin",   "Matthew", "Ivy",
-           "Joanna",    "Kendra",   "Kimberly", "Salli",   "Raveena",
-           "Zeina",     "Zhiyu",    "Mads",     "Naja",    "Ruben",
-           "Lotte",     "Mathieu",  "Celine",   "Lea",     "Chantal",
-           "Hans",      "Marlene",  "Vicki",    "Aditi",   "Karl",
-           "Dora",      "Giorgio",  "Carla",    "Bianca",  "Takumi",
-           "Mizuki",    "Seoyeon",  "Liv",      "Jacek",   "Jan",
-           "Ewa",       "Maja",     "Ricardo",  "Camila",  "Vitoria",
-           "Cristiano", "Ines",     "Carmen",   "Maxim",   "Tatyana",
-           "Enrique",   "Conchita", "Lucia",    "Mia",     "Miguel",
-           "Lupe",      "Penelope", "Astrid",   "Filiz",   "Gwyneth"
+    static constexpr const char *englishVoices[] = {
+        "Brian",  "Amy",    "Emma",     "Geraint", "Russell",
+        "Nicole", "Joey",   "Justin",   "Matthew", "Ivy",
+        "Joanna", "Kendra", "Kimberly", "Salli",   "Raveena",
     };
 
-    std::string voice = GetRandomElement (voices);
+    static constexpr const char *voices[]
+        = {"Zeina",     "Zhiyu",  "Mads",   "Naja",    "Ruben",   "Lotte",
+           "Mathieu",   "Celine", "Lea",    "Chantal", "Hans",    "Marlene",
+           "Vicki",     "Aditi",  "Karl",   "Dora",    "Giorgio", "Carla",
+           "Bianca",    "Takumi", "Mizuki", "Seoyeon", "Liv",     "Jacek",
+           "Jan",       "Ewa",    "Maja",   "Ricardo", "Camila",  "Vitoria",
+           "Cristiano", "Ines",   "Carmen", "Maxim",   "Tatyana", "Enrique",
+           "Conchita",  "Lucia",  "Mia",    "Miguel",  "Lupe",    "Penelope",
+           "Astrid",    "Filiz",  "Gwyneth"};
 
+    if (random (100) < 10)
+        return GetRandomElement (voices);
+    else
+        return GetRandomElement (englishVoices);
+}
+
+/*******************************************************/
+std::string
+DyomRandomizerTTS::GetSoundURL (const std::string &text,
+                                const std::string &voice)
+{
     auto res = internet
                    .Post ("/polly/speak",
                           "Content-Type: application/x-www-form-urlencoded",
@@ -80,6 +131,17 @@ DyomRandomizerTTS::GetSoundURL (const std::string &text)
     return std::regex_replace (url, std::regex ("\\\\/"), "/");
 }
 
+HSTREAM
+BASS_FXDEF (BASS_FX_TempoCreate) (DWORD chan, DWORD flags)
+{
+    typedef HSTREAM (WINAPI * BFXTC) (DWORD, DWORD);
+
+    static auto  handle = LoadLibrary ("bass_fx.dll");
+    static BFXTC proc = (BFXTC) GetProcAddress (handle, "BASS_FX_TempoCreate");
+
+    return proc (chan, flags);
+}
+
 /*******************************************************/
 void
 DyomRandomizerTTS::LoadEntry (StreamEntry &entry)
@@ -91,11 +153,28 @@ DyomRandomizerTTS::LoadEntry (StreamEntry &entry)
             bassInitialised = true;
         }
 
-    printf ("Loading TTS Entry, objective: %d\n", entry.objective);
-    auto url = GetSoundURL (entry.text.c_str ());
+    if (!voices.count (entry.speaker))
+        voices[entry.speaker] = GetRandomVoice ();
+
+    std::string voice = voices[entry.speaker];
+
+    printf ("Loading TTS Entry, objective: %d, voice: %s\n", entry.objective,
+            voice.c_str ());
+    auto url = GetSoundURL (entry.text.c_str (), voice);
 
     entry.sound
-        = BASS_StreamCreateURL (url.c_str (), 0, BASS_STREAM_AUTOFREE, 0, 0);
+        = BASS_StreamCreateURL (url.c_str (), 0, BASS_STREAM_DECODE, 0, 0);
+
+    entry.sound = BASS_FX_TempoCreate (entry.sound, BASS_FX_FREESOURCE);
+    if (!entry.sound)
+        {
+            Logger::GetLogger ()->LogMessage (
+                "ERROR!!! : " + std::to_string (BASS_ErrorGetCode ()));
+        }
+
+    if (entry.text.size () > 32)
+        BASS_ChannelSetAttribute (entry.sound, BASS_ATTRIB_TEMPO,
+                                  entry.text.size () / 1.2f);
 
     printf ("Finished loading TTS Entry, sound: %lx\n", entry.sound);
 
@@ -149,7 +228,7 @@ DyomRandomizerTTS::ProcessStreams ()
 
     for (auto &entry : streams)
         {
-            if (entry.ProcessFSM(*this))
+            if (entry.ProcessFSM (*this))
                 soundsPlaying = true;
         }
 
@@ -171,7 +250,7 @@ DyomRandomizerTTS::ProcessQueue ()
                     if (stream.objective == entry.objective)
                         {
                             stream.shouldPlay = entry.play;
-                            exists = true;
+                            exists            = true;
 
                             break;
                         }
@@ -179,14 +258,15 @@ DyomRandomizerTTS::ProcessQueue ()
 
             if (!exists)
                 {
-                    streams.emplace_back (entry.text, entry.objective);
+                    streams.emplace_back (entry.text, entry.speaker, entry.objective);
                     streams.back ().shouldPlay = entry.play;
 
-                    printf("Added objective to streams, %d\n", entry.objective);
+                    printf ("Added objective to streams, %d\n",
+                            entry.objective);
                 }
         }
 
-    queue.clear();
+    queue.clear ();
 }
 
 /*******************************************************/
@@ -229,6 +309,16 @@ DyomRandomizerTTS::ProcessTTS ()
             ProcessQueue ();
             CleanupStreams ();
 
+            if (reset)
+                {
+                    queue.clear ();
+                    streams.clear ();
+                    voices.clear ();
+                    areAnySoundsLoading = false;
+                    areAnySoundsPlaying = false;
+                    reset               = false;
+                }
+
             std::this_thread::sleep_for (100ms);
         }
 }
@@ -243,17 +333,17 @@ DyomRandomizerTTS::DyomRandomizerTTS ()
 
 /*******************************************************/
 void
-DyomRandomizerTTS::Reset()
+DyomRandomizerTTS::Reset ()
 {
-    running = false;
-    workerThread.join();
+    using namespace std::chrono_literals;
 
-    queue.clear ();
-    streams.clear ();
-    areAnySoundsLoading = false;
-    areAnySoundsPlaying = false;
+    reset           = true;
+    auto resetStart = time (NULL);
 
-    workerThread = std::thread (&DyomRandomizerTTS::ProcessTTS, this);
+    const int TIMEOUT_DURATION = 4;
+
+    while (reset && time (NULL) - resetStart < TIMEOUT_DURATION)
+        std::this_thread::sleep_for (100ms);
 }
 
 /*******************************************************/

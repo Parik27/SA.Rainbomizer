@@ -15,6 +15,8 @@
 #include "util/scrpt.hh"
 #include "util/dyom/Translation.hh"
 #include "util/dyom/TTS.hh"
+#include <set>
+#include <array>
 
 #include "util/dyom/StubSession.hh"
 
@@ -240,6 +242,7 @@ DyomRandomizer::HandleExternalSubtitles ()
 {
     if (prevObjectiveForSubtitles != ScriptSpace[9903])
         {
+            puts("SESSION: OBJECTIVE");
             sm_Session.ReportObjective (storedObjectives[ScriptSpace[9903]]);
             prevObjectiveForSubtitles = ScriptSpace[9903];
         }
@@ -300,6 +303,9 @@ DyomRandomizer::ParseMission (const std::string &url)
                 "Dyom File downloaded failed verification: " + url);
             return false;
         }
+
+    puts("SESSION: MISSIONSTART");
+    sm_Session.ReportMissionStart (mission, url);
 
     Logger::GetLogger ()->LogMessage (url);
     SaveMission (output);
@@ -364,8 +370,9 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
 
     sm_Session.ProcessTimer ();
 
-    // Check for new game
-    if (currentOffset == 91092)
+    // Check for new game or session end
+    if (currentOffset == 91092
+        || (sm_Session.EndsAutomatically () && !sm_Session.IsRunning ()))
         {
             state       = STATE_INACTIVE;
             downloadNew = true;
@@ -377,14 +384,17 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
         {
             case STATE_INACTIVE: {
                 // Autoplay for dyom sessions that request it
-                if (currentOffset == 103522
+                if (currentOffset == 103518
                     && sm_Session.StartsAutomatically ())
                     {
                         state = STATE_MISSION_PLAY;
-                        if ((char *) &ScriptSpace[10918] == "DYOM9.dat"s)
+                        if ((char *) &ScriptSpace[10918] == "DYOM9.dat"s) {
+                            puts("SESSION: STARTSKIP");
                             sm_Session.ReportStartSkip ();
+                        }
                         else
                             {
+                                puts("SESSION: RETRY");
                                 sm_Session.RestoreObjectiveTexts (
                                     storedObjectives);
                                 sm_Session.ReportRetry ();
@@ -446,8 +456,10 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
 
                         // Additional check to make sure that the mission has
                         // objectives.
-                        if (ScriptSpace[10916] > 0)
+                        if (ScriptSpace[10916] > 0) {
+                            puts("SESSION: PASS");
                             sm_Session.ReportMissionPass ();
+                        }
                     }
 
                 // Mission Fail (+ pass check just to be safe)

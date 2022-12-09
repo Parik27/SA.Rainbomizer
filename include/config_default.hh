@@ -345,6 +345,7 @@ RandomSpawn = true
 TranslationChain = "en"
 
 EnableTextToSpeech = false
+OverrideTTSVolume = -1.0
 
 #######################################################
 [CheatRandomizer]

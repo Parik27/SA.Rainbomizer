@@ -983,6 +983,8 @@ struct CMenuManager
 {
     char  field_0x00[0x3c];
     float m_dwBrightness;
+    char  field_0x40[0xF];
+    uint8_t m_nSfxVolume;
 };
 
 struct CPlayerInfo
@@ -1317,14 +1319,15 @@ GetRandomElement (T *container, uint32_t size)
 
 CMatrix *RwFrameGetLTM (void *frame);
 
-extern CPickup *        aPickups;
-extern CStreamingInfo * ms_aInfoForModel;
+extern CPickup         *aPickups;
+extern CStreamingInfo  *ms_aInfoForModel;
 extern CBaseModelInfo **ms_modelInfoPtrs;
-extern RwRGBA *         ms_vehicleColourTable;
-extern int *            ScriptParams;
-extern int *            ScriptSpace;
-extern CPool *&         ms_pPedPool;
-extern CPool *&         ms_pVehiclePool;
-extern CWeaponInfo *    aWeaponInfos;
-extern RsGlobalType *   RsGlobal;
-extern float *          ms_fTimeStep;
+extern RwRGBA          *ms_vehicleColourTable;
+extern int             *ScriptParams;
+extern int             *ScriptSpace;
+extern CPool          *&ms_pPedPool;
+extern CPool          *&ms_pVehiclePool;
+extern CWeaponInfo     *aWeaponInfos;
+extern RsGlobalType    *RsGlobal;
+extern float           *ms_fTimeStep;
+static CMenuManager    *FrontendMenuManager = (CMenuManager *) (0xBA6748);

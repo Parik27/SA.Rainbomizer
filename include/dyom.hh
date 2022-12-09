@@ -37,6 +37,7 @@ public:
         bool        EnableTextToSpeech;
         bool        RandomSpawn;
         std::string TranslationChain;
+        double      OverrideTTSVolume;
     } m_Config;
 
     CRunningScript *mDyomScript = nullptr;

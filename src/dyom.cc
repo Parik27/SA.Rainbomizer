@@ -140,6 +140,7 @@ DyomRandomizer::Initialise ()
             std::pair ("RandomSpawn", &m_Config.RandomSpawn),
             std::pair ("TranslationChain", &m_Config.TranslationChain),
             std::pair ("EnableTextToSpeech", &m_Config.EnableTextToSpeech),
+            std::pair ("OverrideTTSVolume", &m_Config.OverrideTTSVolume),
             std::pair ("AutoTranslateToEnglish",
                        &m_Config.AutoTranslateToEnglish)))
         return;

@@ -1,5 +1,6 @@
 #include "base.hh"
 #include "bass/bass.h"
+#include "dyom.hh"
 #include "functions.hh"
 #include <mutex>
 #include <thread>
@@ -176,7 +177,13 @@ DyomRandomizerTTS::LoadEntry (StreamEntry &entry)
         BASS_ChannelSetAttribute (entry.sound, BASS_ATTRIB_TEMPO,
                                   entry.text.size () / 1.2f);
 
-    printf ("Finished loading TTS Entry, sound: %lx\n", entry.sound);
+
+    BASS_ChannelSetAttribute(entry.sound, BASS_ATTRIB_VOL, FrontendMenuManager->m_nSfxVolume / 12.0f);
+
+    if (DyomRandomizer::GetInstance()->m_Config.OverrideTTSVolume >= 0.0f)
+        BASS_ChannelSetAttribute (
+            entry.sound, BASS_ATTRIB_VOL,
+            DyomRandomizer::GetInstance ()->m_Config.OverrideTTSVolume);
 
     entry.state = StreamEntry::LOADED;
 }

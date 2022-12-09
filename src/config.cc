@@ -139,4 +139,5 @@ ConfigManager::ReadValue (const std::string &tableName, const std::string &key,
 
 READ_VALUE_ADD_TYPE (bool)
 READ_VALUE_ADD_TYPE (int)
+READ_VALUE_ADD_TYPE (double)
 READ_VALUE_ADD_TYPE (std::string)

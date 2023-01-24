@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <regex>
+#include <map>
 
 #include <windows.h>
 #include <wininet.h>
@@ -24,7 +25,9 @@ class DyomTranslator
     void ProcessDidTranslate (std::string translated);
 
 public:
-    DyomTranslator (const std::string &translationChain = "");
+    DyomTranslator (const std::string &translationChain = "",
+                    const std::string &inputCharacters = "",
+                    const std::string &outputCharacters  = "");
     ~DyomTranslator () { internet.Close (); }
 
     void FixupGxtTokens (std::string &text);
@@ -44,4 +47,5 @@ public:
     }
 
     std::vector<std::string> mTranslationChain;
+    std::map<std::string, std::string> mCharacterMap;
 };

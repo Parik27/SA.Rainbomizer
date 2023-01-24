@@ -26,8 +26,7 @@ class DyomTranslator
 
 public:
     DyomTranslator (const std::string &translationChain = "",
-                    const std::string &inputCharacters = "",
-                    const std::string &outputCharacters  = "");
+                    const std::string &charactersMap = "");
     ~DyomTranslator () { internet.Close (); }
 
     void FixupGxtTokens (std::string &text);
@@ -47,5 +46,5 @@ public:
     }
 
     std::vector<std::string> mTranslationChain;
-    std::map<std::string, std::string> mCharacterMap;
+    std::map<std::string, char> mCharacterMap;
 };

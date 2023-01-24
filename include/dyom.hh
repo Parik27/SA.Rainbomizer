@@ -37,8 +37,7 @@ public:
         bool        EnableTextToSpeech;
         bool        RandomSpawn;
         std::string TranslationChain;
-        std::string InputCharacters;
-        std::string OutputCharacters;
+        std::string CharactersMap;
         double      OverrideTTSVolume;
     } m_Config;
 

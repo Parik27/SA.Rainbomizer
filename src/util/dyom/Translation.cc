@@ -56,8 +56,7 @@ EncodeURL (const std::string &s)
 
 /*******************************************************/
 DyomTranslator::DyomTranslator (const std::string &translationChain,
-                                const std::string &inputCharacters,
-                                const std::string &outputCharacters)
+                                const std::string &charactersMap)
 {
     internet.Open ("translate.google.com");
 
@@ -71,17 +70,18 @@ DyomTranslator::DyomTranslator (const std::string &translationChain,
                 mTranslationChain.push_back (std::move (token));
         }
 
-    if (!inputCharacters.empty () && !outputCharacters.empty ()
-        && std::count (inputCharacters.begin (), inputCharacters.end (), ';')
-               == outputCharacters.length ())
+    if (!charactersMap.empty ())
         {
-            std::istringstream iss (inputCharacters);
-            int                i = 0;
-            for (std::string token; std::getline (iss, token, ';');)
+            std::istringstream iss (charactersMap);
+            std::string        token_v;
+            char               ch = '0';
+            for (std::string token; std::getline (iss, token, ';')
+                                    && std::getline (iss, token_v, ';');)
                 {
-                    mCharacterMap.insert (std::pair<std::string, std::string> (
+                    ch = (char)std::stoi (token_v, nullptr, 16);
+                    mCharacterMap.insert (std::pair<std::string, char> (
                         std::move (token),
-                        outputCharacters.substr (i++, 1)));
+                        ch));
                 }
         }
 }
@@ -227,7 +227,7 @@ DyomTranslator::TranslateText (const std::string &text)
             std::string::size_type pos = 0;
             while ((pos = translation.find (key, pos)) != std::string::npos)
                 {
-                    translation.replace (pos, key.length(), value);
+                    translation.replace (pos, key.length(), 1, value);
                     pos += 1;
                 }
         }

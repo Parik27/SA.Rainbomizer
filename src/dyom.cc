@@ -139,8 +139,7 @@ DyomRandomizer::Initialise ()
             std::pair ("UseEnglishOnlyFilter", &m_Config.EnglishOnly),
             std::pair ("RandomSpawn", &m_Config.RandomSpawn),
             std::pair ("TranslationChain", &m_Config.TranslationChain),
-            std::pair ("InputCharacters", &m_Config.InputCharacters),
-            std::pair ("OutputCharacters", &m_Config.OutputCharacters),
+            std::pair ("CharactersMap", &m_Config.CharactersMap),
             std::pair ("EnableTextToSpeech", &m_Config.EnableTextToSpeech),
             std::pair ("OverrideTTSVolume", &m_Config.OverrideTTSVolume),
             std::pair ("AutoTranslateToEnglish",
@@ -257,8 +256,7 @@ DyomRandomizer::SaveMission (const std::vector<uint8_t> &data)
 {
     DYOM::DYOMFileStructure dyomFile;
     DyomTranslator          translator (m_Config.TranslationChain,
-                               m_Config.InputCharacters,
-                               m_Config.OutputCharacters);
+                               m_Config.CharactersMap);
 
     dyomFile.Read (data);
 

@@ -177,6 +177,7 @@ UseGenericPatterns = false
 # So expect additional softlocks and crashes using this.
 SkipChecks = false
 
+)" R"(
 #######################################################
 [ParkedCarRandomizer]
 

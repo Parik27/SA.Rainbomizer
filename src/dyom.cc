@@ -121,6 +121,21 @@ AdjustCodeForDYOM (FILE *file, void *buf, size_t len)
                     injector::WriteMemory (uintptr_t (buf) + 75373, -100.0f);
                 }
 
+            if (DyomRandomizer::m_Config.RandomTime)
+                {
+                    injector::WriteMemory<uint8_t> (uintptr_t (buf) + 75326,
+                                                    random (23));
+
+                    injector::WriteMemory<uint8_t> (uintptr_t (buf) + 75328,
+                                                    random (60));
+                }
+
+            if (DyomRandomizer::m_Config.RandomWeather)
+                {
+                    injector::WriteMemory<uint8_t> (uintptr_t (buf) + 75401,
+                                                    random (22));
+                }
+
 #ifdef DYOM_ENABLE_PARMANENT_FAST_LOADS
             injector::WriteMemory<uint16_t> (uintptr_t (buf) + 91909 + 3, 100);
             injector::WriteMemory<uint16_t> (uintptr_t (buf) + 91921 + 3, 100);
@@ -138,9 +153,24 @@ DyomRandomizer::Initialise ()
             "DYOMRandomizer",
             std::pair ("UseEnglishOnlyFilter", &m_Config.EnglishOnly),
             std::pair ("RandomSpawn", &m_Config.RandomSpawn),
+            std::pair ("RandomTime", &m_Config.RandomTime),
+            std::pair ("RandomWeather", &m_Config.RandomWeather),
+            std::pair ("SpeedUpLongTTSTexts", &m_Config.SpeedUpLongTTSTexts),
             std::pair ("TranslationChain", &m_Config.TranslationChain),
             std::pair ("EnableTextToSpeech", &m_Config.EnableTextToSpeech),
             std::pair ("OverrideTTSVolume", &m_Config.OverrideTTSVolume),
+            std::pair ("ForcedMissionID", &m_Config.ForcedMissionID),
+            std::pair ("OverrideSearchURL", &m_Config.OverrideSearchURL),
+            std::pair ("AutoReset", &m_Config.AutoReset),
+
+            std::pair ("IncrementPassCounterKey",
+                       &m_Config.IncrementPassCounterKey),
+            std::pair ("IncrementSkipCounterKey",
+                       &m_Config.IncrementSkipCounterKey),
+            std::pair ("DecrementPassCounterKey",
+                       &m_Config.DecrementPassCounterKey),
+            std::pair ("DecrementSkipCounterKey",
+                       &m_Config.DecrementSkipCounterKey),
             std::pair ("AutoTranslateToEnglish",
                        &m_Config.AutoTranslateToEnglish)))
         return;
@@ -243,8 +273,13 @@ DyomRandomizer::HandleExternalSubtitles ()
 {
     if (prevObjectiveForSubtitles != ScriptSpace[9903])
         {
-            puts("SESSION: OBJECTIVE");
-            sm_Session.ReportObjective (storedObjectives[ScriptSpace[9903]]);
+            auto objectiveTexts = (const char *) ScriptSpace[9883];
+            std::string objText = objectiveTexts + ScriptSpace[9903] * 100;
+
+            puts ("SESSION: OBJECTIVE");
+
+            sm_Session.ReportObjective (storedObjectives[ScriptSpace[9903]],
+                                        objText);
             prevObjectiveForSubtitles = ScriptSpace[9903];
         }
 }
@@ -268,11 +303,13 @@ DyomRandomizer::SaveMission (const std::vector<uint8_t> &data)
             sm_Session.BackupObjectiveTexts (storedObjectives);
             translator.TranslateDyomFile (dyomFile);
 
+            sm_Session.ReportObjective (originalName,
+                                        dyomFile.g_HEADERSTRINGS[0]);
+
             if (translator.GetDidTranslate ())
                 {
                     prevObjectiveForSubtitles = -1;
                     enableExternalSubtitles   = true;
-                    sm_Session.ReportObjective (originalName);
                     dyomFile.g_HEADERSTRINGS[0]
                         = "[TRANSLATED]" + dyomFile.g_HEADERSTRINGS[0];
                     dyomFile.g_HEADERSTRINGS[0]
@@ -324,21 +361,26 @@ DyomRandomizer::DownloadRandomMission ()
             std::string list;
 
             if (m_Config.EnglishOnly)
-                list = "list?english=1&";
+                list = "list?english=1&order=6";
             else
-                list = random (100) > 38 ? "list?" : "list_d?";
+                list = random (100) > 38 ? "list?order=6&" : "list_d?order=6&";
+
+            if (m_Config.OverrideSearchURL.size ())
+                list = m_Config.OverrideSearchURL;
 
             int total_pages = GetTotalNumberOfDYOMMissionPages (list);
 
-            //#define FORCED_MISSION "show/14681"
-
-#ifdef FORCED_MISSION
-            ParseMission (FORCED_MISSION);
-#else
-            while (!ParseMission (GetRandomEntryFromPage (
-                list + "page=" + std::to_string (random (total_pages)))))
-                ;
-#endif
+            if (m_Config.ForcedMissionID.size ())
+                {
+                    ParseMission (m_Config.ForcedMissionID);
+                }
+            else
+                {
+                    while (!ParseMission (GetRandomEntryFromPage (
+                        list
+                        + "page=" + std::to_string (random (total_pages)))))
+                        ;
+                }
 
             internet.Close ();
         }

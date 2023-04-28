@@ -28,7 +28,7 @@ public:
     ~DyomTranslator () { internet.Close (); }
 
     void FixupGxtTokens (std::string &text);
-    void DecodeSpecialChars (std::string &text);
+    static void DecodeSpecialChars (std::string &text);
 
     std::string TranslateText (const std::string &text);
     void        TranslateDyomFile (DYOM::DYOMFileStructure &file);

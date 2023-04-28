@@ -6,11 +6,21 @@
 #include <thread>
 #include <condition_variable>
 #include <map>
+#include <array>
+#include <regex>
 
 #include "Internet.hh"
 
 class DyomRandomizerTTS
 {
+
+    struct SpeakerVoice
+    {
+        std::string Voice;
+        int         Pitch;
+        bool        RemoveSpeakerName;
+    };
+
     struct StreamEntry
     {
         enum
@@ -25,9 +35,9 @@ class DyomRandomizerTTS
         bool        shouldPlay;
         HSTREAM     sound;
         std::string text;
-        std::string speaker;
+        SpeakerVoice speaker;
 
-        StreamEntry (const std::string &text, const std::string &speaker,
+        StreamEntry (const std::string &text, SpeakerVoice &speaker,
                      int objective)
             : objective (objective), text (text), speaker (speaker)
         {
@@ -40,34 +50,41 @@ class DyomRandomizerTTS
     struct QueueEntry
     {
         std::string text;
-        std::string speaker;
+        SpeakerVoice speaker;
         int         objective;
         bool        play;
     };
 
-    bool                               areAnySoundsLoading;
-    bool                               areAnySoundsPlaying;
-    std::mutex                         queueMutex;
-    std::vector<StreamEntry>           streams;
-    std::vector<QueueEntry>            queue;
-    std::map<std::string, std::string> voices;
+    bool                          areAnySoundsLoading;
+    bool                          areAnySoundsPlaying;
+    std::mutex                    queueMutex;
+    std::vector<StreamEntry>      streams;
+    std::vector<std::regex>       swearFilter;
+    std::vector<QueueEntry>       queue;
+    std::array<SpeakerVoice, 100> voices;
+    bool                          voicesInitialised = false;
 
     InternetUtils internet;
 
     std::string GetSoundURL (const std::string &text, const std::string &voice);
     std::string GuessObjectiveSpeaker (const char *text);
+    void        RemoveSpeakerName (std::string &str);
 
     void ProcessStreams ();
     void ProcessQueue ();
     void CleanupStreams ();
     void ProcessTTS ();
 
+    void ReadSwearFilterFile ();
+
     void LoadEntry (StreamEntry &entry);
     void EnqueueObjective (int objective, bool play);
 
     std::thread workerThread;
-    bool running = false;
-    bool reset = false;
+    bool        running = false;
+    bool        reset   = false;
+
+    void BuildObjectiveSpeakerMap ();
 
 public:
     DyomRandomizerTTS ();

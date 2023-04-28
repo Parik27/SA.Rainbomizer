@@ -15,7 +15,7 @@ public:
     bool IsRunning () { return false; }
     int GetTimeLeft () { return 0; }
     bool IsRestoringFromCrash () { return false; }
-    void ReportObjective (const std::string &str) { }
+    void ReportObjective (const std::string &original, const std::string &translated) { }
     void BackupObjectiveTexts (std::string objectives[100]) {}
     void RestoreObjectiveTexts (std::string objectives[100]) {}
     void ReportMissionStart (const std::string &html, const std::string &url) {}

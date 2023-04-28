@@ -36,8 +36,20 @@ public:
         bool        AutoTranslateToEnglish;
         bool        EnableTextToSpeech;
         bool        RandomSpawn;
+        bool        RandomTime;
+        bool        RandomWeather;
+        bool        SpeedUpLongTTSTexts;
         std::string TranslationChain;
         double      OverrideTTSVolume;
+        std::string ForcedMissionID;
+        std::string OverrideSearchURL;
+
+        int IncrementPassCounterKey;
+        int IncrementSkipCounterKey;
+        int DecrementPassCounterKey;
+        int DecrementSkipCounterKey;
+
+        bool AutoReset;
     } m_Config;
 
     CRunningScript *mDyomScript = nullptr;

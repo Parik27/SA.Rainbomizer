@@ -340,12 +340,24 @@ UseEnglishOnlyFilter = false
 
 AutoTranslateToEnglish = true
 RandomSpawn = true
+RandomWeather = true
+RandomTime = true
 
 # Languages in translation chain separated by a semicolon, e.g. "pl;el;zh-CN;en" means Polish->Greek->Simplified Chinese->English, see https://cloud.google.com/translate/docs/languages for supported languages and their codes
 TranslationChain = "en"
 
 EnableTextToSpeech = false
 OverrideTTSVolume = -1.0
+SpeedUpLongTTSTexts = false
+
+# https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+IncrementPassCounterKey = 115
+IncrementSkipCounterKey = 116
+DecrementPassCounterKey = 117
+DecrementSkipCounterKey = 118
+
+# If a mission is skipped when no missions have been passed, reset the session
+AutoReset = true
 
 #######################################################
 [CheatRandomizer]

@@ -145,7 +145,7 @@ DyomRandomizerTTS::BuildObjectiveSpeakerMap ()
 
     // Generate an array biased towards English voices
 
-    // Check: https://www.desmos.com/calculator/5jrwlempl7 for calculations
+    // Check: https://www.desmos.com/calculator/5jrwlemp7l for calculations
 
     // A value of 5% makes it so that about 20.3% have non-English voices (under
     // some assumptions). A value of 5% makes it so that there's a 10% chance of

@@ -993,8 +993,59 @@ struct CPlayerInfo
     char  field_0x00[0x18c];
 };
 
-struct CObject : public CEntity
+struct CObjectInfo
 {
+    float m_fMass;
+    float m_fTurnMass;
+    float m_fAirResistance;
+    float m_fElasticity;
+    float m_fBuoyancyConstant;
+    float m_fUprootLimit;
+    float m_fColDamageMultiplier;
+    char  m_bColDamageEffect;
+    char  m_bSpecialColResponseCase;
+    bool  m_nCameraAvoidObject;
+    bool  b_CausesExplosion;
+    int  m_bFxType;
+    RwV3d m_vFxOffset;
+    int   m_pFxSystem;
+    float m_fSmashMultiplier;
+    RwV3d m_vBreakVelocity;
+    float m_fBreakVelocityRand;
+    int   m_dwGunBreakMode;
+    int   m_dwSparksOnImpact;
+};
+
+struct CObject : public CPhysical
+{
+    int   m_pControlCodeList;
+    char  m_nObjectType;
+    char  m_nBonusValue;
+    char  m_nCostValue;
+    int   m_nObjectFlags;
+    char  m_nCurrentColDamageEffect;
+    char  m_nStoredColDamageEffect;
+    char  field_146;
+    char  m_nGarageDoorGarageIndex;
+    char  m_nLastWeaponDamage;
+    char  m_nColBrightness;
+    short m_wCarPartModelIndex;
+    int   m_nColorId;
+    int   m_nRemovalTime;
+
+    float m_fHealth;
+    float m_fDoorAngle;
+    float m_fScale;
+    CObjectInfo*   m_pObjectInfo;
+    int   m_pFire;
+    short m_wScriptTriggerIndex;
+    short m_wRemapTxd;
+    int   m_pRemapTexture;
+    int   m_pDummyObject;
+    int   m_dwTimeToRemoveParticles;
+    float m_fParticlesIntensity;
+
+    static CObject *Create (int modelId);
 };
 
 #pragma pack(push, 1)

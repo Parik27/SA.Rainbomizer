@@ -37,6 +37,7 @@ void __fastcall RandomizeObjectIndices (CRunningScript *script, void *edx,
                         {
                             objectsToUse = ObjectsRandomizer::GetInstance ()
                                                ->destructibleObjects;
+                            ObjectsRandomizer::modifyObject = true;
                         }
                     else
                         {
@@ -59,6 +60,34 @@ void __fastcall RandomizeObjectIndices (CRunningScript *script, void *edx,
         }
 }
 
+// Directly modifies the data of the created object to change its properties.
+// Values still need to be worked out.
+/*******************************************************/
+CObject *
+ChangeObjectData (int modelId)
+{
+    CObject *obj = CObject::Create (modelId);
+    if (ObjectsRandomizer::modifyObject)
+    {
+        //    obj->m_pObjectInfo->m_fMass              = 50.0f;
+        //obj->m_pObjectInfo->m_fTurnMass              = 150.0f;
+        //    obj->m_pObjectInfo->m_fAirResistance     = 0.99f;
+        //obj->m_pObjectInfo->m_fElasticity            = 0.0f;
+        //    obj->m_pObjectInfo->m_fUprootLimit       = 350.0f;
+        //obj->m_pObjectInfo->m_fColDamageMultiplier   = 5.0f;
+
+            obj->m_pObjectInfo->m_bColDamageEffect = 200;
+        obj->m_pObjectInfo->m_fSmashMultiplier = 1.0f;
+            obj->m_pObjectInfo->m_vBreakVelocity   = {0.0f, 0.0f, 0.1f};
+        obj->m_pObjectInfo->m_fBreakVelocityRand   = 0.07f;
+            obj->m_pObjectInfo->m_dwGunBreakMode     = 2;
+        obj->m_pObjectInfo->m_dwSparksOnImpact     = 0;
+        obj->m_fHealth                         = 1.0f;
+        ObjectsRandomizer::modifyObject        = false;
+    }
+    return obj;
+}
+
 /*******************************************************/
 void
 ObjectsRandomizer::Initialise ()
@@ -66,7 +95,8 @@ ObjectsRandomizer::Initialise ()
     if (!ConfigManager::ReadConfig ("ObjectRandomizer"))
         return;
 
-    RegisterHooks ({{HOOK_CALL, 0x469773, (void *) RandomizeObjectIndices}});
+    RegisterHooks ({{HOOK_CALL, 0x469773, (void *) RandomizeObjectIndices}/*,
+                    {HOOK_CALL, 0x46979B, (void *) ChangeObjectData}*/});
     Logger::GetLogger ()->LogMessage ("Intialised ObjectsRandomizer");
 }
 

@@ -514,27 +514,37 @@ DyomRandomizerTTS::ProcessTTS ()
 void
 DyomRandomizerTTS::ReadSwearFilterFile ()
 {
-    auto filterFile = GetRainbomizerDataFile("Swear_Words.txt");
-    char line[512] = {};
-
-    while (fgets (line, 256, filterFile))
+    FILE *filterFile = OpenRainbomizerFile ("Swear_Words.txt", "r", "data/");
+    if (filterFile)
         {
-            line[strcspn (line, "\n")] = 0;
-            if (strlen (line) <= 2)
-                continue;
+            char line[512] = {};
 
-            try
+            while (fgets (line, 256, filterFile))
                 {
-                    std::regex reg{line, std::regex_constants::icase};
-                    swearFilter.push_back (reg);
-                }
-            catch (std::regex_error &e)
-                {
-                    Logger::GetLogger ()->LogMessage ("Error parsing regex: "
-                                                      + std::string (line) + " "
-                                                      + e.what ());
+                    line[strcspn (line, "\n")] = 0;
+                    if (strlen (line) <= 2)
+                        continue;
+
+                    try
+                        {
+                            std::regex reg{line, std::regex_constants::icase};
+                            swearFilter.push_back (reg);
+                        }
+                    catch (std::regex_error &e)
+                        {
+                            Logger::GetLogger ()->LogMessage (
+                                "Error parsing regex: " + std::string (line)
+                                + " " + e.what ());
+                        }
                 }
         }
+    else if (!filterFile)
+        {
+            // Log a message if file wasn't found
+            Logger::GetLogger ()->LogMessage (
+                "Failed to read file: rainbomizer/data/Swear_Words.txt");
+        }
+    /*auto filterFile = GetRainbomizerDataFile("Swear_Words.txt");*/
 }
 
 /*******************************************************/

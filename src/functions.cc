@@ -835,6 +835,13 @@ CShopping::LoadShoppingType (const char *name)
 }
 
 /*******************************************************/
+CObject*
+CObject::Create (int modelId)
+{
+    return CallAndReturn<CObject *, 0x5A1F60> (modelId);
+}
+
+/*******************************************************/
 int
 CIplStore::FindIplSlot (char *name)
 {

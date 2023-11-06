@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <windows.h>
 #include <wininet.h>
 #include <string>
@@ -63,9 +64,19 @@ public:
         internet = InternetOpen ("123robot", INTERNET_OPEN_TYPE_PRECONFIG, NULL,
                                  NULL, 0);
 
+        if (!internet)
+            throw std::runtime_error (
+                "Failed to connect to the internet!. Error Code: "
+                + std::to_string (GetLastError ()));
+
         session = InternetConnect (internet, domain.c_str (),
                                    INTERNET_DEFAULT_HTTPS_PORT, NULL, NULL,
                                    INTERNET_SERVICE_HTTP, 0, 0);
+
+        if (!session)
+            throw std::runtime_error (
+                "Failed to connect to the DWOM website!. Error Code: "
+                + std::to_string (GetLastError ()));
     }
 
     void Close ()

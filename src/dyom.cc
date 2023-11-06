@@ -7,6 +7,8 @@
 #include "injector/calling.hpp"
 #include <ctime>
 #include <fstream>
+#include <regex>
+#include <stdexcept>
 #include <wininet.h>
 #include "config.hh"
 #include <cstring>
@@ -194,14 +196,32 @@ DyomRandomizer::Initialise ()
 int
 DyomRandomizer::GetTotalNumberOfDYOMMissionPages (std::string list)
 {
+    std::regex  re ("page=(\\d+)' >");
     std::string lists = internet.Get (list.c_str ()).GetString ();
 
-    auto start = lists.find ("... <span class=pagelink>");
-    start      = lists.find ("\' >", start) + 3;
+    unsigned long max_page = 1;
 
-    auto end = lists.find ("</a>", start);
+    for (std::smatch sm; std::regex_search (lists, sm, re);)
+        {
+            try
+                {
+                    max_page = std::max (max_page, std::stoul (sm[1]));
+                    lists = sm.suffix ();
+                }
+            catch (...)
+                { // ignore }
+                }
+        }
 
-    return std::stoi (lists.substr (start, end - start));
+    if (max_page == 1)
+        {
+            Logger::GetLogger ()->LogMessage (
+                "Warning: DYOM mission page has only 1 mission page");
+        }
+
+    Logger::GetLogger ()->LogMessage (std::to_string(max_page));
+
+    return max_page;
 }
 
 /*******************************************************/
@@ -245,6 +265,10 @@ DyomRandomizer::GetRandomEntryFromPage (std::string page)
     std::string entries = internet.Get (page.c_str ()).GetString ();
 
     int entries_count = CountOccurrencesInString (entries, "<a href='show/");
+
+    if (entries_count == 0)
+        throw std::runtime_error(page + " has no mission entries");
+
     std::size_t start = GetNthOccurrenceOfString (entries, "<a href='show/",
                                                   random (entries_count - 1))
                         + 9;
@@ -541,7 +565,21 @@ DyomRandomizer::HandleDyomScript (CRunningScript *scr)
             if (currentOffset == 103522)
                 {
                     if ((char *) &ScriptSpace[10918] == "DYOM9.dat"s)
-                        DownloadRandomMission ();
+                        {
+                            try
+                            {
+                                DownloadRandomMission ();
+                            }
+                            catch (std::exception &e)
+                            {
+                                Logger::GetLogger ()->LogMessage (
+                                    "Exception occurred while downloading "
+                                    "mission, check the next log entry for "
+                                    "more information");
+                                Logger::GetLogger ()->LogMessage (e.what ());
+                                return;
+                            }
+                        }
                 }
 
             if (currentOffset == 101718 || currentOffset == 101738)

@@ -155,9 +155,11 @@ DyomRandomizerTTS::BuildObjectiveSpeakerMap ()
             bool english = it->Country == "US" || it->Country == "GB"
                            || it->Country == "IN" || it->Country == "AU";
 
-            int baseFreq = english ? 0 : random (10000) < 500;
-
-            voiceUseFrequency.push_back (std::make_pair (it, baseFreq));
+            int baseFreq = english ? 0 : (random (10000) > 500);
+            if (english || (random(10000) <= 500))
+                voiceUseFrequency.push_back (std::make_pair (it, 0));
+            else
+                voiceUseFrequency.push_back (std::make_pair (it, 1));
         }
 
     std::shuffle (voiceUseFrequency.begin (), voiceUseFrequency.end (),

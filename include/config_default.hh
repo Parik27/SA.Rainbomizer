@@ -402,7 +402,7 @@ EnableEasterEgg = true
 # Cutscene Randomizer
 # Randomizes the models used in motion-captured cutscenes, as well as the location in which they take place.
 
-# Voice Line Randomizer	
+# Sound Randomizer	
 # Randomizes dialogue spoken by characters in missions. (Requires original AudioEvents.txt)
 # Can also randomize generic ped lines and some other types of sound effects.
 

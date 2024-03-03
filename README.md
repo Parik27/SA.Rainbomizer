@@ -2,7 +2,7 @@
 [![Discord](https://img.shields.io/discord/681996979974570066.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/BYVBQw7)
 # Rainbomizer 🌈
 
-<img src="https://media.discordapp.net/attachments/419957309192536066/602097860292509718/spinning.gif">
+<img src="https://i.ibb.co/Qc44GgF/Spinning.gif">
 
 Rainbomizer is a randomizer for Grand Theft Auto: San Andreas.
 

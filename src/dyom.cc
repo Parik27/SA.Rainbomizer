@@ -194,6 +194,29 @@ DyomRandomizer::Initialise ()
 
 /*******************************************************/
 int
+DyomRandomizer::GetTotalNumberOfDYOMMissions (std::string list)
+{
+    std::regex re ("form>(\\d+) missions? found<table");
+    std::string lists = internet.Get (list.c_str ()).GetString ();
+
+    std::smatch sm;
+    if (std::regex_search (lists, sm, re))
+        {
+            try
+                {
+                    return std::stoi (sm[1]);
+                }
+            catch (...)
+                {
+                    Logger::GetLogger()->LogMessage("Failed to get total number of DYOM missions for some reason");
+                }
+        }
+
+    return 0;
+}
+
+/*******************************************************/
+int
 DyomRandomizer::GetTotalNumberOfDYOMMissionPages (std::string list)
 {
     std::regex  re ("page=(\\d+)' >");
@@ -259,22 +282,26 @@ GetNthOccurrenceOfString (const std::string &str, const std::string &substr,
 }
 
 /*******************************************************/
-std::string
-DyomRandomizer::GetRandomEntryFromPage (std::string page)
+bool
+DyomRandomizer::GetRandomEntryFromPage (std::string page, std::string &out)
 {
-    std::string entries = internet.Get (page.c_str ()).GetString ();
+    std::string pageContents = internet.Get (page.c_str ()).GetString ();
+    std::vector<std::string> entries;
+    std::regex re ("<a href='(show/\\d+)'>");
 
-    int entries_count = CountOccurrencesInString (entries, "<a href='show/");
+    for (std::smatch sm; std::regex_search(pageContents, sm, re);)
+        {
+            if (!sm_Session.ShouldSkipMission(sm[1]))
+                entries.push_back (sm[1]);
 
-    if (entries_count == 0)
-        throw std::runtime_error(page + " has no mission entries");
+            pageContents = sm.suffix ();
+        }
 
-    std::size_t start = GetNthOccurrenceOfString (entries, "<a href='show/",
-                                                  random (entries_count - 1))
-                        + 9;
-    std::size_t end = entries.find ("'>", start + 1);
+    if (entries.size() == 0)
+        return false;
 
-    return entries.substr (start, end - start);
+    out = entries[random (entries.size () - 1)];
+    return true;
 }
 
 /*******************************************************/
@@ -377,22 +404,51 @@ DyomRandomizer::ParseMission (const std::string &url)
 
 /*******************************************************/
 void
+DyomRandomizer::DownloadRandomMission (const std::string &list)
+{
+    std::string      mission;
+    std::vector<int> skippedPages;
+    int              totalPages = GetTotalNumberOfDYOMMissionPages (list);
+
+    int maxRetries = totalPages + 10;
+    while (maxRetries-- && totalPages > skippedPages.size ())
+        {
+            // Generate page between 1 and total skipping over the skipped
+            // pages.
+            int page = random (totalPages - skippedPages.size () - 1);
+            for (auto i : skippedPages)
+                if (page >= i)
+                    page++;
+
+            if (GetRandomEntryFromPage (list + "page=" + std::to_string (page),
+                                        mission))
+                {
+                    if (ParseMission (mission))
+                        return;
+                    else
+                        sm_Session.ReportMissionUnplayable (mission);
+                }
+            else
+                {
+                    Logger::GetLogger ()->LogMessage (
+                        "No new missions found on page " + std::to_string (page)
+                        + ". Retrying...");
+
+                    skippedPages.push_back (page);
+                }
+        }
+
+    Logger::GetLogger ()->LogMessage (
+        "World has ended. There is no more DYOM content.");
+}
+
+/*******************************************************/
+void
 DyomRandomizer::DownloadRandomMission ()
 {
     if (InternetAttemptConnect (0) == ERROR_SUCCESS)
         {
             internet.Open ("dyom.gtagames.nl");
-            std::string list;
-
-            if (m_Config.EnglishOnly)
-                list = "list?english=1&order=6";
-            else
-                list = random (100) > 38 ? "list?order=6&" : "list_d?order=6&";
-
-            if (m_Config.OverrideSearchURL.size ())
-                list = m_Config.OverrideSearchURL;
-
-            int total_pages = GetTotalNumberOfDYOMMissionPages (list);
 
             if (m_Config.ForcedMissionID.size ())
                 {
@@ -400,10 +456,18 @@ DyomRandomizer::DownloadRandomMission ()
                 }
             else
                 {
-                    while (!ParseMission (GetRandomEntryFromPage (
-                        list
-                        + "page=" + std::to_string (random (total_pages)))))
-                        ;
+                    std::string list;
+
+                    if (m_Config.EnglishOnly)
+                        list = "list?english=1&order=6";
+                    else
+                        list = random (100) > 38 ? "list?order=6&"
+                                                 : "list_d?order=6&";
+
+                    if (m_Config.OverrideSearchURL.size ())
+                        list = m_Config.OverrideSearchURL;
+
+                    DownloadRandomMission (list);
                 }
 
             internet.Close ();
@@ -525,7 +589,7 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
                         // objectives.
                         if (ScriptSpace[10916] > 0) {
                             puts("SESSION: PASS");
-                            sm_Session.ReportMissionPass ();
+                            sm_Session.ReportMissionPass (true);
                         }
                     }
 
@@ -537,7 +601,7 @@ DyomRandomizer::HandleAutoplay (CRunningScript *scr)
                         if (!downloadNew)
                             state = STATE_MISSION_PLAY;
                         else
-                            sm_Session.ReportMissionPass ();
+                            sm_Session.ReportMissionPass (true);
                     }
                 break;
             }

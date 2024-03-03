@@ -2,6 +2,7 @@
 #include "bass/bass.h"
 #include "dyom.hh"
 #include "functions.hh"
+#include <exception>
 #include <mutex>
 #include <thread>
 #include <util/dyom/TTS.hh>
@@ -11,59 +12,15 @@
 #include "bass_fx.h"
 #include "logger.hh"
 #include "gender/gen_ext.h"
+#include "util/dyom/tts/TikTok.hh"
+#include "util/dyom/tts/TikTokSinging.hh"
+#include <util/dyom/tts/StreamlabsPolly.hh>
 
 #include <iostream>
 #include <array>
 #include <regex>
 #include <random>
 #include <algorithm>
-
-enum Gender
-{
-    GENDER_M,
-    GENDER_F,
-    GENDER_U
-};
-
-struct PollyVoice
-{
-    std::string Name;
-    std::string Country;
-    int         Gender;
-};
-
-std::array<PollyVoice, 60> voices = {{
-    {"Brian", "GB", GENDER_M},    {"Amy", "GB", GENDER_F},
-    {"Emma", "GB", GENDER_F},     {"Geraint", "GB-WLS", GENDER_M},
-    {"Russell", "AU", GENDER_M},  {"Nicole", "AU", GENDER_F},
-    {"Joey", "US", GENDER_M},     {"Justin", "US", GENDER_M},
-    {"Matthew", "US", GENDER_M},  {"Ivy", "US", GENDER_F},
-    {"Joanna", "US", GENDER_F},   {"Kendra", "US", GENDER_F},
-    {"Kimberly", "US", GENDER_F}, {"Salli", "US", GENDER_F},
-    {"Raveena", "IN", GENDER_F},  {"Zeina", "ARAB", GENDER_F},
-    {"Zhiyu", "CN", GENDER_F},    {"Mads", "DK", GENDER_M},
-    {"Naja", "DK", GENDER_F},     {"Ruben", "NL", GENDER_M},
-    {"Lotte", "NL", GENDER_F},    {"Mathieu", "FR", GENDER_M},
-    {"Celine", "FR", GENDER_F},   {"Lea", "FR", GENDER_F},
-    {"Chantal", "CA", GENDER_F},  {"Hans", "DE", GENDER_M},
-    {"Marlene", "DE", GENDER_F},  {"Vicki", "DE", GENDER_F},
-    {"Aditi", "IN", GENDER_F},    {"Karl", "IS", GENDER_M},
-    {"Dora", "IS", GENDER_F},     {"Giorgio", "IT", GENDER_M},
-    {"Carla", "IT", GENDER_F},    {"Bianca", "IT", GENDER_F},
-    {"Takumi", "JP", GENDER_M},   {"Mizuki", "JP", GENDER_F},
-    {"Seoyeon", "KR", GENDER_F},  {"Liv", "NO", GENDER_F},
-    {"Jacek", "PL", GENDER_M},    {"Jan", "PL", GENDER_M},
-    {"Ewa", "PL", GENDER_F},      {"Maja", "PL", GENDER_F},
-    {"Ricardo", "BR", GENDER_M},  {"Camila", "BR", GENDER_F},
-    {"Vitoria", "BR", GENDER_F},  {"Cristiano", "PT", GENDER_M},
-    {"Ines", "PT", GENDER_F},     {"Carmen", "RO", GENDER_F},
-    {"Maxim", "RU", GENDER_M},    {"Tatyana", "RU", GENDER_F},
-    {"Enrique", "ES", GENDER_M},  {"Conchita", "ES", GENDER_F},
-    {"Lucia", "ES", GENDER_F},    {"Mia", "MX", GENDER_F},
-    {"Miguel", "US", GENDER_M},   {"Lupe", "US", GENDER_F},
-    {"Penelope", "US", GENDER_F}, {"Astrid", "SE", GENDER_F},
-    {"Filiz", "TR", GENDER_M},    {"Gwyneth", "GB-WLS", GENDER_F},
-}};
 
 // Implement function to get first name file for gender.c
 extern "C" const char* get_first_name_file ()
@@ -136,12 +93,19 @@ GetSpeakerGender (std::string name)
 void
 DyomRandomizerTTS::BuildObjectiveSpeakerMap ()
 {
+    struct VoiceUseFrequency
+    {
+        Voice voice;
+        TTSBackend* backend;
+        int Frequency;
+    };
+    
     if (voicesInitialised)
         return;
 
     std::map<std::string, SpeakerVoice> speakerVoices;
 
-    std::vector<std::pair<decltype (::voices.begin ()), int>> voiceUseFrequency;
+    std::vector<VoiceUseFrequency> voiceUseFrequency;
 
     // Generate an array biased towards English voices
 
@@ -150,17 +114,30 @@ DyomRandomizerTTS::BuildObjectiveSpeakerMap ()
     // A value of 5% makes it so that about 20.3% have non-English voices (under
     // some assumptions). A value of 5% makes it so that there's a 10% chance of
     // non-English voice chosen in a mission with only one speaker (narrator).
-    for (auto it = ::voices.begin (); it != ::voices.end (); ++it)
+
+    auto AddBackend = [&] (TTSBackend* backend)
+    {
+        auto voices = backend->GetVoices ();
+        for (auto it = voices.begin (); it != voices.end (); ++it)
         {
             bool english = it->Country == "US" || it->Country == "GB"
                            || it->Country == "IN" || it->Country == "AU";
 
             int baseFreq = english ? 0 : (random (10000) > 500);
             if (english || (random(10000) <= 500))
-                voiceUseFrequency.push_back (std::make_pair (it, 0));
+                voiceUseFrequency.push_back ({*it, backend, 0});
             else
-                voiceUseFrequency.push_back (std::make_pair (it, 1));
+                voiceUseFrequency.push_back ({*it, backend, 1});
         }
+    };
+
+    static StreamlabsPolly sm_StreamlabsTTS;
+    static TikTokTTS sm_TiktokTTS;
+    static TikTokSinging sm_TiktokSingingTTS;
+
+    AddBackend (&sm_TiktokSingingTTS);
+    AddBackend (&sm_StreamlabsTTS);
+    AddBackend (&sm_TiktokTTS);
 
     std::shuffle (voiceUseFrequency.begin (), voiceUseFrequency.end (),
                   std::mt19937{(unsigned int) time(NULL)});
@@ -195,19 +172,20 @@ DyomRandomizerTTS::BuildObjectiveSpeakerMap ()
             for (auto it = voiceUseFrequency.begin ();
                  it != voiceUseFrequency.end (); ++it)
                 {
-                    if ((it->first->Gender == gender || gender == GENDER_U)
+                    if ((it->voice.Gender == gender || gender == GENDER_U)
                         && (candidate == voiceUseFrequency.end ()
-                            || candidate->second > it->second))
+                            || candidate->Frequency > it->Frequency))
                         candidate = it;
                 }
 
             speakerVoices[speaker]
-                = {candidate->first->Name,
-                   candidate->second
-                       * (candidate->first->Gender == GENDER_F ? -4 : 4),
+                = {candidate->voice.Name,
+                   candidate->Frequency
+                       * (candidate->voice.Gender == GENDER_F ? -4 : 4),
+                   candidate->backend,
                    false};
 
-            candidate->second++;
+            candidate->Frequency++;
             voices[i] = speakerVoices[speaker];
         }
 
@@ -247,68 +225,6 @@ DyomRandomizerTTS::EnqueueObjective (int objective, bool play)
     queue.push_back ({objText, voices[objective], objective, play});
 }
 
-static std::string
-EncodeURL (const std::string &s)
-{
-    const std::string safe_characters
-        = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-    std::ostringstream oss;
-    for (auto c : s)
-        {
-            if (safe_characters.find (c) != std::string::npos)
-                oss << c;
-            else
-                oss << '%' << std::setfill ('0') << std::setw (2)
-                    << std::uppercase << std::hex << (0xff & c);
-        }
-    return oss.str ();
-}
-
-/*******************************************************/
-std::string
-DyomRandomizerTTS::GetRandomVoice ()
-{
-    static constexpr const char *englishVoices[] = {
-        "Brian",  "Amy",    "Emma",     "Geraint", "Russell",
-        "Nicole", "Joey",   "Justin",   "Matthew", "Ivy",
-        "Joanna", "Kendra", "Kimberly", "Salli",   "Raveena",
-    };
-
-    static constexpr const char *voices[]
-        = {"Zeina",     "Zhiyu",  "Mads",   "Naja",    "Ruben",   "Lotte",
-           "Mathieu",   "Celine", "Lea",    "Chantal", "Hans",    "Marlene",
-           "Vicki",     "Aditi",  "Karl",   "Dora",    "Giorgio", "Carla",
-           "Bianca",    "Takumi", "Mizuki", "Seoyeon", "Liv",     "Jacek",
-           "Jan",       "Ewa",    "Maja",   "Ricardo", "Camila",  "Vitoria",
-           "Cristiano", "Ines",   "Carmen", "Maxim",   "Tatyana", "Enrique",
-           "Conchita",  "Lucia",  "Mia",    "Miguel",  "Lupe",    "Penelope",
-           "Astrid",    "Filiz",  "Gwyneth"};
-
-    if (random (100) < 10)
-        return GetRandomElement (voices);
-    else
-        return GetRandomElement (englishVoices);
-}
-
-/*******************************************************/
-std::string
-DyomRandomizerTTS::GetSoundURL (const std::string &text,
-                                const std::string &voice)
-{
-    auto res = internet
-                   .Post ("/polly/speak",
-                          "Content-Type: application/x-www-form-urlencoded",
-                          "service=Polly&voice=" + voice
-                              + "&text=" + EncodeURL (text))
-                   .GetString ();
-
-    auto start = res.find ("\"speak_url\"") + 13;
-    auto end   = res.find ("\"", start);
-
-    auto url = res.substr (start, end - start);
-    return std::regex_replace (url, std::regex ("\\\\/"), "/");
-}
-
 HSTREAM
 BASS_FXDEF (BASS_FX_TempoCreate) (DWORD chan, DWORD flags)
 {
@@ -336,16 +252,15 @@ DyomRandomizerTTS::LoadEntry (StreamEntry &entry)
 
     printf ("Loading TTS Entry, objective: %d, voice: %s\n", entry.objective,
             voice.c_str ());
-    auto url = GetSoundURL (entry.text.c_str (), voice);
 
-    entry.sound
-        = BASS_StreamCreateURL (url.c_str (), 0, BASS_STREAM_DECODE, 0, 0);
-
+    entry.sound = entry.speaker.Backend->GetSoundStream (entry.text, voice, &entry.data);
     entry.sound = BASS_FX_TempoCreate (entry.sound, BASS_FX_FREESOURCE);
+
     if (!entry.sound)
         {
             Logger::GetLogger ()->LogMessage (
-                "ERROR!!! : " + std::to_string (BASS_ErrorGetCode ()));
+                "BASS error (invalid sound): "
+                + std::to_string (BASS_ErrorGetCode ()));
         }
 
     BASS_ChannelSetAttribute (entry.sound, BASS_ATTRIB_TEMPO_PITCH,
@@ -400,6 +315,7 @@ DyomRandomizerTTS::StreamEntry::ProcessFSM (DyomRandomizerTTS &tts)
 
             printf ("Finished playing TTS Entry, sound: %lx\n", sound);
             BASS_StreamFree (sound);
+            speaker.Backend->FreeData(data);
             state = FREE;
             break;
         }

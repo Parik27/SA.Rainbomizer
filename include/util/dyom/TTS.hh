@@ -10,6 +10,7 @@
 #include <regex>
 
 #include "Internet.hh"
+#include "tts/TTSBackend.hh"
 
 class DyomRandomizerTTS
 {
@@ -18,6 +19,7 @@ class DyomRandomizerTTS
     {
         std::string Voice;
         int         Pitch;
+        TTSBackend *Backend;
         bool        RemoveSpeakerName;
     };
 
@@ -31,11 +33,12 @@ class DyomRandomizerTTS
             PLAYING
         } state;
 
-        int         objective;
-        bool        shouldPlay;
-        HSTREAM     sound;
-        std::string text;
+        int          objective;
+        bool         shouldPlay;
+        HSTREAM      sound;
+        std::string  text;
         SpeakerVoice speaker;
+        void        *data;
 
         StreamEntry (const std::string &text, SpeakerVoice &speaker,
                      int objective)
@@ -66,7 +69,6 @@ class DyomRandomizerTTS
 
     InternetUtils internet;
 
-    std::string GetSoundURL (const std::string &text, const std::string &voice);
     std::string GuessObjectiveSpeaker (const char *text);
     void        RemoveSpeakerName (std::string &str);
 

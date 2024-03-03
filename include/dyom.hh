@@ -18,8 +18,10 @@ class DyomRandomizer
     void        SaveMission (const std::vector<uint8_t> &data);
     bool        ParseMission (const std::string &url);
     
-    std::string GetRandomEntryFromPage (std::string page);
+    bool        GetRandomEntryFromPage (std::string page, std::string &out);
     int         GetTotalNumberOfDYOMMissionPages (std::string list);
+    int         GetTotalNumberOfDYOMMissions (std::string list);
+    void        DownloadRandomMission (const std::string &list);
     void        DownloadRandomMission ();
 
     int         prevObjectiveForSubtitles = -1;

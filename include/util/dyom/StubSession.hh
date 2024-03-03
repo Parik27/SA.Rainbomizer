@@ -7,7 +7,8 @@ class DyomStubSession
 public:
     bool StartsAutomatically () { return false; }
     bool EndsAutomatically () { return false; }
-    void ReportMissionPass () { }
+    // legitimate is true if and only if the mission pass text was displayed by dyom.
+    void ReportMissionPass (bool legitimate = false) { }
     void ReportMissionSkip () { }
     void ReportStartSkip () { }
     void ReportRetry () { }
@@ -19,5 +20,7 @@ public:
     void BackupObjectiveTexts (std::string objectives[100]) {}
     void RestoreObjectiveTexts (std::string objectives[100]) {}
     void ReportMissionStart (const std::string &html, const std::string &url) {}
+    bool ShouldSkipMission (const std::string &url) { return true; }
+    void ReportMissionUnplayable (const std::string &url) {}
 };
 // clang-format on

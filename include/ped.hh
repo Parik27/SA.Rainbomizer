@@ -39,7 +39,7 @@ public:
     /// Initialises Hooks/etc.
     void Initialise ();
 
-    static std::vector<std::string> specialModels;
+    inline static std::vector<std::string> specialModels{};
     static bool                     IsSpecialModel (int model);
     static bool                     IsModelValidPedModel (int model);
     static inline bool              isSkinSelect = false;

@@ -20,7 +20,7 @@ public:
     void BackupObjectiveTexts (std::string objectives[100]) {}
     void RestoreObjectiveTexts (std::string objectives[100]) {}
     void ReportMissionStart (const std::string &html, const std::string &url) {}
-    bool ShouldSkipMission (const std::string &url) { return true; }
+    bool ShouldSkipMission (const std::string &url) { return false; }
     void ReportMissionUnplayable (const std::string &url) {}
 };
 // clang-format on

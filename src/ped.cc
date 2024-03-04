@@ -13,7 +13,7 @@
 
 PedRandomizer *PedRandomizer::mInstance = nullptr;
 
-std::vector<std::string> PedRandomizer::specialModels;
+//std::vector<std::string> PedRandomizer::specialModels;
 
 /*******************************************************/
 int

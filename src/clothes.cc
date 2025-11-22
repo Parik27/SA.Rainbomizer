@@ -188,7 +188,7 @@ ClothesRandomizer::FixChangingClothes (int modelId, uint32_t *newClothes,
 int __fastcall ClothesRandomizer::FixAnimCrash (uint32_t *anim, void *edx,
                                                 int arg0, int animGroup)
 {
-    if (animGroup > 0)
+    if (animGroup > 16)
         animGroup = 0;
 
     return CallMethodAndReturn<int, 0x6E3D10> (anim, arg0, animGroup);

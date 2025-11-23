@@ -42,6 +42,7 @@ public:
         bool        RandomWeather;
         bool        SpeedUpLongTTSTexts;
         std::string TranslationChain;
+        std::string CharactersMap;
         double      OverrideTTSVolume;
         std::string ForcedMissionID;
         std::string OverrideSearchURL;

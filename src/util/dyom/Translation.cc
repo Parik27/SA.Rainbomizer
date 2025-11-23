@@ -55,7 +55,8 @@ EncodeURL (const std::string &s)
 }
 
 /*******************************************************/
-DyomTranslator::DyomTranslator (const std::string &translationChain)
+DyomTranslator::DyomTranslator (const std::string &translationChain,
+                                const std::string &charactersMap)
 {
     internet.Open ("translate.google.com");
 
@@ -67,6 +68,21 @@ DyomTranslator::DyomTranslator (const std::string &translationChain)
 
             for (std::string token; std::getline (iss, token, ';');)
                 mTranslationChain.push_back (std::move (token));
+        }
+
+    if (!charactersMap.empty ())
+        {
+            std::istringstream iss (charactersMap);
+            std::string        token_v;
+            char               ch = '0';
+            for (std::string token; std::getline (iss, token, ';')
+                                    && std::getline (iss, token_v, ';');)
+                {
+                    ch = (char)std::stoi (token_v, nullptr, 16);
+                    mCharacterMap.insert (std::pair<std::string, char> (
+                        std::move (token),
+                        ch));
+                }
         }
 }
 
@@ -206,11 +222,22 @@ DyomTranslator::TranslateText (const std::string &text)
             translation = cm[1];
         }
 
+    for (const auto &[key, value] : mCharacterMap)
+        {
+            std::string::size_type pos = 0;
+            while ((pos = translation.find (key, pos)) != std::string::npos)
+                {
+                    translation.replace (pos, key.length(), 1, value);
+                    pos += 1;
+                }
+        }
+
     // translator tends to break tags with spaces, attempt to fix
     DecodeSpecialChars (translation);
     translation
         = std::regex_replace (translation,
                               std::regex ("~\\s*([a-zA-Z0-9]+)\\s*~"), "~$1~");
+
     return translation;
 }
 
@@ -228,6 +255,7 @@ DyomTranslator::DecodeSpecialChars (std::string &text)
     SPECIAL_CHAR ("&amp;", "&");
     SPECIAL_CHAR ("\xe2\x80\x99", "'"); //UTF-8 quotation mark
 
+    if (mCharacterMap.size () < 1)
     // Remove any other non-ascii characters
     text.erase (std::remove_if (text.begin (), text.end (),
                                 [] (char ch) { return ch < 0; }),

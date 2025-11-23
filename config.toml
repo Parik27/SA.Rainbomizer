@@ -338,6 +338,15 @@ RandomizeChaosPoints = false
 # Picks missions only from those designated as English by the DYOM website.
 UseEnglishOnlyFilter = false
 
+AutoTranslateToEnglish = true
+RandomSpawn = true
+
+# Languages in translation chain separated by a semicolon, e.g. "pl;el;zh-CN;en" means Polish->Greek->Simplified Chinese->English, see https://cloud.google.com/translate/docs/languages for supported languages and their codes
+TranslationChain = "en"
+
+#Character replacement pairs. Original unicode symbol must be followed by the byte of it's in-game counterpart (GTA SA uses Windows-1252)
+#CharactersMap = "А;41;Б;80;В;8B;Г;82;Д;83;Е;45;Ё;A8;Ж;84;З;88;И;85;Й;86;К;4B;Л;87;М;96;Н;AD;О;4F;П;8C;Р;50;С;43;Т;8F;У;59;Ф;81;Х;58;Ц;89;Ч;8D;Ш;8E;Щ;8A;Ъ;90;Ы;91;Ь;92;Э;93;Ю;94;Я;95;а;61;б;97;в;A2;г;99;д;9A;е;65;ё;B8;ж;9B;з;9F;и;9C;й;9D;к;6B;л;9E;м;AF;н;AE;о;6F;п;A3;р;70;с;63;т;A6;у;79;ф;98;х;78;ц;A0;ч;A4;ш;A5;щ;A1;ъ;A7;ы;A8;ь;A9;э;AA;ю;AB;я;AC"
+
 #######################################################
 [CheatRandomizer]
 

@@ -159,6 +159,7 @@ DyomRandomizer::Initialise ()
             std::pair ("RandomWeather", &m_Config.RandomWeather),
             std::pair ("SpeedUpLongTTSTexts", &m_Config.SpeedUpLongTTSTexts),
             std::pair ("TranslationChain", &m_Config.TranslationChain),
+            std::pair ("CharactersMap", &m_Config.CharactersMap),
             std::pair ("EnableTextToSpeech", &m_Config.EnableTextToSpeech),
             std::pair ("OverrideTTSVolume", &m_Config.OverrideTTSVolume),
             std::pair ("ForcedMissionID", &m_Config.ForcedMissionID),
@@ -340,7 +341,8 @@ void
 DyomRandomizer::SaveMission (const std::vector<uint8_t> &data)
 {
     DYOM::DYOMFileStructure dyomFile;
-    DyomTranslator          translator (m_Config.TranslationChain);
+    DyomTranslator          translator (m_Config.TranslationChain,
+                               m_Config.CharactersMap);
 
     dyomFile.Read (data);
 
